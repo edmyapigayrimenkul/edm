@@ -32,6 +32,8 @@ export interface Ilan {
   ilce: string | null;
   mahalle: string | null;
   ozellikler: Record<string, string>;
+  /** Onaylı özellikler: ankastre mutfak, çelik kapı, ebeveyn banyo… */
+  donanim: string[];
   gorseller: string[];
   danismanSlug: string | null;
   guncellenme: string | null;
@@ -224,6 +226,7 @@ function aramaMetniKur(
     s.il ?? '',
     s.m2 ? `${s.m2} m2 metrekare` : '',
     ...etiketler,
+    ...guvenliJson<string[]>(s.donanim ?? '[]', []),
     ...Object.entries(ozellikler)
       .filter(([, v]) => v && v !== 'Belirtilmemiş' && v !== 'Yok')
       .flatMap(([k, v]) => [k, v]),
@@ -306,6 +309,7 @@ function satirdanIlan(
   const gorseller = gorselleriDuzenle(hamGorseller, duzen);
   const zaman = Date.parse(s.guncellenme ?? s.ilk_gorulme);
   const etiketler = etiketleriSec(s.oda, s.m2, ozellikler);
+  const donanim = guvenliJson<string[]>(s.donanim ?? '[]', []);
 
   return {
     id: s.id,
@@ -324,6 +328,7 @@ function satirdanIlan(
     ilce: s.ilce,
     mahalle: s.mahalle,
     ozellikler,
+    donanim,
     gorseller,
     danismanSlug: s.danisman_slug,
     guncellenme: s.guncellenme,

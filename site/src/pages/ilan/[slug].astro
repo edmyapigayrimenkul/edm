@@ -172,6 +172,20 @@ const izYolu = {
             )
           }
 
+          <!-- Donanım -->
+          {
+            ilan.donanim.length > 0 && (
+              <section class="mt-12">
+                <h2 class="baslik-orta">Bu mülkte neler var</h2>
+                <ul class="donanim-liste mt-5">
+                  {ilan.donanim.map((d) => (
+                    <li class="donanim">{d}</li>
+                  ))}
+                </ul>
+              </section>
+            )
+          }
+
           <!-- Konum -->
           <section class="mt-12">
             <h2 class="baslik-orta">Konum</h2>
@@ -372,6 +386,39 @@ const izYolu = {
   }
   .aciklama p + p {
     margin-top: 1rem;
+  }
+
+  /* Donanım listesi — her madde onaylı bir özellik, tik işaretiyle */
+  .donanim-liste {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(13rem, 100%), 1fr));
+    gap: 0.5rem 1.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: 62ch;
+  }
+  .donanim {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    font-size: 0.9375rem;
+    color: var(--color-metin-2);
+    padding-block: 0.15rem;
+  }
+  .donanim::before {
+    content: '';
+    flex: none;
+    width: 0.95rem;
+    height: 0.95rem;
+    margin-top: 0.22rem;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--color-kirmizi) 12%, transparent);
+    /* Ortasında kırmızı bir tik */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23f0000d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 6.2l2.4 2.4L9.5 3.8'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 0.7rem;
   }
 
   .ozellik-izgara {

@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS ilanlar (
   ilce           TEXT,
   mahalle        TEXT,
   ozellikler     TEXT NOT NULL DEFAULT '{}',
+  donanim        TEXT NOT NULL DEFAULT '[]',
   gorseller      TEXT NOT NULL DEFAULT '[]',
   danisman_slug  TEXT,
   guncellenme    TEXT,
@@ -82,6 +83,8 @@ export interface SatirIlan {
   /** Hepsiemlak'tan alınan görseller — varsa bunlar tercih edilir. */
   hepsiemlak_gorseller?: string | null;
   hepsiemlak_ref?: string | null;
+  /** Sayfa gövdesinden çıkarılan özellik çipleri (JSON dizi). */
+  donanim?: string | null;
 }
 
 export interface SenkronSonuc {
@@ -96,11 +99,23 @@ export interface SenkronSonuc {
   sureMs: number;
 }
 
-/** Şemayı kurar — her senkron öncesi güvenle çağrılabilir. */
+/**
+ * Şemayı kurar — her senkron öncesi güvenle çağrılabilir.
+ *
+ * İfadeleri ';' ile ayırmadan önce açıklama satırlarını siliyoruz: bir
+ * açıklamanın içinde geçen noktalı virgül aksi halde ifadeyi ikiye bölüp
+ * D1'e anlamsız bir parça gönderiyor.
+ */
 export async function semayiKur(vt: D1Database): Promise<void> {
   const { PANEL_SEMA } = await import('./panel-sema');
   const { PANEL_SEMA2 } = await import('./panel-sema2');
-  for (const ifade of `${SEMA}\n${PANEL_SEMA}\n${PANEL_SEMA2}`.split(';')) {
+
+  const tumu = `${SEMA}\n${PANEL_SEMA}\n${PANEL_SEMA2}`
+    .split('\n')
+    .filter((satir) => !satir.trim().startsWith('--'))
+    .join('\n');
+
+  for (const ifade of tumu.split(';')) {
     const kirpik = ifade.trim();
     if (kirpik) await vt.prepare(kirpik).run();
   }
@@ -151,9 +166,9 @@ export async function portfoyuYaz(
           `INSERT INTO ilanlar (
              id, kaynak, kaynak_url, baslik, aciklama, fiyat, para_birimi, islem,
              kategori, tip, tip_grup, oda, m2, il, ilce, mahalle, ozellikler,
-             gorseller, danisman_slug, guncellenme, ilk_gorulme, son_gorulme,
+             donanim, gorseller, danisman_slug, guncellenme, ilk_gorulme, son_gorulme,
              durum, pasif_tarihi
-           ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, 'aktif', NULL)
+           ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, 'aktif', NULL)
            ON CONFLICT(id) DO UPDATE SET
              kaynak_url    = excluded.kaynak_url,
              baslik        = excluded.baslik,
@@ -170,6 +185,7 @@ export async function portfoyuYaz(
              ilce          = excluded.ilce,
              mahalle       = excluded.mahalle,
              ozellikler    = excluded.ozellikler,
+             donanim       = excluded.donanim,
              gorseller     = excluded.gorseller,
              danisman_slug = excluded.danisman_slug,
              guncellenme   = excluded.guncellenme,
@@ -195,6 +211,7 @@ export async function portfoyuYaz(
           ilan.ilce,
           ilan.mahalle,
           JSON.stringify(ilan.ozellikler),
+          JSON.stringify(ilan.donanim ?? []),
           JSON.stringify(ilan.gorseller),
           ilan.danismanSlug,
           ilan.guncellenme,

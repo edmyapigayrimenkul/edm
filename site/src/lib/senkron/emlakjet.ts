@@ -25,6 +25,8 @@ export interface HamIlan {
   gorseller: string[];
   danismanSlug: string | null;
   guncellenme: string | null;
+  /** Sayfadaki onaylı özellik çipleri: ankastre mutfak, şömine, çelik kapı… */
+  donanim: string[];
 }
 
 const UA =
@@ -218,6 +220,38 @@ function konumCoz(
 }
 
 /* --------------------------------------------------------------
+   Sayfa gövdesinden zengin veri
+   --------------------------------------------------------------
+   JSON-LD yalnızca birkaç alan veriyor; asıl zengin bilgi sayfanın
+   kendisinde: onaylı özellik çipleri ve değer/etiket çiftleri.
+   -------------------------------------------------------------- */
+
+/** Onay simgesiyle işaretlenmiş özellikleri toplar. */
+function donanimCoz(html: string): string[] {
+  const bulunan = [...html.matchAll(/ee-icon-check[\s\S]{0,140}?<\/span>([^<>]{2,45})<\/span>/g)]
+    .map((m) => varlikCoz(m[1]).trim())
+    .filter((d) => d && !/^\s*$/.test(d));
+  return [...new Set(bulunan)];
+}
+
+/**
+ * "220 m²" değeri ile "Brüt" etiketinin ayrı etiketlerde durduğu ikilileri
+ * okur: Oda Sayısı, Banyo Sayısı, Kat Sayısı, Brüt, Net, Bina Yaşı.
+ */
+function olcuCiftleri(html: string): Record<string, string> {
+  const cikti: Record<string, string> = {};
+  const desen =
+    /<p class="[^"]*font-semibold[^"]*">([^<]{1,40})<\/p><p class="text-xs[^"]*">([^<]{2,30})<\/p>/g;
+  let m: RegExpExecArray | null;
+  while ((m = desen.exec(html))) {
+    const etiket = varlikCoz(m[2]).trim();
+    const deger = varlikCoz(m[1]).trim();
+    if (etiket && deger) cikti[etiket] = deger;
+  }
+  return cikti;
+}
+
+/* --------------------------------------------------------------
    Dışa açılan iki işlev
    -------------------------------------------------------------- */
 export async function ofisIlanLinkleri(
@@ -264,6 +298,13 @@ export async function ilanDetay(link: { id: string; url: string }): Promise<HamI
     ])
   );
 
+  // Sayfa gövdesindeki ölçüleri künyeye ekliyoruz; JSON-LD'de yoklar.
+  for (const [etiket, deger] of Object.entries(olcuCiftleri(html))) {
+    const ad =
+      etiket === 'Brüt' ? 'Brüt Metrekare' : etiket === 'Net' ? 'Net Metrekare' : etiket;
+    if (!ozellikler[ad]) ozellikler[ad] = deger;
+  }
+
   const kategori = ozellikler['Kategori'] ?? '';
   const { islem, tip } = kategoriCoz(kategori);
   const kirintilar = ((kirinti?.itemListElement ?? []) as Array<{ name: string }>).map(
@@ -296,6 +337,7 @@ export async function ilanDetay(link: { id: string; url: string }): Promise<HamI
     gorseller: [...new Set((urun.image ?? []) as string[])],
     danismanSlug: danisman?.[1] ?? null,
     guncellenme: kayit?.dateModified ?? null,
+    donanim: donanimCoz(html),
   };
 }
 
