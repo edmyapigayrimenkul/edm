@@ -99,7 +99,8 @@ export interface SenkronSonuc {
 /** Şemayı kurar — her senkron öncesi güvenle çağrılabilir. */
 export async function semayiKur(vt: D1Database): Promise<void> {
   const { PANEL_SEMA } = await import('./panel-sema');
-  for (const ifade of `${SEMA}\n${PANEL_SEMA}`.split(';')) {
+  const { PANEL_SEMA2 } = await import('./panel-sema2');
+  for (const ifade of `${SEMA}\n${PANEL_SEMA}\n${PANEL_SEMA2}`.split(';')) {
     const kirpik = ifade.trim();
     if (kirpik) await vt.prepare(kirpik).run();
   }

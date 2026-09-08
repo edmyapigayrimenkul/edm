@@ -7,9 +7,13 @@
  */
 
 import { portfoy, slugla, type Ilan } from './ilanlar';
+import { icerik, type BolgeMetni } from './icerik';
 
-/** Elle yazılan kısa tanıtımlar. Yalnızca coğrafi/idari gerçekler. */
-const TANIMLAR: Record<string, { giris: string; notlar: string[] }> = {
+/**
+ * Kod içindeki varsayılan tanıtımlar. Panelden düzenlenirse D1'deki metin
+ * bunların yerine geçer; tablo boşsa buradakiler kullanılır.
+ */
+export const TANIMLAR: Record<string, { giris: string; notlar: string[] }> = {
   Silivri: {
     giris:
       'İstanbul’un batı ucunda, Marmara kıyısında bir ilçe. Şehir merkezine D-100 ve Kuzey Marmara Otoyolu ile bağlanıyor; bu ikisi bölgedeki arsa değerinin en belirleyici unsuru. Sahil bandı yazlık ve site yerleşimiyle dolu, kuzeye doğru çıkıldıkça tarım arazisi başlıyor.',
@@ -85,7 +89,7 @@ function ortanca(sayilar: number[]): number | null {
   return s.length % 2 ? s[orta] : Math.round((s[orta - 1] + s[orta]) / 2);
 }
 
-function bolgeKur(ad: string, ilanlar: Ilan[]): Bolge {
+function bolgeKur(ad: string, ilanlar: Ilan[], panelMetni?: BolgeMetni): Bolge {
   const fiyatlar = ilanlar.map((i) => i.fiyat).filter((f): f is number => Boolean(f));
   const birimler = ilanlar
     .filter((i) => i.islem === 'satilik' && i.tipGrup === 'arsa' && i.fiyat && i.m2)
@@ -94,7 +98,10 @@ function bolgeKur(ad: string, ilanlar: Ilan[]): Bolge {
   const il = ilanlar[0]?.il ?? '';
   // "Merkez" tek başına anlamsız; il adıyla birlikte anılıyor.
   const gorunenAd = ad === 'Merkez' ? `${il} Merkez` : ad;
-  const tanim = TANIMLAR[ad];
+  // Panelden yazılmış metin varsa o kazanır; yoksa koddaki varsayılan.
+  const tanim = panelMetni?.giris
+    ? { giris: panelMetni.giris, notlar: panelMetni.notlar }
+    : TANIMLAR[ad];
 
   return {
     ad: gorunenAd,
@@ -123,7 +130,7 @@ const ONBELLEK_MS = 60_000;
 export async function bolgeler(): Promise<Bolge[]> {
   if (onbellek && Date.now() - onbellek.zaman < ONBELLEK_MS) return onbellek.veri;
 
-  const { ilanlar } = await portfoy();
+  const [{ ilanlar }, { bolgeMetinleri }] = await Promise.all([portfoy(), icerik()]);
   const gruplu = new Map<string, Ilan[]>();
   for (const ilan of ilanlar) {
     if (!ilan.ilce) continue;
@@ -133,7 +140,7 @@ export async function bolgeler(): Promise<Bolge[]> {
   }
 
   const veri = [...gruplu]
-    .map(([ad, liste]) => bolgeKur(ad, liste))
+    .map(([ad, liste]) => bolgeKur(ad, liste, bolgeMetinleri.get(ad)))
     .sort((a, b) => b.adet - a.adet);
 
   onbellek = { veri, zaman: Date.now() };

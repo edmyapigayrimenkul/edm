@@ -1,0 +1,308 @@
+---
+/**
+ * Bir ilanın fotoğraflarını düzenleme ekranı.
+ *
+ * Sıralama ve gizleme ayrı bir tabloda tutuluyor; portaldan gelen fotoğraf
+ * listesine dokunulmuyor. Yeni fotoğraf eklendiğinde düzen bozulmadan
+ * listenin sonuna ekleniyor, silinmiş fotoğraf da kendiliğinden düşüyor.
+ */
+import Panel from '../../../layouts/Panel.astro';
+import { paneleGiris } from '../../../lib/panel/yetki';
+import { env } from 'cloudflare:workers';
+import { onbellegiTemizle, baslikTemizle, slugla } from '../../../lib/ilanlar';
+
+const giris = await paneleGiris(Astro.request);
+if ('yanit' in giris) return giris.yanit;
+
+const vt = env.VT as D1Database;
+const id = Astro.params.id!;
+let bildirim: { tur: 'basari' | 'hata'; metin: string } | null = null;
+
+const guvenliJson = <T,>(m: string | null, v: T): T => {
+  try {
+    return m ? (JSON.parse(m) as T) : v;
+  } catch {
+    return v;
+  }
+};
+
+async function duzeniOku() {
+  return await vt
+    .prepare(`SELECT sira, gizli FROM ilan_gorsel_duzen WHERE ilan_id = ?`)
+    .bind(id)
+    .first<{ sira: string; gizli: string }>();
+}
+
+async function duzeniYaz(sira: string[], gizli: string[]) {
+  await vt
+    .prepare(
+      `INSERT INTO ilan_gorsel_duzen (ilan_id, sira, gizli, guncelleme) VALUES (?,?,?,?)
+       ON CONFLICT(ilan_id) DO UPDATE SET
+         sira = excluded.sira, gizli = excluded.gizli, guncelleme = excluded.guncelleme`
+    )
+    .bind(id, JSON.stringify(sira), JSON.stringify(gizli), new Date().toISOString())
+    .run();
+  onbellegiTemizle();
+}
+
+const ilan = await vt
+  .prepare(
+    `SELECT id, baslik, gorseller, hepsiemlak_gorseller, kaynak FROM ilanlar WHERE id = ?`
+  )
+  .bind(id)
+  .first<{
+    id: string;
+    baslik: string;
+    gorseller: string;
+    hepsiemlak_gorseller: string | null;
+    kaynak: string;
+  }>();
+
+if (!ilan) return Astro.rewrite('/404');
+
+const hepsiemlak = guvenliJson<string[]>(ilan.hepsiemlak_gorseller, []);
+const emlakjet = guvenliJson<string[]>(ilan.gorseller, []);
+const tumGorseller = hepsiemlak.length ? hepsiemlak : emlakjet;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const eylem = String(form.get('eylem') ?? '');
+  const hedef = String(form.get('gorsel') ?? '');
+
+  const mevcut = await duzeniOku();
+  let sira = guvenliJson<string[]>(mevcut?.sira ?? null, []);
+  let gizli = guvenliJson<string[]>(mevcut?.gizli ?? null, []);
+
+  // Sıra listesi boşsa mevcut düzenle başlat ki taşıma işlemleri anlamlı olsun.
+  if (!sira.length) sira = tumGorseller.filter((g) => !gizli.includes(g));
+
+  const yer = sira.indexOf(hedef);
+
+  if (eylem === 'kapak' && yer > -1) {
+    sira.splice(yer, 1);
+    sira.unshift(hedef);
+    bildirim = { tur: 'basari', metin: 'Kapak fotoğrafı değişti.' };
+  } else if (eylem === 'sola' && yer > 0) {
+    [sira[yer - 1], sira[yer]] = [sira[yer], sira[yer - 1]];
+    bildirim = { tur: 'basari', metin: 'Sıra güncellendi.' };
+  } else if (eylem === 'saga' && yer > -1 && yer < sira.length - 1) {
+    [sira[yer + 1], sira[yer]] = [sira[yer], sira[yer + 1]];
+    bildirim = { tur: 'basari', metin: 'Sıra güncellendi.' };
+  } else if (eylem === 'gizle') {
+    if (!gizli.includes(hedef)) gizli.push(hedef);
+    sira = sira.filter((g) => g !== hedef);
+    bildirim = { tur: 'basari', metin: 'Fotoğraf gizlendi.' };
+  } else if (eylem === 'goster') {
+    gizli = gizli.filter((g) => g !== hedef);
+    if (!sira.includes(hedef)) sira.push(hedef);
+    bildirim = { tur: 'basari', metin: 'Fotoğraf tekrar gösteriliyor.' };
+  } else if (eylem === 'sifirla') {
+    await vt.prepare(`DELETE FROM ilan_gorsel_duzen WHERE ilan_id = ?`).bind(id).run();
+    onbellegiTemizle();
+    bildirim = { tur: 'basari', metin: 'Düzen sıfırlandı, portaldaki sıraya döndü.' };
+    sira = [];
+    gizli = [];
+  }
+
+  if (eylem !== 'sifirla') await duzeniYaz(sira, gizli);
+}
+
+const duzen = await duzeniOku();
+const sira = guvenliJson<string[]>(duzen?.sira ?? null, []);
+const gizli = new Set(guvenliJson<string[]>(duzen?.gizli ?? null, []));
+
+const siraNo = new Map(sira.map((g, i) => [g, i]));
+const gorunur = tumGorseller
+  .filter((g) => !gizli.has(g))
+  .sort((a, b) => (siraNo.get(a) ?? 999) - (siraNo.get(b) ?? 999));
+const gizlenenler = tumGorseller.filter((g) => gizli.has(g));
+
+const baslik = baslikTemizle(ilan.baslik);
+const yol = `/ilan/${slugla(baslik)}-${ilan.id}`;
+---
+
+<Panel
+  baslik="Fotoğraflar"
+  eposta={giris.kimlik.eposta}
+  ozet={baslik}
+>
+  <div slot="eylem" style="display:flex;gap:0.4rem">
+    <a href={yol} target="_blank" rel="noopener" class="pd pd--sade">İlanı gör ↗</a>
+    <a href="/yonetim/ilanlar" class="pd pd--sade">İlanlara dön</a>
+  </div>
+
+  {bildirim && <div class={`bildirim bildirim--${bildirim.tur}`}>{bildirim.metin}</div>}
+
+  <p class="aciklama-kutu">
+    İlk sıradaki fotoğraf <strong>kapak</strong> olur; kartlarda ve paylaşımlarda o görünür.
+    Buradaki düzen portaldan gelen listeyi bozmaz — yeni fotoğraf eklendiğinde sona
+    eklenir, silinen kendiliğinden düşer.
+    {hepsiemlak.length > 0 && <> Bu ilanın fotoğrafları <strong>Hepsiemlak</strong>’tan geliyor.</>}
+  </p>
+
+  <div class="kutu">
+    <div class="kutu-bas">
+      <h2>Yayındaki fotoğraflar</h2>
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <span style="font-size:0.75rem;color:var(--color-kursun)">{gorunur.length} fotoğraf</span>
+        <form method="POST" onsubmit="return confirm('Tüm düzenlemeler kaldırılıp portaldaki sıraya dönülecek. Emin misiniz?')">
+          <input type="hidden" name="eylem" value="sifirla" />
+          <button type="submit" class="pd pd--sade">Düzeni sıfırla</button>
+        </form>
+      </div>
+    </div>
+
+    {
+      gorunur.length === 0 ? (
+        <p class="bos">Bu ilanın gösterilecek fotoğrafı yok.</p>
+      ) : (
+        <div class="foto-izgara">
+          {gorunur.map((g, i) => (
+            <figure class:list={['foto', i === 0 && 'foto--kapak']}>
+              <div class="foto-gorsel">
+                <img src={g} alt={`Fotoğraf ${i + 1}`} loading="lazy" decoding="async" />
+                {i === 0 && <span class="foto-rozet">Kapak</span>}
+                <span class="foto-no veri-sayi">{i + 1}</span>
+              </div>
+              <figcaption class="foto-eylem">
+                <form method="POST">
+                  <input type="hidden" name="gorsel" value={g} />
+                  <button type="submit" name="eylem" value="sola" class="pd pd--sade" disabled={i === 0} title="Öne al">
+                    ←
+                  </button>
+                  <button type="submit" name="eylem" value="saga" class="pd pd--sade" disabled={i === gorunur.length - 1} title="Geri al">
+                    →
+                  </button>
+                  {i !== 0 && (
+                    <button type="submit" name="eylem" value="kapak" class="pd pd--birincil">
+                      Kapak yap
+                    </button>
+                  )}
+                  <button type="submit" name="eylem" value="gizle" class="pd pd--tehlike">
+                    Gizle
+                  </button>
+                </form>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      )
+    }
+  </div>
+
+  {
+    gizlenenler.length > 0 && (
+      <section class="kutu" style="margin-top:1.5rem">
+        <div class="kutu-bas">
+          <h2>Gizlenen fotoğraflar</h2>
+          <span style="font-size:0.75rem;color:var(--color-kursun)">
+            {gizlenenler.length} fotoğraf sitede görünmüyor
+          </span>
+        </div>
+        <div class="foto-izgara">
+          {gizlenenler.map((g) => (
+            <figure class="foto foto--gizli">
+              <div class="foto-gorsel">
+                <img src={g} alt="Gizlenmiş fotoğraf" loading="lazy" decoding="async" />
+              </div>
+              <figcaption class="foto-eylem">
+                <form method="POST">
+                  <input type="hidden" name="gorsel" value={g} />
+                  <button type="submit" name="eylem" value="goster" class="pd pd--sade">
+                    Tekrar göster
+                  </button>
+                </form>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+    )
+  }
+</Panel>
+
+<style>
+  .aciklama-kutu {
+    background: #fff;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-left: 3px solid var(--color-kirmizi);
+    border-radius: 6px;
+    padding: 0.85rem 1.1rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-metin-2);
+    margin-bottom: 1.25rem;
+    max-width: 74ch;
+  }
+
+  .foto-izgara {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+  .foto {
+    margin: 0;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 12%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--color-kagit);
+  }
+  /* Kapak, kırmızı çerçeveyle ayrılıyor — sayıya bakmadan anlaşılsın */
+  .foto--kapak {
+    border-color: var(--color-kirmizi);
+    box-shadow: 0 0 0 1px var(--color-kirmizi);
+  }
+  .foto--gizli {
+    opacity: 0.55;
+  }
+  .foto--gizli img {
+    filter: grayscale(1);
+  }
+
+  .foto-gorsel {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: var(--color-kirec);
+  }
+  .foto-gorsel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .foto-rozet {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    background: var(--color-kirmizi);
+    color: #fff;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 0.2rem 0.45rem;
+    border-radius: 3px;
+  }
+  .foto-no {
+    position: absolute;
+    right: 0.5rem;
+    bottom: 0.5rem;
+    background: color-mix(in oklab, var(--color-murekkep) 72%, transparent);
+    color: var(--color-kagit);
+    font-size: 0.625rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+  }
+
+  .foto-eylem form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    padding: 0.6rem;
+  }
+  .foto-eylem .pd {
+    height: 1.85rem;
+    padding-inline: 0.6rem;
+    font-size: 0.75rem;
+  }
+</style>

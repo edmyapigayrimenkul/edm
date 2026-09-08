@@ -329,6 +329,17 @@ const izYolu = {
       )
     }
   </div>
+
+  <script is:inline define:vars={{ ilanId: ilan.id }}>
+    // Görüntülenme sinyali — sayfa okunmaya başladıktan 3 saniye sonra,
+    // böylece yanlışlıkla açılıp hemen kapatılanlar sayılmıyor.
+    setTimeout(() => {
+      navigator.sendBeacon?.(
+        '/api/goruntulenme',
+        new Blob([JSON.stringify({ id: ilanId })], { type: 'application/json' })
+      );
+    }, 3000);
+  </script>
 </Temel>
 
 <style>

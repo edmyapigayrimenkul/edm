@@ -1,11 +1,11 @@
 ---
 import Temel from '../layouts/Temel.astro';
-import { KURUM, HIZMETLER } from '../lib/site';
+import { KURUM } from '../lib/site';
 import { icerik } from '../lib/icerik';
 import { portfoy } from '../lib/ilanlar';
 
 const { sayimlar: SAYIMLAR, filtreler: FILTRELER } = await portfoy();
-const { ekip, iletisim } = await icerik();
+const { ekip, iletisim, hizmetler: HIZMETLER } = await icerik();
 const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.adresIlce} / ${iletisim.adresIl}`;
 
 const yil = new Date().getFullYear() - KURUM.kurulus;

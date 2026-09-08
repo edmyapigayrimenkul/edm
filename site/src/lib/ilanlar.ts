@@ -242,7 +242,56 @@ function aramaMetniKur(
   return ham === sade ? ham : `${ham} ${sade}`;
 }
 
-function satirdanIlan(s: SatirIlan, koordinatlar: Map<string, Koordinat>): Ilan {
+export interface GorselDuzen {
+  sira: string[];
+  gizli: string[];
+}
+
+/** Panelden yapılan görsel sıralaması ve gizlemeleri. */
+async function gorselDuzenleri(vt: D1Database): Promise<Map<string, GorselDuzen>> {
+  try {
+    const sonuc = await vt
+      .prepare(`SELECT ilan_id, sira, gizli FROM ilan_gorsel_duzen`)
+      .all<{ ilan_id: string; sira: string; gizli: string }>();
+    return new Map(
+      (sonuc.results ?? []).map((s) => [
+        s.ilan_id,
+        { sira: guvenliJson<string[]>(s.sira, []), gizli: guvenliJson<string[]>(s.gizli, []) },
+      ])
+    );
+  } catch {
+    return new Map();
+  }
+}
+
+/**
+ * Görselleri panel düzenine göre sıralar.
+ * Sırada adı geçenler önce ve verilen sırayla, geri kalanlar arkasına;
+ * gizlenenler hiç dönmüyor. Böylece yeni bir fotoğraf eklendiğinde
+ * düzen bozulmadan listenin sonuna ekleniyor.
+ */
+function gorselleriDuzenle(gorseller: string[], duzen?: GorselDuzen): string[] {
+  if (!duzen) return gorseller;
+  const gizli = new Set(duzen.gizli);
+  const gorunur = gorseller.filter((g) => !gizli.has(g));
+  if (!duzen.sira.length) return gorunur;
+
+  const siraNo = new Map(duzen.sira.map((g, i) => [g, i]));
+  return [...gorunur].sort((a, b) => {
+    const x = siraNo.get(a);
+    const y = siraNo.get(b);
+    if (x === undefined && y === undefined) return 0;
+    if (x === undefined) return 1;
+    if (y === undefined) return -1;
+    return x - y;
+  });
+}
+
+function satirdanIlan(
+  s: SatirIlan,
+  koordinatlar: Map<string, Koordinat>,
+  duzen?: GorselDuzen
+): Ilan {
   const baslikTemiz = baslikTemizle(s.baslik);
   const slug = `${slugla(baslikTemiz)}-${s.id}`;
   const islem = (s.islem === 'kiralik' ? 'kiralik' : 'satilik') as Islem;
@@ -253,7 +302,8 @@ function satirdanIlan(s: SatirIlan, koordinatlar: Map<string, Koordinat>): Ilan 
   const hepsiemlakGorselleri = s.hepsiemlak_gorseller
     ? guvenliJson<string[]>(s.hepsiemlak_gorseller, [])
     : [];
-  const gorseller = hepsiemlakGorselleri.length ? hepsiemlakGorselleri : emlakjetGorselleri;
+  const hamGorseller = hepsiemlakGorselleri.length ? hepsiemlakGorselleri : emlakjetGorselleri;
+  const gorseller = gorselleriDuzenle(hamGorseller, duzen);
   const zaman = Date.parse(s.guncellenme ?? s.ilk_gorulme);
   const etiketler = etiketleriSec(s.oda, s.m2, ozellikler);
 
@@ -354,11 +404,14 @@ export async function portfoy(): Promise<Portfoy> {
   if (onbellek && Date.now() - onbellek.zaman < ONBELLEK_MS) return onbellek.veri;
 
   const vt = env.VT as D1Database;
-  const [satirlar, koordinatlar] = await Promise.all([
+  const [satirlar, koordinatlar, duzenler] = await Promise.all([
     aktifIlanSatirlari(vt),
     koordinatHaritasi(vt),
+    gorselDuzenleri(vt),
   ]);
-  const ilanlar = satirlar.map((satir) => satirdanIlan(satir, koordinatlar));
+  const ilanlar = satirlar.map((satir) =>
+    satirdanIlan(satir, koordinatlar, duzenler.get(satir.id))
+  );
   const senkron = await sonSenkron(vt).catch(() => null);
 
   const veri: Portfoy = {

@@ -10,6 +10,7 @@ import { env } from 'cloudflare:workers';
 import {
   DANISMANLAR as VARSAYILAN_EKIP,
   ILETISIM as VARSAYILAN_ILETISIM,
+  HIZMETLER as VARSAYILAN_HIZMETLER,
   type Danisman,
 } from './site';
 
@@ -36,10 +37,25 @@ export interface Iletisim {
   adresIl: string;
 }
 
+export interface Hizmet {
+  anahtar: string;
+  baslik: string;
+  ozet: string;
+}
+
+/** Bölge rehberindeki elle yazılan tanıtım metni. */
+export interface BolgeMetni {
+  anahtar: string;
+  giris: string;
+  notlar: string[];
+}
+
 export interface Icerik {
   ekip: Danisman[];
   yorumlar: Yorum[];
   iletisim: Iletisim;
+  hizmetler: Hizmet[];
+  bolgeMetinleri: Map<string, BolgeMetni>;
 }
 
 const AYAR_VARSAYILAN: Iletisim = {
@@ -80,6 +96,19 @@ async function ekibiTohumla(): Promise<void> {
         d.hakkinda,
         i
       )
+  );
+  if (yazmalar.length) await vt().batch(yazmalar);
+}
+
+async function hizmetleriTohumla(): Promise<void> {
+  const suAn = new Date().toISOString();
+  const yazmalar = VARSAYILAN_HIZMETLER.map((h, i) =>
+    vt()
+      .prepare(
+        `INSERT OR IGNORE INTO metinler (tur, anahtar, baslik, govde, sira, yayinda, guncelleme)
+         VALUES ('hizmet',?,?,?,?,1,?)`
+      )
+      .bind(String(i), h.baslik, h.ozet, i, suAn)
   );
   if (yazmalar.length) await vt().batch(yazmalar);
 }
@@ -129,6 +158,32 @@ export async function icerik(): Promise<Icerik> {
     .prepare(`SELECT * FROM yorumlar WHERE yayinda = 1 ORDER BY sira ASC, id DESC`)
     .all<Yorum>();
 
+  let hizmetSatirlari = await vt()
+    .prepare(
+      `SELECT anahtar, baslik, govde FROM metinler
+       WHERE tur = 'hizmet' AND yayinda = 1 ORDER BY sira ASC`
+    )
+    .all<{ anahtar: string; baslik: string; govde: string }>()
+    .catch(() => ({ results: [] as Array<{ anahtar: string; baslik: string; govde: string }> }));
+
+  if ((hizmetSatirlari.results ?? []).length === 0) {
+    await hizmetleriTohumla().catch(() => {});
+    hizmetSatirlari = await vt()
+      .prepare(
+        `SELECT anahtar, baslik, govde FROM metinler
+         WHERE tur = 'hizmet' AND yayinda = 1 ORDER BY sira ASC`
+      )
+      .all<{ anahtar: string; baslik: string; govde: string }>()
+      .catch(() => ({ results: [] }));
+  }
+
+  const bolgeSatirlari = await vt()
+    .prepare(
+      `SELECT anahtar, govde, ek FROM metinler WHERE tur = 'bolge' AND yayinda = 1`
+    )
+    .all<{ anahtar: string; govde: string; ek: string | null }>()
+    .catch(() => ({ results: [] as Array<{ anahtar: string; govde: string; ek: string | null }> }));
+
   const ayarHarita = Object.fromEntries(
     (ayarSatirlari.results ?? []).map((a) => [a.anahtar, a.deger])
   );
@@ -147,6 +202,21 @@ export async function icerik(): Promise<Icerik> {
     })),
     yorumlar: yorumSatirlari.results ?? [],
     iletisim: { ...AYAR_VARSAYILAN, ...(ayarHarita as Partial<Iletisim>) },
+    hizmetler: (hizmetSatirlari.results ?? []).map((h) => ({
+      anahtar: h.anahtar,
+      baslik: h.baslik,
+      ozet: h.govde,
+    })),
+    bolgeMetinleri: new Map(
+      (bolgeSatirlari.results ?? []).map((b) => [
+        b.anahtar,
+        {
+          anahtar: b.anahtar,
+          giris: b.govde ?? '',
+          notlar: guvenliJson<string[]>(b.ek ?? '[]', []),
+        },
+      ])
+    ),
   };
 
   onbellek = { veri, zaman: Date.now() };

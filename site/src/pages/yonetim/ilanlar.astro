@@ -94,6 +94,35 @@ if (Astro.request.method === 'POST') {
         tur: 'basari',
         metin: 'İlan eklendi. Elle eklenen ilanlar senkronda silinmez.',
       };
+    } else if (eylem === 'toplu') {
+      const secilenler = form.getAll('secili').map(String).filter(Boolean);
+      const islem = String(form.get('toplu-islem') ?? '');
+      if (!secilenler.length) throw new Error('Hiç ilan seçilmedi.');
+
+      const alan = islem.startsWith('one') ? 'one_cikan' : 'gizli';
+      const deger = islem.endsWith('-ac') ? 1 : 0;
+
+      await vt.batch(
+        secilenler.map((sid) =>
+          vt
+            .prepare(
+              `INSERT INTO ilan_duzenleme (ilan_id, ${alan}, guncelleme) VALUES (?,?,?)
+               ON CONFLICT(ilan_id) DO UPDATE SET ${alan} = excluded.${alan}, guncelleme = excluded.guncelleme`
+            )
+            .bind(sid, deger, suAn())
+        )
+      );
+
+      const adlar: Record<string, string> = {
+        'one-ac': 'öne çıkarıldı',
+        'one-kapat': 'öne çıkarma kaldırıldı',
+        'gizli-ac': 'gizlendi',
+        'gizli-kapat': 'tekrar gösteriliyor',
+      };
+      bildirim = {
+        tur: 'basari',
+        metin: `${secilenler.length} ilan ${adlar[islem] ?? 'güncellendi'}.`,
+      };
     } else if (eylem === 'elle-sil' && id.startsWith('elle-')) {
       await vt.prepare(`DELETE FROM ilanlar WHERE id = ? AND kaynak = 'elle'`).bind(id).run();
       await vt.prepare(`DELETE FROM ilan_duzenleme WHERE ilan_id = ?`).bind(id).run();
@@ -106,12 +135,42 @@ if (Astro.request.method === 'POST') {
 }
 
 const ilanlar = await tumIlanSatirlari(vt);
+
+// Son 30 günün görüntülenmeleri — hangi ilan ilgi görüyor, hangisi durgun.
+const goruntulenmeler = await vt
+  .prepare(
+    `SELECT ilan_id, SUM(adet) AS toplam FROM goruntulenme
+     WHERE gun >= date('now', '-30 days') GROUP BY ilan_id`
+  )
+  .all<{ ilan_id: string; toplam: number }>()
+  .catch(() => ({ results: [] as Array<{ ilan_id: string; toplam: number }> }));
+const bakisHarita = new Map(
+  (goruntulenmeler.results ?? []).map((g) => [g.ilan_id, g.toplam])
+);
+const enCokBakis = Math.max(1, ...bakisHarita.values());
 const duzenlemeler = await vt
   .prepare(`SELECT ilan_id, baslik, aciklama FROM ilan_duzenleme`)
   .all<{ ilan_id: string; baslik: string | null; aciklama: string | null }>();
 const duzHarita = new Map((duzenlemeler.results ?? []).map((d) => [d.ilan_id, d]));
 
 const acik = Astro.url.searchParams.get('duzenle');
+
+const PORTAL_OFIS = 'https://www.hepsiemlak.com/emlak-ofisi/edm-yapi-gayrimenkul-122060';
+
+/**
+ * Yer imi kodu: Hepsiemlak sekmesinde çalışıp ofisin bütün ilanlarını gezer,
+ * fotoğraf adreslerini toplar ve siteye gönderir. Anahtar burada gömülü
+ * olduğu için sayfa yalnızca panelden (Access arkasından) görünüyor.
+ */
+const senkronAnahtari = ((env as Record<string, unknown>).SENKRON_ANAHTARI as string) ?? '';
+const yerImiKodu =
+  'javascript:' +
+  encodeURIComponent(
+    `(async()=>{try{if(!location.hostname.includes('hepsiemlak.com')){alert('Önce Hepsiemlak ofis sayfanızı açın.');return}
+const y=[];for(let s=1;s<=4;s++){const r=await fetch('https://www.hepsiemlak.com/emlak-ofisi/edm-yapi-gayrimenkul-122060'+(s>1?'?page='+s:''),{credentials:'include'});if(!r.ok)break;const h=await r.text();const b=[...h.matchAll(/href="(\/[a-z0-9-]+\/[a-z-]+\/122060-\d+)"/g)].map(m=>m[1]);const o=y.length;b.forEach(x=>{if(!y.includes(x))y.push(x)});if(y.length===o)break}
+const i=[];for(const p of y){const ref=p.split('/').pop();try{const h=await (await fetch('https://www.hepsiemlak.com'+p,{credentials:'include'})).text();const t=h.match(/<title>([^<]*)<\/title>/);let b=(t?t[1]:'').replace(/&#x27;/g,"'").replace(/&amp;/g,'&').replace(/\s*\|\s*hepsiemlak\s*$/i,'').replace(new RegExp('\\s*'+ref+'\\s*$'),'').trim();const g=[...new Set([...h.matchAll(/(ds\d+\/(?:\d\/){6,10}[0-9a-f-]{36}\.jpg)/g)].map(m=>m[1]))].slice(0,15);if(b&&g.length)i.push({ref:ref,baslik:b,gorseller:g})}catch(e){}}
+const c=await fetch('https://edmyapigayrimenkul.com/api/gorsel-aktar',{method:'POST',headers:{'Content-Type':'application/json','X-Senkron-Anahtari':'${senkronAnahtari}'},body:JSON.stringify({ilanlar:i})});const j=await c.json();alert(j.tamam?(j.eslesen+' ilanın fotoğrafları güncellendi.'+(j.eslesmeyen&&j.eslesmeyen.length?'\n\nEşleşmeyen '+j.eslesmeyen.length+' ilan var (başlıklar farklı).':'')):('Hata: '+(j.hata||'bilinmiyor')))}catch(e){alert('Aktarım başarısız: '+e.message)}})()`
+  );
 ---
 
 <Panel
@@ -129,14 +188,27 @@ const acik = Astro.url.searchParams.get('duzenle');
     orijinaline geri döner.
   </p>
 
+  <form method="POST" id="toplu-form" class="toplu-cubuk" data-toplu hidden>
+    <input type="hidden" name="eylem" value="toplu" />
+    <span class="toplu-sayi"><strong data-toplu-sayi>0</strong> ilan seçildi</span>
+    <div class="toplu-dugmeler">
+      <button type="submit" name="toplu-islem" value="one-ac" class="pd pd--birincil">Öne çıkar</button>
+      <button type="submit" name="toplu-islem" value="one-kapat" class="pd pd--sade">Öne çıkarmayı kaldır</button>
+      <button type="submit" name="toplu-islem" value="gizli-ac" class="pd pd--tehlike">Gizle</button>
+      <button type="submit" name="toplu-islem" value="gizli-kapat" class="pd pd--sade">Göster</button>
+    </div>
+  </form>
+
   <div class="kutu">
     <div class="tablo-sar">
-      <table class="veri" style="min-width:52rem">
+      <table class="veri" style="min-width:56rem">
         <thead>
           <tr>
+            <th style="width:2.5rem"><input type="checkbox" data-hepsi aria-label="Tümünü seç" /></th>
             <th>İlan</th>
             <th>Konum</th>
             <th>Fiyat</th>
+            <th>30 gün</th>
             <th>Durum</th>
             <th style="text-align:right">İşlem</th>
           </tr>
@@ -151,6 +223,9 @@ const acik = Astro.url.searchParams.get('duzenle');
                 <>
                   <tr>
                     <td>
+                      <input type="checkbox" name="secili" value={i.id} form="toplu-form" aria-label={`${gosterilenBaslik} seç`} />
+                    </td>
+                    <td>
                       <a href={yol} target="_blank" rel="noopener" style="font-weight:600">
                         {gosterilenBaslik}
                       </a>
@@ -162,6 +237,21 @@ const acik = Astro.url.searchParams.get('duzenle');
                     </td>
                     <td>{[i.ilce, i.il].filter(Boolean).join(' / ') || '—'}</td>
                     <td class="sayi">{fiyatKisa(i.fiyat)}</td>
+                    <td class="sayi">
+                      {(() => {
+                        const bakis = bakisHarita.get(i.id) ?? 0;
+                        return (
+                          <span class="bakis">
+                            <span class="bakis-sayi">{bakis.toLocaleString('tr-TR')}</span>
+                            <span
+                              class="bakis-cubuk"
+                              style={`--oran:${Math.round((bakis / enCokBakis) * 100)}%`}
+                              aria-hidden="true"
+                            />
+                          </span>
+                        );
+                      })()}
+                    </td>
                     <td>
                       <div class="durum-yigin">
                         {i.durum === 'pasif' ? (
@@ -193,13 +283,14 @@ const acik = Astro.url.searchParams.get('duzenle');
                           </button>
                         </form>
                         <a href={`?duzenle=${i.id}#d${i.id}`} class="pd pd--sade">Metni düzelt</a>
+                        <a href={`/yonetim/gorsel/${i.id}`} class="pd pd--sade">Fotoğraflar</a>
                       </div>
                     </td>
                   </tr>
 
                   {acik === i.id && (
                     <tr id={`d${i.id}`}>
-                      <td colspan="5" class="duzenle-hucre">
+                      <td colspan="7" class="duzenle-hucre">
                         <form method="POST" class="duzenle-form">
                           <input type="hidden" name="id" value={i.id} />
                           <input type="hidden" name="eylem" value="metin" />
@@ -249,6 +340,41 @@ const acik = Astro.url.searchParams.get('duzenle');
       </table>
     </div>
   </div>
+
+  <!-- Hepsiemlak görsel tazeleme -->
+  <section class="kutu" style="margin-top:1.5rem">
+    <div class="kutu-bas">
+      <h2>Hepsiemlak fotoğraflarını tazele</h2>
+      <span style="font-size:0.75rem;color:var(--color-kursun)">yeni ilan eklediğinizde</span>
+    </div>
+    <div class="yerimi-kutu">
+      <p>
+        Sitedeki fotoğraflar Hepsiemlak’tan geliyor — orada yatay çekim, yüksek çözünürlüklü
+        ve üzerinde <strong>sizin logonuz</strong> olan hâlleri var. Ama Hepsiemlak sunucumuzu
+        bot sanıp engelliyor, o yüzden aktarımı sizin tarayıcınızın yapması gerekiyor.
+      </p>
+      <p>Bir kez kurun, sonra tek tıkla çalışır:</p>
+      <ol>
+        <li>
+          Aşağıdaki turuncu düğmeyi <strong>yer imi çubuğunuza sürükleyin</strong>
+          (görünmüyorsa <span class="tus">⌘</span><span class="tus">⇧</span><span class="tus">B</span> ile açın).
+        </li>
+        <li>
+          <a href={PORTAL_OFIS} target="_blank" rel="noopener">Hepsiemlak ofis sayfanızı</a> açın.
+        </li>
+        <li>Yer imine tıklayın. Fotoğraflar birkaç saniyede siteye aktarılır.</li>
+      </ol>
+
+      <a class="yerimi" href={yerImiKodu} onclick="alert('Bu düğmeye tıklamak yerine yer imi çubuğunuza sürükleyin.'); return false;">
+        ⬇ EDM fotoğraf aktar
+      </a>
+
+      <p class="yerimi-not">
+        Yer imi yalnızca sizin oturumunuzda çalışır ve gizli anahtarınızı taşır —
+        başkasıyla paylaşmayın.
+      </p>
+    </div>
+  </section>
 
   <!-- Elle ilan ekleme -->
   <section class="kutu" id="elle-ekle" style="margin-top:1.5rem">
@@ -406,4 +532,132 @@ const acik = Astro.url.searchParams.get('duzenle');
   .ekle-form {
     padding: 1.25rem;
   }
+
+  /* --- Toplu işlem --- */
+  .toplu-cubuk {
+    position: sticky;
+    top: 0.75rem;
+    z-index: 20;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    justify-content: space-between;
+    background: var(--color-murekkep);
+    color: var(--color-kagit);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    margin-bottom: 0.85rem;
+    box-shadow: var(--shadow-kalkik);
+  }
+  .toplu-sayi {
+    font-size: 0.875rem;
+  }
+  .toplu-dugmeler {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  /* --- Görüntülenme çubuğu --- */
+  .bakis {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 3.5rem;
+  }
+  .bakis-sayi {
+    font-size: 0.8125rem;
+  }
+  /* Sayının yanında ince bir çubuk: hangi ilan öne çıkıyor, okumadan görünsün */
+  .bakis-cubuk {
+    height: 3px;
+    border-radius: 2px;
+    background: color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    position: relative;
+    overflow: hidden;
+  }
+  .bakis-cubuk::after {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--oran, 0%);
+    background: var(--color-kirmizi);
+  }
+
+  /* --- Yer imi --- */
+  .yerimi-kutu {
+    padding: 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--color-metin-2);
+    max-width: 68ch;
+  }
+  .yerimi-kutu ol {
+    margin: 0.75rem 0 1.1rem;
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+  .yerimi-kutu strong {
+    color: var(--color-murekkep);
+  }
+  .tus {
+    display: inline-block;
+    font-family: var(--font-veri);
+    font-size: 0.6875rem;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 20%, transparent);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 0.05rem 0.3rem;
+    margin-inline: 0.05rem;
+  }
+  .yerimi {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--color-kirmizi);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.875rem;
+    padding: 0.6rem 1.1rem;
+    border-radius: 6px;
+    cursor: grab;
+    user-select: none;
+  }
+  .yerimi:active {
+    cursor: grabbing;
+  }
+  .yerimi-not {
+    margin-top: 0.85rem;
+    font-size: 0.75rem;
+    color: var(--color-kursun);
+  }
 </style>
+
+<script>
+  // Seçim kutuları: toplu işlem çubuğunu yönetir
+  const cubuk = document.querySelector<HTMLElement>('[data-toplu]');
+  const sayac = document.querySelector<HTMLElement>('[data-toplu-sayi]');
+  const hepsi = document.querySelector<HTMLInputElement>('[data-hepsi]');
+  const kutular = Array.from(
+    document.querySelectorAll<HTMLInputElement>('input[name="secili"]')
+  );
+
+  function guncelle() {
+    const secili = kutular.filter((k) => k.checked).length;
+    if (cubuk) cubuk.hidden = secili === 0;
+    if (sayac) sayac.textContent = String(secili);
+    if (hepsi) {
+      hepsi.checked = secili > 0 && secili === kutular.length;
+      hepsi.indeterminate = secili > 0 && secili < kutular.length;
+    }
+  }
+
+  kutular.forEach((k) => k.addEventListener('change', guncelle));
+  hepsi?.addEventListener('change', () => {
+    kutular.forEach((k) => (k.checked = hepsi.checked));
+    guncelle();
+  });
+  guncelle();
+</script>

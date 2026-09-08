@@ -1,0 +1,281 @@
+---
+/**
+ * Site metinleri: hizmet açıklamaları ve bölge tanıtımları.
+ *
+ * Bunlar önceden kodda duruyordu. Panele taşındılar ama koddaki hâlleri
+ * varsayılan olarak kaldı — bir metni boşaltırsanız koddaki yazı geri gelir,
+ * yani yanlışlıkla silmek siteyi boş bırakmıyor.
+ */
+import Panel from '../../layouts/Panel.astro';
+import { paneleGiris } from '../../lib/panel/yetki';
+import { env } from 'cloudflare:workers';
+import { icerik, icerikOnbellegiTemizle } from '../../lib/icerik';
+import { bolgeler, TANIMLAR } from '../../lib/bolgeler';
+
+const giris = await paneleGiris(Astro.request);
+if ('yanit' in giris) return giris.yanit;
+
+const vt = env.VT as D1Database;
+let bildirim: { tur: 'basari' | 'hata'; metin: string } | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const tur = String(form.get('tur') ?? '');
+  const anahtar = String(form.get('anahtar') ?? '');
+  const suAn = new Date().toISOString();
+
+  try {
+    if (tur === 'hizmet' && anahtar) {
+      await vt
+        .prepare(
+          `INSERT INTO metinler (tur, anahtar, baslik, govde, sira, yayinda, guncelleme)
+           VALUES ('hizmet',?,?,?,?,?,?)
+           ON CONFLICT(tur, anahtar) DO UPDATE SET
+             baslik = excluded.baslik, govde = excluded.govde,
+             sira = excluded.sira, yayinda = excluded.yayinda,
+             guncelleme = excluded.guncelleme`
+        )
+        .bind(
+          anahtar,
+          String(form.get('baslik') ?? '').trim().slice(0, 120),
+          String(form.get('govde') ?? '').trim().slice(0, 800),
+          Number(form.get('sira')) || 0,
+          form.get('yayinda') ? 1 : 0,
+          suAn
+        )
+        .run();
+      bildirim = { tur: 'basari', metin: 'Hizmet metni kaydedildi.' };
+    } else if (tur === 'bolge' && anahtar) {
+      const notlar = String(form.get('notlar') ?? '')
+        .split('\n')
+        .map((n) => n.trim())
+        .filter(Boolean);
+      await vt
+        .prepare(
+          `INSERT INTO metinler (tur, anahtar, govde, ek, yayinda, guncelleme)
+           VALUES ('bolge',?,?,?,1,?)
+           ON CONFLICT(tur, anahtar) DO UPDATE SET
+             govde = excluded.govde, ek = excluded.ek, guncelleme = excluded.guncelleme`
+        )
+        .bind(
+          anahtar,
+          String(form.get('giris') ?? '').trim().slice(0, 2000),
+          JSON.stringify(notlar),
+          suAn
+        )
+        .run();
+      bildirim = { tur: 'basari', metin: `${anahtar} tanıtımı kaydedildi.` };
+    } else if (tur === 'hizmet-ekle') {
+      const yeniAnahtar = `h${Date.now().toString(36)}`;
+      await vt
+        .prepare(
+          `INSERT INTO metinler (tur, anahtar, baslik, govde, sira, yayinda, guncelleme)
+           VALUES ('hizmet',?,?,?,99,1,?)`
+        )
+        .bind(yeniAnahtar, 'Yeni hizmet', '', suAn)
+        .run();
+      bildirim = { tur: 'basari', metin: 'Yeni hizmet eklendi, aşağıdan düzenleyin.' };
+    } else if (tur === 'hizmet-sil' && anahtar) {
+      await vt
+        .prepare(`DELETE FROM metinler WHERE tur = 'hizmet' AND anahtar = ?`)
+        .bind(anahtar)
+        .run();
+      bildirim = { tur: 'basari', metin: 'Hizmet silindi.' };
+    }
+    icerikOnbellegiTemizle();
+  } catch (hata) {
+    bildirim = { tur: 'hata', metin: (hata as Error).message };
+  }
+}
+
+const { hizmetler, bolgeMetinleri } = await icerik();
+const bolgeListesi = await bolgeler();
+
+/** Bölge adı D1'de ilçe adıyla saklanıyor ("Merkez" dahil). */
+const bolgeAnahtari = (b: (typeof bolgeListesi)[number]) =>
+  b.ad.replace(/^.+\s(Merkez)$/, '$1');
+---
+
+<Panel
+  baslik="Metinler"
+  eposta={giris.kimlik.eposta}
+  ozet="Hizmet açıklamaları ve bölge tanıtımları"
+>
+  {bildirim && <div class={`bildirim bildirim--${bildirim.tur}`}>{bildirim.metin}</div>}
+
+  <p class="aciklama-kutu">
+    Bir metni <strong>boş bırakırsanız</strong> koddaki varsayılan yazı geri gelir —
+    yani yanlışlıkla silmek siteyi boş bırakmaz.
+  </p>
+
+  <!-- Hizmetler -->
+  <section class="kutu">
+    <div class="kutu-bas">
+      <h2>Hizmetler</h2>
+      <form method="POST">
+        <input type="hidden" name="tur" value="hizmet-ekle" />
+        <button type="submit" class="pd pd--sade">Hizmet ekle</button>
+      </form>
+    </div>
+
+    <div class="metin-liste">
+      {
+        hizmetler.map((h, i) => (
+          <form method="POST" class="metin-satir">
+            <input type="hidden" name="tur" value="hizmet" />
+            <input type="hidden" name="anahtar" value={h.anahtar} />
+
+            <div class="metin-alanlar">
+              <label class="p-alan" style="max-width:20rem">
+                <span>Başlık</span>
+                <input type="text" name="baslik" value={h.baslik} maxlength="120" />
+              </label>
+              <label class="p-alan" style="max-width:6rem">
+                <span>Sıra</span>
+                <input type="number" name="sira" value={String(i)} />
+              </label>
+            </div>
+
+            <label class="p-alan">
+              <span>Açıklama</span>
+              <textarea name="govde" rows="3" set:text={h.ozet} />
+            </label>
+
+            <div class="metin-eylem">
+              <label class="onay-satir">
+                <input type="checkbox" name="yayinda" checked />
+                <span>Yayında</span>
+              </label>
+              <button type="submit" class="pd pd--birincil">Kaydet</button>
+              <button
+                type="submit"
+                name="tur"
+                value="hizmet-sil"
+                class="pd pd--tehlike"
+                formnovalidate
+                onclick="return confirm('Bu hizmet kalıcı olarak silinecek. Emin misiniz?')"
+              >
+                Sil
+              </button>
+            </div>
+          </form>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Bölge tanıtımları -->
+  <section class="kutu" style="margin-top:1.5rem">
+    <div class="kutu-bas">
+      <h2>Bölge tanıtımları</h2>
+      <span style="font-size:0.75rem;color:var(--color-kursun)">
+        {bolgeListesi.length} bölge · rakamlar otomatik, sadece metin elle
+      </span>
+    </div>
+
+    <div class="metin-liste">
+      {
+        bolgeListesi.map((b) => {
+          const anahtar = bolgeAnahtari(b);
+          const panelMetni = bolgeMetinleri.get(anahtar);
+          const varsayilan = TANIMLAR[anahtar];
+          const giris = panelMetni?.giris ?? varsayilan?.giris ?? '';
+          const notlar = (panelMetni?.notlar?.length ? panelMetni.notlar : varsayilan?.notlar) ?? [];
+
+          return (
+            <form method="POST" class="metin-satir">
+              <input type="hidden" name="tur" value="bolge" />
+              <input type="hidden" name="anahtar" value={anahtar} />
+
+              <div class="bolge-bas">
+                <strong>{b.ad}</strong>
+                <span class="veri-sayi bolge-adet">{b.adet} ilan</span>
+                <a href={b.yol} target="_blank" rel="noopener" class="pd pd--sade">Sayfayı gör ↗</a>
+              </div>
+
+              <label class="p-alan">
+                <span>Tanıtım metni</span>
+                <textarea name="giris" rows="4" set:text={giris} />
+              </label>
+
+              <label class="p-alan">
+                <span>Bölge notları — her satıra bir madde</span>
+                <textarea name="notlar" rows="3" set:text={notlar.join('\n')} />
+              </label>
+
+              <div class="metin-eylem">
+                <button type="submit" class="pd pd--birincil">Kaydet</button>
+              </div>
+            </form>
+          );
+        })
+      }
+    </div>
+  </section>
+</Panel>
+
+<style>
+  .aciklama-kutu {
+    background: #fff;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-left: 3px solid var(--color-kirmizi);
+    border-radius: 6px;
+    padding: 0.85rem 1.1rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-metin-2);
+    margin-bottom: 1.25rem;
+    max-width: 72ch;
+  }
+
+  .metin-liste {
+    display: flex;
+    flex-direction: column;
+  }
+  .metin-satir {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 1.25rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-murekkep) 8%, transparent);
+  }
+  .metin-satir:last-child {
+    border-bottom: 0;
+  }
+  .metin-alanlar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .metin-eylem {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .onay-satir {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8125rem;
+    margin-right: auto;
+  }
+  .onay-satir input {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--color-kirmizi);
+  }
+
+  .bolge-bas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1rem;
+  }
+  .bolge-adet {
+    font-size: 0.75rem;
+    color: var(--color-kursun);
+    margin-right: auto;
+  }
+</style>

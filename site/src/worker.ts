@@ -13,18 +13,32 @@ import { handle } from '@astrojs/cloudflare/handler';
 import { portfoyuCek } from './lib/senkron/emlakjet';
 import { semayiKur, portfoyuYaz, gunlugeYaz } from './lib/senkron/depo';
 import { onbellegiTemizle } from './lib/ilanlar';
+import { gunlukOzet } from './lib/eposta';
 
 export interface Env {
   VT: D1Database;
   ASSETS: Fetcher;
   BILDIRIM_ADRESI?: string;
+  EPOSTA?: { send: (mesaj: unknown) => Promise<void> };
 }
 
 export default {
   fetch: handle,
 
-  async scheduled(_olay: ScheduledController, env: Env, baglam: ExecutionContext) {
-    baglam.waitUntil(senkronla(env));
+  async scheduled(olay: ScheduledController, env: Env, baglam: ExecutionContext) {
+    baglam.waitUntil(
+      (async () => {
+        await senkronla(env);
+        // Günlük özet yalnızca sabah çalışmasında (03:00 UTC = 06:00 TR).
+        // Diğer üç çalışmada sessizce sadece senkron yapılıyor.
+        const saat = new Date(olay.scheduledTime).getUTCHours();
+        if (saat === 3) {
+          await gunlukOzet(env.VT, env).catch((h) =>
+            console.error('Günlük özet gönderilemedi:', h)
+          );
+        }
+      })()
+    );
   },
 } satisfies ExportedHandler<Env>;
 

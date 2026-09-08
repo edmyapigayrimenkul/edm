@@ -2,12 +2,12 @@
 import Temel from '../layouts/Temel.astro';
 import ParselTuval from '../components/ParselTuval.astro';
 import IlanKart from '../components/IlanKart.astro';
-import { KURUM, HIZMETLER } from '../lib/site';
+import { KURUM } from '../lib/site';
 import { oneCikanlar, portfoy, danismaninIlanlari } from '../lib/ilanlar';
 import { icerik } from '../lib/icerik';
 
 const { sayimlar: SAYIMLAR, filtreler: FILTRELER } = await portfoy();
-const { ekip, yorumlar, iletisim } = await icerik();
+const { ekip, yorumlar, iletisim, hizmetler: HIZMETLER } = await icerik();
 
 const ekipSayili = await Promise.all(
   ekip.map(async (d) => ({

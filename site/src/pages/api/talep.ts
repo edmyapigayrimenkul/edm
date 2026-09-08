@@ -8,6 +8,7 @@
 
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
+import { epostaGonder } from '../../lib/eposta';
 
 interface Talep {
   tur?: string;
@@ -121,24 +122,14 @@ export const POST: APIRoute = async ({ request }) => {
   return yanit({ tamam: true });
 };
 
-/**
- * Cloudflare Email Service üzerinden bildirim.
- * Bağlama tanımlı değilse sessizce atlanır — form yine de çalışır.
- */
+/** Talep bildirimi — ortak e-posta modülü üzerinden. */
 async function bildirimGonder(kayit: Record<string, unknown>, ip: string): Promise<void> {
-  const gonderici = (env as Record<string, unknown>).EPOSTA as
-    | { send: (mesaj: unknown) => Promise<void> }
-    | undefined;
-  if (!gonderici) return;
-
-  const { EmailMessage } = await import('cloudflare:email');
-
   const konu =
     kayit.tur === 'degerleme'
       ? `Değerleme talebi — ${kayit.ad}`
       : `İletişim formu — ${kayit.ad}`;
 
-  const satirlar = [
+  const govde = [
     ['Ad Soyad', kayit.ad],
     ['Telefon', kayit.telefon],
     ['E-posta', kayit.eposta],
@@ -150,25 +141,10 @@ async function bildirimGonder(kayit: Record<string, unknown>, ip: string): Promi
     ['Mesaj', kayit.mesaj],
     ['Geldiği sayfa', kayit.kaynak],
     ['IP', ip],
-  ].filter(([, deger]) => Boolean(deger)) as Array<[string, string]>;
+  ]
+    .filter(([, deger]) => Boolean(deger))
+    .map(([etiket, deger]) => `${etiket}: ${deger}`)
+    .join('\n');
 
-  const govde = satirlar.map(([etiket, deger]) => `${etiket}: ${deger}`).join('\n');
-  const alici = (env.BILDIRIM_ADRESI as string) ?? 'info@edmyapigayrimenkul.com';
-  const gonderen = 'bildirim@edmyapigayrimenkul.com';
-
-  // Basit bir MIME zarfı; başlık ve gövde UTF-8 olarak kodlanıyor.
-  const konuKodlu = `=?UTF-8?B?${btoa(String.fromCharCode(...new TextEncoder().encode(konu)))}?=`;
-  const ham = [
-    `From: EDM Sitesi <${gonderen}>`,
-    `To: <${alici}>`,
-    `Subject: ${konuKodlu}`,
-    `Message-ID: <${crypto.randomUUID()}@edmyapigayrimenkul.com>`,
-    'MIME-Version: 1.0',
-    'Content-Type: text/plain; charset=UTF-8',
-    'Content-Transfer-Encoding: base64',
-    '',
-    btoa(String.fromCharCode(...new TextEncoder().encode(`${govde}\n`))),
-  ].join('\r\n');
-
-  await gonderici.send(new EmailMessage(gonderen, alici, ham));
+  await epostaGonder(env as never, konu, `${govde}\n\nPanel: https://edmyapigayrimenkul.com/yonetim/talepler`);
 }
