@@ -10,6 +10,7 @@
 
 import { env } from 'cloudflare:workers';
 import { aktifIlanSatirlari, sonSenkron, type SatirIlan } from './senkron/depo';
+import { koordinatHaritasi, konumAnahtari, type Koordinat } from './senkron/konum';
 
 export type Islem = 'satilik' | 'kiralik';
 export type TipGrup = 'konut' | 'arsa' | 'isyeri' | 'diger';
@@ -48,6 +49,10 @@ export interface Ilan {
   yeniMi: boolean;
   kapak: string | null;
   etiketler: string[];
+  /** Mahalle merkezi — kesin adres değil. Bulunamadıysa null. */
+  koordinat: Koordinat | null;
+  /** Arama için düzleştirilmiş metin: başlık, konum, özellikler, açıklama. */
+  aramaMetni: string;
 }
 
 /* ---------------------------------------------------------------
@@ -186,13 +191,71 @@ function ozetle(aciklama: string, uzunluk = 155): string {
 
 const YENI_GUN = 21;
 
-function satirdanIlan(s: SatirIlan): Ilan {
+/**
+ * Arama için düzleştirilmiş metin.
+ *
+ * Sadece başlığa bakmak yetmiyor: "deniz manzaralı", "krediye uygun",
+ * "site içi", "Klassis" gibi ifadeler açıklamada ya da özellik listesinde
+ * geçiyor. Hepsini tek bir metinde topluyoruz. Türkçe karakterlerin
+ * hem kendisini hem sadeleştirilmiş halini yazıyoruz ki "sarıyer" arayan
+ * "sariyer" yazdığında da bulsun.
+ */
+function aramaMetniKur(
+  baslikTemiz: string,
+  s: SatirIlan,
+  ozellikler: Record<string, string>,
+  islem: Islem,
+  etiketler: string[]
+): string {
+  const fiyatKelimeleri: string[] = [];
+  if (s.fiyat) {
+    fiyatKelimeleri.push(String(s.fiyat));
+    if (s.fiyat >= 1_000_000) fiyatKelimeleri.push(`${Math.round(s.fiyat / 1_000_000)} milyon`);
+  }
+
+  const parcalar = [
+    baslikTemiz,
+    s.kategori,
+    s.tip,
+    islem === 'satilik' ? 'satılık' : 'kiralık',
+    s.oda ?? '',
+    s.mahalle ?? '',
+    s.ilce ?? '',
+    s.il ?? '',
+    s.m2 ? `${s.m2} m2 metrekare` : '',
+    ...etiketler,
+    ...Object.entries(ozellikler)
+      .filter(([, v]) => v && v !== 'Belirtilmemiş' && v !== 'Yok')
+      .flatMap(([k, v]) => [k, v]),
+    ...fiyatKelimeleri,
+    // Açıklamanın tamamı değil başı: "deniz manzaralı", "site içinde" gibi
+    // ayırt edici ifadeler hemen hep ilk cümlelerde geçiyor.
+    s.aciklama.slice(0, 600),
+  ];
+
+  const ham = parcalar.join(' ').toLocaleLowerCase('tr').replace(/\s+/g, ' ');
+  const sade = ham
+    .split('')
+    .map((h) => TR_HARF[h] ?? h)
+    .join('');
+
+  return ham === sade ? ham : `${ham} ${sade}`;
+}
+
+function satirdanIlan(s: SatirIlan, koordinatlar: Map<string, Koordinat>): Ilan {
   const baslikTemiz = baslikTemizle(s.baslik);
   const slug = `${slugla(baslikTemiz)}-${s.id}`;
   const islem = (s.islem === 'kiralik' ? 'kiralik' : 'satilik') as Islem;
   const ozellikler = guvenliJson<Record<string, string>>(s.ozellikler, {});
-  const gorseller = guvenliJson<string[]>(s.gorseller, []);
+  // Hepsiemlak görselleri varsa onları kullan: yatay çekim, daha yüksek
+  // çözünürlük ve üzerinde rakip portalın değil ofisin kendi logosu var.
+  const emlakjetGorselleri = guvenliJson<string[]>(s.gorseller, []);
+  const hepsiemlakGorselleri = s.hepsiemlak_gorseller
+    ? guvenliJson<string[]>(s.hepsiemlak_gorseller, [])
+    : [];
+  const gorseller = hepsiemlakGorselleri.length ? hepsiemlakGorselleri : emlakjetGorselleri;
   const zaman = Date.parse(s.guncellenme ?? s.ilk_gorulme);
+  const etiketler = etiketleriSec(s.oda, s.m2, ozellikler);
 
   return {
     id: s.id,
@@ -227,7 +290,9 @@ function satirdanIlan(s: SatirIlan): Ilan {
     ozetMetin: ozetle(s.aciklama),
     yeniMi: Number.isFinite(zaman) && Date.now() - zaman < YENI_GUN * 86_400_000,
     kapak: gorseller[0] ?? null,
-    etiketler: etiketleriSec(s.oda, s.m2, ozellikler),
+    etiketler,
+    koordinat: koordinatlar.get(konumAnahtari(s.mahalle, s.ilce, s.il)) ?? null,
+    aramaMetni: aramaMetniKur(baslikTemiz, s, ozellikler, islem, etiketler),
   };
 }
 
@@ -289,8 +354,11 @@ export async function portfoy(): Promise<Portfoy> {
   if (onbellek && Date.now() - onbellek.zaman < ONBELLEK_MS) return onbellek.veri;
 
   const vt = env.VT as D1Database;
-  const satirlar = await aktifIlanSatirlari(vt);
-  const ilanlar = satirlar.map(satirdanIlan);
+  const [satirlar, koordinatlar] = await Promise.all([
+    aktifIlanSatirlari(vt),
+    koordinatHaritasi(vt),
+  ]);
+  const ilanlar = satirlar.map((satir) => satirdanIlan(satir, koordinatlar));
   const senkron = await sonSenkron(vt).catch(() => null);
 
   const veri: Portfoy = {

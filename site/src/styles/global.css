@@ -184,19 +184,20 @@
    -------------------------------------------------------------- */
 @layer components {
   .kab {
+    --kab-pay: 1.25rem;
     width: 100%;
     margin-inline: auto;
-    padding-inline: 1.25rem;
+    padding-inline: var(--kab-pay);
     max-width: 90rem;
   }
   @media (min-width: 768px) {
     .kab {
-      padding-inline: 2.5rem;
+      --kab-pay: 2.5rem;
     }
   }
   @media (min-width: 1280px) {
     .kab {
-      padding-inline: 4rem;
+      --kab-pay: 4rem;
     }
   }
 

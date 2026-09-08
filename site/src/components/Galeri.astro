@@ -12,6 +12,7 @@ const kalan = Math.max(0, gorseller.length - 5);
 {
   kapak && (
     <div class="galeri" data-galeri>
+      <div class="galeri-serit">
       <button
         type="button"
         class="galeri-ana goruntu-kutu grup-kart"
@@ -38,6 +39,7 @@ const kalan = Math.max(0, gorseller.length - 5);
           ))}
         </div>
       )}
+      </div>
 
       <button type="button" class="galeri-tumu" data-ac="0">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -95,6 +97,46 @@ const kalan = Math.max(0, gorseller.length - 5);
   @media (min-width: 900px) {
     .galeri {
       grid-template-columns: 1.62fr 1fr;
+    }
+  }
+
+  /* Mobil: ızgara yerine parmakla kaydırılan şerit.
+     Dar ekranda küçük küçük dört kare göstermek yerine her fotoğrafı
+     tam genişlikte göstermek hem daha okunur hem daha doğal. */
+  @media (max-width: 899px) {
+    .galeri {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .galeri-serit {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      /* Kenarlardan taşır ki kaydırma tam ekran hissi versin */
+      margin-inline: calc(-1 * var(--kab-pay, 1.25rem));
+      padding-inline: var(--kab-pay, 1.25rem);
+      scroll-padding-inline: var(--kab-pay, 1.25rem);
+    }
+    .galeri-serit::-webkit-scrollbar {
+      display: none;
+    }
+    .galeri-serit > button {
+      flex: 0 0 88%;
+      scroll-snap-align: center;
+      aspect-ratio: 4 / 3;
+      height: auto;
+    }
+    .galeri-yan {
+      display: contents;
+    }
+    .galeri-ana {
+      aspect-ratio: 4 / 3;
+    }
+    .galeri-tumu {
+      right: 1rem;
+      bottom: 1rem;
     }
   }
 
@@ -211,6 +253,21 @@ const kalan = Math.max(0, gorseller.length - 5);
     max-height: calc(100dvh - 8rem);
     object-fit: contain;
     border-radius: 2px;
+  }
+  @media (max-width: 640px) {
+    .buyutec-sahne {
+      padding: 3.25rem 0 4.5rem;
+    }
+    .buyutec-sahne img {
+      max-height: calc(100dvh - 8.5rem);
+      width: 100%;
+    }
+    .buyutec-alt {
+      padding-inline: 1rem;
+    }
+    .buyutec-baslik {
+      display: none;
+    }
   }
   .buyutec-alt {
     display: flex;

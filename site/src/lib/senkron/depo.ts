@@ -79,6 +79,9 @@ export interface SatirIlan {
   pasif_tarihi: string | null;
   /** ilan_duzenleme tablosundan bindirilir; ham tabloda yok. */
   one_cikan?: number;
+  /** Hepsiemlak'tan alınan görseller — varsa bunlar tercih edilir. */
+  hepsiemlak_gorseller?: string | null;
+  hepsiemlak_ref?: string | null;
 }
 
 export interface SenkronSonuc {

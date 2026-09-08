@@ -1,0 +1,165 @@
+---
+/**
+ * İlan konumu haritası.
+ *
+ * Bilinçli olarak kesin nokta göstermiyor: mülkün tam adresi ilanda yazmıyor
+ * ve yazmamalı. Haritada mahalle merkezine oturan geniş bir daire var —
+ * ziyaretçi bölgeyi görüyor, kapı numarasını değil.
+ *
+ * Leaflet yalnızca harita ekrana girdiğinde yükleniyor; ilan sayfasının ilk
+ * açılışını yavaşlatmıyor.
+ */
+
+interface Props {
+  enlem: number;
+  boylam: number;
+  /** Haritada gösterilecek yer adı — daire etiketinde kullanılıyor. */
+  etiket: string;
+  /** Daire yarıçapı (metre). Mahalle için 700 m makul bir örtü. */
+  yaricap?: number;
+}
+
+const { enlem, boylam, etiket, yaricap = 700 } = Astro.props;
+---
+
+<div
+  class="harita"
+  data-harita
+  data-enlem={String(enlem)}
+  data-boylam={String(boylam)}
+  data-yaricap={String(yaricap)}
+  data-etiket={etiket}
+>
+  <div class="harita-tuval" data-harita-tuval></div>
+  <p class="harita-not">
+    Harita mahalle sınırını gösterir, mülkün kesin konumunu değil.
+  </p>
+  <noscript>
+    <p class="harita-not">Haritayı görmek için tarayıcınızda JavaScript gerekiyor.</p>
+  </noscript>
+</div>
+
+<style>
+  .harita {
+    margin-top: 1.25rem;
+  }
+  .harita-tuval {
+    height: clamp(15rem, 38vw, 22rem);
+    border-radius: var(--radius-kart);
+    overflow: hidden;
+    background: var(--color-kirec);
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+  }
+  .harita-not {
+    margin-top: 0.6rem;
+    font-size: 0.75rem;
+    color: var(--color-kursun);
+  }
+
+  /* Leaflet'in kendi kontrollerini siteye yaklaştır */
+  .harita-tuval :global(.leaflet-container) {
+    font-family: var(--font-govde);
+    background: var(--color-kirec);
+  }
+  .harita-tuval :global(.leaflet-control-attribution) {
+    font-size: 0.625rem;
+    background: color-mix(in oklab, var(--color-kagit) 88%, transparent);
+  }
+  .harita-tuval :global(.leaflet-control-zoom a) {
+    color: var(--color-murekkep);
+    border-radius: 4px;
+  }
+  /* Tonu siteyle uyumlu hale getir — ham OSM fazla renkli kalıyor */
+  .harita-tuval :global(.leaflet-tile-pane) {
+    filter: saturate(0.72) contrast(1.02);
+  }
+</style>
+
+<script>
+  const LEAFLET_SURUM = '1.9.4';
+
+  function betikYukle(adres: string): Promise<void> {
+    return new Promise((coz, red) => {
+      if (document.querySelector(`script[src="${adres}"]`)) return coz();
+      const e = document.createElement('script');
+      e.src = adres;
+      e.onload = () => coz();
+      e.onerror = () => red(new Error('Leaflet yüklenemedi'));
+      document.head.appendChild(e);
+    });
+  }
+
+  function stilYukle(adres: string): void {
+    if (document.querySelector(`link[href="${adres}"]`)) return;
+    const e = document.createElement('link');
+    e.rel = 'stylesheet';
+    e.href = adres;
+    document.head.appendChild(e);
+  }
+
+  async function haritayiKur(kutu: HTMLElement) {
+    const enlem = Number(kutu.dataset.enlem);
+    const boylam = Number(kutu.dataset.boylam);
+    const yaricap = Number(kutu.dataset.yaricap) || 700;
+    const tuval = kutu.querySelector<HTMLElement>('[data-harita-tuval]');
+    if (!tuval || !Number.isFinite(enlem) || !Number.isFinite(boylam)) return;
+
+    stilYukle(`https://cdnjs.cloudflare.com/ajax/libs/leaflet/${LEAFLET_SURUM}/leaflet.min.css`);
+    try {
+      await betikYukle(
+        `https://cdnjs.cloudflare.com/ajax/libs/leaflet/${LEAFLET_SURUM}/leaflet.min.js`
+      );
+    } catch {
+      kutu.querySelector('.harita-not')!.textContent = 'Harita şu an yüklenemedi.';
+      return;
+    }
+
+    const L = (window as unknown as { L: any }).L;
+    if (!L) return;
+
+    const harita = L.map(tuval, {
+      center: [enlem, boylam],
+      zoom: 14,
+      // Sayfa kaydırırken harita zumlamasın — mobilde en sinir bozucu şey bu.
+      scrollWheelZoom: false,
+      attributionControl: true,
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '© OpenStreetMap katkıcıları',
+    }).addTo(harita);
+
+    L.circle([enlem, boylam], {
+      radius: yaricap,
+      color: '#f0000d',
+      weight: 1.5,
+      opacity: 0.75,
+      fillColor: '#f0000d',
+      fillOpacity: 0.1,
+    })
+      .addTo(harita)
+      .bindTooltip(kutu.dataset.etiket ?? '', { permanent: false, direction: 'top' });
+
+    // Dokunmatikte tek parmakla sayfa kaysın, iki parmakla harita hareket etsin
+    if (window.matchMedia('(pointer: coarse)').matches) {
+      harita.dragging.disable();
+      harita.on('click', () => harita.dragging.enable());
+    }
+  }
+
+  const kutular = document.querySelectorAll<HTMLElement>('[data-harita]');
+  if (kutular.length) {
+    const gozlemci = new IntersectionObserver(
+      (girisler) => {
+        for (const giris of girisler) {
+          if (!giris.isIntersecting) continue;
+          gozlemci.unobserve(giris.target);
+          haritayiKur(giris.target as HTMLElement);
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    kutular.forEach((k) => gozlemci.observe(k));
+  }
+</script>

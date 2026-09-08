@@ -26,7 +26,7 @@ const durumEtiketi = ilan.islem === 'satilik' ? 'Satılık' : 'Kiralık';
   data-m2={ilan.m2 ?? 0}
   data-oda={ilan.oda ?? ''}
   data-tarih={Date.parse(ilan.guncellenme ?? ilan.ilkGorulme) || 0}
-  data-ara={`${ilan.baslikTemiz} ${ilan.konum} ${ilan.kategori} ${ilan.mahalle ?? ''}`.toLocaleLowerCase('tr')}
+  data-ara={ilan.aramaMetni}
 >
   <a href={ilan.yol} class="flex h-full flex-col">
     <div class:list={['goruntu-kutu ilan-gorsel', genis && 'ilan-gorsel--genis']}>

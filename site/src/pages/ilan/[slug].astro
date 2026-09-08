@@ -1,6 +1,7 @@
 ---
 import Temel from '../../layouts/Temel.astro';
 import Galeri from '../../components/Galeri.astro';
+import Harita from '../../components/Harita.astro';
 import IlanKart from '../../components/IlanKart.astro';
 import { ilanBul, benzerIlanlar, fiyatYaz } from '../../lib/ilanlar';
 import { PORTALLAR, KURUM } from '../../lib/site';
@@ -178,6 +179,18 @@ const izYolu = {
               {ilan.konum}. Tam adres ve parsel bilgisi için bizimle iletişime geçin —
               yerinde göstermeyi tercih ediyoruz.
             </p>
+
+            {
+              ilan.koordinat && (
+                <Harita
+                  enlem={ilan.koordinat.enlem}
+                  boylam={ilan.koordinat.boylam}
+                  etiket={[ilan.mahalle, ilan.ilce].filter(Boolean).join(', ')}
+                  yaricap={ilan.tipGrup === 'arsa' ? 1100 : 700}
+                />
+              )
+            }
+
             <div class="mt-5 flex flex-wrap gap-3">
               <a
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(

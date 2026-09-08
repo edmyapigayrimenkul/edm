@@ -55,7 +55,7 @@ const jsonLd = {
             <input
               type="search"
               data-ara-girdi
-              placeholder="Mahalle, tip veya anahtar kelime…"
+              placeholder="Deniz manzaralı, krediye uygun, Klassis, 3+1…"
               aria-label="İlanlarda ara"
               autocomplete="off"
             />
@@ -348,6 +348,17 @@ const jsonLd = {
     /** Türkçe küçük harfe indirger — "İSTANBUL" ile "istanbul" eşleşsin diye. */
     const kucult = (s: string) => s.toLocaleLowerCase('tr');
 
+    /**
+     * Arama terimini kelimelere ayırır.
+     * "silivri deniz manzaralı" yazan kişi üçünü birden içeren ilanı bekler,
+     * herhangi birini içereni değil — o yüzden hepsi eşleşmek zorunda.
+     */
+    const kelimeler = (metin: string) =>
+      kucult(metin)
+        .split(/[\s,]+/)
+        .map((k) => k.trim())
+        .filter((k) => k.length >= 2);
+
     function pilleriGuncelle() {
       alan!.querySelectorAll<HTMLButtonElement>('[data-filtre]').forEach((p) => {
         const ad = p.dataset.filtre!;
@@ -365,15 +376,16 @@ const jsonLd = {
     }
 
     function uygula() {
-      const q = kucult(arama.trim());
+      const aranan = kelimeler(arama);
       let gorunen = 0;
 
       for (const kart of kartlar) {
+        const metin = kart.dataset.ara ?? '';
         const uygun =
           (!durum.islem || kart.dataset.islem === durum.islem) &&
           (!durum.tip || kart.dataset.tipGrup === durum.tip) &&
           (!durum.ilce || kart.dataset.ilce === durum.ilce) &&
-          (!q || (kart.dataset.ara ?? '').includes(q));
+          aranan.every((k) => metin.includes(k));
 
         kart.hidden = !uygun;
         if (uygun) gorunen++;

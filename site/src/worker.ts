@@ -45,6 +45,12 @@ export async function senkronla(env: Env): Promise<Record<string, unknown>> {
 
     const sonuc = await portfoyuYaz(env.VT, ilanlar, basarisiz);
     await gunlugeYaz(env.VT, baslangic, sonuc);
+
+    // Not: koordinat çözümü buradan yapılmıyor. Nominatim veri merkezi
+    // IP'lerinden gelen istekleri boş yanıtla geçiştiriyor; Worker'dan
+    // yapılan 12 sorgunun 12'si de boş döndü. Yeni bir mahalle eklendiğinde
+    // `node scripts/koordinat-coz.mjs` çalıştırmak yeterli — ayda bir iki kez.
+
     onbellegiTemizle();
 
     console.log(
