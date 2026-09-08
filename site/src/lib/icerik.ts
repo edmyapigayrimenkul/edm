@@ -24,9 +24,20 @@ export interface Yorum {
   konu: string | null;
   yayinda: number;
   sira: number;
+  /* Google'dan gelen yorumlarda atıf alanları — politikaları yazanın
+     adını, avatarını ve yorumun aslına bağlantıyı zorunlu kılıyor. */
+  dis_kimlik?: string | null;
+  foto?: string | null;
+  profil_url?: string | null;
+  google_url?: string | null;
 }
 
 export interface Iletisim {
+  /* Google'dan senkronla gelen genel değerlendirme — ayarlar tablosunda. */
+  google_puan?: string;
+  google_yorum_sayisi?: string;
+  google_harita_url?: string;
+
   telefon: string;
   telefonHam: string;
   whatsapp: string;

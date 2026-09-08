@@ -14,11 +14,15 @@ import { portfoyuCek } from './lib/senkron/emlakjet';
 import { semayiKur, portfoyuYaz, gunlugeYaz } from './lib/senkron/depo';
 import { onbellegiTemizle } from './lib/ilanlar';
 import { gunlukOzet } from './lib/eposta';
+import { googleYorumlariniCek } from './lib/senkron/yorumlar';
 
 export interface Env {
   VT: D1Database;
   ASSETS: Fetcher;
   BILDIRIM_ADRESI?: string;
+  /** Places API anahtarı; tanımlı değilse yorum çekme sessizce atlanır. */
+  GOOGLE_ANAHTARI?: string;
+  GOOGLE_ISLETME_ARAMASI?: string;
   EPOSTA?: { send: (mesaj: unknown) => Promise<void> };
 }
 
@@ -33,6 +37,14 @@ export default {
         // Diğer üç çalışmada sessizce sadece senkron yapılıyor.
         const saat = new Date(olay.scheduledTime).getUTCHours();
         if (saat === 3) {
+          // Yorumlar yavaş değişiyor; günde bir çekmek hem yeterli hem de
+          // Places API kotasının çok altında kalıyor (ayda ~30 çağrı).
+          const yorum = await googleYorumlariniCek(
+            env.VT,
+            env as unknown as Record<string, unknown>
+          );
+          if (yorum.durum !== 'atlandi') console.log('Google yorumları:', JSON.stringify(yorum));
+
           await gunlukOzet(env.VT, env).catch((h) =>
             console.error('Günlük özet gönderilemedi:', h)
           );

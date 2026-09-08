@@ -8,6 +8,8 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { senkronla } from '../../worker';
+import { googleYorumlariniCek } from '../../lib/senkron/yorumlar';
+import { onbellegiTemizle } from '../../lib/ilanlar';
 
 const yanit = (govde: unknown, durum = 200) =>
   new Response(JSON.stringify(govde, null, 1), {
@@ -27,7 +29,16 @@ export const POST: APIRoute = async ({ request }) => {
   if (gelen !== beklenen) return yanit({ hata: 'Yetkisiz.' }, 401);
 
   const sonuc = await senkronla(env as never);
-  return yanit(sonuc, sonuc.tamam ? 200 : 500);
+
+  // Panelden elle tetiklenince yorumlar da tazelensin — anahtar
+  // tanımlanır tanımlanmaz beklemeden görülebilsin diye.
+  const yorumlar = await googleYorumlariniCek(
+    env.VT as D1Database,
+    env as unknown as Record<string, unknown>
+  );
+  if (yorumlar.durum === 'tamam' && yorumlar.yazilan) onbellegiTemizle();
+
+  return yanit({ ...sonuc, yorumlar }, sonuc.tamam ? 200 : 500);
 };
 
 /** Son senkronun ne zaman ve nasıl geçtiğini gösterir — açık uç, gizli veri yok. */

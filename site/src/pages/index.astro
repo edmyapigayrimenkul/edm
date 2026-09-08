@@ -298,28 +298,93 @@ const hizliFiltreler = [
     </div>
   </section>
 
-  <!-- ================= yorumlar (gerçek yorum girilince görünür) ================= -->
+  <!-- ================= YORUMLAR =================
+       Google'dan geliyor. Places API politikaları yorumu yazanın adını ve
+       avatarını göstermeyi, yorumun Google'daki aslına bağlantı vermeyi
+       zorunlu kılıyor; altındaki uyarı da onların önerisi. -->
   {
     yorumlar.length > 0 && (
       <section class="pb-20 lg:pb-28">
         <div class="kab">
-          <p class="etiket" data-belir>
-            Müşterilerimiz
-          </p>
-          <h2 class="baslik-buyuk mt-4 max-w-[16ch]" data-belir data-gecikme="0.06">
-            Bizimle çalışanlar ne dedi
-          </h2>
+          <div class="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <p class="etiket" data-belir>
+                Müşterilerimiz
+              </p>
+              <h2 class="baslik-buyuk mt-4 max-w-[16ch]" data-belir data-gecikme="0.06">
+                Bizimle çalışanlar ne dedi
+              </h2>
+            </div>
+
+            {iletisim.google_puan && (
+              <a
+                href={iletisim.google_harita_url ?? '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="google-ozet"
+                data-belir
+                data-gecikme="0.12"
+              >
+                <span class="google-puan font-veri">{iletisim.google_puan}</span>
+                <span class="google-ozet-metin">
+                  Google puanı
+                  {iletisim.google_yorum_sayisi && <> · {iletisim.google_yorum_sayisi} yorum</>}
+                </span>
+              </a>
+            )}
+          </div>
+
           <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-belir="sira">
             {yorumlar.slice(0, 6).map((y) => (
               <figure class="yorum-kart">
-                <blockquote class="text-[1.0625rem] leading-relaxed">“{y.metin}”</blockquote>
-                <figcaption class="mt-5 border-t border-murekkep/10 pt-4">
-                  <span class="font-medium">{y.ad}</span>
-                  <span class="etiket ml-2">{y.kaynak}</span>
+                {y.puan && (
+                  <p class="yorum-yildiz" aria-label={`${y.puan} yıldız`}>
+                    <span aria-hidden="true">{'★'.repeat(y.puan)}</span>
+                    <span class="yorum-yildiz-bos" aria-hidden="true">{'★'.repeat(5 - y.puan)}</span>
+                  </p>
+                )}
+
+                <blockquote class="mt-3 text-[1.0625rem] leading-relaxed">“{y.metin}”</blockquote>
+
+                <figcaption class="mt-5 flex items-center gap-3 border-t border-murekkep/10 pt-4">
+                  {y.foto && (
+                    <img
+                      class="yorum-avatar"
+                      src={y.foto}
+                      alt=""
+                      width="36"
+                      height="36"
+                      loading="lazy"
+                      decoding="async"
+                      referrerpolicy="no-referrer"
+                    />
+                  )}
+                  <span class="min-w-0 flex-1">
+                    <span class="block truncate font-medium">{y.ad}</span>
+                    <span class="etiket">
+                      {y.kaynak}
+                      {y.tarih && <> · {y.tarih}</>}
+                    </span>
+                  </span>
+                  {y.google_url && (
+                    <a
+                      href={y.google_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="yorum-bag"
+                      aria-label={`${y.ad} yorumunu Google'da görün`}
+                    >
+                      Google’da
+                    </a>
+                  )}
                 </figcaption>
               </figure>
             ))}
           </div>
+
+          <p class="mt-6 text-[0.8125rem] text-kursun">
+            Yorumlar Google tarafından doğrulanmaz; Google sahte içerik denetimi yapar.
+          </p>
         </div>
       </section>
     )
@@ -600,5 +665,57 @@ const hizliFiltreler = [
     font-size: 0.75rem;
     letter-spacing: 0.14em;
     color: var(--color-kirmizi);
+  }
+
+  /* Google özeti ve yorum atıfları */
+  .google-ozet {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 12%, transparent);
+    border-radius: 999px;
+    transition: border-color 0.4s var(--ease-yumusak);
+  }
+  .google-ozet:hover {
+    border-color: color-mix(in oklab, var(--color-murekkep) 26%, transparent);
+  }
+  .google-puan {
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1;
+  }
+  .google-ozet-metin {
+    font-size: 0.8125rem;
+    color: var(--color-metin-2, var(--color-kursun));
+  }
+
+  .yorum-yildiz {
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    color: var(--color-kirmizi);
+    line-height: 1;
+  }
+  .yorum-yildiz-bos {
+    color: color-mix(in oklab, var(--color-murekkep) 18%, transparent);
+  }
+
+  .yorum-avatar {
+    width: 2.25rem;
+    height: 2.25rem;
+    flex: none;
+    border-radius: 999px;
+    object-fit: cover;
+    background: var(--color-kirec);
+  }
+  .yorum-bag {
+    flex: none;
+    font-size: 0.75rem;
+    color: var(--color-kursun);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .yorum-bag:hover {
+    color: var(--color-murekkep);
   }
 </style>
