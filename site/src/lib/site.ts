@@ -120,6 +120,36 @@ export const DANISMANLAR: Danisman[] = [
   },
 ];
 
+/**
+ * Bir işin baştan sona nasıl ilerlediği.
+ *
+ * HIZMETLER "ne yapıyoruz"u anlatıyor; bu ise "nasıl gidiyor"u — zaman
+ * sırasına dizili. Marka konumlandırmasındaki "tapuya kadar yanınızda"
+ * cümlesinin sitedeki karşılığı burası.
+ */
+export const SUREC = [
+  {
+    baslik: 'Yerinde görüyoruz',
+    ozet:
+      'Mülkü geziyor, çevreyi ve son satışları konuşuyoruz. Arsa ya da tarlaysa imar durumunu, kadastral yolu ve tapu kaydını çıkarıyoruz.',
+  },
+  {
+    baslik: 'Fiyatı birlikte koyuyoruz',
+    ozet:
+      'Bölgede gerçekleşmiş satışlara bakıp bir aralık çıkarıyoruz. Değerleme ücretsiz — sonunda satmak zorunda değilsiniz.',
+  },
+  {
+    baslik: 'Alıcıyı biz buluyoruz',
+    ozet:
+      'İlan portalları, ofis vitrini ve kendi alıcı listemiz. Gezdirmeyi biz yapıyoruz; her randevuda evde olmak zorunda kalmıyorsunuz.',
+  },
+  {
+    baslik: 'Tapuya kadar yanınızdayız',
+    ozet:
+      'Pazarlık, sözleşme, harç hesabı ve tapu randevusu. Başladığınız kişiyle bitiriyorsunuz; dosyanız elden ele geçmiyor.',
+  },
+] as const;
+
 export const HIZMETLER = [
   {
     baslik: 'Alım — Satım',

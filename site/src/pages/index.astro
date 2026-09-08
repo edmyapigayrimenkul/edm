@@ -3,7 +3,7 @@ import Temel from '../layouts/Temel.astro';
 import ParselTuval from '../components/ParselTuval.astro';
 import IlanKart from '../components/IlanKart.astro';
 import FotografSeridi from '../components/FotografSeridi.astro';
-import { KURUM } from '../lib/site';
+import { SUREC, KURUM } from '../lib/site';
 import { oneCikanlar, portfoy, danismaninIlanlari, seritIcin } from '../lib/ilanlar';
 import { icerik } from '../lib/icerik';
 
@@ -204,6 +204,43 @@ const hizliFiltreler = [
             </div>
           ))
         }
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SÜREÇ ================= -->
+  <section class="surec-blok" data-adim-alan>
+    <div class="kab">
+      <div class="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+        <div class="surec-sabit">
+          <p class="etiket" data-belir>Nasıl ilerliyor</p>
+          <h2 class="baslik-buyuk mt-4 max-w-[12ch]" data-belir data-gecikme="0.06">
+            Tapuya kadar aynı kişiyle
+          </h2>
+          <p class="mt-6 max-w-[38ch] leading-relaxed text-metin-2" data-belir data-gecikme="0.12">
+            Bir dosya kaç el değiştirirse o kadar bilgi düşüyor. Mülkü ilk gün gezen
+            kişi, tapu dairesinde de yanınızda oluyor.
+          </p>
+          <p class="surec-sayac font-veri" aria-hidden="true">
+            <span data-adim-sayac>01</span>
+            <span class="surec-sayac-ek">/ {String(SUREC.length).padStart(2, '0')}</span>
+          </p>
+        </div>
+
+        <ol class="surec-liste">
+          <span class="surec-ray" aria-hidden="true">
+            <span class="surec-ray-dolu" data-adim-cizgi></span>
+          </span>
+          {
+            SUREC.map((adim, i) => (
+              <li class="surec-adim" data-adim>
+                <span class="surec-no font-veri">{String(i + 1).padStart(2, '0')}</span>
+                <h3 class="baslik-orta mt-3">{adim.baslik}</h3>
+                <p class="mt-3 max-w-[46ch] leading-relaxed text-metin-2">{adim.ozet}</p>
+              </li>
+            ))
+          }
+        </ol>
       </div>
     </div>
   </section>
@@ -492,5 +529,76 @@ const hizliFiltreler = [
   .degerleme-blok {
     background: var(--color-kagit-2);
     border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 8%, transparent);
+  }
+
+  .surec-blok {
+    padding-block: 5rem;
+    border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+  }
+  @media (min-width: 1024px) {
+    .surec-blok {
+      padding-block: 7rem;
+    }
+    /* Başlık okunan adımla birlikte yerinde kalıyor */
+    .surec-sabit {
+      position: sticky;
+      top: 8rem;
+      align-self: start;
+    }
+  }
+
+  .surec-sayac {
+    display: none;
+    margin-top: 3.5rem;
+    font-size: 2.75rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (min-width: 1024px) {
+    .surec-sayac {
+      display: block;
+    }
+  }
+  .surec-sayac-ek {
+    font-size: 1rem;
+    color: var(--color-kursun);
+    margin-left: 0.15rem;
+  }
+
+  .surec-liste {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+    padding-left: 2rem;
+  }
+  @media (min-width: 1024px) {
+    .surec-liste {
+      gap: 6rem;
+      padding-left: 2.75rem;
+    }
+  }
+
+  /* İnce ray ve üzerinde kaydırmayla dolan kırmızı */
+  .surec-ray {
+    position: absolute;
+    left: 0;
+    top: 0.6rem;
+    bottom: 0.6rem;
+    width: 1px;
+    background: color-mix(in oklab, var(--color-murekkep) 14%, transparent);
+  }
+  .surec-ray-dolu {
+    position: absolute;
+    inset: 0;
+    background: var(--color-kirmizi);
+    transform-origin: top;
+  }
+
+  .surec-no {
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    color: var(--color-kirmizi);
   }
 </style>

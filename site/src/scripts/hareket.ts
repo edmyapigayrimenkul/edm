@@ -295,6 +295,85 @@ function seritKur() {
 }
 
 /* ---------------------------------------------------------------
+   Süreç adımları
+
+   Okunan adım tam görünür, diğerleri soluk. Odak kaydırmayla ilerliyor,
+   soldaki sayaç ve kırmızı ray da onunla birlikte.
+
+   Sol sütun CSS'in kendi `position: sticky`'siyle yerinde duruyor —
+   ScrollTrigger'ın pin'i Lenis'le birlikte kırılgan olabiliyor, buna
+   gerek yok.
+   --------------------------------------------------------------- */
+function adimKur() {
+  if (azHareket) return;
+  const alan = document.querySelector<HTMLElement>('[data-adim-alan]');
+  if (!alan) return;
+
+  const adimlar = gsap.utils.toArray<HTMLElement>('[data-adim]', alan);
+  if (!adimlar.length) return;
+
+  const sayac = alan.querySelector<HTMLElement>('[data-adim-sayac]');
+  const cizgi = alan.querySelector<HTMLElement>('[data-adim-cizgi]');
+
+  gsap.set(adimlar, { opacity: 0.4 });
+
+  // Her adıma ayrı tetik koymak, kısa bloklarda ikisini birden yakıyordu.
+  // Onun yerine ekranda hayali bir okuma çizgisi var ve o çizgiye en yakın
+  // adım tek başına canlanıyor — ekran boyu ne olursa olsun tek odak.
+  let aktif = -1;
+  const okuma = () => window.innerHeight * 0.45;
+
+  ScrollTrigger.create({
+    trigger: alan,
+    start: 'top bottom',
+    end: 'bottom top',
+    onUpdate: () => {
+      const cizgiYeri = okuma();
+      let enYakin = 0;
+      let enKucukFark = Infinity;
+
+      adimlar.forEach((adim, i) => {
+        const kutu = adim.getBoundingClientRect();
+        const fark = Math.abs(kutu.top + kutu.height / 2 - cizgiYeri);
+        if (fark < enKucukFark) {
+          enKucukFark = fark;
+          enYakin = i;
+        }
+      });
+
+      if (enYakin === aktif) return;
+      aktif = enYakin;
+
+      adimlar.forEach((adim, i) =>
+        gsap.to(adim, { opacity: i === enYakin ? 1 : 0.4, duration: 0.45, overwrite: true })
+      );
+      adimlar[enYakin].setAttribute('data-adim-etkin', 'evet');
+      if (sayac) sayac.textContent = String(enYakin + 1).padStart(2, '0');
+    },
+  });
+
+  // Soldaki kırmızı ray kaydırmayla doluyor — nerede olduğunu gösteren
+  // tek sürekli işaret. Adımların yakılıp söndürülmesinden bağımsız.
+  if (cizgi) {
+    gsap.fromTo(
+      cizgi,
+      { scaleY: 0 },
+      {
+        scaleY: 1,
+        ease: 'none',
+        transformOrigin: 'top',
+        scrollTrigger: { trigger: alan, start: 'top 62%', end: 'bottom 55%', scrub: 0.4 },
+      }
+    );
+  }
+
+  // Güvenlik ağı: hiçbir adım canlanmadıysa hepsini tam görünür yap.
+  window.setTimeout(() => {
+    if (!alan.querySelector('[data-adim-etkin]')) gsap.set(adimlar, { opacity: 1 });
+  }, 5000);
+}
+
+/* ---------------------------------------------------------------
    Başlık çubuğu: kaydırınca zemin kazanır
    --------------------------------------------------------------- */
 function baslikCubuguKur() {
@@ -368,6 +447,7 @@ export function hareketiBaslat() {
   parallaxKur();
   kahramanKur();
   seritKur();
+  adimKur();
 
   // Görseller yüklendikçe tetik konumları kayar
   window.addEventListener('load', () => {
