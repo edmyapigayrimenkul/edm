@@ -204,6 +204,97 @@ function parallaxKur() {
 }
 
 /* ---------------------------------------------------------------
+   Kahraman kaydırmayla çözülür
+
+   Belirme animasyonları bir kez oynayıp biter; bu ise kaydırmaya bağlı.
+   Aşağı indikçe kahraman yazısı sayfadan biraz daha hızlı çıkıp soluyor,
+   arkadaki parsel dokusu geride kalıyor. İkisinin farklı hızda gitmesi
+   derinlik hissini veren şey.
+
+   Yalnızca saran kutuyu hareket ettiriyoruz — içindeki [data-belir]
+   öğelerinin kendi animasyonlarına ve güvenlik ağına dokunmuyor.
+   --------------------------------------------------------------- */
+function kahramanKur() {
+  if (azHareket) return;
+  const icerik = document.querySelector<HTMLElement>('[data-kahraman-icerik]');
+  if (!icerik) return;
+
+  gsap.to(icerik, {
+    yPercent: -11,
+    opacity: 0.3,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: icerik,
+      start: 'top top',
+      end: 'bottom 42%',
+      scrub: 0.5,
+    },
+  });
+}
+
+/* ---------------------------------------------------------------
+   Fotoğraf şeridi kaydırma hızına tepki verir
+
+   Şerit CSS animasyonuyla dönüyordu — sabit hız, sayfayla ilgisi yok.
+   Burada kontrolü GSAP'e alıyoruz: hızlı kaydırınca şerit hızlanıp
+   hafifçe eğiliyor, yukarı kaydırınca yön değiştiriyor, durunca kendi
+   temposuna dönüyor. Şerit iki kez basılı olduğu için yarım tur
+   (xPercent -50) tam bir döngü ediyor.
+
+   CSS animasyonu yerinde bırakıldı: JS çalışmazsa şerit yine dönüyor.
+   --------------------------------------------------------------- */
+function seritKur() {
+  if (azHareket) return;
+
+  document.querySelectorAll<HTMLElement>('.serit-akis').forEach((akis) => {
+    const sure = parseFloat(getComputedStyle(akis).getPropertyValue('--sure')) || 45;
+
+    akis.style.animation = 'none';
+    const dongu = gsap.to(akis, {
+      xPercent: -50,
+      duration: sure,
+      ease: 'none',
+      repeat: -1,
+    });
+
+    // Üzerine gelince durma davranışı CSS'ten devralınıyor.
+    const kap = akis.closest<HTMLElement>('.serit-durakla');
+    let uzerinde = false;
+    kap?.addEventListener('pointerenter', () => {
+      uzerinde = true;
+      gsap.to(dongu, { timeScale: 0, duration: 0.5, overwrite: true });
+    });
+    kap?.addEventListener('pointerleave', () => {
+      uzerinde = false;
+      gsap.to(dongu, { timeScale: 1, duration: 0.7, overwrite: true });
+    });
+
+    const egimeGit = gsap.quickTo(akis, 'skewX', { duration: 0.5, ease: 'power2.out' });
+    let durgunluk: number;
+
+    ScrollTrigger.create({
+      onUpdate: (kendi) => {
+        if (uzerinde) return;
+        const hiz = kendi.getVelocity();
+        const yon = hiz < 0 ? -1 : 1;
+        const carpan = Math.min(Math.abs(hiz) / 900, 3);
+
+        gsap.to(dongu, { timeScale: yon * (1 + carpan), duration: 0.25, overwrite: true });
+        egimeGit(gsap.utils.clamp(-5, 5, hiz / 260));
+
+        // Kaydırma durunca kendi temposuna dönsün.
+        clearTimeout(durgunluk);
+        durgunluk = window.setTimeout(() => {
+          if (uzerinde) return;
+          gsap.to(dongu, { timeScale: 1, duration: 0.9, overwrite: true });
+          egimeGit(0);
+        }, 150);
+      },
+    });
+  });
+}
+
+/* ---------------------------------------------------------------
    Başlık çubuğu: kaydırınca zemin kazanır
    --------------------------------------------------------------- */
 function baslikCubuguKur() {
@@ -275,6 +366,8 @@ export function hareketiBaslat() {
   belirmeKur();
   sayacKur();
   parallaxKur();
+  kahramanKur();
+  seritKur();
 
   // Görseller yüklendikçe tetik konumları kayar
   window.addEventListener('load', () => {
