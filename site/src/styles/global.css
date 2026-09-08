@@ -76,6 +76,12 @@
 /* --------------------------------------------------------------
    Marka belirteçleri
    -------------------------------------------------------------- */
+/* hidden özniteliği display kuralını her zaman yensin — kart ve
+   düğmeler flex/grid olduğu için tarayıcı varsayılanı yetmiyor. */
+[hidden] {
+  display: none !important;
+}
+
 @theme {
   /* Kılavuz 03 — Renk */
   --color-kirmizi: #f0000d;

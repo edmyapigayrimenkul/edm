@@ -1,0 +1,69 @@
+---
+/**
+ * Ziyaretçinin kaydettiği ilanlar.
+ *
+ * Liste tarayıcıda durduğu için sunucu kimin neyi kaydettiğini bilmiyor.
+ * Bu yüzden sayfa bütün aktif ilanların kartını kapalı olarak basıyor ve
+ * FavoriBetik yalnızca kayıtlı olanları açıyor. Kapalı kartların görselleri
+ * hiç indirilmiyor (lazy), sayfaya binen tek yük HTML.
+ *
+ * Arama motoruna kapalı: herkes için farklı görünen bir sayfanın
+ * dizine girmesinin anlamı yok.
+ */
+import Temel from '../layouts/Temel.astro';
+import IlanKart from '../components/IlanKart.astro';
+import { portfoy } from '../lib/ilanlar';
+
+const { ilanlar } = await portfoy();
+---
+
+<Temel
+  baslik="Kaydettiklerim"
+  aciklama="Beğendiğiniz ilanları burada toplayın; listeyi bize tek mesajda iletin."
+  dizinleme={false}
+>
+  <section class="pt-28 pb-20 lg:pt-36 lg:pb-28" data-favori-sayfa>
+    <div class="kab">
+      <p class="etiket">Sizin listeniz</p>
+      <div class="mt-4 flex flex-wrap items-end justify-between gap-6">
+        <h1 class="baslik-buyuk max-w-[16ch]">Kaydettikleriniz</h1>
+        <div data-favori-arac hidden>
+          <button type="button" data-favori-temizle class="dugme dugme--hayalet">
+            Listeyi temizle
+          </button>
+        </div>
+      </div>
+
+      <!-- Hiç kayıt yokken -->
+      <div data-favori-bos class="bos-kutu mt-10">
+        <p class="baslik-orta max-w-[22ch]">Henüz bir ilan kaydetmediniz.</p>
+        <p class="mt-4 max-w-[46ch] text-metin-2">
+          İlan kartlarının köşesindeki kalbe dokunduğunuzda ilan bu sayfada birikir.
+          Liste yalnızca bu tarayıcıda durur — üyelik gerekmez, kimseyle paylaşılmaz.
+        </p>
+        <a href="/ilanlar" class="dugme dugme--kirmizi mt-7">Portföye göz atın</a>
+      </div>
+
+      <!-- Kayıtlılar; kartlar kapalı basılıp betikle açılıyor -->
+      <div data-favori-izgara hidden class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {ilanlar.map((i) => <IlanKart ilan={i} gizli />)}
+      </div>
+
+      <p class="mt-10 text-sm text-kursun">
+        Listeniz bu tarayıcıda saklanıyor. Başka bir telefondan bakarsanız boş görünür.
+        Beğendiklerinizi bize iletmek isterseniz
+        <a href="/iletisim" class="alt-cizgi font-medium text-murekkep">iletişim sayfasından</a>
+        yazabilirsiniz.
+      </p>
+    </div>
+  </section>
+</Temel>
+
+<style>
+  .bos-kutu {
+    border: 1px dashed color-mix(in oklab, var(--color-murekkep) 18%, transparent);
+    border-radius: var(--radius-kart);
+    padding: clamp(2rem, 6vw, 4rem);
+    background: color-mix(in oklab, var(--color-murekkep) 2.5%, transparent);
+  }
+</style>

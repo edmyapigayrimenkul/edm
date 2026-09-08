@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Kafa from '../components/Kafa.astro';
 import Ayak from '../components/Ayak.astro';
 import WhatsappDugme from '../components/WhatsappDugme.astro';
+import FavoriBetik from '../components/FavoriBetik.astro';
 import { KURUM, SOSYAL } from '../lib/site';
 import { icerik } from '../lib/icerik';
 
@@ -118,6 +119,7 @@ const semalar = [kurumLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd
     <meta property="og:description" content={aciklama} />
     <meta property="og:url" content={kanonik.href} />
     <meta property="og:image" content={gorselTam} />
+    <meta property="og:image:alt" content={aciklama} />
     <meta name="twitter:card" content="summary_large_image" />
 
     <script type="application/ld+json" is:inline set:html={JSON.stringify(semalar)} />
@@ -138,6 +140,7 @@ const semalar = [kurumLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd
 
     <Ayak />
     <WhatsappDugme />
+    <FavoriBetik />
 
     <script>
       import { hareketiBaslat } from '../scripts/hareket';

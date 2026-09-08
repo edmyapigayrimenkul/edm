@@ -54,6 +54,28 @@ const aktifMi = (yol: string) => suAn === yol || suAn.startsWith(`${yol}/`);
 
       <div class="flex items-center gap-2 sm:gap-3">
         <a
+          href="/favorilerim"
+          data-favori-bag
+          hidden
+          class="menu-bag inline-flex items-center gap-1.5"
+          aria-label="Kaydettiklerim"
+        >
+          <svg
+            class="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            stroke="currentColor"
+            stroke-width="1.7"
+            aria-hidden="true"
+          >
+            <path
+              d="M12 20.6 4.7 13.3a4.6 4.6 0 0 1 0-6.5 4.6 4.6 0 0 1 6.5 0l.8.8.8-.8a4.6 4.6 0 0 1 6.5 0 4.6 4.6 0 0 1 0 6.5Z"
+              stroke-linejoin="round"></path>
+          </svg>
+          <span class="font-veri text-sm" data-favori-sayi>0</span>
+        </a>
+
+        <a
           href={`tel:${iletisim.telefonHam}`}
           class="menu-bag hidden items-center gap-2 font-veri text-sm tracking-tight sm:inline-flex"
         >

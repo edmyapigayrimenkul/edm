@@ -1,0 +1,106 @@
+---
+/**
+ * Kaydedilen ilanları yöneten tek betik.
+ *
+ * Her sayfada bir kez, gövdenin sonunda çalışıyor: düğmelerin durumunu
+ * kuruyor, başlıktaki sayacı güncelliyor ve /favorilerim sayfasında hangi
+ * kartların görüneceğine karar veriyor. Liste localStorage'da; sunucuya
+ * hiçbir şey gönderilmiyor, gizli pencerede veya çerezler silinince
+ * kendiliğinden boşalıyor.
+ */
+---
+
+<script is:inline>
+  (() => {
+    const ANAHTAR = 'edm-favori';
+
+    const oku = () => {
+      try {
+        const l = JSON.parse(localStorage.getItem(ANAHTAR) || '[]');
+        return Array.isArray(l) ? l.filter((x) => typeof x === 'string') : [];
+      } catch {
+        // Gizli pencerede ya da depolama kapalıyken sessizce boş liste.
+        return [];
+      }
+    };
+    const yaz = (l) => {
+      try {
+        localStorage.setItem(ANAHTAR, JSON.stringify(l));
+      } catch {}
+    };
+
+    function tazele() {
+      const liste = oku();
+      const kume = new Set(liste);
+
+      document.querySelectorAll('[data-favori]').forEach((d) => {
+        const secili = kume.has(d.dataset.favori);
+        d.setAttribute('aria-pressed', secili ? 'true' : 'false');
+        const metin = d.querySelector('[data-favori-metin]');
+        if (metin) metin.textContent = secili ? 'Kaydedildi' : 'Kaydet';
+      });
+
+      document.querySelectorAll('[data-favori-bag]').forEach((b) => {
+        b.hidden = liste.length === 0;
+        const sayi = b.querySelector('[data-favori-sayi]');
+        if (sayi) sayi.textContent = String(liste.length);
+      });
+
+      const sayfa = document.querySelector('[data-favori-sayfa]');
+      if (!sayfa) return;
+
+      let gorunen = 0;
+      sayfa.querySelectorAll('[data-id]').forEach((kart) => {
+        const secili = kume.has(kart.dataset.id);
+        kart.hidden = !secili;
+        if (!secili) return;
+        gorunen++;
+        // Kapalı kartların adresi data-src'de bekliyor: tarayıcı gizli de
+        // olsa lazy görselleri indirmeye kalkıyor, bu yüzden adresi ancak
+        // kart açılırken veriyoruz.
+        kart.querySelectorAll('img[data-src]').forEach((g) => {
+          g.src = g.dataset.src;
+          delete g.dataset.src;
+        });
+      });
+      const bos = sayfa.querySelector('[data-favori-bos]');
+      const izgara = sayfa.querySelector('[data-favori-izgara]');
+      const arac = sayfa.querySelector('[data-favori-arac]');
+      if (bos) bos.hidden = gorunen > 0;
+      if (izgara) izgara.hidden = gorunen === 0;
+      if (arac) arac.hidden = gorunen === 0;
+    }
+
+    document.addEventListener('click', (olay) => {
+      const temizle = olay.target.closest?.('[data-favori-temizle]');
+      if (temizle) {
+        yaz([]);
+        tazele();
+        return;
+      }
+
+      const dugme = olay.target.closest?.('[data-favori]');
+      if (!dugme) return;
+      // Kart baştan sona bağlantı; tıklama ilana gitmesin.
+      olay.preventDefault();
+      olay.stopPropagation();
+
+      const id = dugme.dataset.favori;
+      const liste = oku();
+      yaz(liste.includes(id) ? liste.filter((x) => x !== id) : [id, ...liste]);
+      tazele();
+
+      dugme.dataset.vur = 'evet';
+      setTimeout(() => delete dugme.dataset.vur, 400);
+    });
+
+    // Başka sekmede eklendiyse burası da haberdar olsun.
+    window.addEventListener('storage', (o) => {
+      if (o.key === ANAHTAR) tazele();
+    });
+    // Geri tuşuyla önbellekten dönen sayfa için.
+    window.addEventListener('pageshow', tazele);
+
+    tazele();
+  })();
+</script>

@@ -1,6 +1,7 @@
 ---
 import type { Ilan } from '../lib/ilanlar';
 import { fiyatKisa } from '../lib/ilanlar';
+import FavoriDugme from './FavoriDugme.astro';
 
 interface Props {
   ilan: Ilan;
@@ -8,9 +9,11 @@ interface Props {
   oncelikli?: boolean;
   /** Geniş kart: iki sütun kaplar, görsel daha yatay. */
   genis?: boolean;
+  /** Kapalı başlar: /favorilerim kartları yalnızca kayıtlıysa açılıyor. */
+  gizli?: boolean;
 }
 
-const { ilan, oncelikli = false, genis = false } = Astro.props;
+const { ilan, oncelikli = false, genis = false, gizli = false } = Astro.props;
 const durumEtiketi = ilan.islem === 'satilik' ? 'Satılık' : 'Kiralık';
 ---
 
@@ -27,13 +30,18 @@ const durumEtiketi = ilan.islem === 'satilik' ? 'Satılık' : 'Kiralık';
   data-oda={ilan.oda ?? ''}
   data-tarih={Date.parse(ilan.guncellenme ?? ilan.ilkGorulme) || 0}
   data-ara={ilan.aramaMetni}
+  data-id={ilan.id}
+  hidden={gizli}
 >
+  <FavoriDugme id={ilan.id} baslik={ilan.baslikTemiz} />
+
   <a href={ilan.yol} class="flex h-full flex-col">
     <div class:list={['goruntu-kutu ilan-gorsel', genis && 'ilan-gorsel--genis']}>
       {
         ilan.kapak ? (
           <img
-            src={ilan.kapak}
+            src={gizli ? undefined : ilan.kapak}
+            data-src={gizli ? ilan.kapak : undefined}
             alt={ilan.baslikTemiz}
             loading={oncelikli ? 'eager' : 'lazy'}
             decoding="async"
@@ -85,6 +93,7 @@ const durumEtiketi = ilan.islem === 'satilik' ? 'Satılık' : 'Kiralık';
 
 <style>
   .ilan-kart {
+    position: relative;
     background: #fff;
     border: 1px solid color-mix(in oklab, var(--color-murekkep) 9%, transparent);
     border-radius: var(--radius-kart);

@@ -1,0 +1,107 @@
+---
+/**
+ * Bir ilanı kaydetme düğmesi.
+ *
+ * Kart üstünde köşedeki küçük kalp, ilan sayfasında yazılı geniş düğme
+ * olarak çıkıyor. Kayıt yalnızca ziyaretçinin tarayıcısında duruyor —
+ * üyelik yok, sunucuya hiçbir şey gitmiyor, kimin neyi beğendiğini
+ * biz de göremiyoruz.
+ *
+ * Düğme sunucudan hep "basılmamış" geliyor; doğru duruma FavoriBetik
+ * sayfa çizilmeden hemen önce çeviriyor.
+ */
+interface Props {
+  id: string;
+  baslik: string;
+  /** Yazılı ve tam genişlikte hâli — ilan sayfası için. */
+  genis?: boolean;
+}
+const { id, baslik, genis = false } = Astro.props;
+---
+
+<button
+  type="button"
+  data-favori={id}
+  aria-pressed="false"
+  aria-label={`${baslik} — kaydet`}
+  class:list={['favori', genis && 'favori--genis']}
+>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+    <path
+      d="M12 20.6 4.7 13.3a4.6 4.6 0 0 1 0-6.5 4.6 4.6 0 0 1 6.5 0l.8.8.8-.8a4.6 4.6 0 0 1 6.5 0 4.6 4.6 0 0 1 0 6.5Z"
+      stroke-linejoin="round"></path>
+  </svg>
+  {genis && <span data-favori-metin>Kaydet</span>}
+</button>
+
+<style>
+  .favori {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    color: var(--color-kagit);
+    background: color-mix(in oklab, var(--color-murekkep) 45%, transparent);
+    backdrop-filter: blur(8px);
+    transition: background-color 0.35s var(--ease-yumusak), color 0.35s var(--ease-yumusak),
+      transform 0.35s var(--ease-yumusak);
+  }
+  .favori:hover {
+    background: color-mix(in oklab, var(--color-murekkep) 72%, transparent);
+  }
+  .favori svg {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  /* Kaydedilmiş: kalp doluyor ve markanın kırmızısına geçiyor */
+  .favori[aria-pressed='true'] {
+    color: var(--color-kirmizi);
+  }
+  .favori[aria-pressed='true'] svg {
+    fill: currentColor;
+    stroke: currentColor;
+  }
+
+  /* Basıldığı an küçük bir tepki — dokunuşun kaydedildiği anlaşılsın */
+  .favori[data-vur='evet'] svg {
+    animation: favori-vur 0.4s var(--ease-yumusak);
+  }
+  @keyframes favori-vur {
+    40% {
+      transform: scale(1.28);
+    }
+  }
+
+  .favori--genis {
+    position: static;
+    width: 100%;
+    height: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-dugme, 2px);
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 16%, transparent);
+    background: transparent;
+    color: var(--color-murekkep);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    backdrop-filter: none;
+  }
+  .favori--genis:hover {
+    background: color-mix(in oklab, var(--color-murekkep) 5%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .favori[data-vur='evet'] svg {
+      animation: none;
+    }
+  }
+</style>

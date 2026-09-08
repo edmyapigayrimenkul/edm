@@ -6,6 +6,7 @@ import IlanKart from '../../components/IlanKart.astro';
 import { ilanBul, benzerIlanlar, fiyatYaz } from '../../lib/ilanlar';
 import { PORTALLAR, KURUM } from '../../lib/site';
 import { icerik, whatsappBaglanti } from '../../lib/icerik';
+import FavoriDugme from '../../components/FavoriDugme.astro';
 
 const { slug } = Astro.params;
 const ilan = slug ? await ilanBul(slug) : undefined;
@@ -289,6 +290,7 @@ const izYolu = {
                 {iletisim.telefon}
               </a>
               <a href="/iletisim" class="dugme dugme--hayalet w-full">Yerinde görmek istiyorum</a>
+              <FavoriDugme id={ilan.id} baslik={ilan.baslikTemiz} genis />
             </div>
 
             <p class="mt-4 text-center text-[0.75rem] text-kursun">
