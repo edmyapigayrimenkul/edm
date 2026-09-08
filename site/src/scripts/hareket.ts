@@ -14,6 +14,34 @@ const azHareket = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 gsap.registerPlugin(ScrollTrigger);
 
+/* Görünüm geçişinde sayfa yeniden yüklenmiyor; bir öncekinden kalan her şeyi
+   elle toplamak gerekiyor. Dinleyiciler tek bir AbortController'a bağlı,
+   Lenis ve şerit döngüsü ayrıca tutuluyor. */
+let kontrol: AbortController | null = null;
+let lenisOrnek: Lenis | null = null;
+let tickerIsi: ((zaman: number) => void) | null = null;
+let seritDonguleri: gsap.core.Tween[] = [];
+let ilkKurulum = true;
+
+const isaret = () => ({ signal: kontrol?.signal }) as AddEventListenerOptions;
+
+/** Bir önceki sayfadan kalan hareketleri söker. */
+export function hareketiDurdur(): void {
+  ScrollTrigger.getAll().forEach((tetik) => tetik.kill());
+  seritDonguleri.forEach((dongu) => dongu.kill());
+  seritDonguleri = [];
+
+  if (tickerIsi) {
+    gsap.ticker.remove(tickerIsi);
+    tickerIsi = null;
+  }
+  lenisOrnek?.destroy();
+  lenisOrnek = null;
+
+  kontrol?.abort();
+  kontrol = null;
+}
+
 /* ---------------------------------------------------------------
    Yumuşak kaydırma
    --------------------------------------------------------------- */
@@ -29,8 +57,10 @@ function kaydirmaKur(): Lenis | null {
   });
 
   lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add((zaman) => lenis.raf(zaman * 1000));
+  tickerIsi = (zaman: number) => lenis.raf(zaman * 1000);
+  gsap.ticker.add(tickerIsi);
   gsap.ticker.lagSmoothing(0);
+  lenisOrnek = lenis;
 
   // Sayfa içi çapa bağlantıları Lenis üzerinden gitsin
   document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
@@ -41,7 +71,7 @@ function kaydirmaKur(): Lenis | null {
       if (!el) return;
       olay.preventDefault();
       lenis.scrollTo(el as HTMLElement, { offset: -96 });
-    });
+    }, isaret());
   });
 
   return lenis;
@@ -52,9 +82,16 @@ function kaydirmaKur(): Lenis | null {
    data-belir="yukari" | "maske" | "olcek" | "sira"
    data-gecikme="0.1"
    --------------------------------------------------------------- */
-function belirmeKur() {
+function belirmeKur(anindaAc: boolean) {
   const ogeler = gsap.utils.toArray<HTMLElement>('[data-belir]');
   const ekranYuksekligi = window.innerHeight;
+
+  /** Animasyonsuz, doğrudan son hâline getirir. */
+  function hemenAc(el: HTMLElement) {
+    gsap.set(el, { opacity: 1, y: 0, yPercent: 0, scale: 1 });
+    if (el.dataset.belir === 'sira') gsap.set(Array.from(el.children), { opacity: 1, y: 0 });
+    el.setAttribute('data-belirdi', 'evet');
+  }
 
   /** Bir öğeyi görünür hale getiren tween'i kurar. */
   function ac(el: HTMLElement, gecikme: number) {
@@ -108,7 +145,9 @@ function belirmeKur() {
     // okunacak içerik gizli kalmaz.
     const ustNokta = el.getBoundingClientRect().top;
     if (ustNokta < ekranYuksekligi * 0.95) {
-      ac(el, gecikme);
+      // Geçişle gelindiyse ekrandaki içerik beklemeden yerinde durur;
+      // sayfa geçişinin üstüne bir de belirme animasyonu binmesin.
+      anindaAc ? hemenAc(el) : ac(el, gecikme);
       return;
     }
 
@@ -128,7 +167,7 @@ function belirmeKur() {
       ScrollTrigger.refresh();
       window.setTimeout(gizliKalaniAc, 1200);
     }
-  });
+  }, isaret());
 }
 
 /** Hâlâ görünmez duran öğeleri anında görünür kılar. */
@@ -256,6 +295,7 @@ function seritKur() {
       ease: 'none',
       repeat: -1,
     });
+    seritDonguleri.push(dongu);
 
     // Üzerine gelince durma davranışı CSS'ten devralınıyor.
     const kap = akis.closest<HTMLElement>('.serit-durakla');
@@ -263,11 +303,11 @@ function seritKur() {
     kap?.addEventListener('pointerenter', () => {
       uzerinde = true;
       gsap.to(dongu, { timeScale: 0, duration: 0.5, overwrite: true });
-    });
+    }, isaret());
     kap?.addEventListener('pointerleave', () => {
       uzerinde = false;
       gsap.to(dongu, { timeScale: 1, duration: 0.7, overwrite: true });
-    });
+    }, isaret());
 
     const egimeGit = gsap.quickTo(akis, 'skewX', { duration: 0.5, ease: 'power2.out' });
     let durgunluk: number;
@@ -374,6 +414,42 @@ function adimKur() {
 }
 
 /* ---------------------------------------------------------------
+   Kartın fotoğrafı ilan sayfasına büyüyerek geçsin
+
+   Geçiş adını her karta baştan yazmak yerine tıklanan karta veriyoruz:
+   sayfada aynı ad tek bir öğede bulunabilir ve tarayıcının 46 kareyi
+   birden anlık görüntülemesi gereksiz bir yük olurdu.
+
+   Yakalama evresinde dinliyoruz — Astro'nun kendi tıklama işleyicisi
+   kabarma evresinde çalışıyor, ad ondan önce yerine konmuş oluyor.
+   --------------------------------------------------------------- */
+const GECIS_ADI = 'ilan-foto';
+
+function gecisKur() {
+  document.addEventListener(
+    'click',
+    (olay) => {
+      const hedef = olay.target as HTMLElement | null;
+      const bag = hedef?.closest?.('a[href^="/ilan/"]') as HTMLAnchorElement | null;
+      if (!bag) return;
+
+      const gorsel = bag.querySelector<HTMLImageElement>('img');
+      if (!gorsel) return;
+
+      // Ad sayfada tek olmalı; ilan sayfasındaki galeri karesi de aday.
+      document.querySelectorAll<HTMLElement>('[data-gecis-adi]').forEach((el) => {
+        el.style.viewTransitionName = '';
+        el.removeAttribute('data-gecis-adi');
+      });
+
+      gorsel.style.viewTransitionName = GECIS_ADI;
+      gorsel.setAttribute('data-gecis-adi', '');
+    },
+    { capture: true, ...isaret() }
+  );
+}
+
+/* ---------------------------------------------------------------
    Başlık çubuğu: kaydırınca zemin kazanır
    --------------------------------------------------------------- */
 function baslikCubuguKur() {
@@ -391,7 +467,7 @@ function baslikCubuguKur() {
   };
 
   guncelle();
-  window.addEventListener('scroll', guncelle, { passive: true });
+  window.addEventListener('scroll', guncelle, { passive: true, ...isaret() });
 }
 
 /* ---------------------------------------------------------------
@@ -419,13 +495,20 @@ function menuKur() {
   panel.querySelectorAll('a').forEach((a) => a.addEventListener('click', kapat));
   document.addEventListener('keydown', (o) => {
     if (o.key === 'Escape') kapat();
-  });
+  }, isaret());
 }
 
 /* ---------------------------------------------------------------
    Başlat
    --------------------------------------------------------------- */
-export function hareketiBaslat() {
+export function hareketiBaslat(): void {
+  // Geçişle gelindiyse bir önceki sayfanın hareketleri hâlâ ayakta.
+  hareketiDurdur();
+  kontrol = new AbortController();
+
+  const gecisle = !ilkKurulum;
+  ilkKurulum = false;
+
   document.documentElement.classList.add('js-var');
 
   menuKur();
@@ -442,18 +525,19 @@ export function hareketiBaslat() {
   }
 
   kaydirmaKur();
-  belirmeKur();
+  belirmeKur(gecisle);
   sayacKur();
   parallaxKur();
   kahramanKur();
   seritKur();
   adimKur();
+  gecisKur();
 
   // Görseller yüklendikçe tetik konumları kayar
   window.addEventListener('load', () => {
     ScrollTrigger.refresh();
     window.setTimeout(gizliKalaniAc, 800);
-  });
+  }, isaret());
 
   // Kaydırma durduğunda ekranda gizli kalan bir şey varsa aç
   let bekleme: number;
@@ -463,6 +547,6 @@ export function hareketiBaslat() {
       clearTimeout(bekleme);
       bekleme = window.setTimeout(gizliKalaniAc, 600);
     },
-    { passive: true }
+    { passive: true, ...isaret() }
   );
 }

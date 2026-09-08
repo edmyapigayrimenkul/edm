@@ -12,6 +12,14 @@
 
 <script is:inline>
   (() => {
+    // Görünüm geçişinde bu satır içi betik yeniden çalışabiliyor. İkinci
+    // kez geldiğinde her şeyi baştan kurmak yerine durumu tazeleyip çıkıyor,
+    // yoksa belge üstündeki dinleyiciler birikirdi.
+    if (window.__edmFavoriTazele) {
+      window.__edmFavoriTazele();
+      return;
+    }
+
     const ANAHTAR = 'edm-favori';
 
     const oku = () => {
@@ -93,6 +101,10 @@
       dugme.dataset.vur = 'evet';
       setTimeout(() => delete dugme.dataset.vur, 400);
     });
+
+    // Geçişle gelen yeni gövdedeki düğmeler de doğru dursun.
+    window.__edmFavoriTazele = tazele;
+    document.addEventListener('astro:page-load', tazele);
 
     // Başka sekmede eklendiyse burası da haberdar olsun.
     window.addEventListener('storage', (o) => {

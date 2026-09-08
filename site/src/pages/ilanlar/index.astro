@@ -329,6 +329,11 @@ const jsonLd = {
 </style>
 
 <script>
+  import { herSayfada } from '../../scripts/sayfa';
+
+  /* Gövde her görünüm geçişinden sonra yeniden kuruluyor: modül betikleri
+     bir kez çalışıp bittiği için gezinince kendiliğinden tekrarlanmaz. */
+  function sayfayiKur() {
   type Sirala = 'yeni' | 'fiyat-artan' | 'fiyat-azalan' | 'm2-azalan';
 
   const alan = document.querySelector<HTMLElement>('[data-filtre-alan]');
@@ -467,4 +472,7 @@ const jsonLd = {
 
     uygula();
   }
+  }
+
+  herSayfada(sayfayiKur);
 </script>

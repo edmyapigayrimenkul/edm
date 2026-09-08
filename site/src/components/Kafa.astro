@@ -257,6 +257,18 @@ const aktifMi = (yol: string) => suAn === yol || suAn.startsWith(`${yol}/`);
 </style>
 
 <script>
+  import { herSayfada } from '../scripts/sayfa';
+
+  /* Pencereye bağlanan dinleyiciler sayfa değişince ölmüyor; hepsi tek bir
+     denetleyiciye bağlı ve bir sonraki kurulumda toptan bırakılıyor. */
+  let kontrol: AbortController | null = null;
+
+  /* Gövde her görünüm geçişinden sonra yeniden kuruluyor: modül betikleri
+     bir kez çalışıp bittiği için gezinince kendiliğinden tekrarlanmaz. */
+  function sayfayiKur() {
+    kontrol?.abort();
+    kontrol = new AbortController();
+    const isaret = { signal: kontrol.signal };
   // Okuma ilerlemesi çizgisi
   const cizgi = document.querySelector<HTMLElement>('.kafa-cizgi');
   if (cizgi) {
@@ -266,7 +278,10 @@ const aktifMi = (yol: string) => suAn === yol || suAn.startsWith(`${yol}/`);
       cizgi.style.setProperty('--ilerleme', String(Math.min(1, Math.max(0, oran))));
     };
     guncelle();
-    window.addEventListener('scroll', guncelle, { passive: true });
-    window.addEventListener('resize', guncelle);
+    window.addEventListener('scroll', guncelle, { passive: true, ...isaret });
+    window.addEventListener('resize', guncelle, isaret);
   }
+  }
+
+  herSayfada(sayfayiKur);
 </script>

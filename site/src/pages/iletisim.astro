@@ -314,6 +314,11 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
 </style>
 
 <script>
+  import { herSayfada } from '../scripts/sayfa';
+
+  /* Gövde her görünüm geçişinden sonra yeniden kuruluyor: modül betikleri
+     bir kez çalışıp bittiği için gezinince kendiliğinden tekrarlanmaz. */
+  function sayfayiKur() {
 
   const form = document.querySelector<HTMLFormElement>('[data-iletisim-form]');
   const waNumara = form?.dataset.wa ?? '905363434197';
@@ -394,4 +399,7 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
       basari.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   }
+  }
+
+  herSayfada(sayfayiKur);
 </script>

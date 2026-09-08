@@ -22,6 +22,18 @@
 </style>
 
 <script>
+  import { herSayfada } from '../scripts/sayfa';
+
+  /* Pencereye bağlanan dinleyiciler sayfa değişince ölmüyor; hepsi tek bir
+     denetleyiciye bağlı ve bir sonraki kurulumda toptan bırakılıyor. */
+  let kontrol: AbortController | null = null;
+
+  /* Gövde her görünüm geçişinden sonra yeniden kuruluyor: modül betikleri
+     bir kez çalışıp bittiği için gezinince kendiliğinden tekrarlanmaz. */
+  function sayfayiKur() {
+    kontrol?.abort();
+    kontrol = new AbortController();
+    const isaret = { signal: kontrol.signal };
   const tuval = document.querySelector<HTMLCanvasElement>('[data-parsel]');
 
   if (tuval) {
@@ -151,7 +163,7 @@
           hedefKayma = Math.min(window.scrollY * 0.12, 90);
           requestAnimationFrame(kare);
         },
-        { passive: true }
+        { passive: true, ...isaret }
       );
     }
 
@@ -162,6 +174,9 @@
         kur();
         ciz(1, suKayma);
       }, 180);
-    });
+    }, isaret);
   }
+  }
+
+  herSayfada(sayfayiKur);
 </script>

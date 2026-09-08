@@ -76,6 +76,15 @@ const { enlem, boylam, etiket, yaricap = 700 } = Astro.props;
 </style>
 
 <script>
+  import { herSayfada } from '../scripts/sayfa';
+
+  /* Önceki sayfanın gözlemcisi kopmuş öğeleri izlemeye devam etmesin. */
+  let gozlemci: IntersectionObserver | null = null;
+
+  /* Gövde her görünüm geçişinden sonra yeniden kuruluyor: modül betikleri
+     bir kez çalışıp bittiği için gezinince kendiliğinden tekrarlanmaz. */
+  function sayfayiKur() {
+    gozlemci?.disconnect();
   const LEAFLET_SURUM = '1.9.4';
 
   function betikYukle(adres: string): Promise<void> {
@@ -150,16 +159,19 @@ const { enlem, boylam, etiket, yaricap = 700 } = Astro.props;
 
   const kutular = document.querySelectorAll<HTMLElement>('[data-harita]');
   if (kutular.length) {
-    const gozlemci = new IntersectionObserver(
+    gozlemci = new IntersectionObserver(
       (girisler) => {
         for (const giris of girisler) {
           if (!giris.isIntersecting) continue;
-          gozlemci.unobserve(giris.target);
+          gozlemci?.unobserve(giris.target);
           haritayiKur(giris.target as HTMLElement);
         }
       },
       { rootMargin: '200px' }
     );
-    kutular.forEach((k) => gozlemci.observe(k));
+    kutular.forEach((k) => gozlemci?.observe(k));
   }
+  }
+
+  herSayfada(sayfayiKur);
 </script>

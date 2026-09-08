@@ -365,6 +365,11 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
 </style>
 
 <script>
+  import { herSayfada } from '../scripts/sayfa';
+
+  /* Gövde her görünüm geçişinden sonra yeniden kuruluyor: modül betikleri
+     bir kez çalışıp bittiği için gezinince kendiliğinden tekrarlanmaz. */
+  function sayfayiKur() {
 
   const form = document.querySelector<HTMLFormElement>('[data-degerleme-form]');
   const waNumara = form?.dataset.wa ?? '905363434197';
@@ -470,4 +475,7 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
       basari.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   }
+  }
+
+  herSayfada(sayfayiKur);
 </script>
