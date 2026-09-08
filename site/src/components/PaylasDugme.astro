@@ -1,0 +1,56 @@
+---
+/**
+ * İlanı paylaşma düğmesi.
+ *
+ * Telefonda cihazın kendi paylaşım penceresini açıyor (WhatsApp, mesaj,
+ * e-posta — kullanıcı hangisini kullanıyorsa). Masaüstünde o pencere
+ * olmadığı için bağlantıyı panoya kopyalayıp geri bildirim veriyor.
+ *
+ * Emlak ilanı en çok paylaşılan sayfa türlerinden biri: insanlar eşine,
+ * ortağına, babasına yollar. Sayfada bunu yapacak bir düğme yoktu.
+ */
+interface Props {
+  baslik: string;
+  metin: string;
+}
+const { baslik, metin } = Astro.props;
+---
+
+<button type="button" class="paylas" data-paylas data-baslik={baslik} data-metin={metin}>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+    <circle cx="18" cy="5" r="3"></circle>
+    <circle cx="6" cy="12" r="3"></circle>
+    <circle cx="18" cy="19" r="3"></circle>
+    <path d="M8.6 10.6 15.4 6.4M8.6 13.4l6.8 4.2" stroke-linecap="round"></path>
+  </svg>
+  <span data-paylas-metin>Paylaş</span>
+</button>
+
+<style>
+  .paylas {
+    display: inline-flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-dugme, 2px);
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 16%, transparent);
+    background: transparent;
+    color: var(--color-murekkep);
+    font-family: inherit;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.35s var(--ease-yumusak);
+  }
+  .paylas:hover {
+    background: color-mix(in oklab, var(--color-murekkep) 5%, transparent);
+  }
+  .paylas svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    flex: none;
+  }
+</style>

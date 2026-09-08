@@ -450,6 +450,48 @@ function gecisKur() {
 }
 
 /* ---------------------------------------------------------------
+   Paylaşma
+
+   Telefonda cihazın kendi paylaşım penceresi açılıyor; masaüstünde o
+   pencere olmadığı için bağlantı panoya kopyalanıp düğmede söyleniyor.
+   --------------------------------------------------------------- */
+function paylasKur() {
+  document.addEventListener(
+    'click',
+    async (olay) => {
+      const hedef = olay.target as HTMLElement | null;
+      const dugme = hedef?.closest?.('[data-paylas]') as HTMLButtonElement | null;
+      if (!dugme) return;
+
+      const etiket = dugme.querySelector<HTMLElement>('[data-paylas-metin]');
+      // Sorgu parametreleri paylaşılan adrese bulaşmasın.
+      const adres = location.origin + location.pathname;
+      const veri = {
+        title: dugme.dataset.baslik || document.title,
+        text: dugme.dataset.metin || '',
+        url: adres,
+      };
+
+      try {
+        if (navigator.share) {
+          await navigator.share(veri);
+          return;
+        }
+        await navigator.clipboard.writeText(adres);
+        if (etiket) {
+          // Kısa tutuluyor: uzun metin düğmeyi genişletip yanındakini eziyor.
+          etiket.textContent = 'Kopyalandı';
+          window.setTimeout(() => (etiket.textContent = 'Paylaş'), 2200);
+        }
+      } catch {
+        // Kullanıcı vazgeçtiyse ya da pano kapalıysa sessizce geç.
+      }
+    },
+    isaret()
+  );
+}
+
+/* ---------------------------------------------------------------
    Başlık çubuğu: kaydırınca zemin kazanır
    --------------------------------------------------------------- */
 function baslikCubuguKur() {
@@ -532,6 +574,7 @@ export function hareketiBaslat(): void {
   seritKur();
   adimKur();
   gecisKur();
+  paylasKur();
 
   // Görseller yüklendikçe tetik konumları kayar
   window.addEventListener('load', () => {

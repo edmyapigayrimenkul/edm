@@ -3,10 +3,11 @@ import Temel from '../../layouts/Temel.astro';
 import Galeri from '../../components/Galeri.astro';
 import Harita from '../../components/Harita.astro';
 import IlanKart from '../../components/IlanKart.astro';
-import { ilanBul, benzerIlanlar, fiyatYaz } from '../../lib/ilanlar';
+import { ilanBul, benzerIlanlar, fiyatYaz, aciklamaParcala } from '../../lib/ilanlar';
 import { PORTALLAR, KURUM } from '../../lib/site';
 import { icerik, whatsappBaglanti } from '../../lib/icerik';
 import FavoriDugme from '../../components/FavoriDugme.astro';
+import PaylasDugme from '../../components/PaylasDugme.astro';
 
 const { slug } = Astro.params;
 const ilan = slug ? await ilanBul(slug) : undefined;
@@ -18,6 +19,7 @@ if (!ilan) return Astro.rewrite('/404');
 if (ilan.slug !== slug) return Astro.redirect(ilan.yol, 301);
 
 const benzer = await benzerIlanlar(ilan, 3);
+const paragraflar = await aciklamaParcala(ilan);
 const { ekip, iletisim } = await icerik();
 const danisman = ekip.find((d) => d.emlakjetSlug && d.emlakjetSlug === ilan.danismanSlug);
 
@@ -42,7 +44,6 @@ const kunye = [
   ilan.oda && { etiket: 'Oda', deger: ilan.oda },
   ilan.m2Metin && { etiket: ilan.tipGrup === 'arsa' ? 'Arsa alanı' : 'Alan', deger: ilan.m2Metin },
   ilan.birimFiyat && { etiket: 'Birim fiyat', deger: ilan.birimFiyat },
-  { etiket: 'İlan no', deger: ilan.id },
 ].filter(Boolean) as Array<{ etiket: string; deger: string }>;
 
 const jsonLd = {
@@ -123,6 +124,11 @@ const izYolu = {
 
         <h1 class="baslik-buyuk mt-5 max-w-[22ch]">{ilan.baslikTemiz}</h1>
         <p class="mt-3 text-metin-2">{ilan.konum}</p>
+
+        <p class="baslik-fiyat font-veri mt-6">
+          {fiyatYaz(ilan.fiyat)}
+          {ilan.islem === 'kiralik' && <span class="baslik-fiyat-ek">/ay</span>}
+        </p>
       </header>
     </div>
 
@@ -152,7 +158,7 @@ const izYolu = {
           <section class="mt-12">
             <h2 class="baslik-orta">İlan açıklaması</h2>
             <div class="aciklama mt-5">
-              {ilan.aciklama.split(/\n{1,}/).map((p) => (p.trim() ? <p>{p.trim()}</p> : null))}
+              {paragraflar.map((p) => <p>{p}</p>)}
             </div>
           </section>
 
@@ -290,7 +296,14 @@ const izYolu = {
                 {iletisim.telefon}
               </a>
               <a href="/iletisim" class="dugme dugme--hayalet w-full">Yerinde görmek istiyorum</a>
-              <FavoriDugme id={ilan.id} baslik={ilan.baslikTemiz} genis />
+
+              <div class="flex gap-2.5">
+                <FavoriDugme id={ilan.id} baslik={ilan.baslikTemiz} genis />
+                <PaylasDugme
+                  baslik={ilan.baslikTemiz}
+                  metin={`${ilan.baslikTemiz} — ${ilan.fiyatMetin}`}
+                />
+              </div>
             </div>
 
             <p class="mt-4 text-center text-[0.75rem] text-kursun">
@@ -346,6 +359,29 @@ const izYolu = {
     }
   </div>
 
+  <!-- Mobilde ekranın altına sabitlenen eylem çubuğu.
+       Telefonda sağdaki yapışkan kart her şeyin altına iniyor; fiyatı
+       görmek için 4 ekran inen kişi aramak için de oraya inmesin. -->
+  <div class="ilan-cubuk" data-ilan-cubuk>
+    <div class="min-w-0">
+      <p class="etiket etiket--acik">
+        {ilan.islem === 'satilik' ? 'Satış fiyatı' : 'Aylık kira'}
+      </p>
+      <p class="cubuk-fiyat font-veri">{fiyatYaz(ilan.fiyat)}</p>
+    </div>
+    <div class="flex flex-none gap-2">
+      <a href={`tel:${iletisim.telefonHam}`} class="cubuk-dugme">Ara</a>
+      <a
+        href={whatsappBaglanti(iletisim.whatsapp, waMesaj)}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="cubuk-dugme cubuk-dugme--kirmizi"
+      >
+        WhatsApp
+      </a>
+    </div>
+  </div>
+
   <script is:inline define:vars={{ ilanId: ilan.id }}>
     // Görüntülenme sinyali — sayfa okunmaya başladıktan 3 saniye sonra,
     // böylece yanlışlıkla açılıp hemen kapatılanlar sayılmıyor.
@@ -380,6 +416,8 @@ const izYolu = {
   }
 
   .aciklama {
+    /* Satır 78 karaktere kadar uzuyordu; göz 65-70'te rahat okuyor. */
+    max-width: 68ch;
     max-width: 68ch;
   }
   .aciklama p {
@@ -516,5 +554,62 @@ const izYolu = {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  /* Fiyat: başlığın hemen altında, ilk ekranda */
+  .baslik-fiyat {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .baslik-fiyat-ek {
+    font-size: 0.9rem;
+    color: var(--color-kursun);
+    margin-left: 0.2rem;
+  }
+
+  /* Mobil eylem çubuğu */
+  .ilan-cubuk {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 46;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem var(--kab-pay, 1.25rem);
+    padding-bottom: calc(0.7rem + env(safe-area-inset-bottom, 0px));
+    background: color-mix(in oklab, var(--color-murekkep) 96%, transparent);
+    backdrop-filter: blur(12px);
+    color: var(--color-kagit);
+    border-top: 1px solid color-mix(in oklab, var(--color-kagit) 14%, transparent);
+  }
+  @media (min-width: 1024px) {
+    .ilan-cubuk {
+      display: none;
+    }
+  }
+  .cubuk-fiyat {
+    font-size: 1.0625rem;
+    font-weight: 500;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+  }
+  .cubuk-dugme {
+    display: inline-flex;
+    align-items: center;
+    height: 2.6rem;
+    padding-inline: 0.95rem;
+    border-radius: 2px;
+    border: 1px solid color-mix(in oklab, var(--color-kagit) 26%, transparent);
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .cubuk-dugme--kirmizi {
+    background: var(--color-kirmizi);
+    border-color: var(--color-kirmizi);
   }
 </style>

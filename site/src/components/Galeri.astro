@@ -107,6 +107,13 @@ const kalan = Math.max(0, gorseller.length - 5);
     .galeri {
       grid-template-columns: 1.62fr 1fr;
     }
+    /* Şerit yalnızca mobilde bir kap; geniş ekranda ortadan çekiliyor ki
+       büyük kare ile küçükler doğrudan ızgaranın iki sütununa otursun.
+       Kap görünür kalırsa ızgaranın tek elemanı o oluyor ve küçük kareler
+       büyüğün yanına değil altına düşüyor. */
+    .galeri-serit {
+      display: contents;
+    }
   }
 
   /* Mobil: ızgara yerine parmakla kaydırılan şerit.

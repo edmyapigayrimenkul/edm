@@ -492,6 +492,200 @@ export async function danismaninIlanlari(emlakjetSlug: string): Promise<Ilan[]> 
   return ilanlar.filter((i) => i.danismanSlug === emlakjetSlug);
 }
 
+/* ---------------------------------------------------------------
+   Açıklama metnini okunur hâle getirme
+
+   Portaldan gelen açıklamalarda satır sonu yok — 46 ilanın 46'sında.
+   Sayfa paragraflara bölmeye çalışıyordu ama bölecek bir şey bulamıyor,
+   metin tek blok hâlinde akıyordu (ortalama 1.636 karakter).
+
+   İçeride portalın izleri de var: madde işareti olarak kullanılmış ✅ ve
+   yıldızlar, "DaireDAİRE" gibi yapışmış kelimeler, arada tamamı büyük
+   harfle yazılmış ilanlar.
+
+   Burada metnin kendisine dokunmuyoruz — yalnızca nerede durduğunu ve
+   nasıl yazıldığını düzeltiyoruz.
+   --------------------------------------------------------------- */
+
+/** Portalın madde işareti olarak kullandığı simgeler. */
+const MADDE_SIMGESI = /[\u2705\u2714\u2611\u2713\u2022\u25AA\u25CF\u25C6\u25BA\u27A4\u2605\u2606\u00BB]/gu;
+
+/** Büyük harf çözülürken olduğu gibi kalması gerekenler. */
+const KISALTMA: Record<string, string> = {
+  edm: 'EDM', tl: 'TL', kdv: 'KDV', kaks: 'KAKS', taks: 'TAKS',
+  toki: 'TOKİ', sgk: 'SGK', tapu: 'tapu',
+};
+
+/**
+ * Bu ilanda özel ad sayılacak kelimeler.
+ *
+ * Başlık zaten düzgün yazılmış olduğu için oradaki büyük harfle başlayan
+ * kelimeler güvenilir bir sözlük veriyor: site adı, mahalle, mevki.
+ * Böylece "BASINKENT" büyük harften çözülürken "basınkent" olmuyor.
+ */
+/**
+ * Başlıklarda büyük harfle geçen ama özel ad olmayan kelimeler.
+ *
+ * Sözlüğü ilan başlıklarından da besliyoruz — site ve mevki adları oradan
+ * geliyor. Ama başlıkta "Müstakil", "Satılık", "Köyünde" gibi cins isimler
+ * de büyük harfle duruyor; bunlar sözlüğe girerse cümle ortasında yersiz
+ * büyük harf çıkıyor.
+ */
+const TUR_KELIMESI = new Set([
+  'satılık', 'kiralık', 'daire', 'villa', 'arsa', 'tarla', 'dükkan', 'ofis',
+  'müstakil', 'köyünde', 'köyü', 'mahallesi', 'mahallesinde', 'mahalle',
+  'mevkii', 'mevki', 'sitesi', 'sitesinde', 'içerisinde', 'üzerinde', 'yanı',
+  'acil', 'lüks', 'kupon', 'yatırımlık', 'hisse', 'imarlı', 'manzaralı',
+  'eşyalı', 'sıfır', 'modern', 'özel', 'havuzlu', 'otoparklı', 'ısıtmalı',
+  'yerden', 'kapalı', 'merkezde', 'merkez', 'dönüm', 'deniz', 'geniş',
+  'yaşında', 'kredi', 'uygun', 'nehri', 'yeni', 'full', 'triplex', 'tripleks',
+]);
+
+async function ozelAdlar(ilan: Ilan): Promise<Set<string>> {
+  const kume = new Set(['trakya', 'marmara', 'saros']);
+  const ekle = (metin: string | null | undefined) => {
+    if (!metin) return;
+    for (const kelime of metin.split(/[^\p{L}\p{N}]+/u)) {
+      if (kelime.length > 2 && kelime[0] === kelime[0].toLocaleUpperCase('tr')) {
+        const kucuk = kelime.toLocaleLowerCase('tr');
+        if (!TUR_KELIMESI.has(kucuk)) kume.add(kucuk);
+      }
+    }
+  };
+
+  // Portföyün kendi yer adları: mahalle, ilçe, il. Yeni bir mahalleye
+  // ilan girildiğinde sözlük kendiliğinden büyüyor.
+  const { ilanlar } = await portfoy();
+  for (const o of ilanlar) {
+    ekle(o.mahalle);
+    ekle(o.ilce);
+    ekle(o.il);
+  }
+  ekle(ilan.baslikTemiz);
+  return kume;
+}
+
+/** Bir kelimenin tamamı büyük harf mi. */
+function tumuBuyukMu(kelime: string): boolean {
+  const harfler = kelime.match(/\p{L}/gu);
+  if (!harfler || harfler.length < 2) return false;
+  return harfler.every((h) => h === h.toLocaleUpperCase('tr'));
+}
+
+/** Küçültülmüş bir kelimeyi kısaltma ve özel ad sözlüğüne göre düzeltir. */
+function kelimeyiDuzelt(parca: string, adlar: Set<string>): string {
+  return parca.replace(/\p{L}[\p{L}\u2019']*/gu, (kelime) => {
+    const kisa = KISALTMA[kelime];
+    if (kisa) return kisa;
+    const bas = (k: string) => k.charAt(0).toLocaleUpperCase('tr') + k.slice(1);
+    if (adlar.has(kelime)) return bas(kelime);
+    // Türkçede ek kelimeye yapışıyor: "selimpaşanın" da özel ad sayılmalı.
+    for (const ad of adlar) {
+      if (ad.length >= 5 && kelime.startsWith(ad)) return bas(kelime);
+    }
+    return kelime;
+  });
+}
+
+/**
+ * Büyük harfle bağıran bölümleri normal yazıma döndürür.
+ *
+ * Ölçüyü paragrafın tamamında almak işe yaramıyor: portalda karışık
+ * metinler var — büyük harfli bir giriş, ardından düzgün yazılmış tanıtım.
+ * Böyle bir paragrafta büyük harf oranı %75'te kalıyor ve hiçbir şey
+ * düzelmiyor. Onun yerine ardışık büyük harfli kelime dizilerini arıyoruz;
+ * altı kelime üst üste bağırıyorsa orası bir blok sayılıyor. Normal
+ * metinde arada geçen özel adlar bu eşiği aşmıyor.
+ */
+function buyukHarfCoz(metin: string, adlar: Set<string>): string {
+  const parcalar = metin.split(/(\s+)/);
+  const kelimeYerleri = parcalar
+    .map((p, i) => ({ p, i }))
+    .filter((x) => x.p.trim() !== '')
+    .map((x) => x.i);
+
+  // "&", ":" gibi harfsiz parçalar diziyi bölmesin — "ŞOKK EDM YAPI &
+  // GAYRİMENKULDEN ..." tek bir bağırma bloğu, ortasındaki & yüzünden
+  // üçe düşüp eşiğin altında kalmamalı.
+  const harfsiz = (k: string) => !/\p{L}/u.test(k);
+  const durum = kelimeYerleri.map((yer) =>
+    harfsiz(parcalar[yer]) ? 'notr' : tumuBuyukMu(parcalar[yer]) ? 'buyuk' : 'kucuk'
+  );
+
+  const donusecek = new Set<number>();
+  let i = 0;
+  while (i < kelimeYerleri.length) {
+    if (durum[i] !== 'buyuk') {
+      i++;
+      continue;
+    }
+    let j = i;
+    let sayi = 0;
+    let sonBuyuk = i;
+    while (j < kelimeYerleri.length && durum[j] !== 'kucuk') {
+      if (durum[j] === 'buyuk') {
+        sayi++;
+        sonBuyuk = j;
+      }
+      j++;
+    }
+    if (sayi >= 6) for (let k = i; k <= sonBuyuk; k++) donusecek.add(kelimeYerleri[k]);
+    i = j;
+  }
+  if (!donusecek.size) return metin;
+
+  const cikti = parcalar
+    .map((parca, yer) =>
+      donusecek.has(yer) ? kelimeyiDuzelt(parca.toLocaleLowerCase('tr'), adlar) : parca
+    )
+    .join('');
+
+  return cikti
+    .replace(/(^|[.!?:]\s+)(\p{Ll})/gu, (_, once, harf) => once + harf.toLocaleUpperCase('tr'))
+    // "yapı" ve "gayrimenkul" tek başlarına cins isim; marka olarak
+    // yalnızca bu kalıpta geçtiğinde büyük harfe dönüyor.
+    .replace(/EDM\s+yapı(\s*&\s*|\s+ve\s+)gayrimenkul/giu, 'EDM Yapı & Gayrimenkul');
+}
+
+/** Uzun kalan bir bloğu cümlelerden bölerek paragraf boyuna indirir. */
+function cumleyeBol(metin: string): string[] {
+  const cumleler = metin.split(/(?<=[.!?])\s+(?=\p{Lu})/gu);
+  const gruplar: string[] = [];
+  let birikim = '';
+  for (const cumle of cumleler) {
+    birikim = birikim ? `${birikim} ${cumle}` : cumle;
+    if (birikim.length >= 220) {
+      gruplar.push(birikim);
+      birikim = '';
+    }
+  }
+  if (birikim) gruplar.push(birikim);
+  return gruplar;
+}
+
+/** Açıklamayı okunabilir paragraflara böler. */
+export async function aciklamaParcala(ilan: Ilan): Promise<string[]> {
+  const adlar = await ozelAdlar(ilan);
+
+  const duzeltilmis = (ilan.aciklama ?? '')
+    .replace(/\r\n?/g, '\n')
+    .replace(MADDE_SIMGESI, '\n')
+    .replace(/\*+/g, '\n')
+    // "DaireDAİRE ÖZELLİKLERİ" gibi yapışmış kelimeleri ayır
+    .replace(/(\p{Ll})(\p{Lu})/gu, '$1 $2')
+    .replace(/[ \t]+/g, ' ');
+
+  return duzeltilmis
+    .split(/\n+/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .flatMap((p) => (p.length <= 320 ? [p] : cumleyeBol(p)))
+    .map((p) => buyukHarfCoz(p, adlar))
+    // Kaynak metin küçük harfle başlıyor olabiliyor.
+    .map((p) => p.charAt(0).toLocaleUpperCase('tr') + p.slice(1))
+    .filter((p) => p.length > 1);
+}
+
 /** Aynı ilçede, aynı işlemde, fiyatça en yakın ilanlar. */
 export async function benzerIlanlar(ilan: Ilan, adet = 3): Promise<Ilan[]> {
   const { ilanlar } = await portfoy();
