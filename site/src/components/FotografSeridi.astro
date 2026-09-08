@@ -1,0 +1,120 @@
+---
+/**
+ * Kahramanın alt kenarındaki fotoğraf şeridi.
+ *
+ * Ziyaretçi ilk ekranda "burada gerçek mülkler var" hissini alsın diye var —
+ * bir vitrin değil, koyu kahramanla açık içerik arasındaki geçiş. Bu yüzden
+ * fotoğraflar hafif karartılmış duruyor, üzerine gelince açılıyor.
+ *
+ * Şerit iki kez basılıyor: birinci kopya bittiğinde ikincisi tam aynı yerde
+ * olduğu için döngü dikişsiz görünüyor.
+ */
+import type { Ilan } from '../lib/ilanlar';
+import { fiyatKisa } from '../lib/ilanlar';
+
+interface Props {
+  ilanlar: Ilan[];
+}
+const { ilanlar } = Astro.props;
+const sure = Math.max(45, ilanlar.length * 7);
+---
+
+{
+  ilanlar.length >= 4 && (
+    <div class="serit serit-durakla" aria-label="Portföyden fotoğraflar">
+      <div class="serit-akis" style={`--sure:${sure}s`}>
+        {[0, 1].map((kopya) =>
+          ilanlar.map((ilan) => (
+            <a
+              href={ilan.yol}
+              class="serit-kare"
+              aria-hidden={kopya === 1 ? 'true' : undefined}
+              tabindex={kopya === 1 ? -1 : undefined}
+            >
+              <img src={ilan.kapak!} alt={kopya === 0 ? ilan.baslikTemiz : ''} loading="lazy" decoding="async" />
+              <span class="serit-bilgi">
+                <span class="serit-yer">{ilan.ilce}</span>
+                <span class="serit-fiyat font-veri">{fiyatKisa(ilan.fiyat)}</span>
+              </span>
+            </a>
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .serit {
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid color-mix(in oklab, var(--color-kagit) 12%, transparent);
+    /* Kenarlarda yumuşak kaybolma — şerit kesilmiş gibi durmasın */
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 6rem,
+      #000 calc(100% - 6rem),
+      transparent 100%
+    );
+  }
+
+  .serit-kare {
+    position: relative;
+    flex: none;
+    width: clamp(11rem, 20vw, 16rem);
+    aspect-ratio: 4 / 3;
+    margin-right: 0.5rem;
+    overflow: hidden;
+    border-radius: var(--radius-kart);
+    background: var(--color-murekkep-3);
+  }
+  .serit-kare img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Kahramanın parçası olduğu için sönük duruyor; üzerine gelince canlanıyor */
+    filter: saturate(0.55) brightness(0.6);
+    transition: filter 0.6s var(--ease-yumusak), transform 0.9s var(--ease-yumusak);
+  }
+  .serit-kare:hover img,
+  .serit-kare:focus-visible img {
+    filter: saturate(1) brightness(0.92);
+    transform: scale(1.04);
+  }
+
+  .serit-bilgi {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.6rem 0.7rem;
+    background: linear-gradient(to top, rgb(18 19 22 / 0.85), transparent);
+    color: var(--color-kagit);
+    opacity: 0;
+    transform: translateY(0.4rem);
+    transition: opacity 0.45s var(--ease-yumusak), transform 0.45s var(--ease-yumusak);
+  }
+  .serit-kare:hover .serit-bilgi,
+  .serit-kare:focus-visible .serit-bilgi {
+    opacity: 1;
+    transform: none;
+  }
+  .serit-yer {
+    font-size: 0.75rem;
+    opacity: 0.85;
+  }
+  .serit-fiyat {
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  /* Hareket azaltma tercihinde şerit durur, taşan kısım kırpılır */
+  @media (prefers-reduced-motion: reduce) {
+    .serit-akis {
+      animation: none;
+    }
+  }
+</style>

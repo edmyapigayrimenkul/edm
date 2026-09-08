@@ -2,8 +2,9 @@
 import Temel from '../layouts/Temel.astro';
 import ParselTuval from '../components/ParselTuval.astro';
 import IlanKart from '../components/IlanKart.astro';
+import FotografSeridi from '../components/FotografSeridi.astro';
 import { KURUM } from '../lib/site';
-import { oneCikanlar, portfoy, danismaninIlanlari } from '../lib/ilanlar';
+import { oneCikanlar, portfoy, danismaninIlanlari, seritIcin } from '../lib/ilanlar';
 import { icerik } from '../lib/icerik';
 
 const { sayimlar: SAYIMLAR, filtreler: FILTRELER } = await portfoy();
@@ -16,6 +17,7 @@ const ekipSayili = await Promise.all(
   }))
 );
 const secki = await oneCikanlar(7);
+const serit = await seritIcin(10);
 const donum = Math.round(SAYIMLAR.toplamAlan / 1000);
 
 const rakamlar = [
@@ -113,6 +115,9 @@ const hizliFiltreler = [
         </dl>
       </div>
     </div>
+
+    <!-- Fotoğraf şeridi: koyu kahramandan açık içeriğe geçiş -->
+    <FotografSeridi ilanlar={serit} />
   </section>
 
   <!-- ================= ÖNE ÇIKAN İLANLAR ================= -->

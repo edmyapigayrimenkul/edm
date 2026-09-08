@@ -542,3 +542,41 @@ export async function oneCikanlar(adet = 6): Promise<Ilan[]> {
 
   return secili.slice(0, adet);
 }
+
+/**
+ * Ana sayfa kahramanının altındaki fotoğraf şeridi.
+ *
+ * Amaç ilan pazarlamak değil, ilk ekranda "burada gerçek mülkler var"
+ * hissini vermek. Bu yüzden en pahalıları değil, fotoğrafı en iyi olanları
+ * seçiyoruz: temiz kaynaktan gelenler (yatay çekim, filigransız) önce.
+ */
+export async function seritIcin(adet = 10): Promise<Ilan[]> {
+  const { ilanlar } = await portfoy();
+
+  const puan = (i: Ilan) => {
+    let p = 0;
+    // Temiz kaynaktan gelen görsel her zaman önde
+    if (i.gorseller[0]?.includes('hemlak.com')) p += 10;
+    if (i.gorseller.length >= 8) p += 3;
+    else if (i.gorseller.length >= 4) p += 1;
+    // Konut fotoğrafı arsa uydu görüntüsünden iyi durur
+    if (i.tipGrup === 'konut') p += 4;
+    return p;
+  };
+
+  const secili: Ilan[] = [];
+  const kullanilanIlce = new Map<string, number>();
+
+  // Aynı mahalleden üst üste iki kare koymayalım; şerit çeşitli görünsün.
+  for (const ilan of [...ilanlar].sort((a, b) => puan(b) - puan(a))) {
+    if (!ilan.kapak) continue;
+    const anahtar = ilan.ilce ?? '—';
+    const sayi = kullanilanIlce.get(anahtar) ?? 0;
+    if (sayi >= 3) continue;
+    secili.push(ilan);
+    kullanilanIlce.set(anahtar, sayi + 1);
+    if (secili.length === adet) break;
+  }
+
+  return secili;
+}
