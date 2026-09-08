@@ -60,9 +60,28 @@ const ilan = await vt
 
 if (!ilan) return Astro.rewrite('/404');
 
+const yuklenenler = await vt
+  .prepare(
+    `SELECT anahtar, sira, boyut, genislik, yukseklik, yuklenme
+     FROM ilan_foto WHERE ilan_id = ? ORDER BY sira ASC`
+  )
+  .bind(id)
+  .all<{
+    anahtar: string;
+    sira: number;
+    boyut: number | null;
+    genislik: number | null;
+    yukseklik: number | null;
+    yuklenme: string;
+  }>()
+  .catch(() => ({ results: [] as never[] }));
+
+const yuklenenAdresler = (yuklenenler.results ?? []).map((y) => `/g/${y.anahtar}`);
+
 const hepsiemlak = guvenliJson<string[]>(ilan.hepsiemlak_gorseller, []);
 const emlakjet = guvenliJson<string[]>(ilan.gorseller, []);
-const tumGorseller = hepsiemlak.length ? hepsiemlak : emlakjet;
+const portalGorselleri = hepsiemlak.length ? hepsiemlak : emlakjet;
+const tumGorseller = [...yuklenenAdresler, ...portalGorselleri];
 
 if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
@@ -120,6 +139,8 @@ const gizlenenler = tumGorseller.filter((g) => gizli.has(g));
 const baslik = baslikTemizle(ilan.baslik);
 const yol = `/ilan/${slugla(baslik)}-${ilan.id}`;
 ---
+
+<div data-ilan-id={id} hidden></div>
 
 <Panel
   baslik="Fotoğraflar"
@@ -189,6 +210,55 @@ const yol = `/ilan/${slugla(baslik)}-${ilan.id}`;
       )
     }
   </div>
+
+  <!-- Kendi fotoğraflarını yükle -->
+  <section class="kutu" style="margin-top:1.5rem" id="yukle">
+    <div class="kutu-bas">
+      <h2>Kendi fotoğraflarını yükle</h2>
+      <span style="font-size:0.75rem;color:var(--color-kursun)">
+        {(yuklenenler.results ?? []).length} yüklenmiş
+      </span>
+    </div>
+
+    <div class="yukle-govde">
+      <p class="yukle-not">
+        Yüklediğin fotoğraflar <strong>portaldan gelenlerin önüne geçer</strong> —
+        tek bir iyi kapak yüklemek yeterli, kalan kareler portaldan gelmeye devam eder.
+        Sildiğinde portal fotoğrafları kendiliğinden öne çıkar.
+        <br />
+        Fotoğraflar yüklenmeden önce tarayıcında küçültülüp WebP'ye çevriliyor;
+        telefonundan çektiğin 5 MB'lık kare siteye 200 KB olarak iniyor.
+      </p>
+
+      <label class="birakma-alani" data-birakma>
+        <input type="file" accept="image/*" multiple data-dosya-secici hidden />
+        <span class="birakma-ikon" aria-hidden="true">↑</span>
+        <span class="birakma-baslik">Fotoğrafları buraya sürükleyin</span>
+        <span class="birakma-alt">ya da tıklayıp seçin · JPG, PNG, HEIC</span>
+      </label>
+
+      <div class="yukleme-durum" data-durum hidden></div>
+
+      {(yuklenenler.results ?? []).length > 0 && (
+        <div class="yuklenen-izgara">
+          {(yuklenenler.results ?? []).map((y) => (
+            <figure class="yuklenen">
+              <img src={`/g/${y.anahtar}`} alt="Yüklenen fotoğraf" loading="lazy" />
+              <figcaption>
+                <span class="veri-sayi yuklenen-bilgi">
+                  {y.genislik && y.yukseklik ? `${y.genislik}×${y.yukseklik}` : '—'}
+                  {y.boyut ? ` · ${Math.round(y.boyut / 1024)} KB` : ''}
+                </span>
+                <button type="button" class="pd pd--tehlike" data-sil={y.anahtar}>
+                  Sil
+                </button>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
 
   {
     gizlenenler.length > 0 && (
@@ -305,4 +375,239 @@ const yol = `/ilan/${slugla(baslik)}-${ilan.id}`;
     padding-inline: 0.6rem;
     font-size: 0.75rem;
   }
+
+  /* --- Yükleme --- */
+  .yukle-govde {
+    padding: 1.25rem;
+  }
+  .yukle-not {
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--color-metin-2);
+    max-width: 70ch;
+    margin-bottom: 1.1rem;
+  }
+  .yukle-not strong {
+    color: var(--color-murekkep);
+  }
+
+  .birakma-alani {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: clamp(1.75rem, 5vw, 3rem);
+    border: 2px dashed color-mix(in oklab, var(--color-murekkep) 18%, transparent);
+    border-radius: 8px;
+    background: var(--color-kagit);
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.3s, background-color 0.3s;
+  }
+  .birakma-alani:hover,
+  .birakma-alani[data-uzerinde] {
+    border-color: var(--color-kirmizi);
+    background: color-mix(in oklab, var(--color-kirmizi) 4%, var(--color-kagit));
+  }
+  .birakma-ikon {
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--color-kirmizi);
+  }
+  .birakma-baslik {
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+  .birakma-alt {
+    font-size: 0.8125rem;
+    color: var(--color-kursun);
+  }
+
+  .yukleme-durum {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    background: var(--color-kagit);
+    font-size: 0.875rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+  .yukleme-satir {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-family: var(--font-veri);
+    font-size: 0.75rem;
+    color: var(--color-metin-2);
+  }
+
+  .yuklenen-izgara {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(11rem, 100%), 1fr));
+    gap: 0.85rem;
+    margin-top: 1.25rem;
+  }
+  .yuklenen {
+    margin: 0;
+    border: 1px solid color-mix(in oklab, var(--color-kirmizi) 30%, transparent);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--color-kagit);
+  }
+  .yuklenen img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+  }
+  .yuklenen figcaption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.45rem 0.55rem;
+  }
+  .yuklenen-bilgi {
+    font-size: 0.6875rem;
+    color: var(--color-kursun);
+  }
+  .yuklenen .pd {
+    height: 1.7rem;
+    padding-inline: 0.55rem;
+    font-size: 0.7rem;
+  }
 </style>
+
+<script>
+  const ILAN = document.querySelector<HTMLElement>('[data-ilan-id]')?.dataset.ilanId ?? '';
+  const alan = document.querySelector<HTMLLabelElement>('[data-birakma]');
+  const secici = document.querySelector<HTMLInputElement>('[data-dosya-secici]');
+  const durum = document.querySelector<HTMLElement>('[data-durum]');
+
+  /** Uzun kenarı bu değere indiriyoruz; ilan fotoğrafı için fazlasıyla yeterli. */
+  const EN_UZUN = 1800;
+
+  function bildir(metin: string, satirlar: string[] = []) {
+    if (!durum) return;
+    durum.hidden = false;
+    durum.innerHTML = '';
+    const bas = document.createElement('div');
+    bas.textContent = metin;
+    durum.appendChild(bas);
+    for (const s of satirlar) {
+      const d = document.createElement('div');
+      d.className = 'yukleme-satir';
+      d.textContent = s;
+      durum.appendChild(d);
+    }
+  }
+
+  /**
+   * Fotoğrafı tarayıcıda küçültüp WebP'ye çevirir.
+   * EXIF dönüşü createImageBitmap tarafından uygulanıyor, yan yatmış
+   * telefon fotoğrafları düz iniyor.
+   */
+  async function kucult(dosya: File): Promise<{ blob: Blob; g: number; y: number } | null> {
+    try {
+      const kaynak = await createImageBitmap(dosya, { imageOrientation: 'from-image' });
+      const oran = Math.min(1, EN_UZUN / Math.max(kaynak.width, kaynak.height));
+      const g = Math.round(kaynak.width * oran);
+      const y = Math.round(kaynak.height * oran);
+
+      const tuval = document.createElement('canvas');
+      tuval.width = g;
+      tuval.height = y;
+      const ctx = tuval.getContext('2d');
+      if (!ctx) return null;
+      ctx.drawImage(kaynak, 0, 0, g, y);
+      kaynak.close();
+
+      const blob = await new Promise<Blob | null>((coz) =>
+        tuval.toBlob((b) => coz(b), 'image/webp', 0.82)
+      );
+      return blob ? { blob, g, y } : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function yukle(dosyalar: File[]) {
+    const gorseller = dosyalar.filter((d) => d.type.startsWith('image/'));
+    if (!gorseller.length) return;
+
+    bildir(`${gorseller.length} fotoğraf hazırlanıyor…`);
+
+    const form = new FormData();
+    form.append('ilan', ILAN);
+    const satirlar: string[] = [];
+
+    for (const dosya of gorseller) {
+      const kucuk = await kucult(dosya);
+      if (!kucuk) {
+        satirlar.push(`${dosya.name} — okunamadı, atlandı`);
+        continue;
+      }
+      const ad = `${dosya.name.replace(/\.[^.]+$/, '')}.webp`;
+      form.append('dosya', new File([kucuk.blob], ad, { type: 'image/webp' }));
+      form.append(`genislik-${ad}`, String(kucuk.g));
+      form.append(`yukseklik-${ad}`, String(kucuk.y));
+      satirlar.push(
+        `${dosya.name} → ${kucuk.g}×${kucuk.y} · ` +
+          `${Math.round(dosya.size / 1024)} KB → ${Math.round(kucuk.blob.size / 1024)} KB`
+      );
+      bildir(`${satirlar.length}/${gorseller.length} hazırlandı…`, satirlar);
+    }
+
+    bildir('Yükleniyor…', satirlar);
+
+    try {
+      const cevap = await fetch('/api/foto', { method: 'POST', body: form });
+      const sonuc = await cevap.json();
+      if (sonuc.tamam) {
+        bildir(`${sonuc.eklenen} fotoğraf yüklendi. Sayfa yenileniyor…`, sonuc.atlanan ?? []);
+        setTimeout(() => location.reload(), 900);
+      } else {
+        bildir(`Yükleme başarısız: ${sonuc.hata ?? 'bilinmiyor'}`);
+      }
+    } catch (hata) {
+      bildir(`Yükleme başarısız: ${(hata as Error).message}`);
+    }
+  }
+
+  alan?.addEventListener('click', () => secici?.click());
+  secici?.addEventListener('change', () => {
+    if (secici.files) yukle([...secici.files]);
+  });
+
+  for (const olay of ['dragenter', 'dragover']) {
+    alan?.addEventListener(olay, (e) => {
+      e.preventDefault();
+      alan.dataset.uzerinde = 'evet';
+    });
+  }
+  for (const olay of ['dragleave', 'drop']) {
+    alan?.addEventListener(olay, (e) => {
+      e.preventDefault();
+      delete alan.dataset.uzerinde;
+    });
+  }
+  alan?.addEventListener('drop', (e) => {
+    const dosyalar = (e as DragEvent).dataTransfer?.files;
+    if (dosyalar?.length) yukle([...dosyalar]);
+  });
+
+  // Silme
+  document.querySelectorAll<HTMLButtonElement>('[data-sil]').forEach((d) =>
+    d.addEventListener('click', async () => {
+      if (!confirm('Bu fotoğraf kalıcı olarak silinecek. Emin misiniz?')) return;
+      d.disabled = true;
+      await fetch('/api/foto', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ anahtar: d.dataset.sil }),
+      });
+      location.reload();
+    })
+  );
+</script>

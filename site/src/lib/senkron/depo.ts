@@ -109,8 +109,9 @@ export interface SenkronSonuc {
 export async function semayiKur(vt: D1Database): Promise<void> {
   const { PANEL_SEMA } = await import('./panel-sema');
   const { PANEL_SEMA2 } = await import('./panel-sema2');
+  const { FOTO_SEMA } = await import('./foto-sema');
 
-  const tumu = `${SEMA}\n${PANEL_SEMA}\n${PANEL_SEMA2}`
+  const tumu = `${SEMA}\n${PANEL_SEMA}\n${PANEL_SEMA2}\n${FOTO_SEMA}`
     .split('\n')
     .filter((satir) => !satir.trim().startsWith('--'))
     .join('\n');

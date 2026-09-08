@@ -11,6 +11,7 @@
 import { env } from 'cloudflare:workers';
 import { aktifIlanSatirlari, sonSenkron, type SatirIlan } from './senkron/depo';
 import { koordinatHaritasi, konumAnahtari, type Koordinat } from './senkron/konum';
+import { yuklenenFotograflar } from './senkron/foto-sema';
 
 export type Islem = 'satilik' | 'kiralik';
 export type TipGrup = 'konut' | 'arsa' | 'isyeri' | 'diger';
@@ -293,7 +294,8 @@ function gorselleriDuzenle(gorseller: string[], duzen?: GorselDuzen): string[] {
 function satirdanIlan(
   s: SatirIlan,
   koordinatlar: Map<string, Koordinat>,
-  duzen?: GorselDuzen
+  duzen?: GorselDuzen,
+  yuklenen?: string[]
 ): Ilan {
   const baslikTemiz = baslikTemizle(s.baslik);
   const slug = `${slugla(baslikTemiz)}-${s.id}`;
@@ -305,7 +307,12 @@ function satirdanIlan(
   const hepsiemlakGorselleri = s.hepsiemlak_gorseller
     ? guvenliJson<string[]>(s.hepsiemlak_gorseller, [])
     : [];
-  const hamGorseller = hepsiemlakGorselleri.length ? hepsiemlakGorselleri : emlakjetGorselleri;
+  // Panelden yüklenenler en önde: tek bir iyi kapak yüklemek yeterli olsun,
+  // kalan kareler portaldan gelmeye devam etsin.
+  const portalGorselleri = hepsiemlakGorselleri.length
+    ? hepsiemlakGorselleri
+    : emlakjetGorselleri;
+  const hamGorseller = [...(yuklenen ?? []), ...portalGorselleri];
   const gorseller = gorselleriDuzenle(hamGorseller, duzen);
   const zaman = Date.parse(s.guncellenme ?? s.ilk_gorulme);
   const etiketler = etiketleriSec(s.oda, s.m2, ozellikler);
@@ -409,13 +416,14 @@ export async function portfoy(): Promise<Portfoy> {
   if (onbellek && Date.now() - onbellek.zaman < ONBELLEK_MS) return onbellek.veri;
 
   const vt = env.VT as D1Database;
-  const [satirlar, koordinatlar, duzenler] = await Promise.all([
+  const [satirlar, koordinatlar, duzenler, yuklenenler] = await Promise.all([
     aktifIlanSatirlari(vt),
     koordinatHaritasi(vt),
     gorselDuzenleri(vt),
+    yuklenenFotograflar(vt),
   ]);
   const ilanlar = satirlar.map((satir) =>
-    satirdanIlan(satir, koordinatlar, duzenler.get(satir.id))
+    satirdanIlan(satir, koordinatlar, duzenler.get(satir.id), yuklenenler.get(satir.id))
   );
   const senkron = await sonSenkron(vt).catch(() => null);
 
