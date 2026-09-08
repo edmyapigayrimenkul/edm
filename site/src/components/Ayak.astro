@@ -1,0 +1,189 @@
+---
+import { KURUM, ILETISIM, SOSYAL, MENU, PORTALLAR } from '../lib/site';
+import { portfoy } from '../lib/ilanlar';
+
+const { sayimlar: SAYIMLAR, sonGuncelleme } = await portfoy();
+
+const yil = new Date().getFullYear();
+const guncelleme = new Date(sonGuncelleme).toLocaleDateString('tr-TR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+---
+
+<footer class="relative overflow-hidden bg-murekkep text-kagit">
+  <div class="kab">
+    <!-- Üst: çağrı -->
+    <div class="grid gap-10 border-b border-kagit/12 py-16 lg:grid-cols-[1.3fr_1fr] lg:items-end lg:py-24">
+      <div>
+        <p class="etiket etiket--acik">Bir sonraki adım</p>
+        <h2 class="baslik-buyuk mt-5 max-w-[15ch]">
+          Mülkünüzün bugünkü değerini birlikte çıkaralım.
+        </h2>
+        <p class="mt-5 max-w-[52ch] text-kagit/62">
+          Bölgede gerçekleşmiş satışlara bakarak ücretsiz bir değerleme hazırlıyoruz.
+          Satmaya karar vermeniz gerekmiyor — rakamı bilmek her zaman işinize yarar.
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-3 lg:justify-end">
+        <a href="/degerleme" class="dugme dugme--kirmizi">Ücretsiz değerleme</a>
+        <a href={`tel:${ILETISIM.telefonHam}`} class="dugme dugme--hayalet-acik">
+          {ILETISIM.telefon}
+        </a>
+      </div>
+    </div>
+
+    <!-- Orta: bilgi sütunları -->
+    <div class="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-12">
+      <div>
+        <img
+          src="/marka/logo-yatay-acik.png"
+          alt={KURUM.ad}
+          width="1000"
+          height="274"
+          class="h-9 w-auto"
+        />
+        <p class="mt-5 max-w-[36ch] text-sm leading-relaxed text-kagit/58">
+          {KURUM.tanim}
+        </p>
+        <div class="mt-6 flex gap-2">
+          {
+            SOSYAL.map((s) => (
+              <a
+                href={s.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="sosyal-dugme"
+                aria-label={s.ad}
+              >
+                {s.ad.slice(0, 2)}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <div>
+        <p class="etiket etiket--acik">Site</p>
+        <ul class="mt-5 flex flex-col gap-2.5 text-sm">
+          <li><a href="/" class="ayak-bag">Ana Sayfa</a></li>
+          {MENU.map((o) => <li><a href={o.yol} class="ayak-bag">{o.ad}</a></li>)}
+          <li><a href="/degerleme" class="ayak-bag">Ücretsiz Değerleme</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="etiket etiket--acik">Portföy</p>
+        <ul class="mt-5 flex flex-col gap-2.5 text-sm">
+          <li><a href="/ilanlar?islem=satilik" class="ayak-bag">Satılık ({SAYIMLAR.satilik})</a></li>
+          <li><a href="/ilanlar?islem=kiralik" class="ayak-bag">Kiralık ({SAYIMLAR.kiralik})</a></li>
+          <li><a href="/ilanlar?tip=konut" class="ayak-bag">Konut ({SAYIMLAR.konut})</a></li>
+          <li><a href="/ilanlar?tip=arsa" class="ayak-bag">Arsa & Tarla ({SAYIMLAR.arsa})</a></li>
+        </ul>
+        <p class="etiket etiket--acik mt-7">Portallarda</p>
+        <ul class="mt-4 flex flex-col gap-2.5 text-sm">
+          {
+            Object.values(PORTALLAR).map((p) => (
+              <li>
+                <a href={p.ofis} target="_blank" rel="noopener noreferrer" class="ayak-bag">
+                  {p.ad}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div>
+        <p class="etiket etiket--acik">Ofis</p>
+        <address class="mt-5 flex flex-col gap-4 text-sm not-italic text-kagit/70">
+          <a href={ILETISIM.haritaArama} target="_blank" rel="noopener noreferrer" class="ayak-bag leading-relaxed">
+            {ILETISIM.adres.satir1}<br />
+            {ILETISIM.adres.satir2}<br />
+            {ILETISIM.adres.ilce} / {ILETISIM.adres.il}
+          </a>
+          <a href={`tel:${ILETISIM.telefonHam}`} class="ayak-bag font-veri">
+            {ILETISIM.telefon}
+          </a>
+          <a href={`mailto:${ILETISIM.eposta}`} class="ayak-bag font-veri text-[0.8125rem]">
+            {ILETISIM.eposta}
+          </a>
+        </address>
+        <dl class="mt-6 flex flex-col gap-1.5 border-t border-kagit/12 pt-5 text-[0.8125rem] text-kagit/58">
+          {
+            ILETISIM.calismaSaatleri.map((s) => (
+              <div class="flex justify-between gap-4">
+                <dt>{s.gun}</dt>
+                <dd class="font-veri">{s.saat}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </div>
+
+    <!-- Alt: künye -->
+    <div
+      class="flex flex-col gap-4 border-t border-kagit/12 py-7 text-[0.8125rem] text-kagit/48 md:flex-row md:items-center md:justify-between"
+    >
+      <p>© {yil} {KURUM.ad}. Tüm hakları saklıdır.</p>
+      <p class="font-veri">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-kirmizi align-middle nabiz"></span>
+        {' '}
+        {SAYIMLAR.toplam} aktif ilan · son güncelleme {guncelleme}
+      </p>
+    </div>
+  </div>
+
+  <!-- Zeminde büyük marka harfleri: dekoratif, ekran okuyucudan gizli -->
+  <div aria-hidden="true" class="ayak-imza">EDM</div>
+</footer>
+
+<style>
+  .ayak-bag {
+    color: color-mix(in oklab, var(--color-kagit) 70%, transparent);
+    transition: color 0.3s var(--ease-yumusak);
+  }
+  .ayak-bag:hover {
+    color: var(--color-kagit);
+  }
+
+  .sosyal-dugme {
+    display: inline-flex;
+    height: 2.25rem;
+    width: 2.25rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--color-kagit) 20%, transparent);
+    font-family: var(--font-veri);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in oklab, var(--color-kagit) 72%, transparent);
+    transition: background-color 0.4s var(--ease-yumusak), color 0.4s var(--ease-yumusak),
+      border-color 0.4s var(--ease-yumusak);
+  }
+  .sosyal-dugme:hover {
+    background: var(--color-kirmizi);
+    border-color: var(--color-kirmizi);
+    color: #fff;
+  }
+
+  .ayak-imza {
+    position: absolute;
+    left: 50%;
+    bottom: -0.32em;
+    transform: translateX(-50%);
+    font-family: var(--font-baslik);
+    font-weight: 600;
+    font-size: clamp(9rem, 30vw, 26rem);
+    line-height: 0.75;
+    letter-spacing: -0.05em;
+    color: color-mix(in oklab, var(--color-kagit) 3.5%, transparent);
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+  }
+</style>

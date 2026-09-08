@@ -1,0 +1,45 @@
+---
+import Temel from '../layouts/Temel.astro';
+import IlanKart from '../components/IlanKart.astro';
+import { oneCikanlar, portfoy } from '../lib/ilanlar';
+import { ILETISIM } from '../lib/site';
+
+Astro.response.status = 404;
+
+const { sayimlar: SAYIMLAR } = await portfoy();
+const oneriler = await oneCikanlar(3);
+---
+
+<Temel
+  baslik="Sayfa bulunamadı"
+  aciklama="Aradığınız sayfa taşınmış ya da hiç var olmamış olabilir."
+  dizinleme={false}
+>
+  <section class="pt-32 pb-16 lg:pt-44 lg:pb-20">
+    <div class="kab">
+      <p class="etiket etiket--kirmizi">404</p>
+      <h1 class="baslik-buyuk mt-4 max-w-[16ch]">Bu adreste bir şey yok</h1>
+      <p class="mt-6 max-w-[50ch] leading-relaxed text-metin-2">
+        Aradığınız ilan satılmış ya da yayından kaldırılmış olabilir — portaldan düşen
+        ilanlar burada da otomatik olarak kapanıyor. Şu an yayında
+        <strong class="text-murekkep">{SAYIMLAR.toplam} ilanımız</strong> var.
+      </p>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="/ilanlar" class="dugme dugme--kirmizi">Tüm ilanlara bak</a>
+        <a href={`tel:${ILETISIM.telefonHam}`} class="dugme dugme--hayalet">
+          Aradığınızı sorun — {ILETISIM.telefon}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-t border-murekkep/10 py-14">
+    <div class="kab">
+      <h2 class="baslik-orta">Portföyden</h2>
+      <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {oneriler.map((ilan) => <IlanKart ilan={ilan} />)}
+      </div>
+    </div>
+  </section>
+</Temel>

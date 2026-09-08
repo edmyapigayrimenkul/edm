@@ -1,0 +1,144 @@
+---
+import '../styles/global.css';
+import Kafa from '../components/Kafa.astro';
+import Ayak from '../components/Ayak.astro';
+import WhatsappDugme from '../components/WhatsappDugme.astro';
+import { KURUM, ILETISIM, SOSYAL } from '../lib/site';
+
+interface Props {
+  baslik: string;
+  aciklama: string;
+  /** Sosyal paylaşımda görünecek görsel (mutlak veya site köküne göreli). */
+  gorsel?: string;
+  /** Kahraman bölümü koyu ise başlık çubuğu şeffaf başlar. */
+  koyuUst?: boolean;
+  /** Arama motorundan gizlenecek sayfalar için. */
+  dizinleme?: boolean;
+  /** Sayfaya özel yapılandırılmış veri. */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  baslik,
+  aciklama,
+  gorsel = '/marka/og-varsayilan.png',
+  koyuUst = false,
+  dizinleme = true,
+  jsonLd,
+} = Astro.props;
+
+const kanonik = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
+const gorselTam = new URL(gorsel, Astro.site).href;
+const tamBaslik = baslik === KURUM.ad ? baslik : `${baslik} — ${KURUM.ad}`;
+
+/** Her sayfada bulunan kurum kimliği. */
+const kurumLd = {
+  '@context': 'https://schema.org',
+  '@type': 'RealEstateAgent',
+  '@id': `${KURUM.site}/#kurum`,
+  name: KURUM.ad,
+  description: KURUM.tanim,
+  url: KURUM.site,
+  telephone: ILETISIM.telefonHam,
+  email: ILETISIM.eposta,
+  logo: new URL('/marka/logo-yatay.png', Astro.site).href,
+  image: gorselTam,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: `${ILETISIM.adres.satir1} ${ILETISIM.adres.satir2}`,
+    addressLocality: ILETISIM.adres.ilce,
+    addressRegion: ILETISIM.adres.il,
+    addressCountry: 'TR',
+  },
+  areaServed: [
+    { '@type': 'City', name: 'Silivri' },
+    { '@type': 'City', name: 'İstanbul' },
+    { '@type': 'City', name: 'Edirne' },
+    { '@type': 'City', name: 'Tekirdağ' },
+  ],
+  sameAs: SOSYAL.map((s) => s.url),
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+      ],
+      opens: '09:00',
+      closes: '19:00',
+    },
+  ],
+};
+
+const semalar = [kurumLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])];
+---
+
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tamBaslik}</title>
+    <meta name="description" content={aciklama} />
+    <link rel="canonical" href={kanonik.href} />
+    {!dizinleme && <meta name="robots" content="noindex, follow" />}
+
+    <meta name="theme-color" content="#121316" />
+    <link rel="icon" type="image/png" href="/favicon-512.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Gövde yazı tipi ilk boyamada gerekiyor; başlık tipi hemen ardından -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/ibm-plex-sans-latin-wght-normal.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/fraunces-latin-wght-normal.woff2"
+      crossorigin
+    />
+    <link rel="preconnect" href="https://imaj.emlakjet.com" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={KURUM.ad} />
+    <meta property="og:locale" content="tr_TR" />
+    <meta property="og:title" content={tamBaslik} />
+    <meta property="og:description" content={aciklama} />
+    <meta property="og:url" content={kanonik.href} />
+    <meta property="og:image" content={gorselTam} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(semalar)} />
+  </head>
+
+  <body>
+    <a
+      href="#icerik"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-full focus:bg-murekkep focus:px-5 focus:py-3 focus:text-sm focus:text-kagit"
+      >İçeriğe geç</a
+    >
+
+    <Kafa koyuUst={koyuUst} />
+
+    <main id="icerik">
+      <slot />
+    </main>
+
+    <Ayak />
+    <WhatsappDugme />
+
+    <script>
+      import { hareketiBaslat } from '../scripts/hareket';
+      hareketiBaslat();
+    </script>
+  </body>
+</html>

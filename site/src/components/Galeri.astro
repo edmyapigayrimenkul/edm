@@ -1,0 +1,345 @@
+---
+interface Props {
+  gorseller: string[];
+  baslik: string;
+}
+const { gorseller, baslik } = Astro.props;
+const kapak = gorseller[0];
+const yan = gorseller.slice(1, 5);
+const kalan = Math.max(0, gorseller.length - 5);
+---
+
+{
+  kapak && (
+    <div class="galeri" data-galeri>
+      <button
+        type="button"
+        class="galeri-ana goruntu-kutu grup-kart"
+        data-ac="0"
+        aria-label={`${baslik} — fotoğrafları büyüt`}
+      >
+        <img src={kapak} alt={baslik} fetchpriority="high" decoding="async" />
+      </button>
+
+      {yan.length > 0 && (
+        <div class="galeri-yan">
+          {yan.map((g, i) => (
+            <button
+              type="button"
+              class="goruntu-kutu grup-kart galeri-kucuk"
+              data-ac={String(i + 1)}
+              aria-label={`Fotoğraf ${i + 2}`}
+            >
+              <img src={g} alt="" loading="lazy" decoding="async" />
+              {i === yan.length - 1 && kalan > 0 && (
+                <span class="galeri-kalan font-veri">+{kalan}</span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <button type="button" class="galeri-tumu" data-ac="0">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1" />
+          <rect x="9" y="1.5" width="5.5" height="5.5" rx="1" />
+          <rect x="1.5" y="9" width="5.5" height="5.5" rx="1" />
+          <rect x="9" y="9" width="5.5" height="5.5" rx="1" />
+        </svg>
+        {gorseller.length} fotoğrafın tümü
+      </button>
+
+      {/* Büyütme katmanı */}
+      <dialog class="buyutec" data-buyutec aria-label="Fotoğraf galerisi">
+        <button type="button" class="buyutec-kapat" data-kapat aria-label="Kapat">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <path d="M5 5l10 10M15 5L5 15" />
+          </svg>
+        </button>
+
+        <button type="button" class="buyutec-ok buyutec-ok--sol" data-onceki aria-label="Önceki fotoğraf">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <path d="M12 4l-6 6 6 6" />
+          </svg>
+        </button>
+
+        <figure class="buyutec-sahne">
+          <img data-buyutec-gorsel src={kapak} alt={baslik} />
+          <figcaption class="buyutec-alt">
+            <span class="font-veri" data-buyutec-sayac>
+              1 / {gorseller.length}
+            </span>
+            <span class="buyutec-baslik">{baslik}</span>
+          </figcaption>
+        </figure>
+
+        <button type="button" class="buyutec-ok buyutec-ok--sag" data-sonraki aria-label="Sonraki fotoğraf">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <path d="M8 4l6 6-6 6" />
+          </svg>
+        </button>
+
+        <script type="application/json" data-gorsel-listesi set:html={JSON.stringify(gorseller)} />
+      </dialog>
+    </div>
+  )
+}
+
+<style>
+  .galeri {
+    position: relative;
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 900px) {
+    .galeri {
+      grid-template-columns: 1.62fr 1fr;
+    }
+  }
+
+  .galeri-ana,
+  .galeri-kucuk {
+    border: 0;
+    padding: 0;
+    cursor: zoom-in;
+    background: var(--color-kirec);
+    border-radius: var(--radius-kart);
+    display: block;
+  }
+  .galeri-ana {
+    aspect-ratio: 4 / 3;
+  }
+  @media (min-width: 900px) {
+    .galeri-ana {
+      aspect-ratio: 3 / 2.35;
+    }
+  }
+
+  .galeri-yan {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .galeri-kucuk {
+    aspect-ratio: 4 / 3;
+  }
+  @media (min-width: 900px) {
+    .galeri-kucuk {
+      aspect-ratio: auto;
+      height: 100%;
+    }
+    .galeri-yan {
+      grid-template-rows: 1fr 1fr;
+    }
+  }
+
+  .galeri-kalan {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: color-mix(in oklab, var(--color-murekkep) 58%, transparent);
+    color: var(--color-kagit);
+    font-size: 1.15rem;
+    backdrop-filter: blur(2px);
+  }
+
+  .galeri-tumu {
+    position: absolute;
+    right: 0.85rem;
+    bottom: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 2.4rem;
+    padding-inline: 0.9rem;
+    border: 0;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--color-kagit) 94%, transparent);
+    backdrop-filter: blur(10px);
+    color: var(--color-murekkep);
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow-kagit);
+    transition: background-color 0.35s var(--ease-yumusak);
+  }
+  .galeri-tumu:hover {
+    background: #fff;
+  }
+  .galeri-tumu svg {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  /* --- Büyüteç --- */
+  .buyutec {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: color-mix(in oklab, var(--color-murekkep) 97%, transparent);
+    color: var(--color-kagit);
+  }
+  .buyutec::backdrop {
+    background: rgb(18 19 22 / 0.9);
+  }
+  .buyutec[open] {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+  }
+
+  .buyutec-sahne {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    height: 100%;
+    padding: 3.5rem 0.5rem 1.5rem;
+    min-width: 0;
+  }
+  .buyutec-sahne img {
+    max-width: 100%;
+    max-height: calc(100dvh - 8rem);
+    object-fit: contain;
+    border-radius: 2px;
+  }
+  .buyutec-alt {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.35rem 1rem;
+    font-size: 0.8125rem;
+    color: color-mix(in oklab, var(--color-kagit) 66%, transparent);
+    text-align: center;
+  }
+  .buyutec-baslik {
+    max-width: 60ch;
+  }
+
+  .buyutec-kapat {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 2;
+  }
+  .buyutec-kapat,
+  .buyutec-ok {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid color-mix(in oklab, var(--color-kagit) 22%, transparent);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-kagit);
+    cursor: pointer;
+    transition: background-color 0.3s var(--ease-yumusak), color 0.3s var(--ease-yumusak);
+  }
+  .buyutec-kapat:hover,
+  .buyutec-ok:hover {
+    background: var(--color-kagit);
+    color: var(--color-murekkep);
+  }
+  .buyutec-kapat svg,
+  .buyutec-ok svg {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+  .buyutec-ok--sol {
+    margin-left: 0.75rem;
+  }
+  .buyutec-ok--sag {
+    margin-right: 0.75rem;
+  }
+  @media (max-width: 640px) {
+    .buyutec-ok {
+      position: absolute;
+      bottom: 1.15rem;
+      z-index: 2;
+    }
+    .buyutec-ok--sol {
+      left: 1rem;
+      margin: 0;
+    }
+    .buyutec-ok--sag {
+      right: 1rem;
+      margin: 0;
+    }
+    .buyutec[open] {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const kok = document.querySelector<HTMLElement>('[data-galeri]');
+  if (kok) {
+    const buyutec = kok.querySelector<HTMLDialogElement>('[data-buyutec]');
+    const gorsel = kok.querySelector<HTMLImageElement>('[data-buyutec-gorsel]');
+    const sayac = kok.querySelector<HTMLElement>('[data-buyutec-sayac]');
+    const listeEtiket = kok.querySelector<HTMLScriptElement>('[data-gorsel-listesi]');
+
+    if (buyutec && gorsel && listeEtiket) {
+      const liste: string[] = JSON.parse(listeEtiket.textContent || '[]');
+      let sira = 0;
+
+      const goster = (yeni: number) => {
+        sira = (yeni + liste.length) % liste.length;
+        gorsel.src = liste[sira];
+        if (sayac) sayac.textContent = `${sira + 1} / ${liste.length}`;
+        // Bir sonrakini önden yükle — ok tuşuyla gezerken bekleme olmasın
+        const sonraki = new Image();
+        sonraki.src = liste[(sira + 1) % liste.length];
+      };
+
+      kok.querySelectorAll<HTMLElement>('[data-ac]').forEach((d) =>
+        d.addEventListener('click', () => {
+          goster(Number(d.dataset.ac ?? 0));
+          buyutec.showModal();
+        })
+      );
+
+      kok.querySelector('[data-kapat]')?.addEventListener('click', () => buyutec.close());
+      kok.querySelector('[data-onceki]')?.addEventListener('click', () => goster(sira - 1));
+      kok.querySelector('[data-sonraki]')?.addEventListener('click', () => goster(sira + 1));
+
+      buyutec.addEventListener('keydown', (o) => {
+        if (o.key === 'ArrowLeft') goster(sira - 1);
+        if (o.key === 'ArrowRight') goster(sira + 1);
+      });
+
+      // Zemine tıklayınca kapat
+      buyutec.addEventListener('click', (o) => {
+        if (o.target === buyutec) buyutec.close();
+      });
+
+      // Dokunmatikte kaydırarak gezinme
+      let baslangicX = 0;
+      buyutec.addEventListener(
+        'touchstart',
+        (o) => {
+          baslangicX = o.changedTouches[0].clientX;
+        },
+        { passive: true }
+      );
+      buyutec.addEventListener(
+        'touchend',
+        (o) => {
+          const fark = o.changedTouches[0].clientX - baslangicX;
+          if (Math.abs(fark) > 55) goster(fark > 0 ? sira - 1 : sira + 1);
+        },
+        { passive: true }
+      );
+    }
+  }
+</script>

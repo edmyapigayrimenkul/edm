@@ -1,0 +1,471 @@
+---
+import Temel from '../layouts/Temel.astro';
+import { ILETISIM, KURUM, DANISMANLAR } from '../lib/site';
+import { portfoy } from '../lib/ilanlar';
+
+const { filtreler: FILTRELER, sayimlar: SAYIMLAR } = await portfoy();
+
+const adimlar = [
+  {
+    baslik: 'Formu doldurun',
+    metin: 'Mülkün tipi, konumu ve büyüklüğü yeterli. Tapu bilgisi istemiyoruz.',
+  },
+  {
+    baslik: 'Bölgeyi tararız',
+    metin:
+      'Aynı mahallede, benzer metrekarede, son altı ayda gerçekleşen satışlara bakarız — portalda yazan istek fiyatlarına değil.',
+  },
+  {
+    baslik: 'Raporu göndeririz',
+    metin:
+      'Tek sayfa: tahmini değer aralığı, karşılaştırdığımız satışlar ve fiyatı etkileyen unsurlar. Aynı gün içinde.',
+  },
+];
+
+const ilceler = FILTRELER.ilce.map((i) => i.deger);
+---
+
+<Temel
+  baslik="Ücretsiz Değerleme"
+  aciklama="Mülkünüzün güncel piyasa değerini ücretsiz öğrenin. Silivri ve Trakya'da gerçekleşmiş satışlara dayalı, aynı gün dönüş yapılan değerleme raporu."
+>
+  <section class="pt-28 pb-12 lg:pt-36">
+    <div class="kab">
+      <div class="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
+        <!-- Anlatım -->
+        <div>
+          <p class="etiket etiket--kirmizi" data-belir>Ücretsiz · Bağlayıcı değil</p>
+          <h1 class="baslik-buyuk mt-4 max-w-[13ch]" data-belir data-gecikme="0.05">
+            Mülkünüz bugün ne eder?
+          </h1>
+          <p class="mt-6 max-w-[50ch] leading-relaxed text-metin-2" data-belir data-gecikme="0.1">
+            Satmaya karar vermenize gerek yok. Rakamı bilmek; kredi, miras paylaşımı,
+            takas ya da sadece merak için işinize yarar. Değerleme için sizden ücret
+            almıyoruz ve sonrasında peşinize düşmüyoruz.
+          </p>
+
+          <ol class="adim-liste mt-10" data-belir="sira">
+            {
+              adimlar.map((a, i) => (
+                <li>
+                  <span class="adim-no font-veri">{String(i + 1).padStart(2, '0')}</span>
+                  <div>
+                    <h2 class="baslik-kucuk">{a.baslik}</h2>
+                    <p class="mt-1.5 text-sm leading-relaxed text-metin-2">{a.metin}</p>
+                  </div>
+                </li>
+              ))
+            }
+          </ol>
+
+          <div class="guven-kutu mt-10">
+            <p class="text-sm leading-relaxed text-metin-2">
+              Bölgede <strong class="text-murekkep">{SAYIMLAR.toplam} aktif ilan</strong> yönetiyoruz
+              ve {KURUM.kurulus}’dan beri Silivri’deyiz. Değerlemeyi yapan kişi, sizinle
+              konuşacak kişiyle aynı.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              {
+                DANISMANLAR.map((d) => (
+                  <span class="rozet rozet--cizgili">{d.ad}</span>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <div>
+          <form class="form-kart" data-degerleme-form novalidate>
+            <div class="grid gap-5">
+              <div class="alan-ikili">
+                <label class="alan">
+                  <span class="alan-etiket">Ad Soyad <span aria-hidden="true">*</span></span>
+                  <input type="text" name="ad" required autocomplete="name" placeholder="Adınız" />
+                  <span class="alan-hata" data-hata></span>
+                </label>
+
+                <label class="alan">
+                  <span class="alan-etiket">Telefon <span aria-hidden="true">*</span></span>
+                  <input
+                    type="tel"
+                    name="telefon"
+                    required
+                    autocomplete="tel"
+                    inputmode="tel"
+                    placeholder="05xx xxx xx xx"
+                  />
+                  <span class="alan-hata" data-hata></span>
+                </label>
+              </div>
+
+              <label class="alan">
+                <span class="alan-etiket">E-posta</span>
+                <input
+                  type="email"
+                  name="eposta"
+                  autocomplete="email"
+                  placeholder="Raporu e-postayla da gönderelim mi?"
+                />
+                <span class="alan-hata" data-hata></span>
+              </label>
+
+              <div class="alan-ikili">
+                <label class="alan">
+                  <span class="alan-etiket">Mülk tipi <span aria-hidden="true">*</span></span>
+                  <select name="tip" required>
+                    <option value="">Seçin…</option>
+                    <option>Daire</option>
+                    <option>Villa / Müstakil ev</option>
+                    <option>Arsa</option>
+                    <option>Tarla</option>
+                    <option>İş yeri / Dükkan</option>
+                    <option>Diğer</option>
+                  </select>
+                  <span class="alan-hata" data-hata></span>
+                </label>
+
+                <label class="alan">
+                  <span class="alan-etiket">İlçe <span aria-hidden="true">*</span></span>
+                  <input
+                    type="text"
+                    name="ilce"
+                    required
+                    list="ilce-listesi"
+                    placeholder="Silivri"
+                    autocomplete="address-level2"
+                  />
+                  <datalist id="ilce-listesi">
+                    {ilceler.map((i) => <option value={i}></option>)}
+                  </datalist>
+                  <span class="alan-hata" data-hata></span>
+                </label>
+              </div>
+
+              <div class="alan-ikili">
+                <label class="alan">
+                  <span class="alan-etiket">Mahalle / mevkii</span>
+                  <input type="text" name="mahalle" placeholder="Mimar Sinan Mah." />
+                </label>
+
+                <label class="alan">
+                  <span class="alan-etiket">Büyüklük (m²)</span>
+                  <input type="number" name="m2" min="1" inputmode="numeric" placeholder="220" />
+                </label>
+              </div>
+
+              <label class="alan">
+                <span class="alan-etiket">Eklemek istedikleriniz</span>
+                <textarea
+                  name="not"
+                  rows="4"
+                  placeholder="Oda sayısı, bina yaşı, imar durumu, kat… Bildiğiniz kadarını yazın."
+                ></textarea>
+              </label>
+
+              <!-- Bot tuzağı: gerçek kullanıcı bu alanı görmez ve doldurmaz -->
+              <div class="tuzak" aria-hidden="true">
+                <label>
+                  Web siteniz
+                  <input type="text" name="website" tabindex="-1" autocomplete="off" />
+                </label>
+              </div>
+
+              <label class="onay">
+                <input type="checkbox" name="onay" required />
+                <span>
+                  Verdiğim bilgilerin değerleme talebim için kullanılmasına izin veriyorum.
+                  Bilgiler üçüncü kişilerle paylaşılmaz.
+                </span>
+              </label>
+
+              <button type="submit" class="dugme dugme--kirmizi w-full !py-4" data-gonder>
+                Değerleme talebi gönder
+              </button>
+
+              <p class="text-center text-[0.75rem] text-kursun">
+                Ortalama dönüş süresi: aynı gün. Acilse
+                <a href={`tel:${ILETISIM.telefonHam}`} class="alt-cizgi text-metin-2">
+                  {ILETISIM.telefon}
+                </a>
+              </p>
+            </div>
+          </form>
+
+          <!-- Başarı ekranı -->
+          <div class="form-kart basari" data-basari hidden>
+            <span class="basari-isaret" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M4 12.5l5 5L20 6.5"></path>
+              </svg>
+            </span>
+            <h2 class="baslik-orta mt-5">Talebiniz bize ulaştı</h2>
+            <p class="mt-3 text-metin-2">
+              En geç bugün içinde size döneceğiz. Daha hızlı olsun isterseniz aynı bilgileri
+              WhatsApp’tan da gönderebilirsiniz.
+            </p>
+            <div class="mt-6 flex flex-col gap-2.5">
+              <a href="#" data-wa-baglanti target="_blank" rel="noopener noreferrer" class="dugme dugme--kirmizi w-full">
+                WhatsApp’tan da bildir
+              </a>
+              <a href="/ilanlar" class="dugme dugme--hayalet w-full">Bu arada ilanlara göz atın</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Temel>
+
+<style>
+  .adim-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .adim-liste li {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: 1rem;
+    padding-block: 1.15rem;
+    border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 11%, transparent);
+  }
+  .adim-liste li:last-child {
+    border-bottom: 1px solid color-mix(in oklab, var(--color-murekkep) 11%, transparent);
+  }
+  .adim-no {
+    font-size: 0.75rem;
+    color: var(--color-kirmizi);
+    padding-top: 0.28rem;
+  }
+
+  .guven-kutu {
+    background: var(--color-kagit-2);
+    border-radius: var(--radius-kart);
+    padding: 1.35rem 1.5rem;
+  }
+
+  /* --- Form --- */
+  .form-kart {
+    background: #fff;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-radius: var(--radius-kart);
+    padding: clamp(1.4rem, 3vw, 2.25rem);
+    box-shadow: var(--shadow-kagit);
+  }
+
+  .alan-ikili {
+    display: grid;
+    gap: 1.25rem;
+  }
+  @media (min-width: 560px) {
+    .alan-ikili {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .alan {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    min-width: 0;
+  }
+  .alan-etiket {
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+  .alan-etiket span {
+    color: var(--color-kirmizi);
+  }
+
+  .alan input,
+  .alan select,
+  .alan textarea {
+    width: 100%;
+    font-family: inherit;
+    font-size: 0.9375rem;
+    color: inherit;
+    background: var(--color-kagit);
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 13%, transparent);
+    border-radius: 6px;
+    padding: 0.7rem 0.85rem;
+    transition: border-color 0.3s var(--ease-yumusak), background-color 0.3s var(--ease-yumusak);
+  }
+  .alan textarea {
+    resize: vertical;
+    min-height: 5.5rem;
+  }
+  .alan input:focus,
+  .alan select:focus,
+  .alan textarea:focus {
+    outline: none;
+    border-color: var(--color-murekkep);
+    background: #fff;
+  }
+  .alan input::placeholder,
+  .alan textarea::placeholder {
+    color: color-mix(in oklab, var(--color-kursun) 82%, transparent);
+  }
+
+  .alan[data-gecersiz] input,
+  .alan[data-gecersiz] select {
+    border-color: var(--color-kirmizi);
+  }
+  .alan-hata {
+    font-size: 0.75rem;
+    color: var(--color-kirmizi-derin);
+    display: none;
+  }
+  .alan[data-gecersiz] .alan-hata {
+    display: block;
+  }
+
+  .onay {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    color: var(--color-metin-2);
+    cursor: pointer;
+  }
+  .onay input {
+    margin-top: 0.15rem;
+    width: 1.05rem;
+    height: 1.05rem;
+    flex: none;
+    accent-color: var(--color-kirmizi);
+  }
+
+  /* Bot tuzağı: ekrandan çıkarılır ama görüntüden gizlenmez ki botlar doldursun */
+  .tuzak {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  /* --- Başarı --- */
+  .basari-isaret {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--color-kirmizi) 12%, transparent);
+    color: var(--color-kirmizi-derin);
+  }
+  .basari-isaret svg {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+</style>
+
+<script>
+  import { ILETISIM } from '../lib/site';
+
+  const form = document.querySelector<HTMLFormElement>('[data-degerleme-form]');
+  const basari = document.querySelector<HTMLElement>('[data-basari]');
+  const waBaglanti = document.querySelector<HTMLAnchorElement>('[data-wa-baglanti]');
+
+  if (form && basari) {
+    const gonderDugme = form.querySelector<HTMLButtonElement>('[data-gonder]')!;
+
+    const hataMetni = (alan: HTMLInputElement | HTMLSelectElement): string => {
+      if (alan.validity.valueMissing) {
+        return alan.name === 'onay' ? 'Devam etmek için onaylayın.' : 'Bu alan gerekli.';
+      }
+      if (alan.name === 'eposta' && alan.validity.typeMismatch) {
+        return 'E-posta adresi geçerli görünmüyor.';
+      }
+      if (alan.name === 'telefon') return 'Size ulaşabileceğimiz bir numara yazın.';
+      return 'Bu alanı kontrol edin.';
+    };
+
+    /** Türk telefon numarasını kabaca doğrular: 10-11 hane. */
+    const telefonGecerli = (deger: string) => {
+      const haneler = deger.replace(/\D/g, '');
+      return haneler.length >= 10 && haneler.length <= 13;
+    };
+
+    function alanDogrula(alan: HTMLInputElement | HTMLSelectElement): boolean {
+      const sarmal = alan.closest<HTMLElement>('.alan');
+      let gecerli = alan.checkValidity();
+      if (gecerli && alan.name === 'telefon') gecerli = telefonGecerli(alan.value);
+
+      if (sarmal) {
+        const hataAlani = sarmal.querySelector<HTMLElement>('[data-hata]');
+        if (gecerli) {
+          sarmal.removeAttribute('data-gecersiz');
+        } else {
+          sarmal.setAttribute('data-gecersiz', 'evet');
+          if (hataAlani) hataAlani.textContent = hataMetni(alan);
+        }
+      }
+      return gecerli;
+    }
+
+    form.querySelectorAll<HTMLInputElement>('input, select, textarea').forEach((alan) => {
+      alan.addEventListener('blur', () => {
+        if (alan.name !== 'website') alanDogrula(alan);
+      });
+      alan.addEventListener('input', () => {
+        alan.closest('.alan')?.removeAttribute('data-gecersiz');
+      });
+    });
+
+    form.addEventListener('submit', async (olay) => {
+      olay.preventDefault();
+
+      const zorunlular = Array.from(
+        form.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[required]')
+      );
+      const hepsiGecerli = zorunlular.map(alanDogrula).every(Boolean);
+
+      if (!hepsiGecerli) {
+        const ilkHata = form.querySelector<HTMLElement>('[data-gecersiz] input, [data-gecersiz] select');
+        ilkHata?.focus();
+        return;
+      }
+
+      const veri = Object.fromEntries(new FormData(form).entries()) as Record<string, string>;
+
+      // WhatsApp yedeği her durumda hazır olsun
+      const satirlar = [
+        'Değerleme talebi',
+        `Ad: ${veri.ad}`,
+        `Telefon: ${veri.telefon}`,
+        veri.eposta ? `E-posta: ${veri.eposta}` : '',
+        `Mülk: ${veri.tip}`,
+        `Konum: ${[veri.mahalle, veri.ilce].filter(Boolean).join(', ')}`,
+        veri.m2 ? `Büyüklük: ${veri.m2} m²` : '',
+        veri.not ? `Not: ${veri.not}` : '',
+      ].filter(Boolean);
+
+      if (waBaglanti) {
+        waBaglanti.href = `https://wa.me/${ILETISIM.whatsapp}?text=${encodeURIComponent(
+          satirlar.join('\n')
+        )}`;
+      }
+
+      gonderDugme.disabled = true;
+      gonderDugme.textContent = 'Gönderiliyor…';
+
+      try {
+        await fetch('/api/talep', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...veri, tur: 'degerleme', kaynak: location.pathname }),
+        });
+      } catch {
+        // Sunucu ulaşılamazsa bile kullanıcıyı boşta bırakmıyoruz;
+        // WhatsApp yedeği başarı ekranında hazır duruyor.
+      }
+
+      form.hidden = true;
+      basari.hidden = false;
+      basari.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
+</script>

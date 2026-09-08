@@ -1,0 +1,479 @@
+---
+import Temel from '../layouts/Temel.astro';
+import ParselTuval from '../components/ParselTuval.astro';
+import IlanKart from '../components/IlanKart.astro';
+import { KURUM, ILETISIM, HIZMETLER, DANISMANLAR } from '../lib/site';
+import { oneCikanlar, portfoy, danismaninIlanlari } from '../lib/ilanlar';
+import { YORUMLAR } from '../lib/yorumlar';
+
+const { sayimlar: SAYIMLAR, filtreler: FILTRELER } = await portfoy();
+const secki = await oneCikanlar(7);
+const donum = Math.round(SAYIMLAR.toplamAlan / 1000);
+
+const rakamlar = [
+  { sayi: SAYIMLAR.toplam, etiket: 'aktif ilan', ek: 'canlı portföy' },
+  { sayi: SAYIMLAR.arsa, etiket: 'arsa & tarla', ek: 'portföyün yarısı' },
+  { sayi: donum, etiket: 'dönüm arazi', ek: 'toplam yüzölçümü' },
+  { sayi: SAYIMLAR.ilce, etiket: 'ilçe', ek: 'İstanbul · Edirne · Tekirdağ' },
+];
+
+/** Portföyün gerçekten bulunduğu ilçeler — elle yazılmıyor, veriden geliyor. */
+const bolgeler = FILTRELER.ilce.slice(0, 8);
+
+const hizliFiltreler = [
+  { ad: 'Satılık Konut', yol: '/ilanlar?islem=satilik&tip=konut' },
+  { ad: 'Arsa & Tarla', yol: '/ilanlar?tip=arsa' },
+  { ad: 'Kiralık', yol: '/ilanlar?islem=kiralik' },
+  { ad: 'Silivri', yol: '/ilanlar?ilce=Silivri' },
+];
+---
+
+<Temel
+  baslik={KURUM.ad}
+  aciklama={`Silivri merkezli emlak ofisi. ${SAYIMLAR.toplam} aktif ilan: konut, arsa ve tarla. İstanbul, Edirne ve Tekirdağ'da alım, satım, kiralama ve ücretsiz değerleme.`}
+  koyuUst={true}
+>
+  <!-- ================= KAHRAMAN ================= -->
+  <section class="kahraman" data-parallax-alan>
+    <div class="kahraman-zemin">
+      <ParselTuval />
+    </div>
+
+    <div class="kab relative">
+      <div class="flex min-h-[min(92svh,54rem)] flex-col justify-end pt-32 pb-10 lg:pb-14">
+        <p class="etiket etiket--acik" data-belir data-gecikme="0.15">
+          Silivri · İstanbul — {KURUM.kurulus}’dan beri
+        </p>
+
+        <h1 class="kahraman-baslik mt-6">
+          <span class="satir-maske"><span class="block" data-belir="maske" data-gecikme="0.05">Silivri’de ev,</span></span>
+          <span class="satir-maske"><span class="block" data-belir="maske" data-gecikme="0.13">Trakya’da toprak.</span></span>
+        </h1>
+
+        <div class="mt-8 grid gap-8 lg:grid-cols-[1.1fr_auto] lg:items-end lg:gap-16">
+          <p class="max-w-[54ch] text-[1.0625rem] leading-relaxed text-kagit/64" data-belir data-gecikme="0.3">
+            Konut ararken oturulacak evi, yatırım ararken karşılığını yıllar sonra veren
+            toprağı biliriz. İmar durumundan tapu devrine kadar bütün yolu birlikte
+            yürüyoruz.
+          </p>
+
+          <div class="flex flex-wrap gap-3" data-belir data-gecikme="0.4">
+            <a href="/ilanlar" class="dugme dugme--kirmizi">
+              {SAYIMLAR.toplam} ilanı gör
+            </a>
+            <a href="/degerleme" class="dugme dugme--hayalet-acik">Ücretsiz değerleme</a>
+          </div>
+        </div>
+
+        <!-- Hızlı filtreler -->
+        <div class="mt-12 flex flex-wrap items-center gap-2" data-belir data-gecikme="0.5">
+          <span class="etiket etiket--acik mr-2">Kısayol</span>
+          {
+            hizliFiltreler.map((f) => (
+              <a href={f.yol} class="hizli-pil">
+                {f.ad}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Rakam şeridi -->
+    <div class="relative border-t border-kagit/12">
+      <div class="kab">
+        <dl class="grid grid-cols-2 lg:grid-cols-4">
+          {
+            rakamlar.map((r, i) => (
+              <div
+                class:list={[
+                  'rakam-hucre',
+                  i < 2 && 'border-b border-kagit/12 lg:border-b-0',
+                  i % 2 === 0 && 'border-r border-kagit/12',
+                  i === 2 && 'lg:border-r',
+                  i === 1 && 'lg:border-r',
+                ]}
+              >
+                <dd class="rakam">
+                  <span data-sayac={r.sayi}>{r.sayi.toLocaleString('tr-TR')}</span>
+                </dd>
+                <dt class="mt-1.5 text-sm font-medium text-kagit/78">{r.etiket}</dt>
+                <p class="etiket etiket--acik mt-1">{r.ek}</p>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ÖNE ÇIKAN İLANLAR ================= -->
+  <section class="py-20 lg:py-28">
+    <div class="kab">
+      <div class="flex flex-wrap items-end justify-between gap-6 border-b border-murekkep/12 pb-8">
+        <div>
+          <p class="etiket" data-belir>Portföyden</p>
+          <h2 class="baslik-buyuk mt-4 max-w-[16ch]" data-belir data-gecikme="0.06">
+            Şu an masamızda olanlar
+          </h2>
+        </div>
+        <a href="/ilanlar" class="dugme dugme--hayalet" data-belir data-gecikme="0.12">
+          Tüm ilanlar
+          <svg class="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <path d="M3 8h10M9 4l4 4-4 4"></path>
+          </svg>
+        </a>
+      </div>
+
+      <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-belir="sira">
+        {secki.map((ilan, i) => <IlanKart ilan={ilan} oncelikli={i < 3} genis={i === 0} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= BÖLGE ================= -->
+  <section class="bolge-blok">
+    <div class="kab">
+      <div class="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
+        <div>
+          <p class="etiket" data-belir>Çalıştığımız yerler</p>
+          <h2 class="baslik-buyuk mt-4 max-w-[13ch]" data-belir data-gecikme="0.06">
+            Haritayı ezbere biliriz
+          </h2>
+          <p class="mt-6 max-w-[46ch] leading-relaxed text-metin-2" data-belir data-gecikme="0.12">
+            Portföyümüz Silivri merkezden başlayıp Selimpaşa sahiline, oradan Edirne
+            Meriç’in ovalarına ve Tekirdağ Malkara’ya uzanıyor. Her ilçenin imar
+            durumu, kadastral yolu ve fiyat seyri ayrı bir konu — biz hepsini
+            yerinde takip ediyoruz.
+          </p>
+          <a href="/rehber" class="dugme dugme--murekkep mt-8" data-belir data-gecikme="0.18">
+            Bölge rehberini oku
+          </a>
+        </div>
+
+        <ul class="bolge-liste" data-belir="sira">
+          {
+            bolgeler.map((b) => (
+              <li>
+                <a href={`/ilanlar?ilce=${encodeURIComponent(b.deger)}`} class="bolge-satir">
+                  <span class="bolge-ad">{b.deger}</span>
+                  <span class="bolge-cizgi" aria-hidden="true" />
+                  <span class="bolge-adet font-veri">{b.adet} ilan</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= HİZMETLER ================= -->
+  <section class="py-20 lg:py-28">
+    <div class="kab">
+      <div class="max-w-[58ch]">
+        <p class="etiket" data-belir>Ne yapıyoruz</p>
+        <h2 class="baslik-buyuk mt-4" data-belir data-gecikme="0.06">
+          İlan yayınlamakla bitmiyor
+        </h2>
+      </div>
+
+      <div class="mt-12 grid gap-px overflow-hidden border border-murekkep/10 bg-murekkep/10 sm:grid-cols-2 lg:grid-cols-3" data-belir="sira">
+        {
+          HIZMETLER.map((h, i) => (
+            <div class="hizmet-hucre">
+              <span class="etiket font-veri">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="baslik-orta mt-4">{h.baslik}</h3>
+              <p class="mt-3 text-sm leading-relaxed text-metin-2">{h.ozet}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DANIŞMANLAR ================= -->
+  <section class="pb-20 lg:pb-28">
+    <div class="kab">
+      <div class="flex flex-wrap items-end justify-between gap-6 border-b border-murekkep/12 pb-8">
+        <div>
+          <p class="etiket" data-belir>Ekip</p>
+          <h2 class="baslik-buyuk mt-4" data-belir data-gecikme="0.06">Kiminle konuşacaksınız</h2>
+        </div>
+        <a href="/danismanlar" class="dugme dugme--hayalet" data-belir data-gecikme="0.12">
+          Danışmanlar
+        </a>
+      </div>
+
+      <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-belir="sira">
+        {
+          DANISMANLAR.map((d) => {
+            const adet = danismaninIlanlari(d.emlakjetSlug).length;
+            const bas = d.ad
+              .split(' ')
+              .map((p) => p[0])
+              .join('');
+            return (
+              <a href={`/danismanlar/${d.slug}`} class="grup-kart danisman-kart">
+                <div class="danisman-portre">
+                  {d.foto ? (
+                    <img src={d.foto} alt={d.ad} loading="lazy" decoding="async" />
+                  ) : (
+                    <span class="danisman-monogram" aria-hidden="true">
+                      {bas}
+                    </span>
+                  )}
+                </div>
+                <div class="p-5">
+                  <h3 class="baslik-kucuk">{d.ad}</h3>
+                  <p class="mt-1 text-sm text-metin-2">{d.unvan}</p>
+                  <div class="cizgi mt-4" />
+                  <div class="flex items-center justify-between gap-3 pt-3.5">
+                    <ul class="flex flex-wrap gap-x-2.5 gap-y-1 text-[0.75rem] text-metin-2">
+                      {d.uzmanlik.slice(0, 2).map((u) => (
+                        <li>{u}</li>
+                      ))}
+                    </ul>
+                    <span class="font-veri text-[0.75rem] text-kursun">{adet} ilan</span>
+                  </div>
+                </div>
+              </a>
+            );
+          })
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= YORUMLAR (gerçek yorum girilince görünür) ================= -->
+  {
+    YORUMLAR.length > 0 && (
+      <section class="pb-20 lg:pb-28">
+        <div class="kab">
+          <p class="etiket" data-belir>
+            Müşterilerimiz
+          </p>
+          <h2 class="baslik-buyuk mt-4 max-w-[16ch]" data-belir data-gecikme="0.06">
+            Bizimle çalışanlar ne dedi
+          </h2>
+          <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-belir="sira">
+            {YORUMLAR.slice(0, 6).map((y) => (
+              <figure class="yorum-kart">
+                <blockquote class="text-[1.0625rem] leading-relaxed">“{y.metin}”</blockquote>
+                <figcaption class="mt-5 border-t border-murekkep/10 pt-4">
+                  <span class="font-medium">{y.ad}</span>
+                  <span class="etiket ml-2">{y.kaynak}</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- ================= DEĞERLEME ÇAĞRISI ================= -->
+  <section class="degerleme-blok">
+    <div class="kab">
+      <div class="grid gap-10 py-16 lg:grid-cols-[1.2fr_1fr] lg:items-center lg:py-24">
+        <div>
+          <p class="etiket etiket--kirmizi" data-belir>Ücretsiz</p>
+          <h2 class="baslik-buyuk mt-4 max-w-[16ch]" data-belir data-gecikme="0.06">
+            Eviniz bugün ne eder?
+          </h2>
+          <p class="mt-6 max-w-[50ch] leading-relaxed text-metin-2" data-belir data-gecikme="0.12">
+            Aynı sokakta, aynı metrekarede, son altı ayda gerçekleşen satışlara bakıyoruz.
+            Portalda yazan istek fiyatlarına değil — gerçekten el değiştiren rakamlara.
+            Sonucu tek sayfalık bir rapor olarak gönderiyoruz.
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-3" data-belir data-gecikme="0.18">
+          <a href="/degerleme" class="dugme dugme--kirmizi w-full !py-4">Değerleme talebi oluştur</a>
+          <a href={`tel:${ILETISIM.telefonHam}`} class="dugme dugme--hayalet w-full !py-4">
+            Telefonla konuşalım — {ILETISIM.telefon}
+          </a>
+          <p class="etiket mt-2 text-center">Ortalama dönüş süresi: aynı gün</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Temel>
+
+<style>
+  /* ---------------- Kahraman ---------------- */
+  .kahraman {
+    position: relative;
+    background: var(--color-murekkep);
+    color: var(--color-kagit);
+    overflow: hidden;
+  }
+  .kahraman-zemin {
+    position: absolute;
+    inset: 0;
+  }
+  /* Parsel dokusunu yazının arkasında yumuşat */
+  .kahraman-zemin::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      120% 80% at 18% 78%,
+      rgb(18 19 22 / 0.94) 0%,
+      rgb(18 19 22 / 0.6) 42%,
+      rgb(18 19 22 / 0.15) 100%
+    );
+  }
+
+  .kahraman-baslik {
+    font-size: clamp(2.9rem, 8.4vw, 7.75rem);
+    line-height: 0.94;
+    letter-spacing: -0.038em;
+  }
+
+  .hizli-pil {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0.95rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--color-kagit) 20%, transparent);
+    font-size: 0.8125rem;
+    color: color-mix(in oklab, var(--color-kagit) 80%, transparent);
+    transition: background-color 0.4s var(--ease-yumusak), color 0.4s var(--ease-yumusak),
+      border-color 0.4s var(--ease-yumusak);
+  }
+  .hizli-pil:hover {
+    background: var(--color-kagit);
+    border-color: var(--color-kagit);
+    color: var(--color-murekkep);
+  }
+
+  .rakam-hucre {
+    padding: 1.6rem 0;
+    padding-right: 1.25rem;
+  }
+  @media (min-width: 1024px) {
+    .rakam-hucre {
+      padding: 2.25rem 0;
+      padding-right: 2rem;
+    }
+    .rakam-hucre + .rakam-hucre {
+      padding-left: 2rem;
+    }
+  }
+  .rakam {
+    font-family: var(--font-baslik);
+    font-weight: 600;
+    font-size: clamp(2.5rem, 5vw, 3.75rem);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------------- Bölge ---------------- */
+  .bolge-blok {
+    background: var(--color-kagit-2);
+    padding-block: clamp(4rem, 9vw, 7rem);
+    border-block: 1px solid color-mix(in oklab, var(--color-murekkep) 8%, transparent);
+  }
+
+  .bolge-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .bolge-satir {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: 1.05rem;
+    border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 12%, transparent);
+    transition: padding-left 0.5s var(--ease-yumusak);
+  }
+  .bolge-liste li:last-child .bolge-satir {
+    border-bottom: 1px solid color-mix(in oklab, var(--color-murekkep) 12%, transparent);
+  }
+  .bolge-satir:hover {
+    padding-left: 0.6rem;
+  }
+  .bolge-ad {
+    font-family: var(--font-baslik);
+    font-size: clamp(1.35rem, 2.4vw, 1.9rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    transition: color 0.35s var(--ease-yumusak);
+  }
+  .bolge-satir:hover .bolge-ad {
+    color: var(--color-kirmizi);
+  }
+  .bolge-cizgi {
+    flex: 1;
+    height: 1px;
+    background: color-mix(in oklab, var(--color-murekkep) 14%, transparent);
+  }
+  .bolge-adet {
+    font-size: 0.8125rem;
+    color: var(--color-kursun);
+    white-space: nowrap;
+  }
+
+  /* ---------------- Hizmetler ---------------- */
+  .hizmet-hucre {
+    background: var(--color-kagit);
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    transition: background-color 0.5s var(--ease-yumusak);
+  }
+  .hizmet-hucre:hover {
+    background: #fff;
+  }
+
+  /* ---------------- Danışmanlar ---------------- */
+  .danisman-kart {
+    display: block;
+    background: #fff;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 9%, transparent);
+    border-radius: var(--radius-kart);
+    overflow: hidden;
+    transition: border-color 0.5s var(--ease-yumusak), box-shadow 0.6s var(--ease-yumusak),
+      transform 0.6s var(--ease-yumusak);
+  }
+  .danisman-kart:hover {
+    box-shadow: var(--shadow-kalkik);
+    transform: translateY(-3px);
+  }
+  .danisman-portre {
+    aspect-ratio: 4 / 3;
+    background: var(--color-kirec);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .danisman-portre img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* Portre gelene kadar: monogram. Yer tutucu olduğu belli olsun diye sade. */
+  .danisman-monogram {
+    font-family: var(--font-baslik);
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: color-mix(in oklab, var(--color-murekkep) 22%, transparent);
+  }
+
+  /* ---------------- Yorum ---------------- */
+  .yorum-kart {
+    margin: 0;
+    background: #fff;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 9%, transparent);
+    border-radius: var(--radius-kart);
+    padding: clamp(1.4rem, 3vw, 2rem);
+  }
+
+  /* ---------------- Değerleme ---------------- */
+  .degerleme-blok {
+    background: var(--color-kagit-2);
+    border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 8%, transparent);
+  }
+</style>

@@ -1,0 +1,1896 @@
+<title>EDM Marka Paftası</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap"
+/>
+
+<style>
+  /* ===============================================================
+     EDM YAPI & GAYRİMENKUL — Marka Paftası
+     Görsel dil: imar/rölöve paftası. Saç teli çizgi, ölçü işareti,
+     mono rakam, sola dayalı blok. Vurgu tek yerde: marka kırmızısı.
+     =============================================================== */
+
+  :root {
+    /* Marka renkleri — bunlar tema değildir, konunun kendisidir.
+       Her iki temada da birebir aynı kalır. */
+    --edm-kirmizi: #f0000d;
+    --edm-kirmizi-derin: #c4030f;
+    --edm-murekkep: #121316;
+    --edm-kagit: #f4f4f3;
+    --edm-kirec: #e4e4e1;
+    --edm-kursun: #8a8b8f;
+
+    /* Sayfa yüzeyleri — tema ile değişen katman */
+    --yuzey: #f4f4f3;
+    --yuzey-2: #ececeb;
+    --yuzey-3: #e4e4e1;
+    --yuzey-ters: #121316;
+    --metin: #121316;
+    --metin-2: #56575c;
+    --metin-3: #8a8b8f;
+    --metin-ters: #f4f4f3;
+    --cizgi: #d6d6d3;
+    --cizgi-koyu: #c2c2be;
+    --vurgu: #f0000d;
+
+    --olcu-kenar: clamp(1.25rem, 5vw, 5rem);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --yuzey: #0e0f11;
+      --yuzey-2: #16171a;
+      --yuzey-3: #1e1f23;
+      --yuzey-ters: #f4f4f3;
+      --metin: #ececeb;
+      --metin-2: #a9aaae;
+      --metin-3: #7d7e83;
+      --metin-ters: #121316;
+      --cizgi: #2a2b30;
+      --cizgi-koyu: #3a3b41;
+      --vurgu: #ff2233;
+    }
+  }
+
+  :root[data-theme='dark'] {
+    --yuzey: #0e0f11;
+    --yuzey-2: #16171a;
+    --yuzey-3: #1e1f23;
+    --yuzey-ters: #f4f4f3;
+    --metin: #ececeb;
+    --metin-2: #a9aaae;
+    --metin-3: #7d7e83;
+    --metin-ters: #121316;
+    --cizgi: #2a2b30;
+    --cizgi-koyu: #3a3b41;
+    --vurgu: #ff2233;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--yuzey);
+    color: var(--metin);
+    font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0;
+    font-weight: 400;
+    text-wrap: balance;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  img {
+    max-width: 100%;
+    display: block;
+  }
+
+  /* --------------------------------------------------------------
+     Pafta kabı: geniş kenar boşluğu + kenarda ölçü cetveli
+     -------------------------------------------------------------- */
+  .pafta {
+    max-width: 1240px;
+    margin-inline: auto;
+    padding-inline: var(--olcu-kenar);
+  }
+
+  .blok {
+    padding-block: clamp(3.5rem, 8vw, 7rem);
+    border-top: 1px solid var(--cizgi);
+  }
+  .blok:first-of-type {
+    border-top: 0;
+  }
+
+  /* Bölüm başlığı: solda mono numara, sağda içerik */
+  .blok-bas {
+    display: grid;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    grid-template-columns: 1fr;
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  }
+  @media (min-width: 900px) {
+    .blok-bas {
+      grid-template-columns: 6rem 1fr;
+    }
+  }
+
+  .madde {
+    font-family: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--vurgu);
+    padding-top: 0.7rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .blok-baslik {
+    font-family: 'Fraunces', 'Times New Roman', serif;
+    font-size: clamp(1.9rem, 3.6vw, 3rem);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+
+  .blok-ozet {
+    margin-top: 0.9rem;
+    max-width: 62ch;
+    color: var(--metin-2);
+    font-size: 1.0625rem;
+  }
+
+  /* Mono etiket — teknik çizim yazısı */
+  .etiket {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--metin-3);
+  }
+
+  .not {
+    font-size: 0.875rem;
+    color: var(--metin-2);
+    max-width: 60ch;
+  }
+
+  /* --------------------------------------------------------------
+     Kapak
+     -------------------------------------------------------------- */
+  .kapak {
+    padding-block: clamp(2.5rem, 6vw, 5rem) clamp(3rem, 7vw, 6rem);
+  }
+
+  .kapak-ust {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 1.1rem;
+    border-bottom: 2px solid var(--metin);
+  }
+
+  .kapak-logo {
+    width: min(320px, 62vw);
+  }
+  .kapak-logo--koyu {
+    display: none;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .kapak-logo--acik {
+      display: none;
+    }
+    :root:not([data-theme='light']) .kapak-logo--koyu {
+      display: block;
+    }
+  }
+  :root[data-theme='dark'] .kapak-logo--acik {
+    display: none;
+  }
+  :root[data-theme='dark'] .kapak-logo--koyu {
+    display: block;
+  }
+
+  .kapak-baslik {
+    font-family: 'Fraunces', 'Times New Roman', serif;
+    font-weight: 800;
+    font-size: clamp(3.2rem, 12vw, 9rem);
+    line-height: 0.86;
+    letter-spacing: -0.035em;
+    margin-top: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .kapak-baslik em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--vurgu);
+  }
+
+  .kapak-alt {
+    margin-top: clamp(1.5rem, 3vw, 2.25rem);
+    display: grid;
+    gap: 1.5rem 3rem;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--cizgi);
+  }
+
+  .kunye-deger {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 0.9375rem;
+    color: var(--metin);
+    margin-top: 0.3rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* --------------------------------------------------------------
+     Genel yerleşim yardımcıları
+     -------------------------------------------------------------- */
+  .izgara {
+    display: grid;
+    gap: clamp(1.25rem, 2.5vw, 2rem);
+  }
+  .izgara--2 {
+    grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+  }
+  .izgara--3 {
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  }
+  .izgara--4 {
+    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  }
+
+  .yan-yan {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: start;
+  }
+  @media (min-width: 900px) {
+    .yan-yan {
+      grid-template-columns: 6rem 1fr;
+    }
+  }
+
+  /* --------------------------------------------------------------
+     Marka özü
+     -------------------------------------------------------------- */
+  .konum {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.5rem, 3vw, 2.15rem);
+    line-height: 1.24;
+    letter-spacing: -0.015em;
+    max-width: 24ch;
+  }
+  .konum b {
+    font-weight: 600;
+    color: var(--vurgu);
+  }
+
+  .kisilik {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0;
+  }
+  .kisilik li {
+    display: grid;
+    grid-template-columns: minmax(7rem, 9rem) 1fr;
+    gap: 1rem 1.5rem;
+    padding-block: 0.95rem;
+    border-top: 1px solid var(--cizgi);
+    align-items: baseline;
+  }
+  .kisilik li:last-child {
+    border-bottom: 1px solid var(--cizgi);
+  }
+  .kisilik dt,
+  .kisilik strong {
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+  .kisilik span {
+    color: var(--metin-2);
+    font-size: 0.9375rem;
+  }
+
+  /* Ses tonu: yap / yapma karşılaştırması */
+  .ton {
+    display: grid;
+    gap: 0;
+    border: 1px solid var(--cizgi);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  @media (min-width: 760px) {
+    .ton {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .ton-hucre {
+    padding: clamp(1.1rem, 2.5vw, 1.6rem);
+    background: var(--yuzey-2);
+  }
+  .ton-hucre + .ton-hucre {
+    border-top: 1px solid var(--cizgi);
+  }
+  @media (min-width: 760px) {
+    .ton-hucre + .ton-hucre {
+      border-top: 0;
+      border-left: 1px solid var(--cizgi);
+    }
+  }
+  .ton-bas {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0.85rem;
+  }
+  .isaret {
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex: none;
+    color: #fff;
+  }
+  .isaret--ol {
+    background: var(--edm-kirmizi);
+  }
+  .isaret--olma {
+    background: var(--metin-3);
+  }
+  .ton-ornek {
+    font-size: 0.9375rem;
+    color: var(--metin-2);
+    padding-block: 0.4rem;
+    border-top: 1px dashed var(--cizgi);
+  }
+  .ton-ornek:first-of-type {
+    border-top: 0;
+  }
+  .ton-hucre--olma .ton-ornek {
+    text-decoration: line-through;
+    text-decoration-color: var(--metin-3);
+    text-decoration-thickness: 1px;
+  }
+
+  /* --------------------------------------------------------------
+     Logo bölümü
+     -------------------------------------------------------------- */
+  .logo-sahne {
+    background: var(--edm-kagit);
+    border: 1px solid var(--cizgi);
+    border-radius: 2px;
+    padding: clamp(1.75rem, 5vw, 3.5rem);
+    display: grid;
+    place-items: center;
+    min-height: 200px;
+  }
+  .logo-sahne--koyu {
+    background: var(--edm-murekkep);
+    border-color: var(--edm-murekkep);
+  }
+  .logo-sahne--kirmizi {
+    background: var(--edm-kirmizi);
+    border-color: var(--edm-kirmizi);
+  }
+
+  .sahne-bas {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: baseline;
+    margin-bottom: 0.7rem;
+  }
+
+  /* Koruma alanı şeması */
+  .koruma {
+    position: relative;
+    background: var(--edm-kagit);
+    border: 1px solid var(--cizgi);
+    padding: clamp(2.5rem, 7vw, 4.5rem);
+    border-radius: 2px;
+  }
+  .koruma-ic {
+    position: relative;
+    outline: 1.5px dashed var(--edm-kirmizi);
+    outline-offset: clamp(1.4rem, 4vw, 2.6rem);
+  }
+  .koruma img {
+    width: min(430px, 100%);
+    margin-inline: auto;
+  }
+  .koruma-x {
+    position: absolute;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--edm-kirmizi);
+    background: var(--edm-kagit);
+    padding-inline: 0.35rem;
+  }
+  .koruma-x--ust {
+    top: clamp(0.7rem, 2.2vw, 1.35rem);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .koruma-x--sol {
+    left: clamp(0.7rem, 2.2vw, 1.35rem);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  /* Yanlış kullanım kutuları */
+  .yanlis {
+    border: 1px solid var(--cizgi);
+    border-radius: 2px;
+    overflow: hidden;
+    background: var(--yuzey-2);
+  }
+  .yanlis-gorsel {
+    background: var(--edm-kagit);
+    aspect-ratio: 16 / 8;
+    display: grid;
+    place-items: center;
+    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .yanlis-gorsel img {
+    width: 82%;
+  }
+  .yanlis-metin {
+    padding: 0.8rem 1rem 1rem;
+    font-size: 0.8125rem;
+    color: var(--metin-2);
+    border-top: 1px solid var(--cizgi);
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  .yanlis-metin .isaret {
+    margin-top: 0.15rem;
+  }
+
+  .bozuk-esne img {
+    transform: scaleX(1.42);
+  }
+  .bozuk-dondur img {
+    transform: rotate(-9deg);
+  }
+  .bozuk-golge img {
+    filter: drop-shadow(4px 6px 5px rgba(0, 0, 0, 0.5));
+  }
+  .bozuk-renk img {
+    filter: hue-rotate(155deg) saturate(1.5);
+  }
+  .bozuk-zemin {
+    background: linear-gradient(120deg, #6b7a52, #b98a4a 55%, #3f4a5a);
+  }
+  .bozuk-sik img {
+    width: 40%;
+  }
+  .bozuk-sik::after {
+    content: '';
+    position: absolute;
+    inset: 38% 8% 38% 8%;
+    border: 1px solid var(--edm-kirmizi);
+    opacity: 0.5;
+  }
+
+  /* --------------------------------------------------------------
+     Renk bölümü
+     -------------------------------------------------------------- */
+  .renk-kart {
+    border: 1px solid var(--cizgi);
+    border-radius: 2px;
+    overflow: hidden;
+    background: var(--yuzey-2);
+    display: flex;
+    flex-direction: column;
+  }
+  .renk-yuzey {
+    height: clamp(112px, 15vw, 168px);
+    position: relative;
+  }
+  .renk-yuzey span {
+    position: absolute;
+    left: 0.85rem;
+    bottom: 0.7rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+  }
+  .renk-govde {
+    padding: 0.9rem 1rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    flex: 1;
+  }
+  .renk-ad {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    line-height: 1.2;
+  }
+  .renk-rol {
+    font-size: 0.8125rem;
+    color: var(--metin-2);
+  }
+  .renk-veri {
+    margin-top: auto;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--cizgi);
+    display: grid;
+    gap: 0.15rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6875rem;
+    color: var(--metin-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Kullanım oranı şeridi */
+  .oran {
+    display: flex;
+    height: 3.25rem;
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid var(--cizgi);
+  }
+  .oran > div {
+    display: grid;
+    place-items: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* Kontrast tablosu */
+  .tablo-sar {
+    overflow-x: auto;
+    border: 1px solid var(--cizgi);
+    border-radius: 2px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    min-width: 520px;
+  }
+  th,
+  td {
+    text-align: left;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--cizgi);
+  }
+  th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--metin-3);
+    font-weight: 400;
+    background: var(--yuzey-2);
+  }
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  td.sayi {
+    font-family: 'IBM Plex Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  .rozet {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6875rem;
+    padding: 0.12rem 0.45rem;
+    border-radius: 2px;
+    border: 1px solid currentColor;
+  }
+  .rozet--iyi {
+    color: #1a7f4b;
+  }
+  .rozet--sinir {
+    color: #9a6b00;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .rozet--iyi {
+      color: #4cc98a;
+    }
+    :root:not([data-theme='light']) .rozet--sinir {
+      color: #e0aa3e;
+    }
+  }
+  :root[data-theme='dark'] .rozet--iyi {
+    color: #4cc98a;
+  }
+  :root[data-theme='dark'] .rozet--sinir {
+    color: #e0aa3e;
+  }
+
+  /* --------------------------------------------------------------
+     Tipografi bölümü
+     -------------------------------------------------------------- */
+  .yazitipi {
+    border-top: 1px solid var(--cizgi);
+    padding-block: clamp(1.5rem, 3vw, 2.25rem);
+    display: grid;
+    gap: 1.25rem;
+  }
+  @media (min-width: 900px) {
+    .yazitipi {
+      grid-template-columns: 15rem 1fr;
+      gap: 2.5rem;
+    }
+  }
+  .yazitipi-ad {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .yazitipi-rol {
+    font-size: 0.875rem;
+    color: var(--metin-2);
+    margin-top: 0.4rem;
+  }
+  .alfabe {
+    font-size: clamp(1.5rem, 3.4vw, 2.5rem);
+    line-height: 1.25;
+    word-break: break-word;
+  }
+  .alfabe--display {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+  }
+  .alfabe--govde {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 400;
+  }
+  .alfabe--mono {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(1.15rem, 2.4vw, 1.7rem);
+    font-variant-numeric: tabular-nums;
+  }
+  .turkce {
+    margin-top: 0.6rem;
+    color: var(--vurgu);
+  }
+
+  /* Ölçek merdiveni */
+  .olcek li {
+    display: grid;
+    grid-template-columns: minmax(5.5rem, 7rem) 1fr;
+    gap: 1rem 1.5rem;
+    align-items: baseline;
+    padding-block: 0.85rem;
+    border-top: 1px solid var(--cizgi);
+  }
+  .olcek {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .olcek li:last-child {
+    border-bottom: 1px solid var(--cizgi);
+  }
+  .olcek-kod {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6875rem;
+    color: var(--metin-3);
+    letter-spacing: 0.06em;
+  }
+  .ornek-h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(2rem, 4.2vw, 3.25rem);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+  }
+  .ornek-h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+    line-height: 1.1;
+  }
+  .ornek-h3 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: 1.125rem;
+  }
+  .ornek-govde {
+    font-size: 1rem;
+    color: var(--metin-2);
+    max-width: 60ch;
+  }
+  .ornek-veri {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9375rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .ornek-etiket {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--metin-3);
+  }
+
+  /* --------------------------------------------------------------
+     Yazım kuralları
+     -------------------------------------------------------------- */
+  .duzeltme {
+    display: grid;
+    gap: 0;
+    border: 1px solid var(--cizgi);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .duzeltme-satir {
+    display: grid;
+    gap: 0.35rem 1.25rem;
+    padding: 0.9rem 1.1rem;
+    border-top: 1px solid var(--cizgi);
+    background: var(--yuzey-2);
+  }
+  .duzeltme-satir:first-child {
+    border-top: 0;
+  }
+  @media (min-width: 820px) {
+    .duzeltme-satir {
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+    }
+  }
+  .yanlis-yazim {
+    font-size: 0.9375rem;
+    color: var(--metin-3);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+  .dogru-yazim {
+    font-size: 0.9375rem;
+    color: var(--metin);
+    font-weight: 500;
+  }
+  .dogru-yazim::before {
+    content: '→ ';
+    color: var(--vurgu);
+  }
+
+  /* --------------------------------------------------------------
+     Uygulamalar
+     -------------------------------------------------------------- */
+  .uygulama {
+    border: 1px solid var(--cizgi);
+    border-radius: 2px;
+    overflow: hidden;
+    background: var(--yuzey-2);
+  }
+  .uygulama-bas {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--cizgi);
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: baseline;
+  }
+  .uygulama-govde {
+    padding: clamp(1.1rem, 3vw, 1.75rem);
+    display: grid;
+    place-items: center;
+    background: var(--yuzey-3);
+  }
+
+  /* Kartvizit maketi */
+  .kartvizit {
+    width: 100%;
+    max-width: 340px;
+    aspect-ratio: 85 / 55;
+    background: var(--edm-kagit);
+    color: var(--edm-murekkep);
+    border-radius: 3px;
+    padding: 1.15rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 12px 28px -12px rgba(0, 0, 0, 0.35);
+    position: relative;
+    overflow: hidden;
+  }
+  .kartvizit--arka {
+    background: var(--edm-murekkep);
+    color: var(--edm-kagit);
+    place-items: center;
+    display: grid;
+  }
+  .kartvizit--arka img {
+    width: 62%;
+  }
+  .kartvizit-serit {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--edm-kirmizi);
+  }
+  .kartvizit img {
+    width: 116px;
+  }
+  .kv-ad {
+    font-family: 'Fraunces', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .kv-unvan {
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    color: #56575c;
+    margin-top: 0.1rem;
+  }
+  .kv-iletisim {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.625rem;
+    line-height: 1.55;
+    color: #56575c;
+    margin-top: 0.5rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Sosyal medya kare maketi */
+  .sosyal {
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 1;
+    background: var(--edm-murekkep);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.1rem;
+    color: var(--edm-kagit);
+  }
+  .sosyal-foto {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(200deg, #2f3b46, #4a5560 40%, #1b2128);
+  }
+  .sosyal-foto::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(18, 19, 22, 0.92) 12%, rgba(18, 19, 22, 0) 62%);
+  }
+  .sosyal > * {
+    position: relative;
+  }
+  .sosyal-rozet {
+    position: absolute;
+    top: 1.1rem;
+    left: 1.1rem;
+    background: var(--edm-kirmizi);
+    color: #fff;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    padding: 0.25rem 0.55rem;
+    border-radius: 2px;
+  }
+  .sosyal-logo {
+    position: absolute;
+    top: 1rem;
+    right: 1.1rem;
+    width: 84px;
+  }
+  .sosyal-fiyat {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .sosyal-yer {
+    font-size: 0.8125rem;
+    opacity: 0.82;
+    margin-top: 0.25rem;
+  }
+  .sosyal-veri {
+    display: flex;
+    gap: 0.9rem;
+    margin-top: 0.7rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid rgba(244, 244, 243, 0.22);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6875rem;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.9;
+  }
+
+  /* E-posta imzası maketi */
+  .imza {
+    background: #fff;
+    color: var(--edm-murekkep);
+    border-radius: 3px;
+    padding: 1.1rem 1.25rem;
+    width: 100%;
+    max-width: 400px;
+    font-size: 0.8125rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0 1rem;
+    align-items: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  .imza-amblem {
+    width: 46px;
+    padding-right: 1rem;
+    border-right: 2px solid var(--edm-kirmizi);
+  }
+  .imza-ad {
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+  .imza-satir {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6875rem;
+    color: #56575c;
+    line-height: 1.65;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Tabela maketi */
+  .tabela {
+    width: 100%;
+    max-width: 380px;
+    background: var(--edm-kagit);
+    border-radius: 3px;
+    overflow: hidden;
+    box-shadow: 0 12px 28px -14px rgba(0, 0, 0, 0.45);
+  }
+  .tabela-ust {
+    background: var(--edm-murekkep);
+    padding: 1rem 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  .tabela-ust img {
+    width: 130px;
+  }
+  .tabela-durum {
+    background: var(--edm-kirmizi);
+    color: #fff;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    padding: 0.3rem 0.6rem;
+    border-radius: 2px;
+    flex: none;
+  }
+  .tabela-govde {
+    padding: 1.1rem;
+    color: var(--edm-murekkep);
+  }
+  .tabela-baslik {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.15;
+  }
+  .tabela-tel {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.25rem;
+    margin-top: 0.7rem;
+    padding-top: 0.7rem;
+    border-top: 1px solid #d6d6d3;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Düğme örnekleri */
+  .dugme-ornek {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.4rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: 'IBM Plex Sans', sans-serif;
+    border: 1px solid transparent;
+  }
+  .dugme-ornek--birincil {
+    background: var(--edm-kirmizi);
+    color: #fff;
+  }
+  .dugme-ornek--ikincil {
+    background: var(--edm-murekkep);
+    color: var(--edm-kagit);
+  }
+  .dugme-ornek--hayalet {
+    border-color: var(--cizgi-koyu);
+    color: var(--metin);
+  }
+
+  /* --------------------------------------------------------------
+     Alt bilgi
+     -------------------------------------------------------------- */
+  .kunye {
+    padding-block: clamp(2.5rem, 5vw, 4rem);
+    border-top: 2px solid var(--metin);
+    display: grid;
+    gap: 1.5rem 3rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .dosya-listesi {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8125rem;
+    color: var(--metin-2);
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+</style>
+
+<main class="pafta">
+  <!-- ============================ KAPAK ============================ -->
+  <header class="kapak">
+    <div class="kapak-ust">
+      <img
+        class="kapak-logo kapak-logo--acik"
+        src="{{VARLIK:logo-yatay.png}}"
+        alt="EDM Yapı &amp; Gayrimenkul logosu"
+      />
+      <img
+        class="kapak-logo kapak-logo--koyu"
+        src="{{VARLIK:logo-yatay-acik.png}}"
+        alt="EDM Yapı &amp; Gayrimenkul logosu"
+      />
+      <p class="etiket">Marka Kılavuzu — Sürüm 1.0 — Eylül 2026</p>
+    </div>
+
+    <h1 class="kapak-baslik">Marka<br /><em>Paftası</em></h1>
+
+    <div class="kapak-alt">
+      <div>
+        <p class="etiket">Kurum</p>
+        <p class="kunye-deger">EDM Yapı &amp; Gayrimenkul</p>
+      </div>
+      <div>
+        <p class="etiket">Faaliyet Bölgesi</p>
+        <p class="kunye-deger">Silivri · Trakya</p>
+      </div>
+      <div>
+        <p class="etiket">Portföy</p>
+        <p class="kunye-deger">46 ilan · 3 danışman</p>
+      </div>
+      <div>
+        <p class="etiket">Kapsam</p>
+        <p class="kunye-deger">Logo · Renk · Tipografi · Dil · Uygulama</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================ 1. MARKA ÖZÜ ============================ -->
+  <section class="blok">
+    <div class="blok-bas">
+      <p class="madde">01</p>
+      <div>
+        <h2 class="blok-baslik">Marka özü</h2>
+        <p class="blok-ozet">
+          Kimlik, ofisin ne sattığından değil nasıl çalıştığından doğar. EDM'nin portföyü
+          Silivri merkezli konutlarla Trakya'nın tarla ve arsalarını birlikte taşıyor —
+          yani hem oturulacak ev hem de yıllar sonra karşılığını verecek toprak. Marka bu
+          ikisini tek bir sözde birleştiriyor.
+        </p>
+      </div>
+    </div>
+
+    <div class="yan-yan">
+      <p class="etiket">Konumlandırma</p>
+      <div class="izgara izgara--2">
+        <p class="konum">
+          Trakya'da toprağı bilen, <b>tapuya kadar yanınızda duran</b> yerel emlak ofisi.
+        </p>
+        <div>
+          <p class="etiket">Slogan</p>
+          <p style="margin-top: 0.5rem; font-family: 'Fraunces', serif; font-size: 1.75rem; font-weight: 600;">
+            Yatırım Ortağınız
+          </p>
+          <p class="not" style="margin-top: 0.7rem;">
+            Logonun altındaki el yazısı slogan markanın imzasıdır. Kurumsal metinlerde
+            tekrar yazılmaz; sadece logo kilidinin parçası olarak kullanılır.
+            Serbest metinde slogan gibi davranmaz, vaat gibi davranır: "ortak" kelimesi
+            işlem bittikten sonra da irtibatın sürdüğünü söyler.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: clamp(2rem, 4vw, 3rem)"></div>
+
+    <div class="yan-yan">
+      <p class="etiket">Kişilik</p>
+      <ul class="kisilik">
+        <li>
+          <strong>Yerel</strong>
+          <span
+            >Silivri'nin hangi mahallesinde imar ne durumda, Meriç'te hangi tarla sulanır —
+            bunu bilmek markanın en büyük kozu. Genel geçer emlak dili değil, yer adı
+            konuşulur.</span
+          >
+        </li>
+        <li>
+          <strong>Net</strong>
+          <span
+            >Rakam, metrekare, pafta ve parsel açıkça yazılır. "Fiyat için arayınız"
+            markanın dili değildir.</span
+          >
+        </li>
+        <li>
+          <strong>Sakin</strong>
+          <span
+            >Ünlem, büyük harf bağırma ve "KAÇIRMAYIN" tonu kullanılmaz. Portföyün kendisi
+            zaten iddialı; sunum sakin kalır.</span
+          >
+        </li>
+        <li>
+          <strong>Kalıcı</strong>
+          <span
+            >Kampanya değil, ilişki kurar. Satış sonrası tapu, vergi ve iskân süreçlerinde
+            de yanında olduğunu hatırlatır.</span
+          >
+        </li>
+      </ul>
+    </div>
+
+    <div style="margin-top: clamp(2rem, 4vw, 3rem)"></div>
+
+    <div class="yan-yan">
+      <p class="etiket">Ses tonu</p>
+      <div class="ton">
+        <div class="ton-hucre">
+          <div class="ton-bas">
+            <span class="isaret isaret--ol" aria-hidden="true">✓</span>
+            <strong style="font-size: 0.9375rem">Böyle yazılır</strong>
+          </div>
+          <p class="ton-ornek">Silivri Gazitepe'de 1.231 m² konut imarlı arsa. Yola cepheli, tapusu hazır.</p>
+          <p class="ton-ornek">Kuzey Marmara Otoyolu bağlantısına 4 km. Alipaşa tapulu.</p>
+          <p class="ton-ornek">Deniz manzarası tüm cephelerden açık; site içinde havuz ve güvenlik var.</p>
+        </div>
+        <div class="ton-hucre ton-hucre--olma">
+          <div class="ton-bas">
+            <span class="isaret isaret--olma" aria-hidden="true">✕</span>
+            <strong style="font-size: 0.9375rem">Böyle yazılmaz</strong>
+          </div>
+          <p class="ton-ornek">KAÇIRILMAYACAK FIRSAT!!! ACİL SATILIK!!!</p>
+          <p class="ton-ornek">Fiyat ve detay için hemen arayınız…</p>
+          <p class="ton-ornek">Muhteşem konumda essiz bir yatırım imkanı sizleri bekliyor</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 2. LOGO ============================ -->
+  <section class="blok">
+    <div class="blok-bas">
+      <p class="madde">02</p>
+      <div>
+        <h2 class="blok-baslik">Logo</h2>
+        <p class="blok-ozet">
+          Logo üç parçadan kurulu: konum pini, ev sembolü ve EDM kelime markası. Pin ile ev
+          iç içe geçer — "yer" ve "yapı" aynı işarette. Kırmızı daima pinde, siyah daima
+          evdedir; bu ayrım hiçbir varyantta bozulmaz.
+        </p>
+      </div>
+    </div>
+
+    <div class="izgara izgara--2">
+      <div>
+        <div class="sahne-bas">
+          <p class="etiket">Ana kilit — yatay</p>
+          <p class="etiket">Birincil kullanım</p>
+        </div>
+        <div class="logo-sahne">
+          <img src="{{VARLIK:logo-yatay.png}}" alt="EDM Yapı &amp; Gayrimenkul yatay logo kilidi" style="width: min(420px, 100%)" />
+        </div>
+        <p class="not" style="margin-top: 0.7rem">
+          Web sitesi başlığı, kartvizit, tabela, evrak. Yeterli yatay alan olan her yerde
+          bu kullanılır.
+        </p>
+      </div>
+
+      <div>
+        <div class="sahne-bas">
+          <p class="etiket">Amblem</p>
+          <p class="etiket">Dar alan</p>
+        </div>
+        <div class="logo-sahne">
+          <img src="{{VARLIK:amblem.png}}" alt="EDM amblemi: konum pini ve ev sembolü" style="width: min(150px, 45%)" />
+        </div>
+        <p class="not" style="margin-top: 0.7rem">
+          Profil fotoğrafı, favicon, uygulama simgesi, damga. Kelime markası okunamayacak
+          kadar küçülüyorsa amblem tek başına kullanılır.
+        </p>
+      </div>
+    </div>
+
+    <div style="margin-top: clamp(1.25rem, 2.5vw, 2rem)"></div>
+
+    <div class="izgara izgara--2">
+      <div>
+        <div class="sahne-bas">
+          <p class="etiket">Koyu zemin</p>
+          <p class="etiket">Siyah → kırık beyaz</p>
+        </div>
+        <div class="logo-sahne logo-sahne--koyu">
+          <img src="{{VARLIK:logo-yatay-acik.png}}" alt="Koyu zemin için açık logo varyantı" style="width: min(420px, 100%)" />
+        </div>
+        <p class="not" style="margin-top: 0.7rem">
+          Koyu yüzeylerde siyah metin kırık beyaza (#F4F4F3) döner. <strong>Kırmızıya
+          dokunulmaz</strong> — marka rengi her zemin üzerinde aynı kalır.
+        </p>
+      </div>
+
+      <div>
+        <div class="sahne-bas">
+          <p class="etiket">Kırmızı zemin</p>
+          <p class="etiket">Yalnızca tek renk</p>
+        </div>
+        <div class="logo-sahne logo-sahne--kirmizi">
+          <img
+            src="{{VARLIK:logo-yatay-acik.png}}"
+            alt="Kırmızı zemin üzerinde tek renk logo"
+            style="width: min(420px, 100%); filter: brightness(0) invert(1)"
+          />
+        </div>
+        <p class="not" style="margin-top: 0.7rem">
+          Kırmızı zeminde logo tamamen beyaza döner. Kırmızı üstünde kırmızı hiçbir zaman
+          kullanılmaz.
+        </p>
+      </div>
+    </div>
+
+    <div style="margin-top: clamp(2rem, 4vw, 3rem)"></div>
+
+    <div class="yan-yan">
+      <p class="etiket">Koruma alanı</p>
+      <div>
+        <div class="koruma">
+          <span class="koruma-x koruma-x--ust">x</span>
+          <span class="koruma-x koruma-x--sol">x</span>
+          <div class="koruma-ic">
+            <img src="{{VARLIK:logo-yatay.png}}" alt="Logonun etrafındaki koruma alanını gösteren şema" />
+          </div>
+        </div>
+        <p class="not" style="margin-top: 0.9rem">
+          Logonun dört yanında, <strong>amblem yüksekliğinin yarısı (x)</strong> kadar boş
+          alan bırakılır. Bu alana yazı, çizgi, fotoğraf kenarı veya başka bir logo
+          giremez. Kalabalık zeminlerde bu pay iki katına çıkarılır.
+        </p>
+        <p class="not" style="margin-top: 0.6rem">
+          <strong>Minimum boyut:</strong> yatay kilit ekranda 120 px, baskıda 32 mm
+          genişliğin altına inmez. Amblem tek başına ekranda 24 px, baskıda 8 mm'ye kadar
+          küçülebilir.
+        </p>
+      </div>
+    </div>
+
+    <div style="margin-top: clamp(2rem, 4vw, 3rem)"></div>
+
+    <div class="yan-yan">
+      <p class="etiket">Yapılmayanlar</p>
+      <div class="izgara izgara--3">
+        <div class="yanlis">
+          <div class="yanlis-gorsel bozuk-esne"><img src="{{VARLIK:logo-yatay.png}}" alt="Yatay olarak esnetilmiş logo" /></div>
+          <p class="yanlis-metin"><span class="isaret isaret--olma" aria-hidden="true">✕</span> Oranı bozacak şekilde esnetmeyin.</p>
+        </div>
+        <div class="yanlis">
+          <div class="yanlis-gorsel bozuk-dondur"><img src="{{VARLIK:logo-yatay.png}}" alt="Eğik yerleştirilmiş logo" /></div>
+          <p class="yanlis-metin"><span class="isaret isaret--olma" aria-hidden="true">✕</span> Döndürmeyin, eğmeyin.</p>
+        </div>
+        <div class="yanlis">
+          <div class="yanlis-gorsel bozuk-renk"><img src="{{VARLIK:logo-yatay.png}}" alt="Rengi değiştirilmiş logo" /></div>
+          <p class="yanlis-metin"><span class="isaret isaret--olma" aria-hidden="true">✕</span> Marka rengini değiştirmeyin.</p>
+        </div>
+        <div class="yanlis">
+          <div class="yanlis-gorsel bozuk-golge"><img src="{{VARLIK:logo-yatay.png}}" alt="Gölge eklenmiş logo" /></div>
+          <p class="yanlis-metin"><span class="isaret isaret--olma" aria-hidden="true">✕</span> Gölge, kabartma veya kontur eklemeyin.</p>
+        </div>
+        <div class="yanlis">
+          <div class="yanlis-gorsel bozuk-zemin"><img src="{{VARLIK:logo-yatay.png}}" alt="Karmaşık fotoğraf üzerine yerleştirilmiş logo" /></div>
+          <p class="yanlis-metin"><span class="isaret isaret--olma" aria-hidden="true">✕</span> Okunurluğu bozan zemine koymayın; önce koyu perde uygulayın.</p>
+        </div>
+        <div class="yanlis">
+          <div class="yanlis-gorsel bozuk-sik"><img src="{{VARLIK:logo-yatay.png}}" alt="Koruma alanı ihlal edilmiş logo" /></div>
+          <p class="yanlis-metin"><span class="isaret isaret--olma" aria-hidden="true">✕</span> Koruma alanına başka öğe sokmayın.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 3. RENK ============================ -->
+  <section class="blok">
+    <div class="blok-bas">
+      <p class="madde">03</p>
+      <div>
+        <h2 class="blok-baslik">Renk</h2>
+        <p class="blok-ozet">
+          Palet dar tutuldu: iki kırmızı, bir mürekkep, üç nötr. Kırmızı logodan
+          örneklendi — saf ve soğuk bir kırmızı olduğu için nötrler de hafif soğuk tarafta
+          seçildi. Sıcak krem tonlar bu kırmızıyla çakışır, kullanılmaz.
+        </p>
+      </div>
+    </div>
+
+    <div class="izgara izgara--3">
+      <div class="renk-kart">
+        <div class="renk-yuzey" style="background: #f0000d"><span style="color: #fff">#F0000D</span></div>
+        <div class="renk-govde">
+          <p class="renk-ad">EDM Kırmızı</p>
+          <p class="renk-rol">Birincil marka rengi. Logo, birincil düğme, vurgu çizgisi, aktif durum.</p>
+          <div class="renk-veri">
+            <span>RGB 240 · 0 · 13</span>
+            <span>CMYK 0 · 100 · 100 · 0</span>
+            <span>Pantone 485 C (en yakın)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="renk-kart">
+        <div class="renk-yuzey" style="background: #c4030f"><span style="color: #fff">#C4030F</span></div>
+        <div class="renk-govde">
+          <p class="renk-ad">Derin Kırmızı</p>
+          <p class="renk-rol">Basılı düğme, üzerine gelme durumu, kırmızı üstüne kırmızı gerektiğinde.</p>
+          <div class="renk-veri">
+            <span>RGB 196 · 3 · 15</span>
+            <span>CMYK 12 · 100 · 100 · 3</span>
+            <span>Pantone 1795 C (en yakın)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="renk-kart">
+        <div class="renk-yuzey" style="background: #121316"><span style="color: #f4f4f3">#121316</span></div>
+        <div class="renk-govde">
+          <p class="renk-ad">Mürekkep</p>
+          <p class="renk-rol">Ana metin rengi ve koyu yüzeyler. Saf siyah değil; ekranda daha yumuşak okunur.</p>
+          <div class="renk-veri">
+            <span>RGB 18 · 19 · 22</span>
+            <span>CMYK 75 · 68 · 62 · 78</span>
+            <span>Pantone Black 6 C (en yakın)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="renk-kart">
+        <div class="renk-yuzey" style="background: #f4f4f3; border-bottom: 1px solid var(--cizgi)">
+          <span style="color: #121316">#F4F4F3</span>
+        </div>
+        <div class="renk-govde">
+          <p class="renk-ad">Kağıt</p>
+          <p class="renk-rol">Ana zemin. Saf beyaz yerine bir tık kırık — ekranda göz yormaz, baskıda kağıda yakın durur.</p>
+          <div class="renk-veri">
+            <span>RGB 244 · 244 · 243</span>
+            <span>CMYK 3 · 2 · 3 · 0</span>
+            <span>Baskıda: kağıdın kendisi</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="renk-kart">
+        <div class="renk-yuzey" style="background: #e4e4e1"><span style="color: #121316">#E4E4E1</span></div>
+        <div class="renk-govde">
+          <p class="renk-ad">Kireç</p>
+          <p class="renk-rol">İkincil yüzey, kart zemini, tablo başlığı, ayırıcı dolgu.</p>
+          <div class="renk-veri">
+            <span>RGB 228 · 228 · 225</span>
+            <span>CMYK 10 · 7 · 9 · 0</span>
+            <span>Cool Gray 1 C (en yakın)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="renk-kart">
+        <div class="renk-yuzey" style="background: #8a8b8f"><span style="color: #fff">#8A8B8F</span></div>
+        <div class="renk-govde">
+          <p class="renk-ad">Kurşun</p>
+          <p class="renk-rol">İkincil metin, mono etiket, saç teli çizgi. Ana metinde kullanılmaz.</p>
+          <div class="renk-veri">
+            <span>RGB 138 · 139 · 143</span>
+            <span>CMYK 50 · 41 · 38 · 4</span>
+            <span>Cool Gray 8 C (en yakın)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: clamp(2rem, 4vw, 3rem)"></div>
+
+    <div class="yan-yan">
+      <p class="etiket">Kullanım oranı</p>
+      <div>
+        <div class="oran">
+          <div style="flex: 70; background: #f4f4f3; color: #121316; border-right: 1px solid #d6d6d3">
+            %70 nötr
+          </div>
+          <div style="flex: 25; background: #121316; color: #f4f4f3">%25 mürekkep</div>
+          <div style="flex: 5; background: #f0000d; color: #fff; font-size: 0.6rem">%5</div>
+        </div>
+        <p class="not" style="margin-top: 0.9rem">
+          Kırmızı bir vurgu rengidir, bir zemin rengi değil. Sayfanın yaklaşık yirmide biri
+          — bir düğme, bir rozet, bir çizgi kadar. Kırmızının geniş alanda kullanıldığı tek
+          yer, bilinçli olarak dikkat çeken tekil bir bölüm ya da "SATILDI" damgasıdır.
+          Kırmızı çoğaldıkça markanın güvenilirliği azalır.
+        </p>
+      </div>
+    </div>
+
+    <div style="margin-top: clamp(2rem, 4vw, 3rem)"></div>
+
+    <div class="yan-yan">
+      <p class="etiket">Erişilebilirlik</p>
+      <div>
+        <div class="tablo-sar">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Metin</th>
+                <th scope="col">Zemin</th>
+                <th scope="col">Kontrast</th>
+                <th scope="col">Durum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Mürekkep #121316</td>
+                <td>Kağıt #F4F4F3</td>
+                <td class="sayi">17,6 : 1</td>
+                <td><span class="rozet rozet--iyi">AAA</span></td>
+              </tr>
+              <tr>
+                <td>Kağıt #F4F4F3</td>
+                <td>Mürekkep #121316</td>
+                <td class="sayi">17,6 : 1</td>
+                <td><span class="rozet rozet--iyi">AAA</span></td>
+              </tr>
+              <tr>
+                <td>Beyaz #FFFFFF</td>
+                <td>EDM Kırmızı #F0000D</td>
+                <td class="sayi">4,7 : 1</td>
+                <td><span class="rozet rozet--iyi">AA</span></td>
+              </tr>
+              <tr>
+                <td>EDM Kırmızı #F0000D</td>
+                <td>Kağıt #F4F4F3</td>
+                <td class="sayi">4,4 : 1</td>
+                <td><span class="rozet rozet--sinir">Yalnızca 18px+ / kalın</span></td>
+              </tr>
+              <tr>
+                <td>Kurşun #8A8B8F</td>
+                <td>Kağıt #F4F4F3</td>
+                <td class="sayi">3,1 : 1</td>
+                <td><span class="rozet rozet--sinir">Yalnızca etiket / ikincil</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="not" style="margin-top: 0.9rem">
+          Kırmızı, açık zeminde <strong>küçük gövde metni olarak kullanılmaz</strong> —
+          kontrastı yetmez. Kırmızıyı ya beyaz üstünde düğme dolgusu olarak ya da 18 px ve
+          üzeri başlıkta kullanın. Kurşun rengi yalnızca etiket ve ikincil bilgi içindir.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 4. TİPOGRAFİ ============================ -->
+  <section class="blok">
+    <div class="blok-bas">
+      <p class="madde">04</p>
+      <div>
+        <h2 class="blok-baslik">Tipografi</h2>
+        <p class="blok-ozet">
+          Üç yazı tipi, üç ayrı iş. Fraunces başlıkları taşır — ağır kesimlerinde EDM
+          kelime markasının o kalın, yayvan serifli karakterini yankılar. IBM Plex Sans
+          gövdeyi okutur. IBM Plex Mono ise rakamların işi: metrekare, fiyat, pafta ve
+          parsel numaraları. Üçü de Türkçe karakterleri eksiksiz taşır.
+        </p>
+      </div>
+    </div>
+
+    <div class="yazitipi">
+      <div>
+        <p class="yazitipi-ad">Fraunces</p>
+        <p class="yazitipi-rol">Başlık · Display</p>
+        <p class="not" style="margin-top: 0.6rem; font-size: 0.8125rem">
+          Ağırlık 600–800. Harf aralığı sıkı (−0.02em), satır aralığı dar. Uzun paragrafta
+          asla kullanılmaz.
+        </p>
+      </div>
+      <div>
+        <p class="alfabe alfabe--display">ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ</p>
+        <p class="alfabe alfabe--display turkce" style="font-size: clamp(1.35rem, 2.8vw, 2rem)">
+          Silivri'de deniz manzaralı villa
+        </p>
+      </div>
+    </div>
+
+    <div class="yazitipi">
+      <div>
+        <p class="yazitipi-ad">IBM Plex Sans</p>
+        <p class="yazitipi-rol">Gövde · Arayüz</p>
+        <p class="not" style="margin-top: 0.6rem; font-size: 0.8125rem">
+          Ağırlık 300–700. Gövde metni 16 px / 1.6. Satır uzunluğu 65 karakteri geçmez.
+        </p>
+      </div>
+      <div>
+        <p class="alfabe alfabe--govde">ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ</p>
+        <p class="alfabe alfabe--govde turkce" style="font-size: clamp(1.35rem, 2.8vw, 2rem)">
+          Tapu ve iskân sürecinde yanınızdayız
+        </p>
+      </div>
+    </div>
+
+    <div class="yazitipi">
+      <div>
+        <p class="yazitipi-ad">IBM Plex Mono</p>
+        <p class="yazitipi-rol">Veri · Etiket</p>
+        <p class="not" style="margin-top: 0.6rem; font-size: 0.8125rem">
+          Rakamlar, ölçüler, ilan numarası, pafta/ada/parsel. Etiketlerde 0.14em harf
+          aralığıyla büyük harf.
+        </p>
+      </div>
+      <div>
+        <p class="alfabe alfabe--mono">0123456789 ₺ m² · ĞİŞÇÖÜ</p>
+        <p class="alfabe alfabe--mono turkce" style="font-size: clamp(1rem, 2vw, 1.35rem)">
+          15.741 m² · Pafta 0 / Parsel 27 · 4.750.000 ₺
+        </p>
+      </div>
+    </div>
+
+    <div style="margin-top: clamp(2rem, 4vw, 3rem)"></div>
+
+    <div class="yan-yan">
+      <p class="etiket">Ölçek</p>
+      <ul class="olcek">
+        <li>
+          <span class="olcek-kod">H1 / 52–64</span>
+          <span class="ornek-h1">Trakya'nın toprağını biliriz</span>
+        </li>
+        <li>
+          <span class="olcek-kod">H2 / 32–40</span>
+          <span class="ornek-h2">Öne çıkan ilanlar</span>
+        </li>
+        <li>
+          <span class="olcek-kod">H3 / 18</span>
+          <span class="ornek-h3">Silivri Gazitepe'de Satılık Konut İmarlı Arsa</span>
+        </li>
+        <li>
+          <span class="olcek-kod">Gövde / 16</span>
+          <span class="ornek-govde"
+            >Yola cepheli, kadastral yolu açık, elektrik ve su hattı parsel sınırında.
+            Tapusu hisseli değil, müstakil.</span
+          >
+        </li>
+        <li>
+          <span class="olcek-kod">Veri / 15</span>
+          <span class="ornek-veri">1.231 m² · 4.250.000 ₺ · İlan no 19626868</span>
+        </li>
+        <li>
+          <span class="olcek-kod">Etiket / 11</span>
+          <span class="ornek-etiket">Satılık Arsa · Silivri</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================ 5. YAZIM DİLİ ============================ -->
+  <section class="blok">
+    <div class="blok-bas">
+      <p class="madde">05</p>
+      <div>
+        <h2 class="blok-baslik">Yazım dili</h2>
+        <p class="blok-ozet">
+          İlan başlığı markanın en çok okunan metnidir — portalda, Google'da ve sitede aynı
+          cümle görünür. Bir yazım hatası, ilanın kendisinden çok ofisin özenini anlatır.
+          Aşağıdakiler mevcut portföyden alınmış gerçek düzeltmelerdir.
+        </p>
+      </div>
+    </div>
+
+    <div class="yan-yan">
+      <p class="etiket">Düzeltmeler</p>
+      <div>
+        <div class="duzeltme">
+          <div class="duzeltme-satir">
+            <span class="yanlis-yazim">Araptepe Mevkii Kıralık Full Lebiderya Villa</span>
+            <span class="dogru-yazim">Araptepe Mevkii'nde Kiralık Deniz Manzaralı Villa</span>
+          </div>
+          <div class="duzeltme-satir">
+            <span class="yanlis-yazim">Silivri Yeni Mahlede Satılık Kupon Arsadan Hisse</span>
+            <span class="dogru-yazim">Silivri Yeni Mahalle'de Satılık Hisseli Arsa</span>
+          </div>
+          <div class="duzeltme-satir">
+            <span class="yanlis-yazim">Silivri Seymen Satılık Anayola Cepheli 1/2 Hiseli Tarla</span>
+            <span class="dogru-yazim">Silivri Seymen'de Ana Yola Cepheli 1/2 Hisseli Tarla</span>
+          </div>
+          <div class="duzeltme-satir">
+            <span class="yanlis-yazim">Edirne Enez Küçükevren Köyünde Acill Satılık Tarla</span>
+            <span class="dogru-yazim">Edirne Enez Küçükevren Köyü'nde Satılık Tarla</span>
+          </div>
+        </div>
+        <p class="not" style="margin-top: 0.9rem">
+          "Acil", "full", "kupon" gibi kelimeler ilan başlığında bilgi taşımaz, yalnızca
+          yer kaplar. Onların yerine <strong>ölçülebilir bir özellik</strong> yazın: kaç
+          metrekare, hangi cephe, hangi imar durumu.
+        </p>
+      </div>
+    </div>
+
+    <div style="margin-top: clamp(2rem, 4vw, 3rem)"></div>
+
+    <div class="yan-yan">
+      <p class="etiket">Başlık kalıbı</p>
+      <div>
+        <div class="izgara izgara--2">
+          <div>
+            <p class="etiket">Konut</p>
+            <p class="ornek-h3" style="margin-top: 0.5rem">
+              [İlçe] [Mahalle]'de [Oda] [Tip] — [Ayırt edici özellik]
+            </p>
+            <p class="not" style="margin-top: 0.5rem">
+              Örnek: <em>Silivri Mimar Sinan'da 4+1 Villa — Site İçi, Havuzlu</em>
+            </p>
+          </div>
+          <div>
+            <p class="etiket">Arsa / Tarla</p>
+            <p class="ornek-h3" style="margin-top: 0.5rem">
+              [İl] [İlçe] [Mevkii]'nde [m²] [İmar durumu]
+            </p>
+            <p class="not" style="margin-top: 0.5rem">
+              Örnek: <em>Edirne Lalapaşa Hacıdanişment'te 15.741 m² Tarla</em>
+            </p>
+          </div>
+        </div>
+        <p class="not" style="margin-top: 1rem">
+          Sayılar Türkçe biçimde yazılır: binlik ayırıcı <strong>nokta</strong> (15.741),
+          ondalık <strong>virgül</strong> (1,5 dönüm). Para birimi rakamdan sonra ve
+          boşlukla: <strong>4.750.000 ₺</strong>. Metrekare her zaman
+          <strong>m²</strong> — "m2" veya "metrekare" değil.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 6. UYGULAMA ============================ -->
+  <section class="blok">
+    <div class="blok-bas">
+      <p class="madde">06</p>
+      <div>
+        <h2 class="blok-baslik">Uygulama</h2>
+        <p class="blok-ozet">
+          Kimlik en çok bu yüzeylerde görünür. Hepsinde aynı üç kural işler: nötr zemin,
+          mürekkep metin, tek bir kırmızı vurgu.
+        </p>
+      </div>
+    </div>
+
+    <div class="izgara izgara--2">
+      <div class="uygulama">
+        <div class="uygulama-bas">
+          <p class="etiket">Kartvizit — ön</p>
+          <p class="etiket">85 × 55 mm</p>
+        </div>
+        <div class="uygulama-govde">
+          <div class="kartvizit">
+            <div class="kartvizit-serit" aria-hidden="true"></div>
+            <img src="{{VARLIK:logo-yatay.png}}" alt="Kartvizit üzerinde logo" />
+            <div>
+              <p class="kv-ad">Metin Özdoğan</p>
+              <p class="kv-unvan">GAYRİMENKUL DANIŞMANI</p>
+              <p class="kv-iletisim">
+                0536 343 41 97<br />
+                metin@edmyapigayrimenkul.com<br />
+                Alibey Mah. Albay Yunus Dirik Cad. No:58/A · Silivri
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="uygulama">
+        <div class="uygulama-bas">
+          <p class="etiket">Kartvizit — arka</p>
+          <p class="etiket">Tek renk mürekkep</p>
+        </div>
+        <div class="uygulama-govde">
+          <div class="kartvizit kartvizit--arka">
+            <img src="{{VARLIK:logo-yatay-acik.png}}" alt="Kartvizit arkasında koyu zemin logosu" />
+          </div>
+        </div>
+      </div>
+
+      <div class="uygulama">
+        <div class="uygulama-bas">
+          <p class="etiket">Sosyal medya — ilan kartı</p>
+          <p class="etiket">1080 × 1080</p>
+        </div>
+        <div class="uygulama-govde">
+          <div class="sosyal">
+            <div class="sosyal-foto" aria-hidden="true"></div>
+            <span class="sosyal-rozet">SATILIK</span>
+            <img class="sosyal-logo" src="{{VARLIK:logo-yatay-acik.png}}" alt="Sosyal medya görselinde logo" />
+            <p class="sosyal-fiyat">7.150.000 ₺</p>
+            <p class="sosyal-yer">Silivri · Mimar Sinan Mah.</p>
+            <div class="sosyal-veri">
+              <span>4+1</span>
+              <span>220 m²</span>
+              <span>Site içi</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="uygulama">
+        <div class="uygulama-bas">
+          <p class="etiket">Tabela / afiş</p>
+          <p class="etiket">Uzaktan okunur</p>
+        </div>
+        <div class="uygulama-govde">
+          <div class="tabela">
+            <div class="tabela-ust">
+              <img src="{{VARLIK:logo-yatay-acik.png}}" alt="Tabelada koyu zemin logosu" />
+              <span class="tabela-durum">SATILIK</span>
+            </div>
+            <div class="tabela-govde">
+              <p class="tabela-baslik">1.231 m²<br />Konut İmarlı Arsa</p>
+              <p class="tabela-tel">0536 343 41 97</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="uygulama">
+        <div class="uygulama-bas">
+          <p class="etiket">E-posta imzası</p>
+          <p class="etiket">Görselsiz de çalışır</p>
+        </div>
+        <div class="uygulama-govde">
+          <div class="imza">
+            <img class="imza-amblem" src="{{VARLIK:amblem.png}}" alt="E-posta imzasında amblem" />
+            <div>
+              <p class="imza-ad">Metin Özdoğan</p>
+              <p class="imza-satir">
+                EDM Yapı &amp; Gayrimenkul · Gayrimenkul Danışmanı<br />
+                0536 343 41 97 · edmyapigayrimenkul.com
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="uygulama">
+        <div class="uygulama-bas">
+          <p class="etiket">Dijital düğmeler</p>
+          <p class="etiket">Site ve formlar</p>
+        </div>
+        <div class="uygulama-govde" style="gap: 0.75rem; grid-auto-flow: row; justify-items: center">
+          <span class="dugme-ornek dugme-ornek--birincil">İlanı incele</span>
+          <span class="dugme-ornek dugme-ornek--ikincil">Ücretsiz değerleme</span>
+          <span class="dugme-ornek dugme-ornek--hayalet">Tüm ilanlar</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: clamp(2rem, 4vw, 3rem)"></div>
+
+    <div class="yan-yan">
+      <p class="etiket">Fotoğraf yönü</p>
+      <div class="izgara izgara--2">
+        <ul class="kisilik">
+          <li>
+            <strong>Gün ışığı</strong>
+            <span>Sabah erken veya gün batımından bir saat önce. Öğle güneşi hem cepheyi hem manzarayı yakar.</span>
+          </li>
+          <li>
+            <strong>Düz ufuk</strong>
+            <span>Deniz manzaralı ilanlarda ufuk çizgisi kadraja paralel olmalı. Eğik ufuk bütün fotoğrafı amatör gösterir.</span>
+          </li>
+          <li>
+            <strong>Boş sahne</strong>
+            <span>İçeride kişisel eşya, ayakkabı, çamaşırlık görünmez. Arsada araç ve moloz kadraja girmez.</span>
+          </li>
+          <li>
+            <strong>Arsada ölçek</strong>
+            <span>Tarla ve arsa fotoğrafı boş alan gibi durur. Kadraja yol, direk veya sınır taşı katın — büyüklük ancak kıyasla anlaşılır.</span>
+          </li>
+        </ul>
+        <div>
+          <p class="etiket">Fotoğraf üstü metin</p>
+          <p class="not" style="margin-top: 0.6rem">
+            Fotoğrafın üstüne yazı gelecekse önce alt kısma mürekkep rengiyle yumuşak bir
+            perde uygulanır (%0'dan %92'ye dikey geçiş). Yazı doğrudan fotoğrafın üstüne
+            konmaz; kontrast tesadüfe bırakılmaz.
+          </p>
+          <p class="not" style="margin-top: 0.6rem">
+            Filigran kullanılmaz. Marka, köşedeki logo ile zaten görünür; fotoğrafın
+            ortasına yarı saydam logo basmak görseli ucuzlatır.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ KÜNYE ============================ -->
+  <footer class="kunye">
+    <div>
+      <p class="etiket">Belge</p>
+      <p class="kunye-deger">Marka Kılavuzu 1.0</p>
+      <p class="not" style="margin-top: 0.4rem; font-size: 0.8125rem">
+        Eylül 2026'da hazırlandı. Web sitesi bu kılavuzu birebir uygular.
+      </p>
+    </div>
+    <div>
+      <p class="etiket">Kaynak dosyalar</p>
+      <ul class="dosya-listesi">
+        <li>edm logo.png · amblem</li>
+        <li>EDM Yapı Gayrimenkul matbaa için 1.cdr</li>
+        <li>ç edm amblerm.tif · baskı</li>
+        <li>varliklar/ · web boyutları</li>
+      </ul>
+    </div>
+    <div>
+      <p class="etiket">Ofis</p>
+      <p class="kunye-deger" style="font-size: 0.8125rem; line-height: 1.6">
+        Alibey Mah. Albay Yunus Dirik Cad.<br />
+        Kılıç Apt. No: 58/A<br />
+        Silivri / İstanbul
+      </p>
+    </div>
+    <div>
+      <p class="etiket">İletişim</p>
+      <p class="kunye-deger">0536 343 41 97</p>
+      <p class="kunye-deger" style="font-size: 0.8125rem">edmyapigayrimenkul.com</p>
+    </div>
+  </footer>
+</main>

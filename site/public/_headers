@@ -1,0 +1,11 @@
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/marka/*
+  Cache-Control: public, max-age=604800
+
+/ekip/*
+  Cache-Control: public, max-age=604800

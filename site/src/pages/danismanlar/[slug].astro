@@ -1,0 +1,186 @@
+---
+import Temel from '../../layouts/Temel.astro';
+import IlanKart from '../../components/IlanKart.astro';
+import { DANISMANLAR, ILETISIM, KURUM, whatsappBaglanti } from '../../lib/site';
+import { danismaninIlanlari } from '../../lib/ilanlar';
+
+const { slug } = Astro.params;
+const danisman = DANISMANLAR.find((d) => d.slug === slug);
+if (!danisman) return Astro.rewrite('/404');
+
+const ilanlar = danisman.emlakjetSlug ? await danismaninIlanlari(danisman.emlakjetSlug) : [];
+const bas = danisman.ad
+  .split(' ')
+  .map((p) => p[0])
+  .join('');
+
+const bolgeler = [...new Set(ilanlar.map((i) => i.ilce).filter(Boolean))] as string[];
+const satilik = ilanlar.filter((i) => i.islem === 'satilik').length;
+const kiralik = ilanlar.filter((i) => i.islem === 'kiralik').length;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'RealEstateAgent',
+  name: danisman.ad,
+  jobTitle: danisman.unvan,
+  description: danisman.hakkinda,
+  telephone: ILETISIM.telefonHam,
+  worksFor: { '@id': `${KURUM.site}/#kurum` },
+  areaServed: bolgeler.map((b) => ({ '@type': 'City', name: b })),
+};
+---
+
+<Temel
+  baslik={danisman.ad}
+  aciklama={`${danisman.ad} — ${danisman.unvan}. ${danisman.hakkinda} ${ilanlar.length} aktif ilan.`}
+  jsonLd={jsonLd}
+>
+  <section class="pt-28 lg:pt-36">
+    <div class="kab">
+      <nav aria-label="Sayfa yolu" class="pb-6">
+        <ol class="flex flex-wrap items-center gap-2 text-[0.8125rem] text-kursun">
+          <li><a href="/" class="hover:text-murekkep">Ana Sayfa</a></li>
+          <li aria-hidden="true">/</li>
+          <li><a href="/danismanlar" class="hover:text-murekkep">Danışmanlar</a></li>
+        </ol>
+      </nav>
+
+      <div class="grid gap-10 pb-14 lg:grid-cols-[19rem_1fr] lg:gap-16">
+        <div class="portre">
+          {
+            danisman.foto ? (
+              <img src={danisman.foto} alt={danisman.ad} />
+            ) : (
+              <span class="monogram" aria-hidden="true">
+                {bas}
+              </span>
+            )
+          }
+        </div>
+
+        <div class="min-w-0">
+          <p class="etiket">{danisman.unvan}</p>
+          <h1 class="baslik-buyuk mt-3">{danisman.ad}</h1>
+          <p class="mt-5 max-w-[56ch] text-[1.0625rem] leading-relaxed text-metin-2">
+            {danisman.hakkinda}
+          </p>
+
+          {
+            ilanlar.length > 0 && (
+              <dl class="ozet-serit mt-8">
+                <div>
+                  <dt class="etiket">Aktif ilan</dt>
+                  <dd class="ozet-deger font-veri">{ilanlar.length}</dd>
+                </div>
+                <div>
+                  <dt class="etiket">Satılık</dt>
+                  <dd class="ozet-deger font-veri">{satilik}</dd>
+                </div>
+                <div>
+                  <dt class="etiket">Kiralık</dt>
+                  <dd class="ozet-deger font-veri">{kiralik}</dd>
+                </div>
+                <div>
+                  <dt class="etiket">Bölge</dt>
+                  <dd class="ozet-deger font-veri">{bolgeler.length}</dd>
+                </div>
+              </dl>
+            )
+          }
+
+          <div class="mt-8 flex flex-wrap gap-2.5">
+            <a
+              href={whatsappBaglanti(`Merhaba ${danisman.ad}, EDM sitesinden ulaşıyorum.`)}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="dugme dugme--kirmizi"
+            >
+              WhatsApp’tan yaz
+            </a>
+            <a href={`tel:${ILETISIM.telefonHam}`} class="dugme dugme--murekkep">
+              {ILETISIM.telefon}
+            </a>
+          </div>
+
+          <div class="mt-8 flex flex-wrap gap-2">
+            {danisman.uzmanlik.map((u) => <span class="rozet rozet--cizgili">{u}</span>)}
+            {bolgeler.map((b) => <span class="rozet rozet--cizgili">{b}</span>)}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t border-murekkep/10 py-14 lg:py-20">
+      <div class="kab">
+        <div class="flex flex-wrap items-end justify-between gap-6">
+          <h2 class="baslik-orta">
+            {ilanlar.length > 0 ? `${danisman.ad.split(' ')[0]}’ın portföyü` : 'Ofis portföyü'}
+            {ilanlar.length > 0 && (
+              <span class="ml-2 font-veri text-base text-kursun">{ilanlar.length}</span>
+            )}
+          </h2>
+          <a href="/ilanlar" class="dugme dugme--hayalet">Tüm ilanlar</a>
+        </div>
+
+        {
+          ilanlar.length > 0 ? (
+            <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" data-belir="sira">
+              {ilanlar.map((ilan, i) => (
+                <IlanKart ilan={ilan} oncelikli={i < 4} />
+              ))}
+            </div>
+          ) : (
+            <p class="mt-8 max-w-[58ch] text-metin-2">
+              {danisman.ad.split(' ')[0]} tüm portföyü yönetiyor; ilanlar ofis adına
+              danışman arkadaşların profillerinde yayınlanıyor. Aradığınızı anlatın,
+              uygun bir şey geldiğinde ilk size haber verelim.
+            </p>
+          )
+        }
+      </div>
+    </div>
+  </section>
+</Temel>
+
+<style>
+  .portre {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 5;
+    background: var(--color-kirec);
+    border-radius: var(--radius-kart);
+    overflow: hidden;
+  }
+  .portre img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .monogram {
+    font-family: var(--font-baslik);
+    font-size: clamp(3.5rem, 9vw, 5.5rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: color-mix(in oklab, var(--color-murekkep) 20%, transparent);
+  }
+
+  .ozet-serit {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+    gap: 1px;
+    background: color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-radius: var(--radius-kart);
+    overflow: hidden;
+    max-width: 34rem;
+  }
+  .ozet-serit > div {
+    background: var(--color-kagit);
+    padding: 0.95rem 1.1rem 1rem;
+  }
+  .ozet-deger {
+    font-size: 1.35rem;
+    margin-top: 0.3rem;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

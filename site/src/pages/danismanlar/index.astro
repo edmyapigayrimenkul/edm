@@ -1,0 +1,176 @@
+---
+import Temel from '../../layouts/Temel.astro';
+import { DANISMANLAR, ILETISIM, KURUM, whatsappBaglanti } from '../../lib/site';
+import { danismaninIlanlari } from '../../lib/ilanlar';
+
+const ekip = await Promise.all(
+  DANISMANLAR.map(async (d) => {
+    // Doğukan'ın Emlakjet'te ayrı profili yok; ilanları Metin üzerinden geçiyor.
+    const ilanlar = d.emlakjetSlug ? await danismaninIlanlari(d.emlakjetSlug) : [];
+    return {
+      ...d,
+      adet: ilanlar.length,
+      bas: d.ad
+        .split(' ')
+        .map((p) => p[0])
+        .join(''),
+      bolgeler: [...new Set(ilanlar.map((i) => i.ilce).filter(Boolean))].slice(0, 4) as string[],
+    };
+  })
+);
+---
+
+<Temel
+  baslik="Danışmanlar"
+  aciklama={`${KURUM.ad} ekibi. Silivri ve Trakya'da konut, arsa ve tarla portföyünü yöneten gayrimenkul danışmanlarımızla doğrudan iletişime geçin.`}
+>
+  <section class="pt-28 pb-16 lg:pt-36 lg:pb-24">
+    <div class="kab">
+      <p class="etiket" data-belir>Ekip</p>
+      <div class="mt-4 flex flex-wrap items-end justify-between gap-6 border-b border-murekkep/12 pb-10">
+        <h1 class="baslik-buyuk max-w-[14ch]" data-belir data-gecikme="0.05">
+          Kiminle konuşacaksınız
+        </h1>
+        <p class="max-w-[46ch] text-metin-2" data-belir data-gecikme="0.1">
+          Küçük bir ekibiz — ilanı yayınlayan, size gösteren ve tapuda yanınızda duran kişi
+          aynı kişi. Aracı zinciri yok.
+        </p>
+      </div>
+
+      <div class="mt-12 grid gap-6 lg:gap-8" data-belir="sira">
+        {
+          ekip.map((d) => (
+            <article class="danisman-satir-kart">
+              <a href={`/danismanlar/${d.slug}`} class="danisman-gorsel grup-kart">
+                {d.foto ? (
+                  <img src={d.foto} alt={d.ad} loading="lazy" decoding="async" />
+                ) : (
+                  <span class="monogram" aria-hidden="true">
+                    {d.bas}
+                  </span>
+                )}
+              </a>
+
+              <div class="danisman-govde">
+                <div>
+                  <h2 class="baslik-orta">
+                    <a href={`/danismanlar/${d.slug}`} class="alt-cizgi">
+                      {d.ad}
+                    </a>
+                  </h2>
+                  <p class="etiket mt-2">{d.unvan}</p>
+                </div>
+
+                <p class="mt-4 max-w-[56ch] leading-relaxed text-metin-2">{d.hakkinda}</p>
+
+                <dl class="danisman-veri mt-6">
+                  {d.emlakjetSlug && (
+                    <div>
+                      <dt class="etiket">Portföy</dt>
+                      <dd class="veri-deger font-veri">{d.adet} ilan</dd>
+                    </div>
+                  )}
+                  <div>
+                    <dt class="etiket">Uzmanlık</dt>
+                    <dd class="mt-1.5 text-sm">{d.uzmanlik.join(' · ')}</dd>
+                  </div>
+                  {d.bolgeler.length > 0 && (
+                    <div>
+                      <dt class="etiket">Bölge</dt>
+                      <dd class="mt-1.5 text-sm">{d.bolgeler.join(' · ')}</dd>
+                    </div>
+                  )}
+                </dl>
+
+                <div class="mt-6 flex flex-wrap gap-2.5">
+                  <a href={`/danismanlar/${d.slug}`} class="dugme dugme--murekkep">
+                    {d.adet > 0 ? `${d.adet} ilanını gör` : 'Profilini gör'}
+                  </a>
+                  <a
+                    href={whatsappBaglanti(`Merhaba ${d.ad}, EDM sitesinden ulaşıyorum.`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="dugme dugme--hayalet"
+                  >
+                    WhatsApp
+                  </a>
+                  <a href={`tel:${ILETISIM.telefonHam}`} class="dugme dugme--hayalet">
+                    {ILETISIM.telefon}
+                  </a>
+                </div>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Temel>
+
+<style>
+  .danisman-satir-kart {
+    display: grid;
+    gap: 1.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 11%, transparent);
+  }
+  .danisman-satir-kart:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  @media (min-width: 760px) {
+    .danisman-satir-kart {
+      grid-template-columns: 15rem 1fr;
+      gap: 2.5rem;
+    }
+  }
+  @media (min-width: 1100px) {
+    .danisman-satir-kart {
+      grid-template-columns: 19rem 1fr;
+      gap: 4rem;
+    }
+  }
+
+  .danisman-gorsel {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 5;
+    max-width: 19rem;
+    background: var(--color-kirec);
+    border-radius: var(--radius-kart);
+    overflow: hidden;
+  }
+  .danisman-gorsel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.1s var(--ease-yumusak);
+  }
+  .grup-kart:hover img {
+    transform: scale(1.04);
+  }
+  .monogram {
+    font-family: var(--font-baslik);
+    font-size: clamp(3rem, 8vw, 4.5rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: color-mix(in oklab, var(--color-murekkep) 20%, transparent);
+  }
+
+  .danisman-govde {
+    min-width: 0;
+  }
+
+  .danisman-veri {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr));
+    gap: 1.25rem 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 11%, transparent);
+  }
+  .veri-deger {
+    font-size: 1.0625rem;
+    margin-top: 0.35rem;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

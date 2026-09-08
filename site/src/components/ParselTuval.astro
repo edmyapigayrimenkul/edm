@@ -1,0 +1,167 @@
+---
+/**
+ * Kahraman zemini: kadastral parsel planı.
+ *
+ * Dikdörtgeni özyinelemeli bölerek imar paftasına benzeyen bir doku üretir ve
+ * çizgileri yavaşça çizer. Fotoğraf yerine bunu kullanıyoruz — markanın işi
+ * toprak, ve bu doku onu bir manzara fotoğrafından daha doğru anlatıyor.
+ */
+---
+
+<canvas data-parsel aria-hidden="true" class="parsel-tuval"></canvas>
+
+<style>
+  .parsel-tuval {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  const tuval = document.querySelector<HTMLCanvasElement>('[data-parsel]');
+
+  if (tuval) {
+    const ctx = tuval.getContext('2d');
+    const azHareket = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    interface Parsel {
+      x: number;
+      y: number;
+      g: number;
+      h: number;
+      derinlik: number;
+    }
+
+    /** Dikdörtgeni kadastral bir plana benzeyecek şekilde böler. */
+    function bol(alan: Parsel, enDerin: number, rastgele: () => number): Parsel[] {
+      const { x, y, g, h, derinlik } = alan;
+      // Yeterince küçüldüyse ya da şans bu yönde çıktıysa parseli bırak.
+      const kucuk = Math.min(g, h) < 90;
+      if (derinlik >= enDerin || kucuk || (derinlik > 2 && rastgele() < 0.22)) return [alan];
+
+      // Uzun kenardan böl — gerçek parselasyon da böyle davranır.
+      const dikey = g > h * 1.05 ? true : h > g * 1.05 ? false : rastgele() > 0.5;
+      // Bölme oranı ortaya yakın ama tam ortada değil; ızgara görüntüsünü kırar.
+      const oran = 0.34 + rastgele() * 0.32;
+
+      const a: Parsel = dikey
+        ? { x, y, g: g * oran, h, derinlik: derinlik + 1 }
+        : { x, y, g, h: h * oran, derinlik: derinlik + 1 };
+      const b: Parsel = dikey
+        ? { x: x + g * oran, y, g: g * (1 - oran), h, derinlik: derinlik + 1 }
+        : { x, y: y + h * oran, g, h: h * (1 - oran), derinlik: derinlik + 1 };
+
+      return [...bol(a, enDerin, rastgele), ...bol(b, enDerin, rastgele)];
+    }
+
+    /** Sabit tohumlu üretici — her yüklemede aynı plan çıksın diye. */
+    function tohumlu(tohum: number) {
+      let s = tohum;
+      return () => {
+        s = (s * 1664525 + 1013904223) % 4294967296;
+        return s / 4294967296;
+      };
+    }
+
+    let parseller: Parsel[] = [];
+    let ol = { g: 0, h: 0 };
+    let vurgulu: Set<number> = new Set();
+
+    function kur() {
+      if (!ctx) return;
+      const oran = Math.min(window.devicePixelRatio || 1, 2);
+      const kutu = tuval!.getBoundingClientRect();
+      ol = { g: kutu.width, h: kutu.height };
+
+      tuval!.width = Math.floor(kutu.width * oran);
+      tuval!.height = Math.floor(kutu.height * oran);
+      ctx.setTransform(oran, 0, 0, oran, 0, 0);
+
+      const rastgele = tohumlu(20190809);
+      // Paftayı tuvalden geniş tutuyoruz ki kenarlarda kesik parsel görünmesin.
+      parseller = bol(
+        { x: -kutu.width * 0.1, y: -kutu.height * 0.1, g: kutu.width * 1.2, h: kutu.height * 1.2, derinlik: 0 },
+        7,
+        rastgele
+      );
+
+      // Birkaç parseli kırmızıyla işaretle — "portföydeki arsalar" hissi.
+      vurgulu = new Set();
+      const r2 = tohumlu(451);
+      while (vurgulu.size < Math.min(4, parseller.length)) {
+        vurgulu.add(Math.floor(r2() * parseller.length));
+      }
+    }
+
+    function ciz(ilerleme: number, kayma: number) {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, ol.g, ol.h);
+      ctx.lineWidth = 1;
+
+      parseller.forEach((p, i) => {
+        // Parseller sırayla beliriyor; sıra köşegen üzerinden hesaplanıyor.
+        const sira = (p.x + p.y) / (ol.g + ol.h);
+        const yerel = Math.max(0, Math.min(1, (ilerleme - sira * 0.55) / 0.45));
+        if (yerel <= 0) return;
+
+        const y = p.y + kayma;
+        const kirmiziMi = vurgulu.has(i);
+
+        ctx.globalAlpha = yerel * (kirmiziMi ? 0.5 : 0.16);
+        ctx.strokeStyle = kirmiziMi ? '#f0000d' : '#f4f4f3';
+        ctx.strokeRect(p.x + 0.5, y + 0.5, p.g - 1, p.h - 1);
+
+        if (kirmiziMi) {
+          ctx.globalAlpha = yerel * 0.05;
+          ctx.fillStyle = '#f0000d';
+          ctx.fillRect(p.x, y, p.g, p.h);
+        }
+      });
+
+      ctx.globalAlpha = 1;
+    }
+
+    let baslangic = 0;
+    let hedefKayma = 0;
+    let suKayma = 0;
+
+    function kare(zaman: number) {
+      if (!baslangic) baslangic = zaman;
+      const gecen = (zaman - baslangic) / 1000;
+      const ilerleme = Math.min(1, gecen / 2.4);
+      // Kaydırmayla çok hafif bir derinlik
+      suKayma += (hedefKayma - suKayma) * 0.06;
+      ciz(ilerleme, suKayma);
+      if (ilerleme < 1 || Math.abs(hedefKayma - suKayma) > 0.4) requestAnimationFrame(kare);
+    }
+
+    kur();
+
+    if (azHareket) {
+      ciz(1, 0);
+    } else {
+      requestAnimationFrame(kare);
+      window.addEventListener(
+        'scroll',
+        () => {
+          hedefKayma = Math.min(window.scrollY * 0.12, 90);
+          requestAnimationFrame(kare);
+        },
+        { passive: true }
+      );
+    }
+
+    let zamanlayici: number;
+    window.addEventListener('resize', () => {
+      clearTimeout(zamanlayici);
+      zamanlayici = window.setTimeout(() => {
+        kur();
+        ciz(1, suKayma);
+      }, 180);
+    });
+  }
+</script>

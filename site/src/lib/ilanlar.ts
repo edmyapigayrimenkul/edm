@@ -1,0 +1,418 @@
+/**
+ * İlan veri katmanı.
+ *
+ * Kaynak: D1 veritabanı (zamanlanmış görev Emlakjet'ten doldurur).
+ * Sunumla ilgili her dönüşüm burada; sayfalar ham satır görmez.
+ *
+ * Portföy 50 civarı kayıt olduğu için tamamını tek seferde okuyup kısa
+ * ömürlü bir önbellekte tutuyoruz — her istekte D1'e gitmenin anlamı yok.
+ */
+
+import { env } from 'cloudflare:workers';
+import { aktifIlanSatirlari, sonSenkron, type SatirIlan } from './senkron/depo';
+
+export type Islem = 'satilik' | 'kiralik';
+export type TipGrup = 'konut' | 'arsa' | 'isyeri' | 'diger';
+
+export interface Ilan {
+  id: string;
+  kaynak: string;
+  kaynakUrl: string;
+  baslik: string;
+  aciklama: string;
+  fiyat: number | null;
+  islem: Islem;
+  kategori: string;
+  tip: string;
+  tipGrup: TipGrup;
+  oda: string | null;
+  m2: number | null;
+  il: string | null;
+  ilce: string | null;
+  mahalle: string | null;
+  ozellikler: Record<string, string>;
+  gorseller: string[];
+  danismanSlug: string | null;
+  guncellenme: string | null;
+  ilkGorulme: string;
+
+  slug: string;
+  yol: string;
+  baslikTemiz: string;
+  konum: string;
+  konumKisa: string;
+  fiyatMetin: string;
+  m2Metin: string | null;
+  birimFiyat: string | null;
+  ozetMetin: string;
+  yeniMi: boolean;
+  kapak: string | null;
+  etiketler: string[];
+}
+
+/* ---------------------------------------------------------------
+   Yazım düzeltmeleri — Marka Kılavuzu 05
+   Portföyde tespit edilen gerçek hatalar. Yalnızca tam kelime
+   eşleşmesinde uygulanır; şüpheli hiçbir şeye dokunulmaz.
+   --------------------------------------------------------------- */
+const YAZIM_DUZELTME: Array<[RegExp, string]> = [
+  [/\bKıralık\b/g, 'Kiralık'],
+  [/\bKıralik\b/g, 'Kiralık'],
+  [/\bMahlede\b/g, 'Mahalle’de'],
+  [/\bMahlesi\b/g, 'Mahallesi'],
+  [/\bHiseli\b/g, 'Hisseli'],
+  [/\bAcill\b/g, 'Acil'],
+  [/\bessiz\b/gi, 'eşsiz'],
+  [/\bKlasiss\b/g, 'Klassis'],
+  [/\bSilivride\b/g, 'Silivri’de'],
+  [/\bSilivrid[ae]n\b/g, 'Silivri’den'],
+  [/\bAnayola\b/g, 'Ana Yola'],
+];
+
+function olculeriDuzelt(metin: string): string {
+  return metin
+    .replace(/(\d[\d.\s]*?)\s*(?:m²|m2\b)/gi, (_, sayi: string) => {
+      const n = parseInt(sayi.replace(/[^\d]/g, ''), 10);
+      return Number.isFinite(n) ? `${n.toLocaleString('tr-TR')} m²` : `${sayi} m²`;
+    })
+    .replace(/(\d[\d.\s]*?)\s*Metrekare/gi, (_, sayi: string) => {
+      const n = parseInt(sayi.replace(/[^\d]/g, ''), 10);
+      return Number.isFinite(n) ? `${n.toLocaleString('tr-TR')} m²` : `${sayi} m²`;
+    });
+}
+
+export function baslikTemizle(baslik: string): string {
+  let s = baslik.trim();
+  for (const [desen, yerine] of YAZIM_DUZELTME) s = s.replace(desen, yerine);
+  return olculeriDuzelt(s).replace(/\s{2,}/g, ' ').trim();
+}
+
+/* ---------------------------------------------------------------
+   Biçimlendiriciler
+   --------------------------------------------------------------- */
+const TR = 'tr-TR';
+
+/** 7150000 -> "7.150.000 ₺" (Kılavuz 05: rakamdan sonra, boşlukla) */
+export function fiyatYaz(fiyat: number | null, islem?: Islem): string {
+  if (!fiyat) return 'Fiyat için arayınız';
+  const s = `${fiyat.toLocaleString(TR)} ₺`;
+  return islem === 'kiralik' ? `${s} / ay` : s;
+}
+
+/** Kart üstünde kısaltılmış fiyat: 7.150.000 -> "7,15 mn ₺" */
+export function fiyatKisa(fiyat: number | null): string {
+  if (!fiyat) return '—';
+  if (fiyat >= 1_000_000) {
+    const mn = fiyat / 1_000_000;
+    const basamak = mn >= 100 ? 0 : mn >= 10 ? 1 : 2;
+    return `${mn.toLocaleString(TR, { maximumFractionDigits: basamak })} mn ₺`;
+  }
+  if (fiyat >= 1_000) return `${(fiyat / 1_000).toLocaleString(TR)} bin ₺`;
+  return `${fiyat.toLocaleString(TR)} ₺`;
+}
+
+export function m2Yaz(m2: number | null): string | null {
+  return m2 ? `${m2.toLocaleString(TR)} m²` : null;
+}
+
+function birimFiyatYaz(fiyat: number | null, m2: number | null, islem: Islem): string | null {
+  if (!fiyat || !m2 || m2 < 1 || islem !== 'satilik') return null;
+  const birim = fiyat / m2;
+  return birim < 1 ? null : `${Math.round(birim).toLocaleString(TR)} ₺/m²`;
+}
+
+/* ---------------------------------------------------------------
+   Adres parçaları
+   --------------------------------------------------------------- */
+const TR_HARF: Record<string, string> = {
+  ç: 'c', Ç: 'c', ğ: 'g', Ğ: 'g', ı: 'i', İ: 'i', ö: 'o', Ö: 'o',
+  ş: 's', Ş: 's', ü: 'u', Ü: 'u', â: 'a', î: 'i', û: 'u', '’': '', "'": '',
+};
+
+export function slugla(metin: string): string {
+  return metin
+    .split('')
+    .map((h) => TR_HARF[h] ?? h)
+    .join('')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 70)
+    .replace(/-+$/g, '');
+}
+
+/* ---------------------------------------------------------------
+   Satır -> İlan
+   --------------------------------------------------------------- */
+function guvenliJson<T>(metin: string, varsayilan: T): T {
+  try {
+    return JSON.parse(metin) as T;
+  } catch {
+    return varsayilan;
+  }
+}
+
+function etiketleriSec(oda: string | null, m2: number | null, o: Record<string, string>): string[] {
+  const cikti: string[] = [];
+  if (oda) cikti.push(oda);
+  const alan = m2Yaz(m2);
+  if (alan) cikti.push(alan);
+
+  const oncelik: Array<[string, string, string]> = [
+    ['Site İçerisinde', 'Evet', 'Site içi'],
+    ['Krediye Uygunluk', 'Krediye Uygun', 'Krediye uygun'],
+    ['Eşya Durumu', 'Eşyalı', 'Eşyalı'],
+    ['Asansör', 'Var', 'Asansörlü'],
+    ['Otopark', 'Var', 'Otoparklı'],
+  ];
+  for (const [anahtar, beklenen, etiket] of oncelik) {
+    if (cikti.length >= 3) break;
+    if (o[anahtar] === beklenen) cikti.push(etiket);
+  }
+  for (const anahtar of ['İmar Durumu', 'Tapu Durumu']) {
+    if (cikti.length >= 3) break;
+    if (o[anahtar] && o[anahtar] !== 'Belirtilmemiş') cikti.push(o[anahtar]);
+  }
+  return cikti.slice(0, 3);
+}
+
+function ozetle(aciklama: string, uzunluk = 155): string {
+  const duz = aciklama.replace(/\s+/g, ' ').trim();
+  if (duz.length <= uzunluk) return duz;
+  const kesit = duz.slice(0, uzunluk);
+  const son = Math.max(kesit.lastIndexOf('. '), kesit.lastIndexOf(', '), kesit.lastIndexOf(' '));
+  return `${kesit.slice(0, son > 60 ? son : uzunluk).trim()}…`;
+}
+
+const YENI_GUN = 21;
+
+function satirdanIlan(s: SatirIlan): Ilan {
+  const baslikTemiz = baslikTemizle(s.baslik);
+  const slug = `${slugla(baslikTemiz)}-${s.id}`;
+  const islem = (s.islem === 'kiralik' ? 'kiralik' : 'satilik') as Islem;
+  const ozellikler = guvenliJson<Record<string, string>>(s.ozellikler, {});
+  const gorseller = guvenliJson<string[]>(s.gorseller, []);
+  const zaman = Date.parse(s.guncellenme ?? s.ilk_gorulme);
+
+  return {
+    id: s.id,
+    kaynak: s.kaynak,
+    kaynakUrl: s.kaynak_url,
+    baslik: s.baslik,
+    aciklama: s.aciklama,
+    fiyat: s.fiyat,
+    islem,
+    kategori: s.kategori,
+    tip: s.tip,
+    tipGrup: (s.tip_grup as TipGrup) ?? 'diger',
+    oda: s.oda,
+    m2: s.m2,
+    il: s.il,
+    ilce: s.ilce,
+    mahalle: s.mahalle,
+    ozellikler,
+    gorseller,
+    danismanSlug: s.danisman_slug,
+    guncellenme: s.guncellenme,
+    ilkGorulme: s.ilk_gorulme,
+
+    slug,
+    yol: `/ilan/${slug}`,
+    baslikTemiz,
+    konum: [s.mahalle, s.ilce, s.il].filter(Boolean).join(' · ') || 'Türkiye',
+    konumKisa: [s.ilce, s.il].filter(Boolean).join(' / ') || 'Türkiye',
+    fiyatMetin: fiyatYaz(s.fiyat, islem),
+    m2Metin: m2Yaz(s.m2),
+    birimFiyat: birimFiyatYaz(s.fiyat, s.m2, islem),
+    ozetMetin: ozetle(s.aciklama),
+    yeniMi: Number.isFinite(zaman) && Date.now() - zaman < YENI_GUN * 86_400_000,
+    kapak: gorseller[0] ?? null,
+    etiketler: etiketleriSec(s.oda, s.m2, ozellikler),
+  };
+}
+
+/* ---------------------------------------------------------------
+   Portföy — kısa ömürlü önbellekli tek okuma
+   --------------------------------------------------------------- */
+export interface FiltreSecenek {
+  deger: string;
+  etiket: string;
+  adet: number;
+}
+
+export interface Portfoy {
+  ilanlar: Ilan[];
+  filtreler: {
+    islem: FiltreSecenek[];
+    tipGrup: FiltreSecenek[];
+    tip: FiltreSecenek[];
+    ilce: FiltreSecenek[];
+    il: FiltreSecenek[];
+  };
+  sayimlar: {
+    toplam: number;
+    satilik: number;
+    kiralik: number;
+    konut: number;
+    arsa: number;
+    ilce: number;
+    gorsel: number;
+    toplamAlan: number;
+  };
+  sonGuncelleme: string;
+}
+
+function say(degerler: Array<{ deger: string | null; etiket: string }>): FiltreSecenek[] {
+  const harita = new Map<string, { etiket: string; adet: number }>();
+  for (const { deger, etiket } of degerler) {
+    if (!deger) continue;
+    const mevcut = harita.get(deger);
+    if (mevcut) mevcut.adet += 1;
+    else harita.set(deger, { etiket, adet: 1 });
+  }
+  return [...harita]
+    .map(([deger, { etiket, adet }]) => ({ deger, etiket, adet }))
+    .sort((a, b) => b.adet - a.adet);
+}
+
+const TIP_ETIKET: Record<string, string> = {
+  konut: 'Konut',
+  arsa: 'Arsa & Tarla',
+  isyeri: 'İş Yeri',
+  diger: 'Diğer',
+};
+
+let onbellek: { veri: Portfoy; zaman: number } | null = null;
+const ONBELLEK_MS = 60_000;
+
+export async function portfoy(): Promise<Portfoy> {
+  if (onbellek && Date.now() - onbellek.zaman < ONBELLEK_MS) return onbellek.veri;
+
+  const vt = env.VT as D1Database;
+  const satirlar = await aktifIlanSatirlari(vt);
+  const ilanlar = satirlar.map(satirdanIlan);
+  const senkron = await sonSenkron(vt).catch(() => null);
+
+  const veri: Portfoy = {
+    ilanlar,
+    filtreler: {
+      islem: say(
+        ilanlar.map((i) => ({
+          deger: i.islem,
+          etiket: i.islem === 'satilik' ? 'Satılık' : 'Kiralık',
+        }))
+      ),
+      tipGrup: say(
+        ilanlar.map((i) => ({ deger: i.tipGrup, etiket: TIP_ETIKET[i.tipGrup] ?? i.tipGrup }))
+      ),
+      tip: say(
+        ilanlar.map((i) => ({
+          deger: i.tip,
+          etiket: i.tip.charAt(0).toLocaleUpperCase('tr') + i.tip.slice(1),
+        }))
+      ),
+      ilce: say(
+        ilanlar.map((i) => ({
+          deger: i.ilce,
+          etiket: i.il && i.ilce !== i.il ? `${i.ilce} / ${i.il}` : (i.ilce ?? ''),
+        }))
+      ),
+      il: say(ilanlar.map((i) => ({ deger: i.il, etiket: i.il ?? '' }))),
+    },
+    sayimlar: {
+      toplam: ilanlar.length,
+      satilik: ilanlar.filter((i) => i.islem === 'satilik').length,
+      kiralik: ilanlar.filter((i) => i.islem === 'kiralik').length,
+      konut: ilanlar.filter((i) => i.tipGrup === 'konut').length,
+      arsa: ilanlar.filter((i) => i.tipGrup === 'arsa').length,
+      ilce: new Set(ilanlar.map((i) => i.ilce).filter(Boolean)).size,
+      gorsel: ilanlar.reduce((t, i) => t + i.gorseller.length, 0),
+      toplamAlan: ilanlar.reduce((t, i) => t + (i.m2 ?? 0), 0),
+    },
+    sonGuncelleme: senkron?.bitis ?? new Date().toISOString(),
+  };
+
+  onbellek = { veri, zaman: Date.now() };
+  return veri;
+}
+
+/** Senkron sonrası önbelleği düşürür. */
+export function onbellegiTemizle(): void {
+  onbellek = null;
+}
+
+/* ---------------------------------------------------------------
+   Sorgular
+   --------------------------------------------------------------- */
+export async function ilanBul(slug: string): Promise<Ilan | undefined> {
+  const { ilanlar } = await portfoy();
+  const bulunan = ilanlar.find((i) => i.slug === slug);
+  if (bulunan) return bulunan;
+  // Başlık değişip slug kaydığında ilan numarasından yakala
+  const idEsleme = slug.match(/(\d{6,})$/);
+  return idEsleme ? ilanlar.find((i) => i.id === idEsleme[1]) : undefined;
+}
+
+export async function danismaninIlanlari(emlakjetSlug: string): Promise<Ilan[]> {
+  const { ilanlar } = await portfoy();
+  return ilanlar.filter((i) => i.danismanSlug === emlakjetSlug);
+}
+
+/** Aynı ilçede, aynı işlemde, fiyatça en yakın ilanlar. */
+export async function benzerIlanlar(ilan: Ilan, adet = 3): Promise<Ilan[]> {
+  const { ilanlar } = await portfoy();
+  const puan = (o: Ilan) => {
+    let p = 0;
+    if (o.ilce === ilan.ilce) p += 3;
+    if (o.il === ilan.il) p += 1;
+    if (o.tipGrup === ilan.tipGrup) p += 2;
+    if (o.islem === ilan.islem) p += 2;
+    if (ilan.fiyat && o.fiyat) {
+      p += (Math.min(ilan.fiyat, o.fiyat) / Math.max(ilan.fiyat, o.fiyat)) * 2;
+    }
+    return p;
+  };
+  return ilanlar
+    .filter((o) => o.id !== ilan.id)
+    .sort((a, b) => puan(b) - puan(a))
+    .slice(0, adet);
+}
+
+/**
+ * Ana sayfa seçkisi.
+ *
+ * Sadece fiyata göre sıralamak işe yaramıyor: en pahalı ilanlar büyük tarlalar
+ * ve onların görselleri uydu ekran görüntüsü. Vitrin kartı gerçek fotoğrafı olan
+ * bir konut olmalı; arsa tarafı da temsil edilsin diye ikisini dönüşümlü diziyoruz.
+ */
+export async function oneCikanlar(adet = 6): Promise<Ilan[]> {
+  const { ilanlar } = await portfoy();
+  const gorselZengin = (i: Ilan) => i.gorseller.length >= 5;
+  const fiyataGore = (a: Ilan, b: Ilan) => (b.fiyat ?? 0) - (a.fiyat ?? 0);
+
+  const konutlar = ilanlar.filter((i) => i.tipGrup === 'konut' && gorselZengin(i)).sort(fiyataGore);
+  const araziler = ilanlar.filter((i) => i.tipGrup === 'arsa' && gorselZengin(i)).sort(fiyataGore);
+
+  const secili: Ilan[] = [];
+  const ekle = (ilan: Ilan | undefined) => {
+    if (ilan && !secili.includes(ilan)) secili.push(ilan);
+  };
+
+  ekle(konutlar[0]);
+
+  let k = 1;
+  let a = 0;
+  while (secili.length < adet && (k < konutlar.length || a < araziler.length)) {
+    if (secili.length % 3 === 0 && a < araziler.length) ekle(araziler[a++]);
+    else if (k < konutlar.length) ekle(konutlar[k++]);
+    else if (a < araziler.length) ekle(araziler[a++]);
+    else break;
+  }
+
+  for (const ilan of [...ilanlar].sort(fiyataGore)) {
+    if (secili.length >= adet) break;
+    ekle(ilan);
+  }
+
+  return secili.slice(0, adet);
+}

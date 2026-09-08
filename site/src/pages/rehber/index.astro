@@ -1,0 +1,167 @@
+---
+import Temel from '../../layouts/Temel.astro';
+import { bolgeler } from '../../lib/bolgeler';
+import { portfoy } from '../../lib/ilanlar';
+import { KURUM } from '../../lib/site';
+
+const BOLGELER = await bolgeler();
+const { sayimlar: SAYIMLAR, sonGuncelleme } = await portfoy();
+
+const guncelleme = new Date(sonGuncelleme).toLocaleDateString('tr-TR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+const tl = (n: number | null) => (n === null ? '—' : `${n.toLocaleString('tr-TR')} ₺`);
+---
+
+<Temel
+  baslik="Bölge Rehberi"
+  aciklama={`Silivri, Edirne ve Tekirdağ'da ${SAYIMLAR.ilce} ilçe. Her bölgede kaç ilan var, fiyatlar nerede, arsada metrekare kaça geliyor — portföyümüzden hesaplanmış güncel veriler.`}
+>
+  <section class="pt-28 pb-14 lg:pt-36">
+    <div class="kab">
+      <p class="etiket" data-belir>Bölge Rehberi</p>
+      <div class="mt-4 grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end lg:gap-16">
+        <h1 class="baslik-buyuk max-w-[15ch]" data-belir data-gecikme="0.05">
+          Trakya’yı bölge bölge okuyalım
+        </h1>
+        <p class="max-w-[48ch] text-metin-2" data-belir data-gecikme="0.1">
+          Aşağıdaki her rakam, kendi portföyümüzdeki {SAYIMLAR.toplam} ilandan hesaplandı —
+          başka bir yerden alınmadı. Portföy değiştikçe sayılar da değişir.
+          <span class="block mt-2 etiket">Son güncelleme: {guncelleme}</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pb-20 lg:pb-28">
+    <div class="kab">
+      <div class="grid gap-5 lg:grid-cols-2" data-belir="sira">
+        {
+          BOLGELER.map((b) => (
+            <a href={b.yol} class="bolge-kart grup-kart">
+              <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <h2 class="baslik-orta">{b.ad}</h2>
+                  <p class="etiket mt-1.5">{b.il}</p>
+                </div>
+                <span class="bolge-adet font-veri">{b.adet}</span>
+              </div>
+
+              {b.giris && (
+                <p class="mt-4 line-clamp-3 text-sm leading-relaxed text-metin-2">{b.giris}</p>
+              )}
+
+              <dl class="bolge-veri mt-5">
+                <div>
+                  <dt class="etiket">Konut</dt>
+                  <dd class="font-veri">{b.konut}</dd>
+                </div>
+                <div>
+                  <dt class="etiket">Arsa & tarla</dt>
+                  <dd class="font-veri">{b.arsa}</dd>
+                </div>
+                <div>
+                  <dt class="etiket">Fiyat aralığı</dt>
+                  <dd class="font-veri text-[0.8125rem]">
+                    {b.enDusuk === b.enYuksek ? tl(b.enDusuk) : `${tl(b.enDusuk)} — ${tl(b.enYuksek)}`}
+                  </dd>
+                </div>
+                {b.ortancaBirimFiyat && (
+                  <div>
+                    <dt class="etiket">Arsada m²</dt>
+                    <dd class="font-veri">{b.ortancaBirimFiyat.toLocaleString('tr-TR')} ₺</dd>
+                  </div>
+                )}
+              </dl>
+
+              <span class="bolge-git">
+                Bölgeyi incele
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                  <path d="M3 8h10M9 4l4 4-4 4" />
+                </svg>
+              </span>
+            </a>
+          ))
+        }
+      </div>
+
+      <p class="mt-10 max-w-[62ch] text-sm leading-relaxed text-kursun">
+        Not: Buradaki fiyatlar {KURUM.ad} portföyündeki güncel <strong>istek fiyatlarıdır</strong>;
+        gerçekleşmiş satış fiyatı değildir. Bölgenizde gerçekleşmiş satışlara dayalı bir
+        değerlendirme için <a href="/degerleme" class="alt-cizgi text-metin-2">ücretsiz değerleme</a>
+        talebinde bulunabilirsiniz.
+      </p>
+    </div>
+  </section>
+</Temel>
+
+<style>
+  .bolge-kart {
+    display: block;
+    background: #fff;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-radius: var(--radius-kart);
+    padding: clamp(1.4rem, 3vw, 2rem);
+    transition: box-shadow 0.5s var(--ease-yumusak), transform 0.5s var(--ease-yumusak),
+      border-color 0.5s var(--ease-yumusak);
+  }
+  .bolge-kart:hover {
+    box-shadow: var(--shadow-kalkik);
+    transform: translateY(-3px);
+    border-color: color-mix(in oklab, var(--color-murekkep) 16%, transparent);
+  }
+
+  .bolge-adet {
+    font-family: var(--font-baslik);
+    font-size: 2.25rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: color-mix(in oklab, var(--color-murekkep) 28%, transparent);
+    font-variant-numeric: tabular-nums;
+    transition: color 0.4s var(--ease-yumusak);
+  }
+  .bolge-kart:hover .bolge-adet {
+    color: var(--color-kirmizi);
+  }
+
+  .bolge-veri {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(8rem, 45%), 1fr));
+    gap: 1rem 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+  }
+  .bolge-veri dd {
+    margin-top: 0.3rem;
+    font-size: 1rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bolge-git {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 1.35rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-kirmizi);
+  }
+  .bolge-git svg {
+    width: 0.85rem;
+    height: 0.85rem;
+    transition: transform 0.4s var(--ease-yumusak);
+  }
+  .bolge-kart:hover .bolge-git svg {
+    transform: translateX(3px);
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

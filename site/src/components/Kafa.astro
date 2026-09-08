@@ -1,0 +1,247 @@
+---
+import { KURUM, ILETISIM, MENU } from '../lib/site';
+
+interface Props {
+  /** Sayfa koyu bir kahramanla açılıyorsa çubuk şeffaf başlar. */
+  koyuUst?: boolean;
+}
+const { koyuUst = false } = Astro.props;
+const suAn = Astro.url.pathname;
+const aktifMi = (yol: string) => suAn === yol || suAn.startsWith(`${yol}/`);
+---
+
+<header
+  data-kafa
+  data-koyu={koyuUst ? 'evet' : 'hayir'}
+  data-katmanli="hayir"
+  class="fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,border-color] duration-500"
+>
+  <div class="kab">
+    <div class="flex h-[4.5rem] items-center justify-between gap-6 lg:h-20">
+      <a href="/" class="shrink-0" aria-label={`${KURUM.ad} — ana sayfa`}>
+        <img
+          class="logo-koyu h-8 w-auto lg:h-9"
+          src="/marka/logo-yatay.png"
+          alt={KURUM.ad}
+          width="1000"
+          height="274"
+        />
+        <img
+          class="logo-acik h-8 w-auto lg:h-9"
+          src="/marka/logo-yatay-acik.png"
+          alt={KURUM.ad}
+          width="1000"
+          height="274"
+        />
+      </a>
+
+      <nav class="hidden items-center gap-8 lg:flex" aria-label="Ana menü">
+        {
+          MENU.map((oge) => (
+            <a
+              href={oge.yol}
+              aria-current={aktifMi(oge.yol) ? 'page' : undefined}
+              class="menu-bag text-[0.9375rem] font-medium transition-colors duration-300"
+            >
+              <span class="alt-cizgi">{oge.ad}</span>
+            </a>
+          ))
+        }
+      </nav>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a
+          href={`tel:${ILETISIM.telefonHam}`}
+          class="menu-bag hidden items-center gap-2 font-veri text-sm tracking-tight sm:inline-flex"
+        >
+          <svg
+            class="h-3.5 w-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path
+              d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"
+            ></path>
+          </svg>
+          {ILETISIM.telefon}
+        </a>
+
+        <a href="/degerleme" class="dugme dugme--kirmizi hidden !px-5 !py-2.5 text-[0.8125rem] md:inline-flex">
+          Ücretsiz değerleme
+        </a>
+
+        <button
+          type="button"
+          data-menu-dugme
+          aria-expanded="false"
+          aria-controls="mobil-menu"
+          class="menu-bag -mr-2 inline-flex h-11 w-11 items-center justify-center lg:hidden"
+        >
+          <span class="sr-only">Menüyü aç</span>
+          <span class="menu-ikon" aria-hidden="true">
+            <span></span>
+            <span></span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="kafa-cizgi"></div>
+</header>
+
+<!-- Mobil menü -->
+<div
+  id="mobil-menu"
+  data-menu-panel
+  data-acik="hayir"
+  class="fixed inset-0 z-40 bg-murekkep text-kagit lg:hidden"
+>
+  <div class="kab flex h-full flex-col pt-24 pb-10">
+    <nav class="flex flex-col" aria-label="Mobil menü">
+      {
+        MENU.map((oge, i) => (
+          <a
+            href={oge.yol}
+            style={`--sira:${i}`}
+            class="menu-satir border-t border-kagit/12 py-5 font-baslik text-[2rem] leading-none last:border-b"
+          >
+            {oge.ad}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="mt-auto flex flex-col gap-4 pt-10">
+      <a href="/degerleme" class="dugme dugme--kirmizi w-full">Ücretsiz değerleme al</a>
+      <a href={`tel:${ILETISIM.telefonHam}`} class="dugme dugme--hayalet-acik w-full">
+        {ILETISIM.telefon}
+      </a>
+      <p class="etiket etiket--acik pt-2">{ILETISIM.adres.tam}</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* --- Çubuk zemini ------------------------------------------------ */
+  /* Koyu kahraman üstünde: şeffaf başla, açık logo ve açık menü.
+     Kaydırınca: kağıt zemin, koyu logo. */
+  [data-kafa] {
+    background-color: transparent;
+    border-bottom: 1px solid transparent;
+  }
+
+  [data-kafa][data-koyu='hayir'] {
+    background-color: color-mix(in oklab, var(--color-kagit) 88%, transparent);
+    backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom-color: color-mix(in oklab, var(--color-murekkep) 9%, transparent);
+  }
+
+  [data-kafa][data-katmanli='evet'] {
+    background-color: color-mix(in oklab, var(--color-kagit) 90%, transparent);
+    backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom-color: color-mix(in oklab, var(--color-murekkep) 9%, transparent);
+    box-shadow: 0 1px 24px -12px rgb(18 19 22 / 0.3);
+  }
+
+  /* --- Logo varyantı ---------------------------------------------- */
+  .logo-acik {
+    display: none;
+  }
+  [data-kafa][data-koyu='evet'][data-katmanli='hayir'] .logo-koyu {
+    display: none;
+  }
+  [data-kafa][data-koyu='evet'][data-katmanli='hayir'] .logo-acik {
+    display: block;
+  }
+
+  /* --- Menü bağlantı rengi ---------------------------------------- */
+  .menu-bag {
+    color: var(--color-murekkep);
+  }
+  [data-kafa][data-koyu='evet'][data-katmanli='hayir'] .menu-bag {
+    color: var(--color-kagit);
+  }
+  .menu-bag[aria-current='page'] {
+    color: var(--color-kirmizi);
+  }
+
+  /* Kaydırma çizgisi: sayfanın ne kadarının okunduğunu gösterir */
+  .kafa-cizgi {
+    height: 2px;
+    background: var(--color-kirmizi);
+    transform-origin: 0 50%;
+    transform: scaleX(var(--ilerleme, 0));
+    transition: transform 0.1s linear;
+  }
+
+  /* --- Hamburger --------------------------------------------------- */
+  .menu-ikon {
+    position: relative;
+    display: block;
+    width: 22px;
+    height: 12px;
+  }
+  .menu-ikon span {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 0.45s var(--ease-yumusak), opacity 0.3s;
+  }
+  .menu-ikon span:first-child {
+    top: 0;
+  }
+  .menu-ikon span:last-child {
+    bottom: 0;
+  }
+  [aria-expanded='true'] .menu-ikon span:first-child {
+    transform: translateY(5.25px) rotate(45deg);
+  }
+  [aria-expanded='true'] .menu-ikon span:last-child {
+    transform: translateY(-5.25px) rotate(-45deg);
+  }
+
+  /* --- Mobil panel ------------------------------------------------- */
+  [data-menu-panel] {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.4s var(--ease-yumusak), transform 0.5s var(--ease-yumusak),
+      visibility 0.4s;
+  }
+  [data-menu-panel][data-acik='evet'] {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+  .menu-satir {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.5s var(--ease-yumusak), transform 0.6s var(--ease-yumusak);
+    transition-delay: calc(0.06s * var(--sira) + 0.08s);
+  }
+  [data-menu-panel][data-acik='evet'] .menu-satir {
+    opacity: 1;
+    transform: none;
+  }
+</style>
+
+<script>
+  // Okuma ilerlemesi çizgisi
+  const cizgi = document.querySelector<HTMLElement>('.kafa-cizgi');
+  if (cizgi) {
+    const guncelle = () => {
+      const yukseklik = document.documentElement.scrollHeight - window.innerHeight;
+      const oran = yukseklik > 0 ? window.scrollY / yukseklik : 0;
+      cizgi.style.setProperty('--ilerleme', String(Math.min(1, Math.max(0, oran))));
+    };
+    guncelle();
+    window.addEventListener('scroll', guncelle, { passive: true });
+    window.addEventListener('resize', guncelle);
+  }
+</script>

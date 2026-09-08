@@ -1,0 +1,170 @@
+---
+import type { Ilan } from '../lib/ilanlar';
+import { fiyatKisa } from '../lib/ilanlar';
+
+interface Props {
+  ilan: Ilan;
+  /** İlk ekranda görünen kartlarda görsel hemen yüklenir. */
+  oncelikli?: boolean;
+  /** Geniş kart: iki sütun kaplar, görsel daha yatay. */
+  genis?: boolean;
+}
+
+const { ilan, oncelikli = false, genis = false } = Astro.props;
+const durumEtiketi = ilan.islem === 'satilik' ? 'Satılık' : 'Kiralık';
+---
+
+<article
+  class:list={['grup-kart ilan-kart', genis && 'ilan-kart--genis']}
+  data-ilan
+  data-islem={ilan.islem}
+  data-tip-grup={ilan.tipGrup}
+  data-tip={ilan.tip}
+  data-ilce={ilan.ilce ?? ''}
+  data-il={ilan.il ?? ''}
+  data-fiyat={ilan.fiyat ?? 0}
+  data-m2={ilan.m2 ?? 0}
+  data-oda={ilan.oda ?? ''}
+  data-tarih={Date.parse(ilan.guncellenme ?? ilan.ilkGorulme) || 0}
+  data-ara={`${ilan.baslikTemiz} ${ilan.konum} ${ilan.kategori} ${ilan.mahalle ?? ''}`.toLocaleLowerCase('tr')}
+>
+  <a href={ilan.yol} class="flex h-full flex-col">
+    <div class:list={['goruntu-kutu ilan-gorsel', genis && 'ilan-gorsel--genis']}>
+      {
+        ilan.kapak ? (
+          <img
+            src={ilan.kapak}
+            alt={ilan.baslikTemiz}
+            loading={oncelikli ? 'eager' : 'lazy'}
+            decoding="async"
+            fetchpriority={oncelikli ? 'high' : 'auto'}
+          />
+        ) : (
+          <div class="grid h-full place-items-center">
+            <span class="etiket">Görsel yok</span>
+          </div>
+        )
+      }
+
+      <div class="ilan-rozetler">
+        <span class:list={['rozet', ilan.islem === 'satilik' ? 'rozet--kirmizi' : 'rozet--murekkep']}>
+          {durumEtiketi}
+        </span>
+        {ilan.yeniMi && <span class="rozet rozet--yeni">Yeni</span>}
+      </div>
+
+      {
+        ilan.gorseller.length > 1 && (
+          <span class="ilan-foto-sayisi font-veri">{ilan.gorseller.length} fotoğraf</span>
+        )
+      }
+    </div>
+
+    <div class="flex flex-1 flex-col p-5">
+      <p class="etiket">{ilan.kategori} · {ilan.konumKisa}</p>
+
+      <h3 class="baslik-kucuk mt-2.5 line-clamp-2">{ilan.baslikTemiz}</h3>
+
+      {ilan.mahalle && <p class="mt-1.5 text-sm text-metin-2">{ilan.mahalle}</p>}
+
+      <div class="mt-auto pt-5">
+        <div class="cizgi"></div>
+        <div class="flex items-end justify-between gap-4 pt-3.5">
+          <ul class="flex flex-wrap items-center gap-x-3 gap-y-1 font-veri text-[0.75rem] text-metin-2">
+            {ilan.etiketler.map((e) => <li>{e}</li>)}
+          </ul>
+          <p class="ilan-fiyat">
+            {fiyatKisa(ilan.fiyat)}
+            {ilan.islem === 'kiralik' && <span class="ilan-fiyat-ek">/ay</span>}
+          </p>
+        </div>
+      </div>
+    </div>
+  </a>
+</article>
+
+<style>
+  .ilan-kart {
+    background: #fff;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 9%, transparent);
+    border-radius: var(--radius-kart);
+    overflow: hidden;
+    transition: border-color 0.5s var(--ease-yumusak), box-shadow 0.6s var(--ease-yumusak),
+      transform 0.6s var(--ease-yumusak);
+  }
+  .ilan-kart:hover {
+    border-color: color-mix(in oklab, var(--color-murekkep) 16%, transparent);
+    box-shadow: var(--shadow-kalkik);
+    transform: translateY(-3px);
+  }
+
+  .ilan-gorsel {
+    aspect-ratio: 4 / 3;
+  }
+  .ilan-gorsel--genis {
+    aspect-ratio: 16 / 10;
+  }
+  @media (min-width: 900px) {
+    .ilan-kart--genis {
+      grid-column: span 2;
+    }
+    .ilan-kart--genis .ilan-gorsel--genis {
+      aspect-ratio: 21 / 10;
+    }
+  }
+
+  .ilan-rozetler {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .rozet--yeni {
+    background: color-mix(in oklab, var(--color-kagit) 92%, transparent);
+    color: var(--color-murekkep);
+    backdrop-filter: blur(8px);
+  }
+
+  .ilan-foto-sayisi {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    color: var(--color-kagit);
+    background: color-mix(in oklab, var(--color-murekkep) 62%, transparent);
+    backdrop-filter: blur(6px);
+    padding: 0.28rem 0.5rem;
+    border-radius: 2px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.45s var(--ease-yumusak), transform 0.45s var(--ease-yumusak);
+  }
+  .grup-kart:hover .ilan-foto-sayisi {
+    opacity: 1;
+    transform: none;
+  }
+
+  .ilan-fiyat {
+    font-family: var(--font-veri);
+    font-size: 1.0625rem;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .ilan-fiyat-ek {
+    font-size: 0.6875rem;
+    color: var(--color-kursun);
+    margin-left: 0.15rem;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

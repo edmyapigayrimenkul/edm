@@ -1,0 +1,469 @@
+@import 'tailwindcss';
+
+/* ===============================================================
+   EDM Yapı & Gayrimenkul — site tasarım sistemi
+   Kaynak: kurumsal-kimlik/kurumsal-kimlik.html (Marka Kılavuzu 1.0)
+   Buradaki her renk ve yazı tipi o belgede tanımlıdır; serbestçe
+   değiştirilmez — önce kılavuz güncellenir.
+   =============================================================== */
+
+/* --------------------------------------------------------------
+   Yazı tipleri — yalnızca latin + latin-ext (Türkçe ğ ş ı İ için şart)
+   -------------------------------------------------------------- */
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/fraunces-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/fraunces-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Plex Sans';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 700;
+  src: url('/fonts/ibm-plex-sans-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Plex Sans';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 700;
+  src: url('/fonts/ibm-plex-sans-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Plex Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('/fonts/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Plex Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('/fonts/ibm-plex-mono-latin-ext-400-normal.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* --------------------------------------------------------------
+   Marka belirteçleri
+   -------------------------------------------------------------- */
+@theme {
+  /* Kılavuz 03 — Renk */
+  --color-kirmizi: #f0000d;
+  --color-kirmizi-derin: #c4030f;
+  --color-murekkep: #121316;
+  --color-kagit: #f4f4f3;
+  --color-kirec: #e4e4e1;
+  --color-kursun: #8a8b8f;
+
+  /* Siteye özgü ara tonlar — kılavuzun altı renginden türetildi */
+  --color-murekkep-2: #1a1c21;
+  --color-murekkep-3: #24272d;
+  --color-murekkep-4: #33373f;
+  --color-kagit-2: #ececeb;
+  --color-metin-2: #56575c;
+
+  /* Kılavuz 04 — Tipografi */
+  --font-baslik: 'Fraunces', 'Times New Roman', Georgia, serif;
+  --font-govde: 'Plex Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-veri: 'Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --radius-kart: 3px;
+  --radius-yumusak: 10px;
+
+  /* Yumuşak, katmanlı gölgeler */
+  --shadow-kagit: 0 1px 2px rgb(18 19 22 / 0.05), 0 3px 10px rgb(18 19 22 / 0.04);
+  --shadow-kalkik: 0 2px 4px rgb(18 19 22 / 0.04), 0 14px 32px rgb(18 19 22 / 0.09),
+    0 36px 68px rgb(18 19 22 / 0.06);
+  --shadow-uzak: 0 40px 80px -24px rgb(18 19 22 / 0.3);
+
+  --ease-yumusak: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-cikis: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* --------------------------------------------------------------
+   Temel
+   -------------------------------------------------------------- */
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Lenis devredeyken tarayıcının kendi yumuşak kaydırması çakışır */
+  html.lenis {
+    scroll-behavior: auto;
+  }
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  body {
+    background-color: var(--color-kagit);
+    color: var(--color-murekkep);
+    font-family: var(--font-govde);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: var(--color-kirmizi);
+    color: #fff;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-baslik);
+    font-weight: 600;
+    letter-spacing: -0.022em;
+    line-height: 1;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-kirmizi);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  img {
+    -webkit-user-drag: none;
+  }
+
+  /* Rakamlar her yerde hizalı */
+  .veri,
+  time,
+  th,
+  td {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* --------------------------------------------------------------
+   Bileşenler
+   -------------------------------------------------------------- */
+@layer components {
+  .kab {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+    max-width: 90rem;
+  }
+  @media (min-width: 768px) {
+    .kab {
+      padding-inline: 2.5rem;
+    }
+  }
+  @media (min-width: 1280px) {
+    .kab {
+      padding-inline: 4rem;
+    }
+  }
+
+  /* Mono etiket — kılavuzdaki teknik çizim yazısı */
+  .etiket {
+    font-family: var(--font-veri);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-kursun);
+  }
+  .etiket--kirmizi {
+    color: var(--color-kirmizi);
+  }
+  .etiket--acik {
+    color: color-mix(in oklab, var(--color-kagit) 62%, transparent);
+  }
+
+  /* Kılavuz 04 — ölçek */
+  .baslik-dev {
+    font-size: clamp(2.75rem, 8.5vw, 7.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.035em;
+  }
+  .baslik-buyuk {
+    font-size: clamp(2.1rem, 5vw, 4rem);
+    line-height: 1;
+    letter-spacing: -0.028em;
+  }
+  .baslik-orta {
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+    line-height: 1.08;
+  }
+  .baslik-kucuk {
+    font-family: var(--font-govde);
+    font-weight: 600;
+    font-size: 1.0625rem;
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+  }
+
+  /* Düğmeler — alttan dolan perde */
+  .dugme {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    padding: 0.9rem 1.6rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1;
+    overflow: hidden;
+    isolation: isolate;
+    white-space: nowrap;
+    transition: transform 0.5s var(--ease-yumusak), box-shadow 0.5s var(--ease-yumusak),
+      color 0.35s var(--ease-yumusak), border-color 0.35s var(--ease-yumusak);
+  }
+  .dugme:active {
+    transform: scale(0.975);
+  }
+  .dugme::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    transform: translateY(101%);
+    transition: transform 0.55s var(--ease-yumusak);
+  }
+  .dugme:hover::after {
+    transform: translateY(0);
+  }
+
+  .dugme--kirmizi {
+    background: var(--color-kirmizi);
+    color: #fff;
+  }
+  .dugme--kirmizi::after {
+    background: var(--color-kirmizi-derin);
+  }
+
+  .dugme--murekkep {
+    background: var(--color-murekkep);
+    color: var(--color-kagit);
+  }
+  .dugme--murekkep::after {
+    background: var(--color-kirmizi);
+  }
+
+  .dugme--hayalet {
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 20%, transparent);
+    color: var(--color-murekkep);
+  }
+  .dugme--hayalet::after {
+    background: var(--color-murekkep);
+  }
+  .dugme--hayalet:hover {
+    color: var(--color-kagit);
+    border-color: transparent;
+  }
+
+  .dugme--hayalet-acik {
+    border: 1px solid color-mix(in oklab, var(--color-kagit) 30%, transparent);
+    color: var(--color-kagit);
+  }
+  .dugme--hayalet-acik::after {
+    background: var(--color-kagit);
+  }
+  .dugme--hayalet-acik:hover {
+    color: var(--color-murekkep);
+    border-color: transparent;
+  }
+
+  /* Saç teli çizgi — kılavuzun pafta dili */
+  .cizgi {
+    height: 1px;
+    background: color-mix(in oklab, var(--color-murekkep) 12%, transparent);
+  }
+  .cizgi--acik {
+    background: color-mix(in oklab, var(--color-kagit) 16%, transparent);
+  }
+
+  /* Soldan açılan alt çizgi */
+  .alt-cizgi {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-repeat: no-repeat;
+    background-position: left 100%;
+    transition: background-size 0.45s var(--ease-yumusak);
+  }
+  .alt-cizgi:hover,
+  a:hover > .alt-cizgi {
+    background-size: 100% 1px;
+  }
+
+  /* Durum rozeti: SATILIK / KİRALIK / SATILDI */
+  .rozet {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-veri);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.34rem 0.6rem;
+    border-radius: 2px;
+    line-height: 1;
+  }
+  .rozet--kirmizi {
+    background: var(--color-kirmizi);
+    color: #fff;
+  }
+  .rozet--murekkep {
+    background: var(--color-murekkep);
+    color: var(--color-kagit);
+  }
+  .rozet--cizgili {
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 22%, transparent);
+    color: var(--color-metin-2);
+  }
+}
+
+/* --------------------------------------------------------------
+   Hareket
+   -------------------------------------------------------------- */
+@layer utilities {
+  /* Beliren öğeler yalnızca JS varken gizlenir; JS yoksa içerik durur */
+  .js-var [data-belir] {
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  .satir-maske {
+    overflow: hidden;
+    display: block;
+  }
+
+  /* Görsel kutusu — üzerine gelince yavaş yakınlaşma */
+  .goruntu-kutu {
+    overflow: hidden;
+    position: relative;
+    background: var(--color-kirec);
+  }
+  .goruntu-kutu img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s var(--ease-yumusak);
+  }
+  .grup-kart:hover .goruntu-kutu img {
+    transform: scale(1.055);
+  }
+
+  /* Fotoğraf üstü perde — kılavuz 06, "fotoğraf üstü metin" kuralı */
+  .perde::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to top,
+      rgb(18 19 22 / 0.92) 0%,
+      rgb(18 19 22 / 0.55) 32%,
+      rgb(18 19 22 / 0) 68%
+    );
+  }
+
+  @keyframes serit {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+  .serit-akis {
+    display: flex;
+    width: max-content;
+    animation: serit var(--sure, 45s) linear infinite;
+  }
+  .serit-durakla:hover .serit-akis {
+    animation-play-state: paused;
+  }
+
+  @keyframes nabiz {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.4;
+      transform: scale(0.78);
+    }
+  }
+  .nabiz {
+    animation: nabiz 2.4s var(--ease-yumusak) infinite;
+  }
+
+  @keyframes agir-zoom {
+    from {
+      transform: scale(1.03);
+    }
+    to {
+      transform: scale(1.13);
+    }
+  }
+  .agir-zoom {
+    animation: agir-zoom 20s var(--ease-yumusak) forwards;
+  }
+}
+
+/* --------------------------------------------------------------
+   Hareket azaltma tercihi
+   -------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .js-var [data-belir] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

@@ -1,0 +1,216 @@
+---
+import Temel from '../../layouts/Temel.astro';
+import IlanKart from '../../components/IlanKart.astro';
+import { bolgeler, bolgeBul } from '../../lib/bolgeler';
+import { KURUM } from '../../lib/site';
+
+const { slug } = Astro.params;
+const bolge = slug ? await bolgeBul(slug) : undefined;
+if (!bolge) return Astro.rewrite('/404');
+
+const TUM_BOLGELER = await bolgeler();
+
+const tl = (n: number | null) => (n === null ? '—' : `${n.toLocaleString('tr-TR')} ₺`);
+const donum = bolge.toplamAlan / 1000;
+
+const olcuIsimleri = [
+  { etiket: 'Aktif ilan', deger: String(bolge.adet) },
+  { etiket: 'Satılık', deger: String(bolge.satilik) },
+  ...(bolge.kiralik > 0 ? [{ etiket: 'Kiralık', deger: String(bolge.kiralik) }] : []),
+  { etiket: 'Konut', deger: String(bolge.konut) },
+  { etiket: 'Arsa & tarla', deger: String(bolge.arsa) },
+  {
+    etiket: 'Toplam alan',
+    deger: donum >= 1 ? `${donum.toLocaleString('tr-TR', { maximumFractionDigits: 1 })} dönüm` : `${bolge.toplamAlan} m²`,
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Place',
+  name: bolge.ad,
+  address: { '@type': 'PostalAddress', addressLocality: bolge.ad, addressRegion: bolge.il, addressCountry: 'TR' },
+  description: bolge.giris ?? `${bolge.ad} bölgesindeki ${bolge.adet} ilan.`,
+};
+---
+
+<Temel
+  baslik={`${bolge.ad} Emlak Rehberi`}
+  aciklama={`${bolge.ad}’de ${bolge.adet} aktif ilan. ${bolge.konut} konut, ${bolge.arsa} arsa ve tarla. Fiyat aralığı ${tl(bolge.enDusuk)} — ${tl(bolge.enYuksek)}. ${KURUM.ad} portföyünden güncel veriler.`}
+  jsonLd={jsonLd}
+>
+  <section class="pt-28 lg:pt-36">
+    <div class="kab">
+      <nav aria-label="Sayfa yolu" class="pb-6">
+        <ol class="flex flex-wrap items-center gap-2 text-[0.8125rem] text-kursun">
+          <li><a href="/" class="hover:text-murekkep">Ana Sayfa</a></li>
+          <li aria-hidden="true">/</li>
+          <li><a href="/rehber" class="hover:text-murekkep">Bölge Rehberi</a></li>
+        </ol>
+      </nav>
+
+      <p class="etiket">{bolge.il}</p>
+      <h1 class="baslik-buyuk mt-3 max-w-[16ch]">{bolge.ad}</h1>
+
+      {
+        bolge.giris && (
+          <p class="mt-6 max-w-[62ch] text-[1.0625rem] leading-relaxed text-metin-2">
+            {bolge.giris}
+          </p>
+        )
+      }
+
+      <!-- Ölçüler -->
+      <dl class="olcu-serit mt-10">
+        {
+          olcuIsimleri.map((o) => (
+            <div>
+              <dt class="etiket">{o.etiket}</dt>
+              <dd class="olcu-deger font-veri">{o.deger}</dd>
+            </div>
+          ))
+        }
+      </dl>
+
+      <!-- Fiyat okuması -->
+      <div class="mt-6 grid gap-5 lg:grid-cols-[1.15fr_1fr]">
+        <div class="fiyat-kutu">
+          <p class="etiket">Portföyümüzdeki fiyat aralığı</p>
+          <p class="fiyat-satir font-veri">
+            {bolge.enDusuk === bolge.enYuksek
+              ? tl(bolge.enDusuk)
+              : `${tl(bolge.enDusuk)} — ${tl(bolge.enYuksek)}`}
+          </p>
+          {
+            bolge.ortancaBirimFiyat && (
+              <p class="mt-4 border-t border-murekkep/10 pt-4 text-sm text-metin-2">
+                Arsa ve tarlada metrekare başına ortanca fiyat
+                <strong class="ml-1 font-veri text-murekkep">
+                  {bolge.ortancaBirimFiyat.toLocaleString('tr-TR')} ₺
+                </strong>
+              </p>
+            )
+          }
+          <p class="mt-3 text-[0.75rem] leading-relaxed text-kursun">
+            Bunlar istek fiyatlarıdır, gerçekleşmiş satış değil. Gerçek değer için
+            <a href="/degerleme" class="alt-cizgi text-metin-2">ücretsiz değerleme</a> isteyin.
+          </p>
+        </div>
+
+        {
+          bolge.notlar.length > 0 && (
+            <div class="not-kutu">
+              <p class="etiket">Bölge notları</p>
+              <ul class="mt-4 flex flex-col gap-3">
+                {bolge.notlar.map((n) => (
+                  <li class="not-satir">{n}</li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </div>
+
+      <!-- Mahalleler -->
+      {
+        bolge.mahalleler.length > 0 && (
+          <div class="mt-10">
+            <p class="etiket">Portföyümüzün bulunduğu mahalle ve mevkiler</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              {bolge.mahalleler.map((m) => (
+                <span class="rozet rozet--cizgili">{m}</span>
+              ))}
+            </div>
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- İlanlar -->
+  <section class="mt-16 border-t border-murekkep/10 py-14 lg:py-20">
+    <div class="kab">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <h2 class="baslik-orta">
+          {bolge.ad}’deki ilanlarımız
+          <span class="ml-2 font-veri text-base text-kursun">{bolge.adet}</span>
+        </h2>
+        <a href={`/ilanlar?ilce=${encodeURIComponent(bolge.ad.replace(/^.+ Merkez$/, 'Merkez'))}`} class="dugme dugme--hayalet">
+          Filtreleyerek gör
+        </a>
+      </div>
+
+      <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" data-belir="sira">
+        {bolge.ilanlar.map((ilan, i) => <IlanKart ilan={ilan} oncelikli={i < 4} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Diğer bölgeler -->
+  <section class="border-t border-murekkep/10 py-14">
+    <div class="kab">
+      <p class="etiket">Diğer bölgeler</p>
+      <div class="mt-5 flex flex-wrap gap-2.5">
+        {
+          TUM_BOLGELER.filter((b) => b.slug !== bolge.slug).map((b) => (
+            <a href={b.yol} class="dugme dugme--hayalet">
+              {b.ad}
+              <span class="font-veri text-[0.75rem] opacity-55">{b.adet}</span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Temel>
+
+<style>
+  .olcu-serit {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(8.5rem, 45%), 1fr));
+    gap: 1px;
+    background: color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-radius: var(--radius-kart);
+    overflow: hidden;
+  }
+  .olcu-serit > div {
+    background: var(--color-kagit);
+    padding: 1rem 1.15rem 1.1rem;
+  }
+  .olcu-deger {
+    font-size: 1.25rem;
+    margin-top: 0.35rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fiyat-kutu,
+  .not-kutu {
+    background: #fff;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-radius: var(--radius-kart);
+    padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  }
+  .fiyat-satir {
+    font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+    margin-top: 0.6rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .not-satir {
+    display: flex;
+    gap: 0.7rem;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-metin-2);
+  }
+  .not-satir::before {
+    content: '';
+    flex: none;
+    width: 0.3rem;
+    height: 0.3rem;
+    margin-top: 0.62rem;
+    border-radius: 999px;
+    background: var(--color-kirmizi);
+  }
+</style>

@@ -1,0 +1,445 @@
+---
+import Temel from '../../layouts/Temel.astro';
+import Galeri from '../../components/Galeri.astro';
+import IlanKart from '../../components/IlanKart.astro';
+import { ilanBul, benzerIlanlar, fiyatYaz } from '../../lib/ilanlar';
+import { DANISMANLAR, ILETISIM, PORTALLAR, whatsappBaglanti, KURUM } from '../../lib/site';
+
+const { slug } = Astro.params;
+const ilan = slug ? await ilanBul(slug) : undefined;
+
+// İlan portaldan düşmüşse ya da adres hatalıysa 404 sayfasına geç.
+if (!ilan) return Astro.rewrite('/404');
+
+// Başlık düzeldiğinde eski adres yaşamaya devam etmesin: kanonik adrese taşı.
+if (ilan.slug !== slug) return Astro.redirect(ilan.yol, 301);
+
+const benzer = await benzerIlanlar(ilan, 3);
+const danisman = DANISMANLAR.find((d) => d.emlakjetSlug === ilan.danismanSlug);
+
+/** Künyede gösterilmeyecek alanlar — ya başka yerde var ya da anlamsız. */
+const gizliOzellikler = new Set(['İlan Numarası', 'Kategori', 'İlan Güncelleme Tarihi']);
+const ozellikler = Object.entries(ilan.ozellikler)
+  .filter(([ad, deger]) => !gizliOzellikler.has(ad) && deger && deger !== 'Belirtilmemiş')
+  .sort((a, b) => a[0].localeCompare(b[0], 'tr'));
+
+const guncellemeTarihi = ilan.guncellenme
+  ? new Date(ilan.guncellenme).toLocaleDateString('tr-TR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+  : null;
+
+const waMesaj = `Merhaba, ${ilan.kaynakUrl.includes('emlakjet') ? '' : ''}"${ilan.baslikTemiz}" ilanı (No: ${ilan.id}) hakkında bilgi almak istiyorum.`;
+
+/** Kart üstünde gösterilen ana ölçüler. */
+const kunye = [
+  ilan.oda && { etiket: 'Oda', deger: ilan.oda },
+  ilan.m2Metin && { etiket: ilan.tipGrup === 'arsa' ? 'Arsa alanı' : 'Alan', deger: ilan.m2Metin },
+  ilan.birimFiyat && { etiket: 'Birim fiyat', deger: ilan.birimFiyat },
+  { etiket: 'İlan no', deger: ilan.id },
+].filter(Boolean) as Array<{ etiket: string; deger: string }>;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'RealEstateListing',
+  name: ilan.baslikTemiz,
+  description: ilan.aciklama.slice(0, 400),
+  url: new URL(ilan.yol, Astro.site).href,
+  image: ilan.gorseller.slice(0, 8),
+  datePosted: ilan.ilkGorulme,
+  ...(ilan.guncellenme ? { dateModified: ilan.guncellenme } : {}),
+  offers: {
+    '@type': 'Offer',
+    price: ilan.fiyat ?? undefined,
+    priceCurrency: 'TRY',
+    availability: 'https://schema.org/InStock',
+    businessFunction:
+      ilan.islem === 'satilik'
+        ? 'http://purl.org/goodrelations/v1#Sell'
+        : 'http://purl.org/goodrelations/v1#LeaseOut',
+    seller: { '@id': `${KURUM.site}/#kurum` },
+  },
+  ...(ilan.ilce
+    ? {
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: ilan.ilce,
+          addressRegion: ilan.il ?? undefined,
+          addressCountry: 'TR',
+        },
+      }
+    : {}),
+};
+
+const izYolu = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: KURUM.site },
+    { '@type': 'ListItem', position: 2, name: 'İlanlar', item: `${KURUM.site}/ilanlar` },
+    { '@type': 'ListItem', position: 3, name: ilan.baslikTemiz },
+  ],
+};
+---
+
+<Temel
+  baslik={ilan.baslikTemiz}
+  aciklama={`${ilan.kategori} · ${ilan.konum} · ${ilan.fiyatMetin}. ${ilan.ozetMetin}`}
+  gorsel={ilan.kapak ?? undefined}
+  jsonLd={[jsonLd, izYolu]}
+>
+  <div class="pt-24 lg:pt-28">
+    <div class="kab">
+      <!-- İz yolu -->
+      <nav aria-label="Sayfa yolu" class="py-4">
+        <ol class="flex flex-wrap items-center gap-2 text-[0.8125rem] text-kursun">
+          <li><a href="/" class="hover:text-murekkep">Ana Sayfa</a></li>
+          <li aria-hidden="true">/</li>
+          <li><a href="/ilanlar" class="hover:text-murekkep">İlanlar</a></li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <a href={`/ilanlar?ilce=${encodeURIComponent(ilan.ilce ?? '')}`} class="hover:text-murekkep">
+              {ilan.ilce}
+            </a>
+          </li>
+        </ol>
+      </nav>
+
+      <!-- Başlık -->
+      <header class="pb-6">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class:list={['rozet', ilan.islem === 'satilik' ? 'rozet--kirmizi' : 'rozet--murekkep']}>
+            {ilan.islem === 'satilik' ? 'Satılık' : 'Kiralık'}
+          </span>
+          <span class="rozet rozet--cizgili">{ilan.kategori}</span>
+          {ilan.yeniMi && <span class="rozet rozet--cizgili">Yeni eklendi</span>}
+        </div>
+
+        <h1 class="baslik-buyuk mt-5 max-w-[22ch]">{ilan.baslikTemiz}</h1>
+        <p class="mt-3 text-metin-2">{ilan.konum}</p>
+      </header>
+    </div>
+
+    <!-- Galeri -->
+    <div class="kab">
+      <Galeri gorseller={ilan.gorseller} baslik={ilan.baslikTemiz} />
+    </div>
+
+    <!-- Gövde -->
+    <div class="kab">
+      <div class="grid gap-10 py-12 lg:grid-cols-[1fr_22rem] lg:gap-14 lg:py-16">
+        <!-- Sol: içerik -->
+        <div class="min-w-0">
+          <!-- Künye şeridi -->
+          <dl class="kunye-serit">
+            {
+              kunye.map((k) => (
+                <div>
+                  <dt class="etiket">{k.etiket}</dt>
+                  <dd class="kunye-deger">{k.deger}</dd>
+                </div>
+              ))
+            }
+          </dl>
+
+          <!-- Açıklama -->
+          <section class="mt-12">
+            <h2 class="baslik-orta">İlan açıklaması</h2>
+            <div class="aciklama mt-5">
+              {ilan.aciklama.split(/\n{1,}/).map((p) => (p.trim() ? <p>{p.trim()}</p> : null))}
+            </div>
+          </section>
+
+          <!-- Özellikler -->
+          {
+            ozellikler.length > 0 && (
+              <section class="mt-12">
+                <h2 class="baslik-orta">Özellikler</h2>
+                <dl class="ozellik-izgara mt-5">
+                  {ozellikler.map(([ad, deger]) => (
+                    <div class="ozellik-satir">
+                      <dt>{ad}</dt>
+                      <dd>{deger}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+            )
+          }
+
+          <!-- Konum -->
+          <section class="mt-12">
+            <h2 class="baslik-orta">Konum</h2>
+            <p class="mt-4 text-metin-2">
+              {ilan.konum}. Tam adres ve parsel bilgisi için bizimle iletişime geçin —
+              yerinde göstermeyi tercih ediyoruz.
+            </p>
+            <div class="mt-5 flex flex-wrap gap-3">
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                  [ilan.mahalle, ilan.ilce, ilan.il].filter(Boolean).join(' ')
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="dugme dugme--hayalet"
+              >
+                Haritada bölgeyi gör
+              </a>
+              <a
+                href={`/ilanlar?ilce=${encodeURIComponent(ilan.ilce ?? '')}`}
+                class="dugme dugme--hayalet"
+              >
+                {ilan.ilce}’deki diğer ilanlar
+              </a>
+            </div>
+          </section>
+
+          <!-- Kaynak / şeffaflık -->
+          <section class="mt-12 border-t border-murekkep/10 pt-6">
+            <p class="text-[0.8125rem] leading-relaxed text-kursun">
+              {guncellemeTarihi && <>Bu ilan {guncellemeTarihi} tarihinde güncellendi. </>}
+              Aynı ilan
+              <a href={ilan.kaynakUrl} target="_blank" rel="noopener noreferrer" class="alt-cizgi text-metin-2">
+                {PORTALLAR.emlakjet.ad}
+              </a>
+              ve diğer portallarda da yayında. Fiyat ve durum bilgileri portföyümüzden
+              otomatik olarak güncellenir.
+            </p>
+          </section>
+        </div>
+
+        <!-- Sağ: yapışkan iletişim -->
+        <aside class="lg:sticky lg:top-28 lg:self-start">
+          <div class="iletisim-kart">
+            <p class="etiket">{ilan.islem === 'satilik' ? 'Satış fiyatı' : 'Aylık kira'}</p>
+            <p class="fiyat-buyuk">{fiyatYaz(ilan.fiyat)}</p>
+            {
+              ilan.islem === 'kiralik' && (
+                <p class="mt-1 text-sm text-metin-2">aylık</p>
+              )
+            }
+            {
+              ilan.birimFiyat && (
+                <p class="mt-2 font-veri text-[0.8125rem] text-kursun">{ilan.birimFiyat}</p>
+              )
+            }
+
+            <div class="cizgi my-5"></div>
+
+            {
+              danisman && (
+                <a href={`/danismanlar/${danisman.slug}`} class="danisman-satir">
+                  <span class="danisman-rozet" aria-hidden="true">
+                    {danisman.ad
+                      .split(' ')
+                      .map((p) => p[0])
+                      .join('')}
+                  </span>
+                  <span class="min-w-0">
+                    <span class="block truncate font-medium">{danisman.ad}</span>
+                    <span class="block truncate text-[0.8125rem] text-metin-2">
+                      {danisman.unvan}
+                    </span>
+                  </span>
+                </a>
+              )
+            }
+
+            <div class="mt-5 flex flex-col gap-2.5">
+              <a
+                href={whatsappBaglanti(waMesaj)}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="dugme dugme--kirmizi w-full"
+              >
+                WhatsApp’tan sor
+              </a>
+              <a href={`tel:${ILETISIM.telefonHam}`} class="dugme dugme--murekkep w-full">
+                {ILETISIM.telefon}
+              </a>
+              <a href="/iletisim" class="dugme dugme--hayalet w-full">Yerinde görmek istiyorum</a>
+            </div>
+
+            <p class="mt-4 text-center text-[0.75rem] text-kursun">
+              İlan no <span class="font-veri">{ilan.id}</span>
+            </p>
+          </div>
+
+          <div class="portal-kutu">
+            <p class="etiket">Diğer portallarda</p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <a href={ilan.kaynakUrl} target="_blank" rel="noopener noreferrer" class="portal-pil">
+                {PORTALLAR.emlakjet.ad}
+              </a>
+              <a
+                href={PORTALLAR.hepsiemlak.ofis}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="portal-pil"
+              >
+                {PORTALLAR.hepsiemlak.ad}
+              </a>
+              <a
+                href={PORTALLAR.sahibinden.ofis}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="portal-pil"
+              >
+                {PORTALLAR.sahibinden.ad}
+              </a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- Benzer ilanlar -->
+    {
+      benzer.length > 0 && (
+        <section class="border-t border-murekkep/10 py-16 lg:py-20">
+          <div class="kab">
+            <div class="flex flex-wrap items-end justify-between gap-6">
+              <h2 class="baslik-orta">Bunlar da ilginizi çekebilir</h2>
+              <a href="/ilanlar" class="dugme dugme--hayalet">Tüm ilanlar</a>
+            </div>
+            <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-belir="sira">
+              {benzer.map((b) => (
+                <IlanKart ilan={b} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+  </div>
+</Temel>
+
+<style>
+  .kunye-serit {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    gap: 1px;
+    background: color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-radius: var(--radius-kart);
+    overflow: hidden;
+  }
+  .kunye-serit > div {
+    background: var(--color-kagit);
+    padding: 1rem 1.15rem 1.1rem;
+  }
+  .kunye-deger {
+    font-family: var(--font-veri);
+    font-size: 1.0625rem;
+    margin-top: 0.4rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .aciklama {
+    max-width: 68ch;
+  }
+  .aciklama p {
+    line-height: 1.75;
+    color: var(--color-metin-2);
+  }
+  .aciklama p + p {
+    margin-top: 1rem;
+  }
+
+  .ozellik-izgara {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr));
+    gap: 0 2.5rem;
+  }
+  .ozellik-satir {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.85rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+  }
+  .ozellik-satir dt {
+    font-size: 0.875rem;
+    color: var(--color-kursun);
+  }
+  .ozellik-satir dd {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-align: right;
+  }
+
+  /* --- Yapışkan kart --- */
+  .iletisim-kart {
+    background: #fff;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-radius: var(--radius-kart);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-kagit);
+  }
+  .fiyat-buyuk {
+    font-family: var(--font-baslik);
+    font-weight: 600;
+    font-size: clamp(1.85rem, 3.2vw, 2.35rem);
+    line-height: 1;
+    letter-spacing: -0.028em;
+    margin-top: 0.6rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .danisman-satir {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.65rem;
+    margin-inline: -0.65rem;
+    border-radius: 6px;
+    transition: background-color 0.35s var(--ease-yumusak);
+  }
+  .danisman-satir:hover {
+    background: var(--color-kagit-2);
+  }
+  .danisman-rozet {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex: none;
+    border-radius: 999px;
+    background: var(--color-kirec);
+    font-family: var(--font-baslik);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-metin-2);
+  }
+
+  .portal-kutu {
+    margin-top: 0.75rem;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-radius: var(--radius-kart);
+    padding: 1.15rem 1.5rem 1.35rem;
+  }
+  .portal-pil {
+    display: inline-flex;
+    align-items: center;
+    height: 1.95rem;
+    padding-inline: 0.7rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 12%, transparent);
+    font-size: 0.75rem;
+    color: var(--color-metin-2);
+    transition: border-color 0.3s var(--ease-yumusak), color 0.3s var(--ease-yumusak);
+  }
+  .portal-pil:hover {
+    border-color: var(--color-murekkep);
+    color: var(--color-murekkep);
+  }
+
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+</style>

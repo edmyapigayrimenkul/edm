@@ -1,0 +1,308 @@
+---
+import Temel from '../layouts/Temel.astro';
+import { KURUM, ILETISIM, HIZMETLER, DANISMANLAR } from '../lib/site';
+import { portfoy } from '../lib/ilanlar';
+
+const { sayimlar: SAYIMLAR, filtreler: FILTRELER } = await portfoy();
+
+const yil = new Date().getFullYear() - KURUM.kurulus;
+const donum = Math.round(SAYIMLAR.toplamAlan / 1000);
+
+const ilkeler = [
+  {
+    baslik: 'Rakamı söyleriz',
+    metin:
+      'Fiyat, metrekare, imar durumu ve tapu durumu ilanda açıkça yazar. “Fiyat için arayınız” diye bir şeyimiz yok — telefonu, bilgiyi saklamak için değil, soruyu cevaplamak için açarız.',
+  },
+  {
+    baslik: 'Toprağı biliriz',
+    metin: `Portföyümüzün yarısı arsa ve tarla — toplam ${donum.toLocaleString('tr-TR')} dönüm. Kadastral yol, gabari, KAKS ve imar planı okumak bizim için ek hizmet değil, işin kendisi.`,
+  },
+  {
+    baslik: 'Aynı kişiyle devam edersiniz',
+    metin:
+      'İlanı yayınlayan, mülkü size gezdiren ve tapuda yanınızda duran kişi aynı kişidir. Küçük bir ekibiz ve bunu bilerek koruyoruz.',
+  },
+  {
+    baslik: 'İş bitince de buradayız',
+    metin:
+      'Tapu devrinden sonra iskân, abonelik, vergi ve kiraya verme süreçlerinde de arayabilirsiniz. Sloganımız “Yatırım Ortağınız” — ortaklık satışta bitmez.',
+  },
+];
+
+const iller = FILTRELER.il;
+---
+
+<Temel
+  baslik="Hakkımızda"
+  aciklama={`${KURUM.ad} — ${KURUM.kurulus}'dan beri Silivri'de. Konut, arsa ve tarla portföyüyle İstanbul, Edirne ve Tekirdağ'da hizmet veren yerel emlak ofisi.`}
+>
+  <!-- Giriş -->
+  <section class="pt-28 pb-16 lg:pt-36 lg:pb-20">
+    <div class="kab">
+      <p class="etiket" data-belir>Hakkımızda</p>
+      <h1 class="baslik-buyuk mt-4 max-w-[16ch]" data-belir data-gecikme="0.05">
+        Silivri’de {yil} yıldır aynı masadayız
+      </h1>
+      <div class="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-16">
+        <p class="text-[1.0625rem] leading-relaxed text-metin-2" data-belir data-gecikme="0.1">
+          EDM Yapı & Gayrimenkul {KURUM.kurulus} yılında Silivri’de kuruldu. Kuruluşundan
+          bu yana aynı ilçede, aynı adreste çalışıyoruz. Bu tercih; “bölgeyi biliyoruz”
+          cümlesini bir reklam sözü olmaktan çıkarıp ölçülebilir bir şeye çeviriyor.
+        </p>
+        <p class="text-[1.0625rem] leading-relaxed text-metin-2" data-belir data-gecikme="0.16">
+          Portföyümüz iki ayak üzerinde duruyor: Silivri ve sahil bandındaki konutlar,
+          bir de Trakya’nın içlerine — Edirne Meriç’e, Lalapaşa’ya, Tekirdağ Malkara’ya —
+          uzanan arsa ve tarlalar. Bu ikisini bir arada yürütmek, hem oturacak ev arayanla
+          hem uzun vadeli yatırımcıyla aynı dili konuşabilmek demek.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rakamlar -->
+  <section class="rakam-blok">
+    <div class="kab">
+      <dl class="grid grid-cols-2 gap-px bg-murekkep/10 lg:grid-cols-4">
+        {
+          [
+            { s: SAYIMLAR.toplam, e: 'aktif ilan' },
+            { s: SAYIMLAR.arsa, e: 'arsa & tarla' },
+            { s: donum, e: 'dönüm arazi' },
+            { s: yil, e: 'yıllık deneyim' },
+          ].map((r) => (
+            <div class="rakam-hucre">
+              <dd class="rakam">
+                <span data-sayac={r.s}>{r.s.toLocaleString('tr-TR')}</span>
+              </dd>
+              <dt class="mt-2 text-sm text-metin-2">{r.e}</dt>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <!-- İlkeler -->
+  <section class="py-20 lg:py-28">
+    <div class="kab">
+      <div class="max-w-[54ch]">
+        <p class="etiket" data-belir>Nasıl çalışıyoruz</p>
+        <h2 class="baslik-buyuk mt-4" data-belir data-gecikme="0.06">Dört basit kural</h2>
+      </div>
+
+      <div class="mt-12 grid gap-x-12 gap-y-2 lg:grid-cols-2" data-belir="sira">
+        {
+          ilkeler.map((i, n) => (
+            <div class="ilke-satir">
+              <span class="ilke-no font-veri">{String(n + 1).padStart(2, '0')}</span>
+              <div>
+                <h3 class="baslik-orta">{i.baslik}</h3>
+                <p class="mt-3 max-w-[52ch] leading-relaxed text-metin-2">{i.metin}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Kapsama -->
+  <section class="kapsama-blok">
+    <div class="kab">
+      <div class="grid gap-12 py-16 lg:grid-cols-[1fr_1.1fr] lg:gap-20 lg:py-24">
+        <div>
+          <p class="etiket etiket--acik" data-belir>Kapsama alanı</p>
+          <h2 class="baslik-buyuk mt-4 max-w-[14ch]" data-belir data-gecikme="0.06">
+            Üç ilde, {SAYIMLAR.ilce} ilçede
+          </h2>
+          <p class="mt-6 max-w-[46ch] leading-relaxed text-kagit/62" data-belir data-gecikme="0.12">
+            Merkezimiz Silivri ama iş bölgesi sınırında bitmiyor. Trakya bir bütün:
+            İstanbul’un batısındaki bir arsayla Edirne’deki bir tarlayı aynı yatırımcı
+            değerlendiriyor. Biz de ikisine birden bakıyoruz.
+          </p>
+        </div>
+
+        <ul class="il-liste" data-belir="sira">
+          {
+            iller.map((il) => (
+              <li>
+                <a href={`/ilanlar?q=${encodeURIComponent(il.deger)}`} class="il-satir">
+                  <span class="il-ad">{il.deger}</span>
+                  <span class="il-cizgi" aria-hidden="true" />
+                  <span class="font-veri text-sm text-kagit/55">{il.adet} ilan</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hizmetler -->
+  <section class="py-20 lg:py-28">
+    <div class="kab">
+      <div class="max-w-[54ch]">
+        <p class="etiket" data-belir>Hizmetler</p>
+        <h2 class="baslik-buyuk mt-4" data-belir data-gecikme="0.06">Neleri üstleniyoruz</h2>
+      </div>
+
+      <div
+        class="mt-12 grid gap-px overflow-hidden border border-murekkep/10 bg-murekkep/10 sm:grid-cols-2 lg:grid-cols-3"
+        data-belir="sira"
+      >
+        {
+          HIZMETLER.map((h, i) => (
+            <div class="hizmet-hucre">
+              <span class="etiket font-veri">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="baslik-orta mt-4">{h.baslik}</h3>
+              <p class="mt-3 text-sm leading-relaxed text-metin-2">{h.ozet}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Ekip -->
+  <section class="pb-20 lg:pb-28">
+    <div class="kab">
+      <div class="flex flex-wrap items-end justify-between gap-6 border-b border-murekkep/12 pb-8">
+        <div>
+          <p class="etiket">Ekip</p>
+          <h2 class="baslik-buyuk mt-4">{DANISMANLAR.length} kişiyiz</h2>
+        </div>
+        <a href="/danismanlar" class="dugme dugme--hayalet">Danışman profilleri</a>
+      </div>
+
+      <div class="mt-10 grid gap-6 sm:grid-cols-3" data-belir="sira">
+        {
+          DANISMANLAR.map((d) => (
+            <a href={`/danismanlar/${d.slug}`} class="ekip-kart">
+              <span class="ekip-monogram" aria-hidden="true">
+                {d.ad
+                  .split(' ')
+                  .map((p) => p[0])
+                  .join('')}
+              </span>
+              <h3 class="baslik-kucuk mt-4">{d.ad}</h3>
+              <p class="mt-1 text-sm text-metin-2">{d.unvan}</p>
+            </a>
+          ))
+        }
+      </div>
+
+      <div class="mt-14 flex flex-wrap items-center gap-3 border-t border-murekkep/10 pt-10">
+        <a href="/iletisim" class="dugme dugme--kirmizi">Ofise gelin</a>
+        <a href={`tel:${ILETISIM.telefonHam}`} class="dugme dugme--hayalet">{ILETISIM.telefon}</a>
+        <p class="ml-auto max-w-[30ch] text-sm text-kursun">{ILETISIM.adres.tam}</p>
+      </div>
+    </div>
+  </section>
+</Temel>
+
+<style>
+  .rakam-blok {
+    border-block: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    background: color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+  }
+  .rakam-hucre {
+    background: var(--color-kagit);
+    padding: clamp(1.5rem, 4vw, 2.75rem) clamp(1rem, 2vw, 1.5rem);
+  }
+  .rakam {
+    font-family: var(--font-baslik);
+    font-weight: 600;
+    font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ilke-satir {
+    display: grid;
+    grid-template-columns: 2.75rem 1fr;
+    gap: 1rem;
+    padding-block: 1.75rem;
+    border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 11%, transparent);
+  }
+  .ilke-no {
+    font-size: 0.75rem;
+    color: var(--color-kirmizi);
+    padding-top: 0.5rem;
+  }
+
+  .kapsama-blok {
+    background: var(--color-murekkep);
+    color: var(--color-kagit);
+  }
+  .il-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .il-satir {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: 1.15rem;
+    border-top: 1px solid color-mix(in oklab, var(--color-kagit) 14%, transparent);
+    transition: padding-left 0.5s var(--ease-yumusak);
+  }
+  .il-liste li:last-child .il-satir {
+    border-bottom: 1px solid color-mix(in oklab, var(--color-kagit) 14%, transparent);
+  }
+  .il-satir:hover {
+    padding-left: 0.6rem;
+  }
+  .il-ad {
+    font-family: var(--font-baslik);
+    font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    transition: color 0.35s var(--ease-yumusak);
+  }
+  .il-satir:hover .il-ad {
+    color: var(--color-kirmizi);
+  }
+  .il-cizgi {
+    flex: 1;
+    height: 1px;
+    background: color-mix(in oklab, var(--color-kagit) 18%, transparent);
+  }
+
+  .hizmet-hucre {
+    background: var(--color-kagit);
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    transition: background-color 0.5s var(--ease-yumusak);
+  }
+  .hizmet-hucre:hover {
+    background: #fff;
+  }
+
+  .ekip-kart {
+    display: block;
+    padding: clamp(1.4rem, 3vw, 2rem);
+    background: #fff;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-radius: var(--radius-kart);
+    transition: box-shadow 0.5s var(--ease-yumusak), transform 0.5s var(--ease-yumusak);
+  }
+  .ekip-kart:hover {
+    box-shadow: var(--shadow-kalkik);
+    transform: translateY(-3px);
+  }
+  .ekip-monogram {
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 999px;
+    background: var(--color-kirec);
+    font-family: var(--font-baslik);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--color-metin-2);
+  }
+</style>
