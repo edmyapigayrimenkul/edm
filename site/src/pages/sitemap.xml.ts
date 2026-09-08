@@ -6,7 +6,8 @@
 import type { APIRoute } from 'astro';
 import { portfoy } from '../lib/ilanlar';
 import { bolgeler } from '../lib/bolgeler';
-import { DANISMANLAR, KURUM } from '../lib/site';
+import { KURUM } from '../lib/site';
+import { icerik } from '../lib/icerik';
 
 interface Giris {
   yol: string;
@@ -18,6 +19,7 @@ interface Giris {
 export const GET: APIRoute = async () => {
   const { ilanlar, sonGuncelleme } = await portfoy();
   const bolgeListesi = await bolgeler();
+  const { ekip } = await icerik();
 
   const girisler: Giris[] = [
     { yol: '/', oncelik: '1.0', siklik: 'daily', tarih: sonGuncelleme },
@@ -34,7 +36,7 @@ export const GET: APIRoute = async () => {
       tarih: i.guncellenme ?? undefined,
     })),
     ...bolgeListesi.map((b) => ({ yol: b.yol, oncelik: '0.7', siklik: 'weekly' })),
-    ...DANISMANLAR.map((d) => ({
+    ...ekip.map((d) => ({
       yol: `/danismanlar/${d.slug}`,
       oncelik: '0.6',
       siklik: 'monthly',

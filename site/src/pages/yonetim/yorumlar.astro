@@ -1,0 +1,299 @@
+---
+import Panel from '../../layouts/Panel.astro';
+import { paneleGiris } from '../../lib/panel/yetki';
+import { env } from 'cloudflare:workers';
+import { icerikOnbellegiTemizle } from '../../lib/icerik';
+
+const giris = await paneleGiris(Astro.request);
+if ('yanit' in giris) return giris.yanit;
+
+const vt = env.VT as D1Database;
+let bildirim: { tur: 'basari' | 'hata'; metin: string } | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const eylem = String(form.get('eylem') ?? '');
+  const id = Number(form.get('id'));
+
+  try {
+    if (eylem === 'ekle' || eylem === 'guncelle') {
+      const ad = String(form.get('ad') ?? '').trim();
+      const metin = String(form.get('metin') ?? '').trim();
+      if (!ad || !metin) throw new Error('İsim ve yorum metni gerekli.');
+
+      const alanlar = [
+        ad.slice(0, 120),
+        metin.slice(0, 2000),
+        String(form.get('kaynak') ?? 'Google'),
+        String(form.get('tarih') ?? '') || null,
+        Number(form.get('puan')) || null,
+        String(form.get('konu') ?? '').trim().slice(0, 160) || null,
+        form.get('yayinda') ? 1 : 0,
+        Number(form.get('sira')) || 0,
+      ];
+
+      if (eylem === 'ekle') {
+        await vt
+          .prepare(
+            `INSERT INTO yorumlar (ad, metin, kaynak, tarih, puan, konu, yayinda, sira)
+             VALUES (?,?,?,?,?,?,?,?)`
+          )
+          .bind(...alanlar)
+          .run();
+        bildirim = { tur: 'basari', metin: 'Yorum eklendi.' };
+      } else {
+        await vt
+          .prepare(
+            `UPDATE yorumlar SET ad=?, metin=?, kaynak=?, tarih=?, puan=?, konu=?, yayinda=?, sira=?
+             WHERE id = ?`
+          )
+          .bind(...alanlar, id)
+          .run();
+        bildirim = { tur: 'basari', metin: 'Yorum güncellendi.' };
+      }
+    } else if (eylem === 'yayin' && id) {
+      await vt
+        .prepare(`UPDATE yorumlar SET yayinda = ? WHERE id = ?`)
+        .bind(Number(form.get('deger')) ? 1 : 0, id)
+        .run();
+      bildirim = { tur: 'basari', metin: 'Yayın durumu değişti.' };
+    } else if (eylem === 'sil' && id) {
+      await vt.prepare(`DELETE FROM yorumlar WHERE id = ?`).bind(id).run();
+      bildirim = { tur: 'basari', metin: 'Yorum silindi.' };
+    }
+    icerikOnbellegiTemizle();
+  } catch (hata) {
+    bildirim = { tur: 'hata', metin: (hata as Error).message };
+  }
+}
+
+const yorumlar = await vt
+  .prepare(`SELECT * FROM yorumlar ORDER BY sira ASC, id DESC`)
+  .all<Record<string, unknown>>();
+
+const duzenle = Astro.url.searchParams.get('duzenle');
+const duzenlenen = duzenle
+  ? (yorumlar.results ?? []).find((y) => String(y.id) === duzenle)
+  : null;
+---
+
+<Panel
+  baslik="Yorumlar"
+  eposta={giris.kimlik.eposta}
+  ozet="Ana sayfada gösterilen müşteri yorumları"
+>
+  {bildirim && <div class={`bildirim bildirim--${bildirim.tur}`}>{bildirim.metin}</div>}
+
+  <p class="aciklama-kutu">
+    Yorumlar <strong>uydurulmaz</strong>. Buraya yalnızca gerçekten alınmış yorumları girin —
+    Google İşletme Profili’ndeki yorumları kopyalayabilirsiniz. Liste boşken ana sayfadaki
+    yorumlar bölümü hiç görünmez.
+  </p>
+
+  <div class="iki-sutun">
+    <!-- Liste -->
+    <div class="kutu">
+      <div class="kutu-bas">
+        <h2>Kayıtlı yorumlar</h2>
+        <span style="font-size:0.75rem;color:var(--color-kursun)">
+          {(yorumlar.results ?? []).length} yorum
+        </span>
+      </div>
+
+      {
+        (yorumlar.results ?? []).length === 0 ? (
+          <p class="bos">Henüz yorum girilmedi. Sağdaki formdan ekleyebilirsiniz.</p>
+        ) : (
+          <ul class="yorum-liste">
+            {(yorumlar.results ?? []).map((y) => (
+              <li class="yorum-satir">
+                <div class="yorum-bas">
+                  <strong>{String(y.ad)}</strong>
+                  <span class="cip cip--pasif">{String(y.kaynak)}</span>
+                  {y.puan && <span class="veri-sayi puan">{'★'.repeat(Number(y.puan))}</span>}
+                  {y.yayinda === 1 ? (
+                    <span class="cip cip--kapandi">Yayında</span>
+                  ) : (
+                    <span class="cip cip--gizli">Gizli</span>
+                  )}
+                </div>
+                <p class="yorum-metin">{String(y.metin)}</p>
+                <div class="yorum-eylem">
+                  <a href={`?duzenle=${y.id}#form`} class="pd pd--sade">Düzenle</a>
+                  <form method="POST">
+                    <input type="hidden" name="id" value={String(y.id)} />
+                    <input type="hidden" name="eylem" value="yayin" />
+                    <input type="hidden" name="deger" value={y.yayinda === 1 ? '0' : '1'} />
+                    <button type="submit" class="pd pd--sade">
+                      {y.yayinda === 1 ? 'Yayından kaldır' : 'Yayınla'}
+                    </button>
+                  </form>
+                  <form method="POST" onsubmit="return confirm('Bu yorum kalıcı olarak silinecek. Emin misiniz?')">
+                    <input type="hidden" name="id" value={String(y.id)} />
+                    <input type="hidden" name="eylem" value="sil" />
+                    <button type="submit" class="pd pd--tehlike">Sil</button>
+                  </form>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+
+    <!-- Form -->
+    <div class="kutu" id="form">
+      <div class="kutu-bas">
+        <h2>{duzenlenen ? 'Yorumu düzenle' : 'Yeni yorum'}</h2>
+        {duzenlenen && <a href="/yonetim/yorumlar" class="pd pd--sade">Yeni ekle</a>}
+      </div>
+
+      <form method="POST" class="yorum-form">
+        <input type="hidden" name="eylem" value={duzenlenen ? 'guncelle' : 'ekle'} />
+        {duzenlenen && <input type="hidden" name="id" value={String(duzenlenen.id)} />}
+
+        <label class="p-alan">
+          <span>Ad Soyad *</span>
+          <input type="text" name="ad" required maxlength="120" value={String(duzenlenen?.ad ?? '')} />
+        </label>
+
+        <label class="p-alan">
+          <span>Yorum *</span>
+          <textarea name="metin" rows="5" required set:text={String(duzenlenen?.metin ?? '')} />
+        </label>
+
+        <div class="p-izgara">
+          <label class="p-alan">
+            <span>Kaynak</span>
+            <select name="kaynak">
+              {['Google', 'Sahibinden', 'Doğrudan'].map((k) => (
+                <option value={k} selected={duzenlenen?.kaynak === k}>
+                  {k}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label class="p-alan">
+            <span>Puan</span>
+            <select name="puan">
+              <option value="">—</option>
+              {[5, 4, 3, 2, 1].map((p) => (
+                <option value={String(p)} selected={Number(duzenlenen?.puan) === p}>
+                  {'★'.repeat(p)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label class="p-alan">
+            <span>Tarih</span>
+            <input type="date" name="tarih" value={String(duzenlenen?.tarih ?? '')} />
+          </label>
+          <label class="p-alan">
+            <span>Sıra</span>
+            <input type="number" name="sira" value={String(duzenlenen?.sira ?? 0)} />
+          </label>
+        </div>
+
+        <label class="p-alan">
+          <span>Konu (opsiyonel)</span>
+          <input
+            type="text"
+            name="konu"
+            maxlength="160"
+            placeholder="Silivri'de arsa alımı"
+            value={String(duzenlenen?.konu ?? '')}
+          />
+        </label>
+
+        <label class="onay-satir">
+          <input type="checkbox" name="yayinda" checked={duzenlenen ? duzenlenen.yayinda === 1 : true} />
+          <span>Sitede yayınla</span>
+        </label>
+
+        <button type="submit" class="pd pd--kirmizi">
+          {duzenlenen ? 'Değişiklikleri kaydet' : 'Yorumu ekle'}
+        </button>
+      </form>
+    </div>
+  </div>
+</Panel>
+
+<style>
+  .aciklama-kutu {
+    background: #fff;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-left: 3px solid var(--color-kirmizi);
+    border-radius: 6px;
+    padding: 0.85rem 1.1rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-metin-2);
+    margin-bottom: 1.25rem;
+    max-width: 72ch;
+  }
+
+  .iki-sutun {
+    display: grid;
+    gap: 1rem;
+    align-items: start;
+  }
+  @media (min-width: 1050px) {
+    .iki-sutun {
+      grid-template-columns: 1.3fr 1fr;
+    }
+  }
+
+  .yorum-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .yorum-satir {
+    padding: 1rem 1.1rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-murekkep) 8%, transparent);
+  }
+  .yorum-satir:last-child {
+    border-bottom: 0;
+  }
+  .yorum-bas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.9375rem;
+  }
+  .puan {
+    color: var(--color-kirmizi);
+    font-size: 0.8125rem;
+  }
+  .yorum-metin {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-metin-2);
+  }
+  .yorum-eylem {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.75rem;
+  }
+
+  .yorum-form {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .onay-satir {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+  }
+  .onay-satir input {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--color-kirmizi);
+  }
+</style>

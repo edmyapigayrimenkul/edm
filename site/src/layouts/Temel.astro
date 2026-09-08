@@ -3,7 +3,8 @@ import '../styles/global.css';
 import Kafa from '../components/Kafa.astro';
 import Ayak from '../components/Ayak.astro';
 import WhatsappDugme from '../components/WhatsappDugme.astro';
-import { KURUM, ILETISIM, SOSYAL } from '../lib/site';
+import { KURUM, SOSYAL } from '../lib/site';
+import { icerik } from '../lib/icerik';
 
 interface Props {
   baslik: string;
@@ -27,6 +28,8 @@ const {
   jsonLd,
 } = Astro.props;
 
+const { iletisim } = await icerik();
+
 const kanonik = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
 const gorselTam = new URL(gorsel, Astro.site).href;
 const tamBaslik = baslik === KURUM.ad ? baslik : `${baslik} — ${KURUM.ad}`;
@@ -39,15 +42,15 @@ const kurumLd = {
   name: KURUM.ad,
   description: KURUM.tanim,
   url: KURUM.site,
-  telephone: ILETISIM.telefonHam,
-  email: ILETISIM.eposta,
+  telephone: iletisim.telefonHam,
+  email: iletisim.eposta,
   logo: new URL('/marka/logo-yatay.png', Astro.site).href,
   image: gorselTam,
   address: {
     '@type': 'PostalAddress',
-    streetAddress: `${ILETISIM.adres.satir1} ${ILETISIM.adres.satir2}`,
-    addressLocality: ILETISIM.adres.ilce,
-    addressRegion: ILETISIM.adres.il,
+    streetAddress: `${iletisim.adresSatir1} ${iletisim.adresSatir2}`,
+    addressLocality: iletisim.adresIlce,
+    addressRegion: iletisim.adresIl,
     addressCountry: 'TR',
   },
   areaServed: [

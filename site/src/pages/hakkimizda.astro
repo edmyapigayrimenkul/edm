@@ -1,9 +1,12 @@
 ---
 import Temel from '../layouts/Temel.astro';
-import { KURUM, ILETISIM, HIZMETLER, DANISMANLAR } from '../lib/site';
+import { KURUM, HIZMETLER } from '../lib/site';
+import { icerik } from '../lib/icerik';
 import { portfoy } from '../lib/ilanlar';
 
 const { sayimlar: SAYIMLAR, filtreler: FILTRELER } = await portfoy();
+const { ekip, iletisim } = await icerik();
+const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.adresIlce} / ${iletisim.adresIl}`;
 
 const yil = new Date().getFullYear() - KURUM.kurulus;
 const donum = Math.round(SAYIMLAR.toplamAlan / 1000);
@@ -171,14 +174,14 @@ const iller = FILTRELER.il;
       <div class="flex flex-wrap items-end justify-between gap-6 border-b border-murekkep/12 pb-8">
         <div>
           <p class="etiket">Ekip</p>
-          <h2 class="baslik-buyuk mt-4">{DANISMANLAR.length} kişiyiz</h2>
+          <h2 class="baslik-buyuk mt-4">{ekip.length} kişiyiz</h2>
         </div>
         <a href="/danismanlar" class="dugme dugme--hayalet">Danışman profilleri</a>
       </div>
 
       <div class="mt-10 grid gap-6 sm:grid-cols-3" data-belir="sira">
         {
-          DANISMANLAR.map((d) => (
+          ekip.map((d) => (
             <a href={`/danismanlar/${d.slug}`} class="ekip-kart">
               <span class="ekip-monogram" aria-hidden="true">
                 {d.ad
@@ -195,8 +198,8 @@ const iller = FILTRELER.il;
 
       <div class="mt-14 flex flex-wrap items-center gap-3 border-t border-murekkep/10 pt-10">
         <a href="/iletisim" class="dugme dugme--kirmizi">Ofise gelin</a>
-        <a href={`tel:${ILETISIM.telefonHam}`} class="dugme dugme--hayalet">{ILETISIM.telefon}</a>
-        <p class="ml-auto max-w-[30ch] text-sm text-kursun">{ILETISIM.adres.tam}</p>
+        <a href={`tel:${iletisim.telefonHam}`} class="dugme dugme--hayalet">{iletisim.telefon}</a>
+        <p class="ml-auto max-w-[30ch] text-sm text-kursun">{adresTam}</p>
       </div>
     </div>
   </section>

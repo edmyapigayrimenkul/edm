@@ -1,11 +1,13 @@
 ---
 import Temel from '../../layouts/Temel.astro';
 import IlanKart from '../../components/IlanKart.astro';
-import { DANISMANLAR, ILETISIM, KURUM, whatsappBaglanti } from '../../lib/site';
+import { KURUM } from '../../lib/site';
 import { danismaninIlanlari } from '../../lib/ilanlar';
+import { icerik, whatsappBaglanti } from '../../lib/icerik';
 
 const { slug } = Astro.params;
-const danisman = DANISMANLAR.find((d) => d.slug === slug);
+const { ekip, iletisim } = await icerik();
+const danisman = ekip.find((d) => d.slug === slug);
 if (!danisman) return Astro.rewrite('/404');
 
 const ilanlar = danisman.emlakjetSlug ? await danismaninIlanlari(danisman.emlakjetSlug) : [];
@@ -24,7 +26,7 @@ const jsonLd = {
   name: danisman.ad,
   jobTitle: danisman.unvan,
   description: danisman.hakkinda,
-  telephone: ILETISIM.telefonHam,
+  telephone: iletisim.telefonHam,
   worksFor: { '@id': `${KURUM.site}/#kurum` },
   areaServed: bolgeler.map((b) => ({ '@type': 'City', name: b })),
 };
@@ -90,15 +92,15 @@ const jsonLd = {
 
           <div class="mt-8 flex flex-wrap gap-2.5">
             <a
-              href={whatsappBaglanti(`Merhaba ${danisman.ad}, EDM sitesinden ulaşıyorum.`)}
+              href={whatsappBaglanti(iletisim.whatsapp, `Merhaba ${danisman.ad}, EDM sitesinden ulaşıyorum.`)}
               target="_blank"
               rel="noopener noreferrer"
               class="dugme dugme--kirmizi"
             >
               WhatsApp’tan yaz
             </a>
-            <a href={`tel:${ILETISIM.telefonHam}`} class="dugme dugme--murekkep">
-              {ILETISIM.telefon}
+            <a href={`tel:${iletisim.telefonHam}`} class="dugme dugme--murekkep">
+              {iletisim.telefon}
             </a>
           </div>
 

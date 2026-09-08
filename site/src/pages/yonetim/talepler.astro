@@ -1,0 +1,372 @@
+---
+import Panel from '../../layouts/Panel.astro';
+import { paneleGiris } from '../../lib/panel/yetki';
+import { env } from 'cloudflare:workers';
+
+const giris = await paneleGiris(Astro.request);
+if ('yanit' in giris) return giris.yanit;
+
+const vt = env.VT as D1Database;
+let bildirim: { tur: 'basari' | 'hata'; metin: string } | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const id = Number(form.get('id'));
+  const eylem = String(form.get('eylem') ?? '');
+
+  if (id && eylem === 'durum') {
+    const yeniDurum = String(form.get('durum') ?? 'yeni');
+    await vt
+      .prepare(
+        `UPDATE talepler
+         SET durum = ?, ilgilenen = ?, kapanma = CASE WHEN ? = 'kapandi' THEN datetime('now') ELSE NULL END
+         WHERE id = ?`
+      )
+      .bind(yeniDurum, giris.kimlik.eposta, yeniDurum, id)
+      .run();
+    bildirim = { tur: 'basari', metin: 'Talep durumu güncellendi.' };
+  }
+
+  if (id && eylem === 'not') {
+    await vt
+      .prepare(`UPDATE talepler SET ic_not = ? WHERE id = ?`)
+      .bind(String(form.get('ic_not') ?? '').slice(0, 2000) || null, id)
+      .run();
+    bildirim = { tur: 'basari', metin: 'Not kaydedildi.' };
+  }
+}
+
+const suzgec = Astro.url.searchParams.get('durum') ?? 'hepsi';
+const kosul =
+  suzgec === 'hepsi' ? '' : suzgec === 'acik' ? `WHERE durum <> 'kapandi'` : `WHERE durum = ?`;
+const baglar = suzgec === 'hepsi' || suzgec === 'acik' ? [] : [suzgec];
+
+const talepler = await vt
+  .prepare(`SELECT * FROM talepler ${kosul} ORDER BY id DESC LIMIT 200`)
+  .bind(...baglar)
+  .all<Record<string, unknown>>();
+
+const sayimlar = await vt
+  .prepare(`SELECT durum, COUNT(*) AS adet FROM talepler GROUP BY durum`)
+  .all<{ durum: string; adet: number }>();
+const say = Object.fromEntries((sayimlar.results ?? []).map((s) => [s.durum, s.adet]));
+const toplam = Object.values(say).reduce((t: number, n) => t + Number(n), 0);
+
+const suzgecler = [
+  { deger: 'hepsi', ad: 'Hepsi', adet: toplam },
+  { deger: 'acik', ad: 'Açık', adet: (Number(say.yeni) || 0) + (Number(say.islemde) || 0) },
+  { deger: 'yeni', ad: 'Yeni', adet: Number(say.yeni) || 0 },
+  { deger: 'islemde', ad: 'İşlemde', adet: Number(say.islemde) || 0 },
+  { deger: 'kapandi', ad: 'Kapandı', adet: Number(say.kapandi) || 0 },
+];
+
+const tarih = (d: unknown) =>
+  d
+    ? new Date(String(d).replace(' ', 'T') + 'Z').toLocaleString('tr-TR', {
+        day: 'numeric',
+        month: 'long',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : '—';
+
+const cipSinif = (durum: unknown) =>
+  durum === 'yeni' ? 'cip--yeni' : durum === 'islemde' ? 'cip--islemde' : 'cip--kapandi';
+const cipAd = (durum: unknown) =>
+  durum === 'yeni' ? 'Yeni' : durum === 'islemde' ? 'İşlemde' : 'Kapandı';
+---
+
+<Panel
+  baslik="Talepler"
+  eposta={giris.kimlik.eposta}
+  ozet="Siteden gelen değerleme ve iletişim formları"
+>
+  {bildirim && <div class={`bildirim bildirim--${bildirim.tur}`}>{bildirim.metin}</div>}
+
+  <div class="suzgec-satir">
+    {
+      suzgecler.map((s) => (
+        <a
+          href={s.deger === 'hepsi' ? '/yonetim/talepler' : `/yonetim/talepler?durum=${s.deger}`}
+          class="suzgec"
+          aria-current={suzgec === s.deger ? 'true' : undefined}
+        >
+          {s.ad}
+          <span class="veri-sayi suzgec-adet">{s.adet}</span>
+        </a>
+      ))
+    }
+  </div>
+
+  {
+    (talepler.results ?? []).length === 0 ? (
+      <div class="kutu">
+        <p class="bos">
+          Bu filtrede talep yok. Formlar çalışıyor — biri değerleme veya iletişim formunu
+          doldurduğunda buraya düşecek ve Gmail'inize de bildirim gidecek.
+        </p>
+      </div>
+    ) : (
+      <div class="talep-liste">
+        {(talepler.results ?? []).map((t) => (
+          <article class="talep" id={`t${t.id}`}>
+            <div class="talep-bas">
+              <div>
+                <div class="talep-kimlik">
+                  <h2>{String(t.ad)}</h2>
+                  <span class={`cip ${cipSinif(t.durum)}`}>{cipAd(t.durum)}</span>
+                  <span class="cip cip--pasif">
+                    {t.tur === 'degerleme' ? 'Değerleme' : 'İletişim'}
+                  </span>
+                </div>
+                <p class="talep-zaman veri-sayi">{tarih(t.olusturma)}</p>
+              </div>
+
+              <div class="talep-iletisim">
+                <a href={`tel:${String(t.telefon).replace(/\s/g, '')}`} class="pd pd--birincil">
+                  {String(t.telefon)}
+                </a>
+                <a
+                  href={`https://wa.me/9${String(t.telefon).replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noopener"
+                  class="pd pd--sade"
+                >
+                  WhatsApp
+                </a>
+                {t.eposta && (
+                  <a href={`mailto:${String(t.eposta)}`} class="pd pd--sade">
+                    E-posta
+                  </a>
+                )}
+              </div>
+            </div>
+
+            <dl class="talep-veri">
+              {t.mulk_tipi && (
+                <div>
+                  <dt>Mülk tipi</dt>
+                  <dd>{String(t.mulk_tipi)}</dd>
+                </div>
+              )}
+              {(t.ilce || t.mahalle) && (
+                <div>
+                  <dt>Konum</dt>
+                  <dd>{[t.mahalle, t.ilce].filter(Boolean).join(', ')}</dd>
+                </div>
+              )}
+              {t.m2 && (
+                <div>
+                  <dt>Büyüklük</dt>
+                  <dd class="veri-sayi">{Number(t.m2).toLocaleString('tr-TR')} m²</dd>
+                </div>
+              )}
+              {t.konu && (
+                <div>
+                  <dt>Konu</dt>
+                  <dd>{String(t.konu)}</dd>
+                </div>
+              )}
+              {t.eposta && (
+                <div>
+                  <dt>E-posta</dt>
+                  <dd class="veri-sayi">{String(t.eposta)}</dd>
+                </div>
+              )}
+              {t.kaynak && (
+                <div>
+                  <dt>Geldiği sayfa</dt>
+                  <dd class="veri-sayi">{String(t.kaynak)}</dd>
+                </div>
+              )}
+            </dl>
+
+            {t.mesaj && <p class="talep-mesaj">{String(t.mesaj)}</p>}
+
+            <div class="talep-eylem">
+              <form method="POST" class="talep-durum">
+                <input type="hidden" name="id" value={String(t.id)} />
+                <input type="hidden" name="eylem" value="durum" />
+                {t.durum !== 'islemde' && (
+                  <button type="submit" name="durum" value="islemde" class="pd pd--sade">
+                    İşleme al
+                  </button>
+                )}
+                {t.durum !== 'kapandi' && (
+                  <button type="submit" name="durum" value="kapandi" class="pd pd--sade">
+                    Kapat
+                  </button>
+                )}
+                {t.durum !== 'yeni' && (
+                  <button type="submit" name="durum" value="yeni" class="pd pd--sade">
+                    Yeniye al
+                  </button>
+                )}
+              </form>
+
+              <form method="POST" class="talep-not">
+                <input type="hidden" name="id" value={String(t.id)} />
+                <input type="hidden" name="eylem" value="not" />
+                <label class="p-alan">
+                  <span>İç not</span>
+                  <textarea
+                    name="ic_not"
+                    rows="2"
+                    placeholder="Görüşme notu, sonraki adım…"
+                    set:text={String(t.ic_not ?? '')}
+                  />
+                </label>
+                <button type="submit" class="pd pd--birincil">Notu kaydet</button>
+              </form>
+            </div>
+
+            {t.ilgilenen && (
+              <p class="talep-ilgilenen">Son işlem: {String(t.ilgilenen)}</p>
+            )}
+          </article>
+        ))}
+      </div>
+    )
+  }
+</Panel>
+
+<style>
+  .suzgec-satir {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 1.25rem;
+  }
+  .suzgec {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    height: 2.1rem;
+    padding-inline: 0.85rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 12%, transparent);
+    background: #fff;
+    font-size: 0.8125rem;
+    color: var(--color-metin-2);
+  }
+  .suzgec[aria-current] {
+    background: var(--color-murekkep);
+    border-color: var(--color-murekkep);
+    color: var(--color-kagit);
+  }
+  .suzgec-adet {
+    font-size: 0.6875rem;
+    opacity: 0.6;
+  }
+
+  .talep-liste {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .talep {
+    background: #fff;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-radius: 8px;
+    padding: 1.15rem 1.25rem 1.25rem;
+    scroll-margin-top: 1rem;
+  }
+  .talep:target {
+    border-color: var(--color-kirmizi);
+  }
+
+  .talep-bas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .talep-kimlik {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .talep-kimlik h2 {
+    font-family: var(--font-govde);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+  .talep-zaman {
+    font-size: 0.75rem;
+    color: var(--color-kursun);
+    margin-top: 0.3rem;
+  }
+  .talep-iletisim {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .talep-veri {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(9rem, 45%), 1fr));
+    gap: 0.85rem 1.5rem;
+    margin-top: 1.1rem;
+    padding-top: 1rem;
+    border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 8%, transparent);
+  }
+  .talep-veri dt {
+    font-family: var(--font-veri);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-kursun);
+  }
+  .talep-veri dd {
+    font-size: 0.875rem;
+    margin-top: 0.2rem;
+    word-break: break-word;
+  }
+
+  .talep-mesaj {
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    background: var(--color-kagit);
+    border-radius: 6px;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  .talep-eylem {
+    display: grid;
+    gap: 0.85rem;
+    margin-top: 1.1rem;
+    padding-top: 1rem;
+    border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 8%, transparent);
+  }
+  @media (min-width: 780px) {
+    .talep-eylem {
+      grid-template-columns: auto 1fr;
+      align-items: end;
+    }
+  }
+  .talep-durum {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .talep-not {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-end;
+  }
+  .talep-not .p-alan {
+    flex: 1;
+  }
+
+  .talep-ilgilenen {
+    margin-top: 0.7rem;
+    font-family: var(--font-veri);
+    font-size: 0.6875rem;
+    color: var(--color-kursun);
+  }
+</style>

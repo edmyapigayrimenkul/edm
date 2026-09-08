@@ -1,9 +1,11 @@
 ---
 import Temel from '../layouts/Temel.astro';
-import { ILETISIM, KURUM, DANISMANLAR } from '../lib/site';
+import { KURUM } from '../lib/site';
+import { icerik } from '../lib/icerik';
 import { portfoy } from '../lib/ilanlar';
 
 const { filtreler: FILTRELER, sayimlar: SAYIMLAR } = await portfoy();
+const { ekip, iletisim } = await icerik();
 
 const adimlar = [
   {
@@ -66,7 +68,7 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
             </p>
             <div class="mt-4 flex flex-wrap gap-2">
               {
-                DANISMANLAR.map((d) => (
+                ekip.map((d) => (
                   <span class="rozet rozet--cizgili">{d.ad}</span>
                 ))
               }
@@ -76,7 +78,7 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
 
         <!-- Form -->
         <div>
-          <form class="form-kart" data-degerleme-form novalidate>
+          <form class="form-kart" data-degerleme-form novalidate data-wa={iletisim.whatsapp}>
             <div class="grid gap-5">
               <div class="alan-ikili">
                 <label class="alan">
@@ -185,8 +187,8 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
 
               <p class="text-center text-[0.75rem] text-kursun">
                 Ortalama dönüş süresi: aynı gün. Acilse
-                <a href={`tel:${ILETISIM.telefonHam}`} class="alt-cizgi text-metin-2">
-                  {ILETISIM.telefon}
+                <a href={`tel:${iletisim.telefonHam}`} class="alt-cizgi text-metin-2">
+                  {iletisim.telefon}
                 </a>
               </p>
             </div>
@@ -363,9 +365,9 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
 </style>
 
 <script>
-  import { ILETISIM } from '../lib/site';
 
   const form = document.querySelector<HTMLFormElement>('[data-degerleme-form]');
+  const waNumara = form?.dataset.wa ?? '905363434197';
   const basari = document.querySelector<HTMLElement>('[data-basari]');
   const waBaglanti = document.querySelector<HTMLAnchorElement>('[data-wa-baglanti]');
 
@@ -444,7 +446,7 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
       ].filter(Boolean);
 
       if (waBaglanti) {
-        waBaglanti.href = `https://wa.me/${ILETISIM.whatsapp}?text=${encodeURIComponent(
+        waBaglanti.href = `https://wa.me/${waNumara}?text=${encodeURIComponent(
           satirlar.join('\n')
         )}`;
       }

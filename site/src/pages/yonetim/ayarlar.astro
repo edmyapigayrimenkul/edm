@@ -1,0 +1,168 @@
+---
+import Panel from '../../layouts/Panel.astro';
+import { paneleGiris } from '../../lib/panel/yetki';
+import { env } from 'cloudflare:workers';
+import { icerik, icerikOnbellegiTemizle } from '../../lib/icerik';
+
+const giris = await paneleGiris(Astro.request);
+if ('yanit' in giris) return giris.yanit;
+
+const vt = env.VT as D1Database;
+let bildirim: { tur: 'basari' | 'hata'; metin: string } | null = null;
+
+/** Panelden düzenlenebilen ayarlar — anahtar, etiket, açıklama. */
+const ALANLAR = [
+  { anahtar: 'telefon', etiket: 'Telefon (görünen)', ipucu: '0536 343 41 97 biçiminde' },
+  { anahtar: 'telefonHam', etiket: 'Telefon (arama bağlantısı)', ipucu: '+905363434197 biçiminde' },
+  { anahtar: 'whatsapp', etiket: 'WhatsApp numarası', ipucu: 'Başında + olmadan: 905363434197' },
+  { anahtar: 'eposta', etiket: 'E-posta', ipucu: 'Sitede gösterilen adres' },
+  { anahtar: 'adresSatir1', etiket: 'Adres — 1. satır', ipucu: '' },
+  { anahtar: 'adresSatir2', etiket: 'Adres — 2. satır', ipucu: '' },
+  { anahtar: 'adresIlce', etiket: 'İlçe', ipucu: '' },
+  { anahtar: 'adresIl', etiket: 'İl', ipucu: '' },
+] as const;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  try {
+    const suAn = new Date().toISOString();
+    const yazmalar = ALANLAR.map((a) =>
+      vt
+        .prepare(
+          `INSERT INTO ayarlar (anahtar, deger, guncelleme) VALUES (?,?,?)
+           ON CONFLICT(anahtar) DO UPDATE SET deger = excluded.deger, guncelleme = excluded.guncelleme`
+        )
+        .bind(a.anahtar, String(form.get(a.anahtar) ?? '').trim().slice(0, 300), suAn)
+    );
+    await vt.batch(yazmalar);
+    icerikOnbellegiTemizle();
+    bildirim = { tur: 'basari', metin: 'Ayarlar kaydedildi. Site en geç bir dakikada güncellenir.' };
+  } catch (hata) {
+    bildirim = { tur: 'hata', metin: (hata as Error).message };
+  }
+}
+
+const { iletisim } = await icerik();
+const guncelleme = await vt
+  .prepare(`SELECT MAX(guncelleme) AS son FROM ayarlar`)
+  .first<{ son: string | null }>();
+---
+
+<Panel
+  baslik="Ayarlar"
+  eposta={giris.kimlik.eposta}
+  ozet="Sitede görünen iletişim bilgileri"
+>
+  {bildirim && <div class={`bildirim bildirim--${bildirim.tur}`}>{bildirim.metin}</div>}
+
+  <p class="aciklama-kutu">
+    Buradaki bilgiler sitenin her yerinde kullanılıyor: başlık çubuğu, alt bilgi, ilan
+    sayfalarındaki arama düğmeleri, WhatsApp bağlantıları ve arama motorlarına verilen
+    kurum bilgisi. Bir numarayı burada değiştirmek hepsini birden değiştirir.
+  </p>
+
+  <form method="POST" class="kutu ayar-form">
+    <div class="p-izgara">
+      {
+        ALANLAR.map((a) => (
+          <label class="p-alan">
+            <span>{a.etiket}</span>
+            <input
+              type="text"
+              name={a.anahtar}
+              value={String((iletisim as Record<string, string>)[a.anahtar] ?? '')}
+              maxlength="300"
+            />
+            {a.ipucu && <small class="ipucu">{a.ipucu}</small>}
+          </label>
+        ))
+      }
+    </div>
+
+    <div class="ayar-alt">
+      <button type="submit" class="pd pd--kirmizi">Kaydet</button>
+      {
+        guncelleme?.son && (
+          <span class="veri-sayi son-guncelleme">
+            son değişiklik: {new Date(guncelleme.son).toLocaleString('tr-TR', {
+              day: 'numeric',
+              month: 'long',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </span>
+        )
+      }
+    </div>
+  </form>
+
+  <section class="kutu" style="margin-top:1.5rem">
+    <div class="kutu-bas">
+      <h2>Koddan yönetilenler</h2>
+    </div>
+    <div class="kod-liste">
+      <p>
+        Aşağıdakiler henüz panelden düzenlenemiyor. Değişmesi gerekirse söyleyin, ya bu
+        ekrana taşırım ya da doğrudan güncellerim.
+      </p>
+      <ul>
+        <li><strong>Hizmet açıklamaları</strong> — ana sayfa ve hakkımızda bölümlerindeki altı hizmet</li>
+        <li><strong>Bölge rehberi metinleri</strong> — her ilçenin tanıtım paragrafı ve notları</li>
+        <li><strong>Kurum tanıtımı</strong> — hakkımızda sayfasındaki uzun metinler</li>
+        <li><strong>Çalışma saatleri</strong></li>
+      </ul>
+    </div>
+  </section>
+</Panel>
+
+<style>
+  .aciklama-kutu {
+    background: #fff;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-left: 3px solid var(--color-kirmizi);
+    border-radius: 6px;
+    padding: 0.85rem 1.1rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-metin-2);
+    margin-bottom: 1.25rem;
+    max-width: 72ch;
+  }
+  .ayar-form {
+    padding: 1.25rem;
+    max-width: 60rem;
+  }
+  .ipucu {
+    font-size: 0.6875rem;
+    color: var(--color-kursun);
+  }
+  .ayar-alt {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 8%, transparent);
+  }
+  .son-guncelleme {
+    font-size: 0.75rem;
+    color: var(--color-kursun);
+  }
+  .kod-liste {
+    padding: 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--color-metin-2);
+    max-width: 68ch;
+  }
+  .kod-liste ul {
+    margin: 0.85rem 0 0;
+    padding-left: 1.1rem;
+    display: grid;
+    gap: 0.4rem;
+  }
+  .kod-liste strong {
+    color: var(--color-murekkep);
+  }
+</style>

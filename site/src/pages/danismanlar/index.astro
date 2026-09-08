@@ -1,10 +1,13 @@
 ---
 import Temel from '../../layouts/Temel.astro';
-import { DANISMANLAR, ILETISIM, KURUM, whatsappBaglanti } from '../../lib/site';
+import { KURUM } from '../../lib/site';
 import { danismaninIlanlari } from '../../lib/ilanlar';
+import { icerik, whatsappBaglanti } from '../../lib/icerik';
+
+const { ekip: ekipListesi, iletisim } = await icerik();
 
 const ekip = await Promise.all(
-  DANISMANLAR.map(async (d) => {
+  ekipListesi.map(async (d) => {
     // Doğukan'ın Emlakjet'te ayrı profili yok; ilanları Metin üzerinden geçiyor.
     const ilanlar = d.emlakjetSlug ? await danismaninIlanlari(d.emlakjetSlug) : [];
     return {
@@ -87,15 +90,15 @@ const ekip = await Promise.all(
                     {d.adet > 0 ? `${d.adet} ilanını gör` : 'Profilini gör'}
                   </a>
                   <a
-                    href={whatsappBaglanti(`Merhaba ${d.ad}, EDM sitesinden ulaşıyorum.`)}
+                    href={whatsappBaglanti(iletisim.whatsapp, `Merhaba ${d.ad}, EDM sitesinden ulaşıyorum.`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     class="dugme dugme--hayalet"
                   >
                     WhatsApp
                   </a>
-                  <a href={`tel:${ILETISIM.telefonHam}`} class="dugme dugme--hayalet">
-                    {ILETISIM.telefon}
+                  <a href={`tel:${iletisim.telefonHam}`} class="dugme dugme--hayalet">
+                    {iletisim.telefon}
                   </a>
                 </div>
               </div>

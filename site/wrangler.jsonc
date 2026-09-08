@@ -10,6 +10,10 @@
     "binding": "ASSETS"
   },
 
+    // workers.dev adresi kapalı: panel yalnızca Access'in koruduğu
+  // edmyapigayrimenkul.com üzerinden açılabilsin.
+  "workers_dev": false,
+
   "observability": { "enabled": true },
 
   // İlan ve talep veritabanı

@@ -77,6 +77,8 @@ export interface SatirIlan {
   son_gorulme: string;
   durum: string;
   pasif_tarihi: string | null;
+  /** ilan_duzenleme tablosundan bindirilir; ham tabloda yok. */
+  one_cikan?: number;
 }
 
 export interface SenkronSonuc {
@@ -93,7 +95,8 @@ export interface SenkronSonuc {
 
 /** Şemayı kurar — her senkron öncesi güvenle çağrılabilir. */
 export async function semayiKur(vt: D1Database): Promise<void> {
-  for (const ifade of SEMA.split(';')) {
+  const { PANEL_SEMA } = await import('./panel-sema');
+  for (const ifade of `${SEMA}\n${PANEL_SEMA}`.split(';')) {
     const kirpik = ifade.trim();
     if (kirpik) await vt.prepare(kirpik).run();
   }
@@ -114,8 +117,10 @@ export async function portfoyuYaz(
   const baslangic = Date.now();
   const suAn = new Date().toISOString();
 
+  // Elle eklenen ilanlar portalda görünmez; senkronun onlara dokunmaması için
+  // karşılaştırmaya hiç alınmıyorlar.
   const oncekiSatirlar = await vt
-    .prepare('SELECT id, durum, fiyat, guncellenme FROM ilanlar')
+    .prepare(`SELECT id, durum, fiyat, guncellenme FROM ilanlar WHERE kaynak <> 'elle'`)
     .all<{ id: string; durum: string; fiyat: number | null; guncellenme: string | null }>();
   const onceki = new Map((oncekiSatirlar.results ?? []).map((s) => [s.id, s]));
 
@@ -253,15 +258,44 @@ export async function gunlugeYaz(
     .run();
 }
 
-/** Aktif ilanları veritabanı satırı olarak döndürür. */
+/**
+ * Aktif ilanlar — panelden yapılan düzeltmeler bindirilmiş halde.
+ * `gizli` işaretli ilanlar hiç dönmez; öne çıkanlar başa alınır.
+ */
 export async function aktifIlanSatirlari(vt: D1Database): Promise<SatirIlan[]> {
   const sonuc = await vt
     .prepare(
-      `SELECT * FROM ilanlar
-       WHERE durum = 'aktif'
-       ORDER BY COALESCE(guncellenme, ilk_gorulme) DESC`
+      `SELECT
+         i.*,
+         COALESCE(d.baslik,   i.baslik)   AS baslik,
+         COALESCE(d.aciklama, i.aciklama) AS aciklama,
+         COALESCE(d.one_cikan, 0)         AS one_cikan
+       FROM ilanlar i
+       LEFT JOIN ilan_duzenleme d ON d.ilan_id = i.id
+       WHERE i.durum = 'aktif' AND COALESCE(d.gizli, 0) = 0
+       ORDER BY COALESCE(d.one_cikan, 0) DESC,
+                COALESCE(i.guncellenme, i.ilk_gorulme) DESC`
     )
     .all<SatirIlan>();
+  return sonuc.results ?? [];
+}
+
+/** Panel için: gizliler ve pasifler dahil her şey. */
+export async function tumIlanSatirlari(vt: D1Database): Promise<
+  Array<SatirIlan & { one_cikan: number; gizli: number; duzenlendi: number }>
+> {
+  const sonuc = await vt
+    .prepare(
+      `SELECT
+         i.*,
+         COALESCE(d.one_cikan, 0) AS one_cikan,
+         COALESCE(d.gizli, 0)     AS gizli,
+         CASE WHEN d.baslik IS NOT NULL OR d.aciklama IS NOT NULL THEN 1 ELSE 0 END AS duzenlendi
+       FROM ilanlar i
+       LEFT JOIN ilan_duzenleme d ON d.ilan_id = i.id
+       ORDER BY i.durum ASC, COALESCE(i.guncellenme, i.ilk_gorulme) DESC`
+    )
+    .all<SatirIlan & { one_cikan: number; gizli: number; duzenlendi: number }>();
   return sonuc.results ?? [];
 }
 

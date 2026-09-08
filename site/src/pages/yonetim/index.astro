@@ -1,0 +1,292 @@
+---
+import Panel from '../../layouts/Panel.astro';
+import { paneleGiris } from '../../lib/panel/yetki';
+import { env } from 'cloudflare:workers';
+import { senkronla } from '../../worker';
+import { onbellegiTemizle } from '../../lib/ilanlar';
+
+const giris = await paneleGiris(Astro.request);
+if ('yanit' in giris) return giris.yanit;
+
+const vt = env.VT as D1Database;
+let bildirim: { tur: 'basari' | 'hata'; metin: string } | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  if (form.get('eylem') === 'senkron') {
+    const sonuc = await senkronla(env as never);
+    onbellegiTemizle();
+    bildirim = sonuc.tamam
+      ? {
+          tur: 'basari',
+          metin: `Senkron tamam: ${sonuc.bulunan} ilan bulundu, ${sonuc.eklenen} yeni, ${sonuc.pasiflenen} pasife düştü.`,
+        }
+      : { tur: 'hata', metin: `Senkron başarısız: ${sonuc.hata ?? sonuc.sebep}` };
+  }
+}
+
+const [ilanSayim, talepSayim, sonSenkronlar, sonTalepler] = await Promise.all([
+  vt
+    .prepare(
+      `SELECT
+         SUM(CASE WHEN durum = 'aktif' THEN 1 ELSE 0 END) AS aktif,
+         SUM(CASE WHEN durum = 'pasif' THEN 1 ELSE 0 END) AS pasif,
+         COUNT(*) AS toplam
+       FROM ilanlar`
+    )
+    .first<{ aktif: number; pasif: number; toplam: number }>(),
+  vt
+    .prepare(
+      `SELECT
+         SUM(CASE WHEN durum = 'yeni' THEN 1 ELSE 0 END) AS yeni,
+         COUNT(*) AS toplam
+       FROM talepler`
+    )
+    .first<{ yeni: number; toplam: number }>(),
+  vt
+    .prepare(
+      `SELECT baslangic, bitis, bulunan, eklenen, pasiflenen, basarisiz, hata
+       FROM senkron_gunlugu ORDER BY id DESC LIMIT 5`
+    )
+    .all<Record<string, unknown>>(),
+  vt
+    .prepare(
+      `SELECT id, tur, ad, telefon, ilce, mulk_tipi, olusturma, durum
+       FROM talepler ORDER BY id DESC LIMIT 6`
+    )
+    .all<Record<string, unknown>>(),
+]);
+
+const gizliSayim = await vt
+  .prepare(
+    `SELECT
+       SUM(gizli) AS gizli,
+       SUM(one_cikan) AS one_cikan,
+       SUM(CASE WHEN baslik IS NOT NULL OR aciklama IS NOT NULL THEN 1 ELSE 0 END) AS duzenli
+     FROM ilan_duzenleme`
+  )
+  .first<{ gizli: number; one_cikan: number; duzenli: number }>()
+  .catch(() => null);
+
+const son = (sonSenkronlar.results ?? [])[0] as Record<string, string | number | null> | undefined;
+
+const tarih = (d: unknown) =>
+  d
+    ? new Date(String(d)).toLocaleString('tr-TR', {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : '—';
+
+const kartlar = [
+  { etiket: 'Aktif ilan', deger: ilanSayim?.aktif ?? 0, alt: `${ilanSayim?.pasif ?? 0} pasif arşivde` },
+  {
+    etiket: 'Yeni talep',
+    deger: talepSayim?.yeni ?? 0,
+    alt: `toplam ${talepSayim?.toplam ?? 0}`,
+    vurgu: (talepSayim?.yeni ?? 0) > 0,
+  },
+  { etiket: 'Öne çıkarılan', deger: gizliSayim?.one_cikan ?? 0, alt: 'ana sayfada başta' },
+  { etiket: 'Gizlenen', deger: gizliSayim?.gizli ?? 0, alt: 'sitede görünmüyor' },
+];
+---
+
+<Panel baslik="Özet" eposta={giris.kimlik.eposta} ozet="Sitenin bugünkü durumu">
+  <form method="POST" slot="eylem">
+    <input type="hidden" name="eylem" value="senkron" />
+    <button type="submit" class="pd pd--kirmizi">İlanları şimdi güncelle</button>
+  </form>
+
+  {bildirim && <div class={`bildirim bildirim--${bildirim.tur}`}>{bildirim.metin}</div>}
+
+  <div class="ozet-kartlar">
+    {
+      kartlar.map((k) => (
+        <div class:list={['ozet-kart', k.vurgu && 'ozet-kart--vurgu']}>
+          <p class="ozet-etiket">{k.etiket}</p>
+          <p class="ozet-deger veri-sayi">{Number(k.deger).toLocaleString('tr-TR')}</p>
+          <p class="ozet-alt">{k.alt}</p>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="ozet-alt-izgara">
+    <!-- Son talepler -->
+    <section class="kutu">
+      <div class="kutu-bas">
+        <h2>Son talepler</h2>
+        <a href="/yonetim/talepler" class="pd pd--sade">Tümü</a>
+      </div>
+      {
+        (sonTalepler.results ?? []).length === 0 ? (
+          <p class="bos">Henüz talep gelmedi. Formlar çalışıyor; ilk talep buraya düşecek.</p>
+        ) : (
+          <div class="tablo-sar">
+            <table class="veri">
+              <thead>
+                <tr>
+                  <th>Kim</th>
+                  <th>Konu</th>
+                  <th>Tarih</th>
+                  <th>Durum</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(sonTalepler.results ?? []).map((t) => (
+                  <tr>
+                    <td>
+                      <a href={`/yonetim/talepler#t${t.id}`} style="font-weight:600">
+                        {String(t.ad)}
+                      </a>
+                      <br />
+                      <span class="veri-sayi" style="font-size:0.75rem;color:var(--color-kursun)">
+                        {String(t.telefon)}
+                      </span>
+                    </td>
+                    <td>
+                      {t.tur === 'degerleme' ? 'Değerleme' : 'İletişim'}
+                      {t.mulk_tipi && <> · {String(t.mulk_tipi)}</>}
+                      {t.ilce && <> · {String(t.ilce)}</>}
+                    </td>
+                    <td class="sayi">{tarih(t.olusturma)}</td>
+                    <td>
+                      <span class={`cip cip--${t.durum === 'yeni' ? 'yeni' : t.durum === 'islemde' ? 'islemde' : 'kapandi'}`}>
+                        {t.durum === 'yeni' ? 'Yeni' : t.durum === 'islemde' ? 'İşlemde' : 'Kapandı'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+      }
+    </section>
+
+    <!-- Senkron geçmişi -->
+    <section class="kutu">
+      <div class="kutu-bas">
+        <h2>İlan senkronu</h2>
+        <span class="veri-sayi" style="font-size:0.75rem;color:var(--color-kursun)">
+          günde 4 kez
+        </span>
+      </div>
+
+      <div class="senkron-ozet">
+        <p class="ozet-etiket">Son çalışma</p>
+        <p class="senkron-zaman veri-sayi">{tarih(son?.bitis)}</p>
+        {
+          son?.hata ? (
+            <p class="senkron-hata">{String(son.hata)}</p>
+          ) : (
+            <p class="ozet-alt">
+              {son ? `${son.bulunan} ilan tarandı · ${son.pasiflenen ?? 0} pasife düştü` : 'Henüz çalışmadı'}
+            </p>
+          )
+        }
+      </div>
+
+      <div class="tablo-sar">
+        <table class="veri" style="min-width:26rem">
+          <thead>
+            <tr>
+              <th>Zaman</th>
+              <th>Bulunan</th>
+              <th>Yeni</th>
+              <th>Pasif</th>
+              <th>Hata</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              (sonSenkronlar.results ?? []).map((s) => (
+                <tr>
+                  <td class="sayi">{tarih(s.bitis ?? s.baslangic)}</td>
+                  <td class="sayi">{String(s.bulunan ?? '—')}</td>
+                  <td class="sayi">{String(s.eklenen ?? '—')}</td>
+                  <td class="sayi">{String(s.pasiflenen ?? '—')}</td>
+                  <td>
+                    {s.hata ? (
+                      <span class="cip cip--yeni">Hata</span>
+                    ) : (
+                      <span class="cip cip--kapandi">Temiz</span>
+                    )}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</Panel>
+
+<style>
+  .ozet-kartlar {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr));
+    margin-bottom: 1.5rem;
+  }
+  .ozet-kart {
+    background: #fff;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-radius: 8px;
+    padding: 1.1rem 1.25rem 1.25rem;
+  }
+  /* Dikkat isteyen tek kart kırmızı şeritle ayrılır — sayıya bakmadan anlaşılsın */
+  .ozet-kart--vurgu {
+    border-color: color-mix(in oklab, var(--color-kirmizi) 45%, transparent);
+    box-shadow: inset 3px 0 0 var(--color-kirmizi);
+  }
+  .ozet-etiket {
+    font-family: var(--font-veri);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-kursun);
+  }
+  .ozet-deger {
+    font-family: var(--font-baslik);
+    font-size: 2.1rem;
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-top: 0.35rem;
+  }
+  .ozet-alt {
+    font-size: 0.8125rem;
+    color: var(--color-metin-2);
+    margin-top: 0.15rem;
+  }
+
+  .ozet-alt-izgara {
+    display: grid;
+    gap: 1rem;
+    align-items: start;
+  }
+  @media (min-width: 1100px) {
+    .ozet-alt-izgara {
+      grid-template-columns: 1.25fr 1fr;
+    }
+  }
+
+  .senkron-ozet {
+    padding: 1.1rem 1.1rem 1.25rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+  }
+  .senkron-zaman {
+    font-size: 1.15rem;
+    font-weight: 500;
+    margin-top: 0.3rem;
+  }
+  .senkron-hata {
+    margin-top: 0.4rem;
+    font-size: 0.8125rem;
+    color: var(--color-kirmizi-derin);
+  }
+</style>

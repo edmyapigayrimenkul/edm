@@ -1,0 +1,70 @@
+/**
+ * Yönetim panelinin kullandığı tablolar.
+ *
+ * Tasarım kuralı: senkron ile panel birbirine karışmaz.
+ * Emlakjet'ten gelen veri `ilanlar` tablosuna yazılır ve her senkronda üzerine
+ * yazılır. Panelden yapılan müdahaleler ayrı bir `ilan_duzenleme` tablosunda
+ * durur, okuma anında üstüne bindirilir. Böylece bir başlığı elle düzeltmek
+ * senkronu bozmaz, senkron da düzeltmeyi silmez.
+ */
+
+export const PANEL_SEMA = `
+-- Portaldan gelen ilana yapılan elle müdahaleler
+CREATE TABLE IF NOT EXISTS ilan_duzenleme (
+  ilan_id     TEXT PRIMARY KEY,
+  baslik      TEXT,
+  aciklama    TEXT,
+  one_cikan   INTEGER NOT NULL DEFAULT 0,
+  gizli       INTEGER NOT NULL DEFAULT 0,
+  guncelleme  TEXT NOT NULL
+);
+
+-- Müşteri yorumları — uydurulmaz, elle girilir
+CREATE TABLE IF NOT EXISTS yorumlar (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  ad         TEXT NOT NULL,
+  metin      TEXT NOT NULL,
+  kaynak     TEXT NOT NULL DEFAULT 'Google',
+  tarih      TEXT,
+  puan       INTEGER,
+  konu       TEXT,
+  yayinda    INTEGER NOT NULL DEFAULT 1,
+  sira       INTEGER NOT NULL DEFAULT 0,
+  olusturma  TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Ekip — koddan taşındı, panelden yönetiliyor
+CREATE TABLE IF NOT EXISTS ekip (
+  slug           TEXT PRIMARY KEY,
+  emlakjet_slug  TEXT,
+  ad             TEXT NOT NULL,
+  unvan          TEXT NOT NULL,
+  telefon        TEXT,
+  eposta         TEXT,
+  foto           TEXT,
+  uzmanlik       TEXT NOT NULL DEFAULT '[]',
+  hakkinda       TEXT NOT NULL DEFAULT '',
+  sira           INTEGER NOT NULL DEFAULT 0,
+  yayinda        INTEGER NOT NULL DEFAULT 1
+);
+
+-- Site metinleri ve iletişim bilgileri
+CREATE TABLE IF NOT EXISTS ayarlar (
+  anahtar     TEXT PRIMARY KEY,
+  deger       TEXT NOT NULL,
+  guncelleme  TEXT
+);
+
+CREATE INDEX IF NOT EXISTS yorum_yayin ON yorumlar (yayinda, sira);
+CREATE INDEX IF NOT EXISTS ekip_sira   ON ekip (yayinda, sira);
+`;
+
+/** Taleplere iç not ve ilgilenen kişi alanları — var olan tabloya ekleniyor. */
+export const TALEP_EKLERI = [
+  `ALTER TABLE talepler ADD COLUMN ic_not TEXT`,
+  `ALTER TABLE talepler ADD COLUMN ilgilenen TEXT`,
+  `ALTER TABLE talepler ADD COLUMN kapanma TEXT`,
+];
+
+/** Elle eklenen ilanların senkronda pasife düşmemesi için işaret. */
+export const ELLE_KAYNAK = 'elle';

@@ -1,11 +1,15 @@
 ---
 import Temel from '../layouts/Temel.astro';
-import { ILETISIM, KURUM, SOSYAL, DANISMANLAR, whatsappBaglanti } from '../lib/site';
+import { KURUM, SOSYAL } from '../lib/site';
+import { icerik, whatsappBaglanti, haritaBaglanti } from '../lib/icerik';
+
+const { ekip, iletisim } = await icerik();
+const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.adresIlce} / ${iletisim.adresIl}`;
 ---
 
 <Temel
   baslik="İletişim"
-  aciklama={`${KURUM.ad} ofisi Silivri'de. ${ILETISIM.adres.tam}. Telefon ${ILETISIM.telefon}. Randevu almadan da uğrayabilirsiniz.`}
+  aciklama={`${KURUM.ad} ofisi Silivri'de. ${adresTam}. Telefon ${iletisim.telefon}. Randevu almadan da uğrayabilirsiniz.`}
 >
   <section class="pt-28 pb-16 lg:pt-36 lg:pb-24">
     <div class="kab">
@@ -19,43 +23,43 @@ import { ILETISIM, KURUM, SOSYAL, DANISMANLAR, whatsappBaglanti } from '../lib/s
         <div>
           <ul class="kanal-liste" data-belir="sira">
             <li>
-              <a href={`tel:${ILETISIM.telefonHam}`} class="kanal">
+              <a href={`tel:${iletisim.telefonHam}`} class="kanal">
                 <span class="etiket">Telefon</span>
-                <span class="kanal-deger font-veri">{ILETISIM.telefon}</span>
+                <span class="kanal-deger font-veri">{iletisim.telefon}</span>
                 <span class="kanal-not">Hafta içi ve cumartesi 09:00 — 19:00</span>
               </a>
             </li>
             <li>
               <a
-                href={whatsappBaglanti('Merhaba, EDM Yapı & Gayrimenkul ile görüşmek istiyorum.')}
+                href={whatsappBaglanti(iletisim.whatsapp, 'Merhaba, EDM Yapı & Gayrimenkul ile görüşmek istiyorum.')}
                 target="_blank"
                 rel="noopener noreferrer"
                 class="kanal"
               >
                 <span class="etiket">WhatsApp</span>
-                <span class="kanal-deger font-veri">{ILETISIM.telefon}</span>
+                <span class="kanal-deger font-veri">{iletisim.telefon}</span>
                 <span class="kanal-not">En hızlı dönüş buradan olur</span>
               </a>
             </li>
             <li>
-              <a href={`mailto:${ILETISIM.eposta}`} class="kanal">
+              <a href={`mailto:${iletisim.eposta}`} class="kanal">
                 <span class="etiket">E-posta</span>
-                <span class="kanal-deger font-veri text-[1.05rem]">{ILETISIM.eposta}</span>
+                <span class="kanal-deger font-veri text-[1.05rem]">{iletisim.eposta}</span>
                 <span class="kanal-not">Belge ve dosya göndermek için</span>
               </a>
             </li>
             <li>
               <a
-                href={ILETISIM.haritaArama}
+                href={haritaBaglanti(iletisim)}
                 target="_blank"
                 rel="noopener noreferrer"
                 class="kanal"
               >
                 <span class="etiket">Ofis</span>
                 <span class="kanal-deger kanal-adres">
-                  {ILETISIM.adres.satir1}<br />
-                  {ILETISIM.adres.satir2}<br />
-                  {ILETISIM.adres.ilce} / {ILETISIM.adres.il}
+                  {iletisim.adresSatir1}<br />
+                  {iletisim.adresSatir2}<br />
+                  {iletisim.adresIlce} / {iletisim.adresIl}
                 </span>
                 <span class="kanal-not">Haritada aç</span>
               </a>
@@ -80,7 +84,7 @@ import { ILETISIM, KURUM, SOSYAL, DANISMANLAR, whatsappBaglanti } from '../lib/s
 
         <!-- Sağ: form -->
         <div>
-          <form class="form-kart" data-iletisim-form novalidate>
+          <form class="form-kart" data-iletisim-form novalidate data-wa={iletisim.whatsapp}>
             <h2 class="baslik-orta">Bize yazın</h2>
             <p class="mt-2 text-sm text-metin-2">
               Ne aradığınızı anlatın; portföyümüzde yoksa bulmaya çalışırız.
@@ -169,7 +173,7 @@ import { ILETISIM, KURUM, SOSYAL, DANISMANLAR, whatsappBaglanti } from '../lib/s
         <p class="etiket">Doğrudan danışmana ulaşın</p>
         <div class="mt-5 flex flex-wrap gap-2.5">
           {
-            DANISMANLAR.map((d) => (
+            ekip.map((d) => (
               <a href={`/danismanlar/${d.slug}`} class="dugme dugme--hayalet">
                 {d.ad}
               </a>
@@ -310,9 +314,9 @@ import { ILETISIM, KURUM, SOSYAL, DANISMANLAR, whatsappBaglanti } from '../lib/s
 </style>
 
 <script>
-  import { ILETISIM } from '../lib/site';
 
   const form = document.querySelector<HTMLFormElement>('[data-iletisim-form]');
+  const waNumara = form?.dataset.wa ?? '905363434197';
   const basari = document.querySelector<HTMLElement>('[data-basari]');
   const waBaglanti = document.querySelector<HTMLAnchorElement>('[data-wa-baglanti]');
 
@@ -369,7 +373,7 @@ import { ILETISIM, KURUM, SOSYAL, DANISMANLAR, whatsappBaglanti } from '../lib/s
           '',
           veri.mesaj,
         ].join('\n');
-        waBaglanti.href = `https://wa.me/${ILETISIM.whatsapp}?text=${encodeURIComponent(metin)}`;
+        waBaglanti.href = `https://wa.me/${waNumara}?text=${encodeURIComponent(metin)}`;
       }
 
       gonderDugme.disabled = true;

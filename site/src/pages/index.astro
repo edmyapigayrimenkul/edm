@@ -2,11 +2,19 @@
 import Temel from '../layouts/Temel.astro';
 import ParselTuval from '../components/ParselTuval.astro';
 import IlanKart from '../components/IlanKart.astro';
-import { KURUM, ILETISIM, HIZMETLER, DANISMANLAR } from '../lib/site';
+import { KURUM, HIZMETLER } from '../lib/site';
 import { oneCikanlar, portfoy, danismaninIlanlari } from '../lib/ilanlar';
-import { YORUMLAR } from '../lib/yorumlar';
+import { icerik } from '../lib/icerik';
 
 const { sayimlar: SAYIMLAR, filtreler: FILTRELER } = await portfoy();
+const { ekip, yorumlar, iletisim } = await icerik();
+
+const ekipSayili = await Promise.all(
+  ekip.map(async (d) => ({
+    ...d,
+    adet: d.emlakjetSlug ? (await danismaninIlanlari(d.emlakjetSlug)).length : 0,
+  }))
+);
 const secki = await oneCikanlar(7);
 const donum = Math.round(SAYIMLAR.toplamAlan / 1000);
 
@@ -207,8 +215,8 @@ const hizliFiltreler = [
 
       <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-belir="sira">
         {
-          DANISMANLAR.map((d) => {
-            const adet = danismaninIlanlari(d.emlakjetSlug).length;
+          ekipSayili.map((d) => {
+            const adet = d.adet;
             const bas = d.ad
               .split(' ')
               .map((p) => p[0])
@@ -245,9 +253,9 @@ const hizliFiltreler = [
     </div>
   </section>
 
-  <!-- ================= YORUMLAR (gerçek yorum girilince görünür) ================= -->
+  <!-- ================= yorumlar (gerçek yorum girilince görünür) ================= -->
   {
-    YORUMLAR.length > 0 && (
+    yorumlar.length > 0 && (
       <section class="pb-20 lg:pb-28">
         <div class="kab">
           <p class="etiket" data-belir>
@@ -257,7 +265,7 @@ const hizliFiltreler = [
             Bizimle çalışanlar ne dedi
           </h2>
           <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-belir="sira">
-            {YORUMLAR.slice(0, 6).map((y) => (
+            {yorumlar.slice(0, 6).map((y) => (
               <figure class="yorum-kart">
                 <blockquote class="text-[1.0625rem] leading-relaxed">“{y.metin}”</blockquote>
                 <figcaption class="mt-5 border-t border-murekkep/10 pt-4">
@@ -290,8 +298,8 @@ const hizliFiltreler = [
 
         <div class="flex flex-col gap-3" data-belir data-gecikme="0.18">
           <a href="/degerleme" class="dugme dugme--kirmizi w-full !py-4">Değerleme talebi oluştur</a>
-          <a href={`tel:${ILETISIM.telefonHam}`} class="dugme dugme--hayalet w-full !py-4">
-            Telefonla konuşalım — {ILETISIM.telefon}
+          <a href={`tel:${iletisim.telefonHam}`} class="dugme dugme--hayalet w-full !py-4">
+            Telefonla konuşalım — {iletisim.telefon}
           </a>
           <p class="etiket mt-2 text-center">Ortalama dönüş süresi: aynı gün</p>
         </div>

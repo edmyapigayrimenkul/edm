@@ -3,7 +3,8 @@ import Temel from '../../layouts/Temel.astro';
 import Galeri from '../../components/Galeri.astro';
 import IlanKart from '../../components/IlanKart.astro';
 import { ilanBul, benzerIlanlar, fiyatYaz } from '../../lib/ilanlar';
-import { DANISMANLAR, ILETISIM, PORTALLAR, whatsappBaglanti, KURUM } from '../../lib/site';
+import { PORTALLAR, KURUM } from '../../lib/site';
+import { icerik, whatsappBaglanti } from '../../lib/icerik';
 
 const { slug } = Astro.params;
 const ilan = slug ? await ilanBul(slug) : undefined;
@@ -15,7 +16,8 @@ if (!ilan) return Astro.rewrite('/404');
 if (ilan.slug !== slug) return Astro.redirect(ilan.yol, 301);
 
 const benzer = await benzerIlanlar(ilan, 3);
-const danisman = DANISMANLAR.find((d) => d.emlakjetSlug === ilan.danismanSlug);
+const { ekip, iletisim } = await icerik();
+const danisman = ekip.find((d) => d.emlakjetSlug && d.emlakjetSlug === ilan.danismanSlug);
 
 /** Künyede gösterilmeyecek alanlar — ya başka yerde var ya da anlamsız. */
 const gizliOzellikler = new Set(['İlan Numarası', 'Kategori', 'İlan Güncelleme Tarihi']);
@@ -249,15 +251,15 @@ const izYolu = {
 
             <div class="mt-5 flex flex-col gap-2.5">
               <a
-                href={whatsappBaglanti(waMesaj)}
+                href={whatsappBaglanti(iletisim.whatsapp, waMesaj)}
                 target="_blank"
                 rel="noopener noreferrer"
                 class="dugme dugme--kirmizi w-full"
               >
                 WhatsApp’tan sor
               </a>
-              <a href={`tel:${ILETISIM.telefonHam}`} class="dugme dugme--murekkep w-full">
-                {ILETISIM.telefon}
+              <a href={`tel:${iletisim.telefonHam}`} class="dugme dugme--murekkep w-full">
+                {iletisim.telefon}
               </a>
               <a href="/iletisim" class="dugme dugme--hayalet w-full">Yerinde görmek istiyorum</a>
             </div>

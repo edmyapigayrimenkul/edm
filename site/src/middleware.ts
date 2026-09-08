@@ -11,8 +11,8 @@ import { defineMiddleware } from 'astro:middleware';
 
 const KOK_ALAN = 'edmyapigayrimenkul.com';
 
-/** Önbelleklenmeyecek yollar: form uçları ve yönetim. */
-const ONBELLEKSIZ = [/^\/api\//];
+/** Önbelleklenmeyecek yollar: form uçları ve yönetim paneli. */
+const ONBELLEKSIZ = [/^\/api\//, /^\/yonetim/];
 
 export const onRequest = defineMiddleware(async (baglam, sonraki) => {
   const adres = baglam.url;

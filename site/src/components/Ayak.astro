@@ -1,8 +1,12 @@
 ---
-import { KURUM, ILETISIM, SOSYAL, MENU, PORTALLAR } from '../lib/site';
+import { KURUM, SOSYAL, MENU, PORTALLAR, ILETISIM } from '../lib/site';
 import { portfoy } from '../lib/ilanlar';
+import { icerik, haritaBaglanti } from '../lib/icerik';
 
 const { sayimlar: SAYIMLAR, sonGuncelleme } = await portfoy();
+const { iletisim } = await icerik();
+// Çalışma saatleri henüz panelden yönetilmiyor; koddaki değer geçerli.
+const CALISMA_SAATLERI = ILETISIM.calismaSaatleri;
 
 const yil = new Date().getFullYear();
 const guncelleme = new Date(sonGuncelleme).toLocaleDateString('tr-TR', {
@@ -28,8 +32,8 @@ const guncelleme = new Date(sonGuncelleme).toLocaleDateString('tr-TR', {
       </div>
       <div class="flex flex-wrap gap-3 lg:justify-end">
         <a href="/degerleme" class="dugme dugme--kirmizi">Ücretsiz değerleme</a>
-        <a href={`tel:${ILETISIM.telefonHam}`} class="dugme dugme--hayalet-acik">
-          {ILETISIM.telefon}
+        <a href={`tel:${iletisim.telefonHam}`} class="dugme dugme--hayalet-acik">
+          {iletisim.telefon}
         </a>
       </div>
     </div>
@@ -98,21 +102,21 @@ const guncelleme = new Date(sonGuncelleme).toLocaleDateString('tr-TR', {
       <div>
         <p class="etiket etiket--acik">Ofis</p>
         <address class="mt-5 flex flex-col gap-4 text-sm not-italic text-kagit/70">
-          <a href={ILETISIM.haritaArama} target="_blank" rel="noopener noreferrer" class="ayak-bag leading-relaxed">
-            {ILETISIM.adres.satir1}<br />
-            {ILETISIM.adres.satir2}<br />
-            {ILETISIM.adres.ilce} / {ILETISIM.adres.il}
+          <a href={haritaBaglanti(iletisim)} target="_blank" rel="noopener noreferrer" class="ayak-bag leading-relaxed">
+            {iletisim.adresSatir1}<br />
+            {iletisim.adresSatir2}<br />
+            {iletisim.adresIlce} / {iletisim.adresIl}
           </a>
-          <a href={`tel:${ILETISIM.telefonHam}`} class="ayak-bag font-veri">
-            {ILETISIM.telefon}
+          <a href={`tel:${iletisim.telefonHam}`} class="ayak-bag font-veri">
+            {iletisim.telefon}
           </a>
-          <a href={`mailto:${ILETISIM.eposta}`} class="ayak-bag font-veri text-[0.8125rem]">
-            {ILETISIM.eposta}
+          <a href={`mailto:${iletisim.eposta}`} class="ayak-bag font-veri text-[0.8125rem]">
+            {iletisim.eposta}
           </a>
         </address>
         <dl class="mt-6 flex flex-col gap-1.5 border-t border-kagit/12 pt-5 text-[0.8125rem] text-kagit/58">
           {
-            ILETISIM.calismaSaatleri.map((s) => (
+            CALISMA_SAATLERI.map((s) => (
               <div class="flex justify-between gap-4">
                 <dt>{s.gun}</dt>
                 <dd class="font-veri">{s.saat}</dd>

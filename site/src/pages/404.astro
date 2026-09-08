@@ -2,12 +2,13 @@
 import Temel from '../layouts/Temel.astro';
 import IlanKart from '../components/IlanKart.astro';
 import { oneCikanlar, portfoy } from '../lib/ilanlar';
-import { ILETISIM } from '../lib/site';
+import { icerik } from '../lib/icerik';
 
 Astro.response.status = 404;
 
 const { sayimlar: SAYIMLAR } = await portfoy();
 const oneriler = await oneCikanlar(3);
+const { iletisim } = await icerik();
 ---
 
 <Temel
@@ -27,8 +28,8 @@ const oneriler = await oneCikanlar(3);
 
       <div class="mt-8 flex flex-wrap gap-3">
         <a href="/ilanlar" class="dugme dugme--kirmizi">Tüm ilanlara bak</a>
-        <a href={`tel:${ILETISIM.telefonHam}`} class="dugme dugme--hayalet">
-          Aradığınızı sorun — {ILETISIM.telefon}
+        <a href={`tel:${iletisim.telefonHam}`} class="dugme dugme--hayalet">
+          Aradığınızı sorun — {iletisim.telefon}
         </a>
       </div>
     </div>

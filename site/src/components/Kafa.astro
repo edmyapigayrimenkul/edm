@@ -1,11 +1,14 @@
 ---
-import { KURUM, ILETISIM, MENU } from '../lib/site';
+import { KURUM, MENU } from '../lib/site';
+import { icerik } from '../lib/icerik';
 
 interface Props {
   /** Sayfa koyu bir kahramanla açılıyorsa çubuk şeffaf başlar. */
   koyuUst?: boolean;
 }
 const { koyuUst = false } = Astro.props;
+const { iletisim } = await icerik();
+const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.adresIlce} / ${iletisim.adresIl}`;
 const suAn = Astro.url.pathname;
 const aktifMi = (yol: string) => suAn === yol || suAn.startsWith(`${yol}/`);
 ---
@@ -51,7 +54,7 @@ const aktifMi = (yol: string) => suAn === yol || suAn.startsWith(`${yol}/`);
 
       <div class="flex items-center gap-2 sm:gap-3">
         <a
-          href={`tel:${ILETISIM.telefonHam}`}
+          href={`tel:${iletisim.telefonHam}`}
           class="menu-bag hidden items-center gap-2 font-veri text-sm tracking-tight sm:inline-flex"
         >
           <svg
@@ -66,7 +69,7 @@ const aktifMi = (yol: string) => suAn === yol || suAn.startsWith(`${yol}/`);
               d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"
             ></path>
           </svg>
-          {ILETISIM.telefon}
+          {iletisim.telefon}
         </a>
 
         <a href="/degerleme" class="dugme dugme--kirmizi hidden !px-5 !py-2.5 text-[0.8125rem] md:inline-flex">
@@ -117,10 +120,10 @@ const aktifMi = (yol: string) => suAn === yol || suAn.startsWith(`${yol}/`);
 
     <div class="mt-auto flex flex-col gap-4 pt-10">
       <a href="/degerleme" class="dugme dugme--kirmizi w-full">Ücretsiz değerleme al</a>
-      <a href={`tel:${ILETISIM.telefonHam}`} class="dugme dugme--hayalet-acik w-full">
-        {ILETISIM.telefon}
+      <a href={`tel:${iletisim.telefonHam}`} class="dugme dugme--hayalet-acik w-full">
+        {iletisim.telefon}
       </a>
-      <p class="etiket etiket--acik pt-2">{ILETISIM.adres.tam}</p>
+      <p class="etiket etiket--acik pt-2">{adresTam}</p>
     </div>
   </div>
 </div>

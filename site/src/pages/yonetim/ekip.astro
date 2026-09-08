@@ -1,0 +1,288 @@
+---
+import Panel from '../../layouts/Panel.astro';
+import { paneleGiris } from '../../lib/panel/yetki';
+import { env } from 'cloudflare:workers';
+import { icerikOnbellegiTemizle } from '../../lib/icerik';
+import { slugla } from '../../lib/ilanlar';
+
+const giris = await paneleGiris(Astro.request);
+if ('yanit' in giris) return giris.yanit;
+
+const vt = env.VT as D1Database;
+let bildirim: { tur: 'basari' | 'hata'; metin: string } | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const eylem = String(form.get('eylem') ?? '');
+  const slug = String(form.get('slug') ?? '');
+
+  try {
+    if (eylem === 'kaydet') {
+      const ad = String(form.get('ad') ?? '').trim();
+      if (!ad) throw new Error('İsim gerekli.');
+
+      const yeniSlug = slug || slugla(ad);
+      const uzmanlik = String(form.get('uzmanlik') ?? '')
+        .split(',')
+        .map((u) => u.trim())
+        .filter(Boolean);
+
+      await vt
+        .prepare(
+          `INSERT INTO ekip (slug, emlakjet_slug, ad, unvan, telefon, eposta, foto, uzmanlik, hakkinda, sira, yayinda)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?)
+           ON CONFLICT(slug) DO UPDATE SET
+             emlakjet_slug=excluded.emlakjet_slug, ad=excluded.ad, unvan=excluded.unvan,
+             telefon=excluded.telefon, eposta=excluded.eposta, foto=excluded.foto,
+             uzmanlik=excluded.uzmanlik, hakkinda=excluded.hakkinda,
+             sira=excluded.sira, yayinda=excluded.yayinda`
+        )
+        .bind(
+          yeniSlug,
+          String(form.get('emlakjet_slug') ?? '').trim() || null,
+          ad.slice(0, 120),
+          String(form.get('unvan') ?? '').trim().slice(0, 120),
+          String(form.get('telefon') ?? '').trim() || null,
+          String(form.get('eposta') ?? '').trim() || null,
+          String(form.get('foto') ?? '').trim() || null,
+          JSON.stringify(uzmanlik),
+          String(form.get('hakkinda') ?? '').trim().slice(0, 1500),
+          Number(form.get('sira')) || 0,
+          form.get('yayinda') ? 1 : 0
+        )
+        .run();
+      bildirim = { tur: 'basari', metin: `${ad} kaydedildi.` };
+    } else if (eylem === 'sil' && slug) {
+      await vt.prepare(`DELETE FROM ekip WHERE slug = ?`).bind(slug).run();
+      bildirim = { tur: 'basari', metin: 'Danışman silindi.' };
+    }
+    icerikOnbellegiTemizle();
+  } catch (hata) {
+    bildirim = { tur: 'hata', metin: (hata as Error).message };
+  }
+}
+
+const ekipSatirlari = await vt
+  .prepare(`SELECT * FROM ekip ORDER BY sira ASC, ad ASC`)
+  .all<Record<string, unknown>>();
+
+const duzenle = Astro.url.searchParams.get('duzenle');
+const kisi = duzenle ? (ekipSatirlari.results ?? []).find((e) => e.slug === duzenle) : null;
+
+const uzmanlikMetni = (deger: unknown) => {
+  try {
+    return (JSON.parse(String(deger ?? '[]')) as string[]).join(', ');
+  } catch {
+    return '';
+  }
+};
+---
+
+<Panel baslik="Ekip" eposta={giris.kimlik.eposta} ozet="Danışman profilleri ve sıralaması">
+  {bildirim && <div class={`bildirim bildirim--${bildirim.tur}`}>{bildirim.metin}</div>}
+
+  <div class="iki-sutun">
+    <div class="kutu">
+      <div class="kutu-bas">
+        <h2>Danışmanlar</h2>
+        <a href="/yonetim/ekip" class="pd pd--sade">Yeni ekle</a>
+      </div>
+      <ul class="ekip-liste">
+        {
+          (ekipSatirlari.results ?? []).map((e) => (
+            <li class="ekip-satir">
+              <div class="ekip-portre">
+                {e.foto ? (
+                  <img src={String(e.foto)} alt={String(e.ad)} loading="lazy" />
+                ) : (
+                  <span>{String(e.ad).split(' ').map((p) => p[0]).join('')}</span>
+                )}
+              </div>
+              <div class="ekip-bilgi">
+                <strong>{String(e.ad)}</strong>
+                {e.yayinda === 1 ? (
+                  <span class="cip cip--kapandi">Yayında</span>
+                ) : (
+                  <span class="cip cip--gizli">Gizli</span>
+                )}
+                <p class="ekip-unvan">{String(e.unvan)}</p>
+                <p class="ekip-uzmanlik">{uzmanlikMetni(e.uzmanlik)}</p>
+              </div>
+              <div class="ekip-eylem">
+                <a href={`?duzenle=${e.slug}#form`} class="pd pd--sade">Düzenle</a>
+                <form method="POST" onsubmit="return confirm('Bu danışman kalıcı olarak silinecek. Emin misiniz?')">
+                  <input type="hidden" name="slug" value={String(e.slug)} />
+                  <input type="hidden" name="eylem" value="sil" />
+                  <button type="submit" class="pd pd--tehlike">Sil</button>
+                </form>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="kutu" id="form">
+      <div class="kutu-bas">
+        <h2>{kisi ? `${kisi.ad} — düzenle` : 'Yeni danışman'}</h2>
+      </div>
+      <form method="POST" class="ekip-form">
+        <input type="hidden" name="eylem" value="kaydet" />
+        {kisi && <input type="hidden" name="slug" value={String(kisi.slug)} />}
+
+        <div class="p-izgara">
+          <label class="p-alan">
+            <span>Ad Soyad *</span>
+            <input type="text" name="ad" required value={String(kisi?.ad ?? '')} />
+          </label>
+          <label class="p-alan">
+            <span>Unvan</span>
+            <input type="text" name="unvan" placeholder="Gayrimenkul Danışmanı" value={String(kisi?.unvan ?? '')} />
+          </label>
+          <label class="p-alan">
+            <span>Telefon</span>
+            <input type="text" name="telefon" value={String(kisi?.telefon ?? '')} />
+          </label>
+          <label class="p-alan">
+            <span>E-posta</span>
+            <input type="email" name="eposta" value={String(kisi?.eposta ?? '')} />
+          </label>
+          <label class="p-alan">
+            <span>Sıra</span>
+            <input type="number" name="sira" value={String(kisi?.sira ?? 0)} />
+          </label>
+          <label class="p-alan">
+            <span>Emlakjet profil kodu</span>
+            <input
+              type="text"
+              name="emlakjet_slug"
+              placeholder="metin-ozdogan-1025129"
+              value={String(kisi?.emlakjet_slug ?? '')}
+            />
+          </label>
+        </div>
+
+        <label class="p-alan">
+          <span>Fotoğraf adresi</span>
+          <input type="text" name="foto" placeholder="/ekip/ad-soyad.webp" value={String(kisi?.foto ?? '')} />
+        </label>
+
+        <label class="p-alan">
+          <span>Uzmanlık — virgülle ayırın</span>
+          <input
+            type="text"
+            name="uzmanlik"
+            placeholder="Arsa ve tarla, Kiralama"
+            value={uzmanlikMetni(kisi?.uzmanlik)}
+          />
+        </label>
+
+        <label class="p-alan">
+          <span>Hakkında</span>
+          <textarea name="hakkinda" rows="4" set:text={String(kisi?.hakkinda ?? '')} />
+        </label>
+
+        <label class="onay-satir">
+          <input type="checkbox" name="yayinda" checked={kisi ? kisi.yayinda === 1 : true} />
+          <span>Sitede göster</span>
+        </label>
+
+        <button type="submit" class="pd pd--kirmizi">Kaydet</button>
+        <p class="ipucu">
+          Emlakjet profil kodu, danışmanın ilanlarının profiline bağlanmasını sağlar.
+          Boş bırakılırsa ilan sayısı gösterilmez.
+        </p>
+      </form>
+    </div>
+  </div>
+</Panel>
+
+<style>
+  .iki-sutun {
+    display: grid;
+    gap: 1rem;
+    align-items: start;
+  }
+  @media (min-width: 1050px) {
+    .iki-sutun {
+      grid-template-columns: 1.15fr 1fr;
+    }
+  }
+  .ekip-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .ekip-satir {
+    display: grid;
+    grid-template-columns: 3.25rem 1fr auto;
+    gap: 0.9rem;
+    align-items: start;
+    padding: 1rem 1.1rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-murekkep) 8%, transparent);
+  }
+  .ekip-satir:last-child {
+    border-bottom: 0;
+  }
+  .ekip-portre {
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--color-kirec);
+    display: grid;
+    place-items: center;
+    font-family: var(--font-baslik);
+    font-weight: 600;
+    color: var(--color-metin-2);
+  }
+  .ekip-portre img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .ekip-bilgi {
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.9375rem;
+  }
+  .ekip-unvan,
+  .ekip-uzmanlik {
+    flex-basis: 100%;
+    font-size: 0.8125rem;
+    color: var(--color-metin-2);
+  }
+  .ekip-uzmanlik {
+    color: var(--color-kursun);
+  }
+  .ekip-eylem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .ekip-form {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .onay-satir {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+  }
+  .onay-satir input {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--color-kirmizi);
+  }
+  .ipucu {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--color-kursun);
+  }
+</style>

@@ -1,15 +1,16 @@
 ---
-import { whatsappBaglanti } from '../lib/site';
+import { icerik, whatsappBaglanti } from '../lib/icerik';
 
 interface Props {
   /** Sayfaya özel açılış mesajı — ilan detayında ilan başlığıyla dolar. */
   mesaj?: string;
 }
 const { mesaj = 'Merhaba, EDM Yapı & Gayrimenkul ile görüşmek istiyorum.' } = Astro.props;
+const { iletisim } = await icerik();
 ---
 
 <a
-  href={whatsappBaglanti(mesaj)}
+  href={whatsappBaglanti(iletisim.whatsapp, mesaj)}
   target="_blank"
   rel="noopener noreferrer"
   class="wa-dugme"

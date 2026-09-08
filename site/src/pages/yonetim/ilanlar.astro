@@ -1,0 +1,409 @@
+---
+import Panel from '../../layouts/Panel.astro';
+import { paneleGiris } from '../../lib/panel/yetki';
+import { env } from 'cloudflare:workers';
+import { tumIlanSatirlari } from '../../lib/senkron/depo';
+import { onbellegiTemizle, baslikTemizle, slugla, fiyatKisa } from '../../lib/ilanlar';
+
+const giris = await paneleGiris(Astro.request);
+if ('yanit' in giris) return giris.yanit;
+
+const vt = env.VT as D1Database;
+let bildirim: { tur: 'basari' | 'hata'; metin: string } | null = null;
+
+const suAn = () => new Date().toISOString();
+
+/** ilan_duzenleme satırını oluşturur ya da tek alanını günceller. */
+async function duzenlemeYaz(id: string, alan: string, deger: unknown) {
+  await vt
+    .prepare(
+      `INSERT INTO ilan_duzenleme (ilan_id, ${alan}, guncelleme) VALUES (?,?,?)
+       ON CONFLICT(ilan_id) DO UPDATE SET ${alan} = excluded.${alan}, guncelleme = excluded.guncelleme`
+    )
+    .bind(id, deger, suAn())
+    .run();
+}
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const eylem = String(form.get('eylem') ?? '');
+  const id = String(form.get('id') ?? '');
+
+  try {
+    if (eylem === 'one-cikar' && id) {
+      await duzenlemeYaz(id, 'one_cikan', Number(form.get('deger')) ? 1 : 0);
+      bildirim = { tur: 'basari', metin: 'Öne çıkarma güncellendi.' };
+    } else if (eylem === 'gizle' && id) {
+      await duzenlemeYaz(id, 'gizli', Number(form.get('deger')) ? 1 : 0);
+      bildirim = { tur: 'basari', metin: 'Görünürlük güncellendi.' };
+    } else if (eylem === 'metin' && id) {
+      const baslik = String(form.get('baslik') ?? '').trim();
+      const aciklama = String(form.get('aciklama') ?? '').trim();
+      await vt
+        .prepare(
+          `INSERT INTO ilan_duzenleme (ilan_id, baslik, aciklama, guncelleme) VALUES (?,?,?,?)
+           ON CONFLICT(ilan_id) DO UPDATE SET
+             baslik = excluded.baslik, aciklama = excluded.aciklama, guncelleme = excluded.guncelleme`
+        )
+        .bind(id, baslik || null, aciklama || null, suAn())
+        .run();
+      bildirim = { tur: 'basari', metin: 'Metin güncellendi. Portaldan gelen hâli bozulmadı.' };
+    } else if (eylem === 'sifirla' && id) {
+      await vt.prepare(`DELETE FROM ilan_duzenleme WHERE ilan_id = ?`).bind(id).run();
+      bildirim = { tur: 'basari', metin: 'Düzenlemeler kaldırıldı, portaldaki hâline döndü.' };
+    } else if (eylem === 'elle-ekle') {
+      const baslik = String(form.get('baslik') ?? '').trim();
+      const fiyat = Number(form.get('fiyat')) || null;
+      if (!baslik) throw new Error('Başlık gerekli.');
+
+      const yeniId = `elle-${Date.now().toString(36)}`;
+      const gorseller = String(form.get('gorseller') ?? '')
+        .split(/[\n,]+/)
+        .map((g) => g.trim())
+        .filter((g) => /^https?:\/\//.test(g));
+
+      await vt
+        .prepare(
+          `INSERT INTO ilanlar
+             (id, kaynak, kaynak_url, baslik, aciklama, fiyat, para_birimi, islem, kategori,
+              tip, tip_grup, oda, m2, il, ilce, mahalle, ozellikler, gorseller,
+              danisman_slug, guncellenme, ilk_gorulme, son_gorulme, durum, pasif_tarihi)
+           VALUES (?,'elle','',?,?,?,'TRY',?,?,?,?,?,?,?,?,?,'{}',?,NULL,?,?,?,'aktif',NULL)`
+        )
+        .bind(
+          yeniId,
+          baslik,
+          String(form.get('aciklama') ?? '').trim(),
+          fiyat,
+          String(form.get('islem') ?? 'satilik'),
+          String(form.get('kategori') ?? '').trim(),
+          String(form.get('tip') ?? 'diger').trim().toLocaleLowerCase('tr'),
+          String(form.get('tip_grup') ?? 'diger'),
+          String(form.get('oda') ?? '').trim() || null,
+          Number(form.get('m2')) || null,
+          String(form.get('il') ?? '').trim() || null,
+          String(form.get('ilce') ?? '').trim() || null,
+          String(form.get('mahalle') ?? '').trim() || null,
+          JSON.stringify(gorseller),
+          suAn(),
+          suAn(),
+          suAn()
+        )
+        .run();
+      bildirim = {
+        tur: 'basari',
+        metin: 'İlan eklendi. Elle eklenen ilanlar senkronda silinmez.',
+      };
+    } else if (eylem === 'elle-sil' && id.startsWith('elle-')) {
+      await vt.prepare(`DELETE FROM ilanlar WHERE id = ? AND kaynak = 'elle'`).bind(id).run();
+      await vt.prepare(`DELETE FROM ilan_duzenleme WHERE ilan_id = ?`).bind(id).run();
+      bildirim = { tur: 'basari', metin: 'Elle eklenen ilan silindi.' };
+    }
+    onbellegiTemizle();
+  } catch (hata) {
+    bildirim = { tur: 'hata', metin: (hata as Error).message };
+  }
+}
+
+const ilanlar = await tumIlanSatirlari(vt);
+const duzenlemeler = await vt
+  .prepare(`SELECT ilan_id, baslik, aciklama FROM ilan_duzenleme`)
+  .all<{ ilan_id: string; baslik: string | null; aciklama: string | null }>();
+const duzHarita = new Map((duzenlemeler.results ?? []).map((d) => [d.ilan_id, d]));
+
+const acik = Astro.url.searchParams.get('duzenle');
+---
+
+<Panel
+  baslik="İlanlar"
+  eposta={giris.kimlik.eposta}
+  ozet={`${ilanlar.filter((i) => i.durum === 'aktif').length} aktif · ${ilanlar.filter((i) => i.durum === 'pasif').length} pasif`}
+>
+  <a href="#elle-ekle" class="pd pd--kirmizi" slot="eylem">Portalda olmayan ilan ekle</a>
+
+  {bildirim && <div class={`bildirim bildirim--${bildirim.tur}`}>{bildirim.metin}</div>}
+
+  <p class="aciklama-kutu">
+    Buradaki düzenlemeler <strong>portaldan gelen veriyi bozmaz</strong>. Bir başlığı
+    düzelttiğinizde senkron çalışsa bile düzeltmeniz kalır; “Portaldakine döndür” dediğinizde
+    orijinaline geri döner.
+  </p>
+
+  <div class="kutu">
+    <div class="tablo-sar">
+      <table class="veri" style="min-width:52rem">
+        <thead>
+          <tr>
+            <th>İlan</th>
+            <th>Konum</th>
+            <th>Fiyat</th>
+            <th>Durum</th>
+            <th style="text-align:right">İşlem</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            ilanlar.map((i) => {
+              const duz = duzHarita.get(i.id);
+              const gosterilenBaslik = duz?.baslik ?? baslikTemizle(i.baslik);
+              const yol = `/ilan/${slugla(baslikTemizle(duz?.baslik ?? i.baslik))}-${i.id}`;
+              return (
+                <>
+                  <tr>
+                    <td>
+                      <a href={yol} target="_blank" rel="noopener" style="font-weight:600">
+                        {gosterilenBaslik}
+                      </a>
+                      <div class="satir-etiket">
+                        <span class="veri-sayi">{i.id}</span>
+                        {i.kaynak === 'elle' && <span class="cip cip--pasif">Elle eklendi</span>}
+                        {i.duzenlendi === 1 && <span class="cip cip--islemde">Düzenlendi</span>}
+                      </div>
+                    </td>
+                    <td>{[i.ilce, i.il].filter(Boolean).join(' / ') || '—'}</td>
+                    <td class="sayi">{fiyatKisa(i.fiyat)}</td>
+                    <td>
+                      <div class="durum-yigin">
+                        {i.durum === 'pasif' ? (
+                          <span class="cip cip--pasif">Pasif</span>
+                        ) : i.gizli === 1 ? (
+                          <span class="cip cip--gizli">Gizli</span>
+                        ) : (
+                          <span class="cip cip--kapandi">Yayında</span>
+                        )}
+                        {i.one_cikan === 1 && <span class="cip cip--one">Öne çıkan</span>}
+                      </div>
+                    </td>
+                    <td style="text-align:right">
+                      <div class="islem-yigin">
+                        <form method="POST">
+                          <input type="hidden" name="id" value={i.id} />
+                          <input type="hidden" name="eylem" value="one-cikar" />
+                          <input type="hidden" name="deger" value={i.one_cikan === 1 ? '0' : '1'} />
+                          <button type="submit" class="pd pd--sade" title="Ana sayfada başa al">
+                            {i.one_cikan === 1 ? 'Öne çıkarmayı kaldır' : 'Öne çıkar'}
+                          </button>
+                        </form>
+                        <form method="POST">
+                          <input type="hidden" name="id" value={i.id} />
+                          <input type="hidden" name="eylem" value="gizle" />
+                          <input type="hidden" name="deger" value={i.gizli === 1 ? '0' : '1'} />
+                          <button type="submit" class="pd pd--sade">
+                            {i.gizli === 1 ? 'Göster' : 'Gizle'}
+                          </button>
+                        </form>
+                        <a href={`?duzenle=${i.id}#d${i.id}`} class="pd pd--sade">Metni düzelt</a>
+                      </div>
+                    </td>
+                  </tr>
+
+                  {acik === i.id && (
+                    <tr id={`d${i.id}`}>
+                      <td colspan="5" class="duzenle-hucre">
+                        <form method="POST" class="duzenle-form">
+                          <input type="hidden" name="id" value={i.id} />
+                          <input type="hidden" name="eylem" value="metin" />
+                          <label class="p-alan">
+                            <span>Başlık</span>
+                            <input
+                              type="text"
+                              name="baslik"
+                              value={duz?.baslik ?? baslikTemizle(i.baslik)}
+                              maxlength="200"
+                            />
+                          </label>
+                          <label class="p-alan">
+                            <span>Açıklama</span>
+                            <textarea name="aciklama" rows="6" set:text={duz?.aciklama ?? i.aciklama} />
+                          </label>
+                          <div class="duzenle-eylem">
+                            <button type="submit" class="pd pd--birincil">Kaydet</button>
+                            <a href="/yonetim/ilanlar" class="pd pd--sade">Vazgeç</a>
+                          </div>
+                        </form>
+
+                        <div class="duzenle-yan">
+                          <p class="ozet-etiket">Portaldaki hâli</p>
+                          <p class="orijinal-baslik">{i.baslik}</p>
+                          <form method="POST">
+                            <input type="hidden" name="id" value={i.id} />
+                            <input type="hidden" name="eylem" value="sifirla" />
+                            <button type="submit" class="pd pd--tehlike">Portaldakine döndür</button>
+                          </form>
+                          {i.kaynak === 'elle' && (
+                            <form method="POST" style="margin-top:0.5rem">
+                              <input type="hidden" name="id" value={i.id} />
+                              <input type="hidden" name="eylem" value="elle-sil" />
+                              <button type="submit" class="pd pd--tehlike">İlanı sil</button>
+                            </form>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
+              );
+            })
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Elle ilan ekleme -->
+  <section class="kutu" id="elle-ekle" style="margin-top:1.5rem">
+    <div class="kutu-bas">
+      <h2>Portalda olmayan ilan ekle</h2>
+      <span style="font-size:0.75rem;color:var(--color-kursun)">Senkron bunlara dokunmaz</span>
+    </div>
+    <form method="POST" class="ekle-form">
+      <input type="hidden" name="eylem" value="elle-ekle" />
+
+      <div class="p-izgara">
+        <label class="p-alan" style="grid-column:1/-1">
+          <span>Başlık *</span>
+          <input type="text" name="baslik" required maxlength="200" placeholder="Silivri Merkez'de 3+1 Daire" />
+        </label>
+
+        <label class="p-alan">
+          <span>İşlem</span>
+          <select name="islem">
+            <option value="satilik">Satılık</option>
+            <option value="kiralik">Kiralık</option>
+          </select>
+        </label>
+        <label class="p-alan">
+          <span>Kategori (görünen)</span>
+          <input type="text" name="kategori" placeholder="Satılık Daire" />
+        </label>
+        <label class="p-alan">
+          <span>Tip</span>
+          <input type="text" name="tip" placeholder="daire" />
+        </label>
+        <label class="p-alan">
+          <span>Tip grubu</span>
+          <select name="tip_grup">
+            <option value="konut">Konut</option>
+            <option value="arsa">Arsa & Tarla</option>
+            <option value="isyeri">İş Yeri</option>
+            <option value="diger">Diğer</option>
+          </select>
+        </label>
+
+        <label class="p-alan">
+          <span>Fiyat (₺)</span>
+          <input type="number" name="fiyat" min="0" inputmode="numeric" />
+        </label>
+        <label class="p-alan">
+          <span>Metrekare</span>
+          <input type="number" name="m2" min="0" inputmode="numeric" />
+        </label>
+        <label class="p-alan">
+          <span>Oda</span>
+          <input type="text" name="oda" placeholder="3+1" />
+        </label>
+
+        <label class="p-alan">
+          <span>İl</span>
+          <input type="text" name="il" placeholder="İstanbul" />
+        </label>
+        <label class="p-alan">
+          <span>İlçe</span>
+          <input type="text" name="ilce" placeholder="Silivri" />
+        </label>
+        <label class="p-alan">
+          <span>Mahalle</span>
+          <input type="text" name="mahalle" placeholder="Alibey Mahallesi" />
+        </label>
+      </div>
+
+      <label class="p-alan" style="margin-top:1rem">
+        <span>Açıklama</span>
+        <textarea name="aciklama" rows="5" />
+      </label>
+
+      <label class="p-alan" style="margin-top:1rem">
+        <span>Fotoğraf adresleri — her satıra bir tane</span>
+        <textarea name="gorseller" rows="3" placeholder="https://…" />
+      </label>
+
+      <button type="submit" class="pd pd--kirmizi" style="margin-top:1rem">İlanı ekle</button>
+    </form>
+  </section>
+</Panel>
+
+<style>
+  .aciklama-kutu {
+    background: #fff;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-left: 3px solid var(--color-kirmizi);
+    border-radius: 6px;
+    padding: 0.85rem 1.1rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-metin-2);
+    margin-bottom: 1.25rem;
+    max-width: 72ch;
+  }
+
+  .satir-etiket {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.3rem;
+    font-size: 0.6875rem;
+    color: var(--color-kursun);
+  }
+  .durum-yigin,
+  .islem-yigin {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+  .islem-yigin {
+    justify-content: flex-end;
+  }
+
+  .duzenle-hucre {
+    background: var(--color-kagit);
+    display: grid;
+    gap: 1.25rem;
+  }
+  @media (min-width: 900px) {
+    .duzenle-hucre {
+      grid-template-columns: 1fr 15rem;
+    }
+  }
+  .duzenle-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .duzenle-eylem {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .duzenle-yan {
+    border-left: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    padding-left: 1.25rem;
+  }
+  @media (max-width: 899px) {
+    .duzenle-yan {
+      border-left: 0;
+      padding-left: 0;
+      border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+      padding-top: 1rem;
+    }
+  }
+  .orijinal-baslik {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 0.35rem 0 0.85rem;
+    color: var(--color-metin-2);
+  }
+
+  .ekle-form {
+    padding: 1.25rem;
+  }
+</style>
