@@ -1,6 +1,12 @@
 /**
  * Panelden fotoğraf yükleme ve silme.
  *
+ * Yolu neden /yonetim altında: Cloudflare Access uygulaması
+ * `edmyapigayrimenkul.com/yonetim` yolunu kapsıyor. Bu yolun dışındaki bir
+ * istek Access'ten geçmediği için kimlik jetonunu hiç almıyor ve uç nokta
+ * herkesi yetkisiz sayıyor. Burada durunca hem kenar sunucu hem de
+ * aşağıdaki jeton doğrulaması koruyor.
+ *
  * Dosyalar R2'de, kayıtları D1'de. Boyutlandırma ve WebP'ye çevirme
  * tarayıcıda yapılıyor — sunucuda görüntü işleme kütüphanesi çalıştırmaya
  * gerek kalmıyor ve 5 MB'lık telefon fotoğrafı ağdan hiç geçmiyor.
@@ -8,8 +14,8 @@
 
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
-import { paneleGiris } from '../../lib/panel/yetki';
-import { onbellegiTemizle } from '../../lib/ilanlar';
+import { paneleGiris } from '../../../lib/panel/yetki';
+import { onbellegiTemizle } from '../../../lib/ilanlar';
 
 const EN_BUYUK = 3 * 1024 * 1024; // tarayıcı zaten küçültüyor; bu bir emniyet freni
 const KABUL = new Set(['image/webp', 'image/jpeg', 'image/png']);

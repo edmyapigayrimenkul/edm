@@ -562,8 +562,12 @@ const yol = `/ilan/${slugla(baslik)}-${ilan.id}`;
     bildir('Yükleniyor…', satirlar);
 
     try {
-      const cevap = await fetch('/api/foto', { method: 'POST', body: form });
-      const sonuc = await cevap.json();
+      const cevap = await fetch('/yonetim/api/foto', { method: 'POST', body: form });
+      // Access oturumu 24 saatte bir düşüyor; o durumda JSON değil giriş
+      // sayfası geliyor. Ham hatayı göstermek yerine ne yapılacağını söyle.
+      const sonuc = await cevap.json().catch(() => ({
+        hata: 'Oturum süresi dolmuş olabilir. Sayfayı yenileyip tekrar deneyin.',
+      }));
       if (sonuc.tamam) {
         bildir(`${sonuc.eklenen} fotoğraf yüklendi. Sayfa yenileniyor…`, sonuc.atlanan ?? []);
         setTimeout(() => location.reload(), 900);
@@ -602,7 +606,7 @@ const yol = `/ilan/${slugla(baslik)}-${ilan.id}`;
     d.addEventListener('click', async () => {
       if (!confirm('Bu fotoğraf kalıcı olarak silinecek. Emin misiniz?')) return;
       d.disabled = true;
-      await fetch('/api/foto', {
+      await fetch('/yonetim/api/foto', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ anahtar: d.dataset.sil }),
