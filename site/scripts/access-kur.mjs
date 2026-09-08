@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { cf, ortam } from './lib/cf.mjs';
 
 const KOK = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const EKIP_ALANI = 'ezanplus.cloudflareaccess.com';
+const EKIP_ALANI = 'ozbornstudio.cloudflareaccess.com';
 const ALAN = 'edmyapigayrimenkul.com/yonetim';
 const UYGULAMA_ADI = 'EDM Yönetim Paneli';
 

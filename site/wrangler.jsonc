@@ -35,6 +35,8 @@
   "send_email": [{ "name": "EPOSTA" }],
 
   "vars": {
+    "ACCESS_EKIP_ALANI": "ozbornstudio.cloudflareaccess.com",
+    "ACCESS_AUD": "55604eaba7e4d8d8dfc3eff4db7902bb308f158ea9630d8bbd99c49251f55b0b",
     "BILDIRIM_ADRESI": "ozdogandogukan@gmail.com"
   }
 }
