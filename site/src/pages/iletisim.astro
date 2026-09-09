@@ -41,6 +41,17 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
                 <span class="kanal-not">En hızlı dönüş buradan olur</span>
               </a>
             </li>
+            {
+              iletisim.sabit && (
+                <li>
+                  <a href={`tel:${iletisim.sabitHam}`} class="kanal">
+                    <span class="etiket">Ofis sabit hattı</span>
+                    <span class="kanal-deger font-veri">{iletisim.sabit}</span>
+                    <span class="kanal-not">Ofiste kimse varsa buradan da ulaşabilirsiniz</span>
+                  </a>
+                </li>
+              )
+            }
             <li>
               <a href={`mailto:${iletisim.eposta}`} class="kanal">
                 <span class="etiket">E-posta</span>

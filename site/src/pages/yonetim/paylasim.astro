@@ -1,0 +1,278 @@
+---
+/**
+ * Sosyal medya paylaşım üreteci.
+ *
+ * Bir ilan seç, hazır görsel çıksın: WhatsApp durumu ve Instagram hikâyesi
+ * için 1080×1920, Instagram gönderisi için 1080×1350, kare için 1080×1080.
+ * Yanında da kopyalanmaya hazır metin.
+ *
+ * Görsel tarayıcıda canvas ile çiziliyor — sunucuda görüntü işleme yok,
+ * dosya hiçbir yere yüklenmiyor, "İndir" dediğin an bilgisayarına iniyor.
+ * Fotoğraf portal sunucusundan geldiği için canvas'ı kirletmesin diye
+ * /yonetim/api/gorsel üzerinden geçiyor.
+ */
+import Panel from '../../layouts/Panel.astro';
+import { paneleGiris } from '../../lib/panel/yetki';
+import { portfoy } from '../../lib/ilanlar';
+import { icerik } from '../../lib/icerik';
+import { KURUM } from '../../lib/site';
+
+const giris = await paneleGiris(Astro.request);
+if ('yanit' in giris) return giris.yanit;
+
+const { ilanlar } = await portfoy();
+const { iletisim } = await icerik();
+
+/** İstemciye yalnızca çizim için gereken alanlar gidiyor. */
+const veri = ilanlar.map((i) => ({
+  id: i.id,
+  baslik: i.baslikTemiz,
+  islem: i.islem === 'satilik' ? 'SATILIK' : 'KİRALIK',
+  kategori: i.kategori,
+  konum: i.konum,
+  mahalle: i.mahalle ?? '',
+  ilce: i.ilce ?? '',
+  il: i.il ?? '',
+  fiyat: i.fiyatMetin,
+  birim: i.birimFiyat ?? '',
+  oda: i.oda ?? '',
+  m2: i.m2Metin ?? '',
+  yol: i.yol,
+  kapak: i.kapak ?? '',
+  gorseller: i.gorseller.slice(0, 8),
+}));
+
+const ayar = {
+  site: KURUM.site,
+  telefon: iletisim.telefon,
+  sabit: iletisim.sabit ?? '',
+};
+---
+
+<Panel
+  baslik="Paylaşım görseli"
+  eposta={giris.kimlik.eposta}
+  ozet={`${veri.length} ilandan seçin — görsel ve metin hazır çıkar`}
+>
+  <div class="pd-kutu" data-uretec>
+    <div class="uretec">
+      <!-- Sol: seçimler -->
+      <div class="uretec-secim">
+        <label class="pd-alan">
+          <span class="pd-etiket">İlan</span>
+          <select data-ilan class="pd-girdi">
+            {veri.map((i) => <option value={i.id}>{i.baslik}</option>)}
+          </select>
+        </label>
+
+        <label class="pd-alan">
+          <span class="pd-etiket">Fotoğraf</span>
+          <select data-foto class="pd-girdi"></select>
+        </label>
+
+        <div class="pd-alan">
+          <span class="pd-etiket">Biçim</span>
+          <div class="biçim-satir">
+            <button type="button" class="biçim" data-bicim="hikaye" data-secili>
+              Hikâye / Durum
+              <small>1080 × 1920</small>
+            </button>
+            <button type="button" class="biçim" data-bicim="gonderi">
+              Gönderi
+              <small>1080 × 1350</small>
+            </button>
+            <button type="button" class="biçim" data-bicim="kare">
+              Kare
+              <small>1080 × 1080</small>
+            </button>
+          </div>
+        </div>
+
+        <button type="button" class="pd pd--kirmizi w-full" data-indir>Görseli indir</button>
+        <p class="pd-ipucu" data-durum>Hazırlanıyor…</p>
+
+        <div class="pd-alan mt-6">
+          <span class="pd-etiket">Paylaşım metni</span>
+          <textarea data-metin class="pd-girdi metin-kutu" rows="14" readonly></textarea>
+          <button type="button" class="pd w-full mt-2" data-kopyala>Metni kopyala</button>
+        </div>
+      </div>
+
+      <!-- Sağ: önizleme -->
+      <div class="uretec-onizleme">
+        <canvas data-tuval class="tuval"></canvas>
+      </div>
+    </div>
+  </div>
+</Panel>
+
+<script define:vars={{ veri, ayar }}>
+  import { OLCU, paylasimCiz, paylasimMetni } from '../../scripts/paylasim-gorsel';
+
+  const kok = document.querySelector('[data-uretec]');
+  if (kok) {
+    const ilanSecim = kok.querySelector('[data-ilan]');
+    const fotoSecim = kok.querySelector('[data-foto]');
+    const tuval = kok.querySelector('[data-tuval]');
+    const durum = kok.querySelector('[data-durum]');
+    const metinKutu = kok.querySelector('[data-metin]');
+    let bicim = 'hikaye';
+
+    const bul = () => veri.find((i) => i.id === ilanSecim.value) ?? veri[0];
+
+    /** Portal fotoğrafı kendi alan adımızdan geçiyor ki canvas kirlenmesin. */
+    const araci = (adres) =>
+      adres.startsWith('/') ? adres : `/yonetim/api/gorsel?u=${encodeURIComponent(adres)}`;
+
+    const gorselYukle = (adres) =>
+      new Promise((coz, red) => {
+        const g = new Image();
+        g.onload = () => coz(g);
+        g.onerror = () => red(new Error('Fotoğraf yüklenemedi'));
+        g.src = araci(adres);
+      });
+
+    async function ciz() {
+      durum.textContent = 'Hazırlanıyor…';
+      const sonuc = await paylasimCiz(tuval, bul(), ayar, bicim, {
+        fotoAdresi: fotoSecim.value,
+        gorselYukle,
+      });
+      durum.textContent = sonuc.uyari ?? `${sonuc.en} × ${sonuc.boy} · hazır`;
+    }
+
+    function fotolariKur() {
+      const i = bul();
+      fotoSecim.innerHTML = '';
+      i.gorseller.forEach((g, s) => {
+        const o = document.createElement('option');
+        o.value = g;
+        o.textContent = `${s + 1}. fotoğraf`;
+        fotoSecim.appendChild(o);
+      });
+    }
+
+    async function tazele() {
+      metinKutu.value = paylasimMetni(bul(), ayar);
+      await ciz();
+    }
+
+    ilanSecim.addEventListener('change', () => {
+      fotolariKur();
+      tazele();
+    });
+    fotoSecim.addEventListener('change', ciz);
+
+    kok.querySelectorAll('[data-bicim]').forEach((d) =>
+      d.addEventListener('click', () => {
+        bicim = d.dataset.bicim;
+        kok.querySelectorAll('[data-bicim]').forEach((x) => delete x.dataset.secili);
+        d.dataset.secili = 'evet';
+        ciz();
+      })
+    );
+
+    kok.querySelector('[data-indir]').addEventListener('click', () => {
+      const i = bul();
+      tuval.toBlob((blob) => {
+        if (!blob) {
+          durum.textContent = 'Görsel üretilemedi.';
+          return;
+        }
+        const adres = URL.createObjectURL(blob);
+        const bag = document.createElement('a');
+        bag.href = adres;
+        bag.download = `edm-${bicim}-${i.id}.png`;
+        bag.click();
+        URL.revokeObjectURL(adres);
+      }, 'image/png');
+    });
+
+    kok.querySelector('[data-kopyala]').addEventListener('click', async (o) => {
+      try {
+        await navigator.clipboard.writeText(metinKutu.value);
+        o.target.textContent = 'Kopyalandı';
+        setTimeout(() => (o.target.textContent = 'Metni kopyala'), 1800);
+      } catch {
+        metinKutu.select();
+      }
+    });
+
+    // Yazı tipleri yüklenmeden çizersek canvas yedek fontla basar.
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => {
+      fotolariKur();
+      tazele();
+    });
+  }
+</script>
+
+<style>
+  .uretec {
+    display: grid;
+    gap: 1.75rem;
+  }
+  @media (min-width: 900px) {
+    .uretec {
+      grid-template-columns: 1fr 22rem;
+      align-items: start;
+    }
+  }
+
+  .uretec-onizleme {
+    position: sticky;
+    top: 1.5rem;
+    display: grid;
+    place-items: start center;
+    background: repeating-conic-gradient(#efefee 0% 25%, #e4e4e1 0% 50%) 0 0 / 20px 20px;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 12%, transparent);
+    border-radius: 4px;
+    padding: 1rem;
+  }
+  .tuval {
+    max-width: 100%;
+    max-height: 70vh;
+    height: auto;
+    display: block;
+    box-shadow: 0 8px 26px -12px rgb(18 19 22 / 0.5);
+  }
+
+  .biçim-satir {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+  }
+  .biçim {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.6rem 0.5rem;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 16%, transparent);
+    border-radius: 3px;
+    background: #fff;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+  }
+  .biçim small {
+    font-family: var(--font-veri);
+    font-size: 0.6875rem;
+    color: var(--color-kursun);
+  }
+  .biçim[data-secili] {
+    border-color: var(--color-murekkep);
+    background: var(--color-murekkep);
+    color: var(--color-kagit);
+  }
+  .biçim[data-secili] small {
+    color: color-mix(in oklab, var(--color-kagit) 66%, transparent);
+  }
+
+  .metin-kutu {
+    font-family: var(--font-veri);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    resize: vertical;
+  }
+</style>

@@ -76,6 +76,7 @@ async function yeriBul(anahtar: string, sorgu: string): Promise<string | null> {
       'Content-Type': 'application/json',
       'X-Goog-Api-Key': anahtar,
       'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress',
+      Referer: 'https://edmyapigayrimenkul.com/',
     },
     body: JSON.stringify({ textQuery: sorgu, languageCode: 'tr', maxResultCount: 1 }),
   });
@@ -117,6 +118,7 @@ export async function googleYorumlariniCek(
         'X-Goog-FieldMask':
           'id,displayName,rating,userRatingCount,googleMapsUri,reviews',
         'Accept-Language': 'tr',
+        Referer: 'https://edmyapigayrimenkul.com/',
       },
     });
 

@@ -44,7 +44,7 @@ const kurumLd = {
   name: KURUM.ad,
   description: KURUM.tanim,
   url: KURUM.site,
-  telephone: iletisim.telefonHam,
+  telephone: [iletisim.telefonHam, iletisim.sabitHam].filter(Boolean),
   email: iletisim.eposta,
   logo: new URL('/marka/logo-yatay.png', Astro.site).href,
   image: gorselTam,

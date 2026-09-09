@@ -40,6 +40,9 @@ export interface Iletisim {
 
   telefon: string;
   telefonHam: string;
+  /** Ofisin sabit hattı — Google kaydındaki numara. */
+  sabit: string;
+  sabitHam: string;
   whatsapp: string;
   eposta: string;
   adresSatir1: string;
@@ -72,6 +75,8 @@ export interface Icerik {
 const AYAR_VARSAYILAN: Iletisim = {
   telefon: VARSAYILAN_ILETISIM.telefon,
   telefonHam: VARSAYILAN_ILETISIM.telefonHam,
+  sabit: VARSAYILAN_ILETISIM.sabit,
+  sabitHam: VARSAYILAN_ILETISIM.sabitHam,
   whatsapp: VARSAYILAN_ILETISIM.whatsapp,
   eposta: VARSAYILAN_ILETISIM.eposta,
   adresSatir1: VARSAYILAN_ILETISIM.adres.satir1,

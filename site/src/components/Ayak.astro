@@ -110,6 +110,13 @@ const guncelleme = new Date(sonGuncelleme).toLocaleDateString('tr-TR', {
           <a href={`tel:${iletisim.telefonHam}`} class="ayak-bag font-veri">
             {iletisim.telefon}
           </a>
+          {
+            iletisim.sabit && (
+              <a href={`tel:${iletisim.sabitHam}`} class="ayak-bag font-veri">
+                {iletisim.sabit}
+              </a>
+            )
+          }
           <a href={`mailto:${iletisim.eposta}`} class="ayak-bag font-veri text-[0.8125rem]">
             {iletisim.eposta}
           </a>

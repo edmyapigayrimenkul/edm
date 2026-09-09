@@ -19,6 +19,11 @@ export const ILETISIM = {
   telefon: '0536 343 41 97',
   telefonHam: '+905363434197',
   whatsapp: '905363434197',
+  // Ofisin sabit hattı — Google işletme kaydındaki numara. Ana çağrı
+  // butonları cepte kalıyor (WhatsApp oradan çalışıyor); sabit hat
+  // iletişim sayfası, altbilgi ve yapılandırılmış veride görünüyor.
+  sabit: '0212 727 29 55',
+  sabitHam: '+902127272955',
   eposta: 'info@edmyapigayrimenkul.com',
   adres: {
     satir1: 'Alibey Mah. Albay Yunus Dirik Cad.',
