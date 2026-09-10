@@ -15,11 +15,14 @@ if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
   if (form.get('eylem') === 'senkron') {
     const sonuc = await senkronla(env as never);
+    const { googleYorumlariniCek } = await import('../../lib/senkron/yorumlar');
+    const yorumSonuc = await googleYorumlariniCek(vt, env as unknown as Record<string, unknown>).catch(() => null);
     onbellegiTemizle();
+    const yorumEki = yorumSonuc?.durum === 'tamam' ? ` · Google: ${yorumSonuc.puan ?? '—'} (${yorumSonuc.toplamYorum ?? 0} yorum)` : '';
     bildirim = sonuc.tamam
       ? {
           tur: 'basari',
-          metin: `Senkron tamam: ${sonuc.bulunan} ilan bulundu, ${sonuc.eklenen} yeni, ${sonuc.pasiflenen} pasife düştü.`,
+          metin: `Senkron tamam: ${sonuc.bulunan} ilan bulundu, ${sonuc.eklenen} yeni, ${sonuc.pasiflenen} pasife düştü${yorumEki}.`,
         }
       : { tur: 'hata', metin: `Senkron başarısız: ${sonuc.hata ?? sonuc.sebep}` };
   }

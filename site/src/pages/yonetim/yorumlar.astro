@@ -60,6 +60,19 @@ if (Astro.request.method === 'POST') {
     } else if (eylem === 'sil' && id) {
       await vt.prepare(`DELETE FROM yorumlar WHERE id = ?`).bind(id).run();
       bildirim = { tur: 'basari', metin: 'Yorum silindi.' };
+    } else if (eylem === 'google_senkron') {
+      const { googleYorumlariniCek } = await import('../../lib/senkron/yorumlar');
+      const sonuc = await googleYorumlariniCek(vt, env as unknown as Record<string, unknown>);
+      if (sonuc.durum === 'tamam') {
+        bildirim = {
+          tur: 'basari',
+          metin: `Google yorumları güncellendi (${sonuc.yazilan ?? 0} yorum kaydedildi). Puan: ${sonuc.puan ?? '—'} · Toplam: ${sonuc.toplamYorum ?? 0} yorum.`,
+        };
+      } else if (sonuc.durum === 'atlandi') {
+        bildirim = { tur: 'hata', metin: 'Google API anahtarı (GOOGLE_ANAHTARI) tanımlı değil.' };
+      } else {
+        bildirim = { tur: 'hata', metin: `Google yorumları çekilemedi: ${sonuc.not ?? ''}` };
+      }
     }
     icerikOnbellegiTemizle();
   } catch (hata) {
@@ -93,11 +106,19 @@ const duzenlenen = duzenle
   <div class="iki-sutun">
     <!-- Liste -->
     <div class="kutu">
-      <div class="kutu-bas">
-        <h2>Kayıtlı yorumlar</h2>
-        <span style="font-size:0.75rem;color:var(--color-kursun)">
-          {(yorumlar.results ?? []).length} yorum
-        </span>
+      <div class="kutu-bas flex items-center justify-between">
+        <div>
+          <h2>Kayıtlı yorumlar</h2>
+          <span style="font-size:0.75rem;color:var(--color-kursun)">
+            {(yorumlar.results ?? []).length} yorum
+          </span>
+        </div>
+        <form method="POST">
+          <input type="hidden" name="eylem" value="google_senkron" />
+          <button type="submit" class="pd pd--kirmizi text-xs !py-1 !px-2.5">
+            Google’dan Çek
+          </button>
+        </form>
       </div>
 
       {

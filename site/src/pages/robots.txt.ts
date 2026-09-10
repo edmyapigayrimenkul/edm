@@ -6,6 +6,8 @@ export const GET: APIRoute = () =>
     `User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /yonetim/
+Disallow: /g/
 
 Sitemap: ${KURUM.site}/sitemap.xml
 `,

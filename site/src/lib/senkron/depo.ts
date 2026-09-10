@@ -120,6 +120,21 @@ export async function semayiKur(vt: D1Database): Promise<void> {
     const kirpik = ifade.trim();
     if (kirpik) await vt.prepare(kirpik).run();
   }
+
+  // Var olan tablolara sonradan eklenen sütunlar ve indeksler (zaten varsa SQLite hata verir, yutuyoruz)
+  const ekSorgular = [
+    `ALTER TABLE yorumlar ADD COLUMN dis_kimlik TEXT`,
+    `ALTER TABLE yorumlar ADD COLUMN foto TEXT`,
+    `ALTER TABLE yorumlar ADD COLUMN profil_url TEXT`,
+    `ALTER TABLE yorumlar ADD COLUMN google_url TEXT`,
+    `ALTER TABLE talepler ADD COLUMN ic_not TEXT`,
+    `ALTER TABLE talepler ADD COLUMN ilgilenen TEXT`,
+    `ALTER TABLE talepler ADD COLUMN kapanma TEXT`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS yorum_dis_kimlik ON yorumlar (dis_kimlik)`,
+  ];
+  for (const sql of ekSorgular) {
+    await vt.prepare(sql).run().catch(() => {});
+  }
 }
 
 /**

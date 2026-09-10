@@ -55,6 +55,7 @@ const ayar = {
   ozet={`${veri.length} ilandan seçin — görsel ve metin hazır çıkar`}
 >
   <div class="pd-kutu" data-uretec>
+    <script type="application/json" id="uretec-veri" set:html={JSON.stringify({ veri, ayar })} />
     <div class="uretec">
       <!-- Sol: seçimler -->
       <div class="uretec-secim">
@@ -106,19 +107,28 @@ const ayar = {
   </div>
 </Panel>
 
-<script define:vars={{ veri, ayar }}>
-  import { OLCU, paylasimCiz, paylasimMetni } from '../../scripts/paylasim-gorsel';
+<script>
+  import { paylasimCiz, paylasimMetni } from '../../scripts/paylasim-gorsel';
+  import type { PaylasimIlan, PaylasimAyar } from '../../scripts/paylasim-gorsel';
 
+  const veriElemani = document.getElementById('uretec-veri');
   const kok = document.querySelector('[data-uretec]');
-  if (kok) {
-    const ilanSecim = kok.querySelector('[data-ilan]');
-    const fotoSecim = kok.querySelector('[data-foto]');
-    const tuval = kok.querySelector('[data-tuval]');
-    const durum = kok.querySelector('[data-durum]');
-    const metinKutu = kok.querySelector('[data-metin]');
-    let bicim = 'hikaye';
 
-    const bul = () => veri.find((i) => i.id === ilanSecim.value) ?? veri[0];
+  if (veriElemani && kok) {
+    const { veri, ayar } = JSON.parse(veriElemani.textContent || '{}') as {
+      veri: PaylasimIlan[];
+      ayar: PaylasimAyar;
+    };
+
+    const ilanSecim = kok.querySelector<HTMLSelectElement>('[data-ilan]');
+    const fotoSecim = kok.querySelector<HTMLSelectElement>('[data-foto]');
+    const tuval = kok.querySelector<HTMLCanvasElement>('[data-tuval]');
+    const durum = kok.querySelector<HTMLElement>('[data-durum]');
+    const metinKutu = kok.querySelector<HTMLTextAreaElement>('[data-metin]');
+    let bicim: 'hikaye' | 'gonderi' | 'kare' = 'hikaye';
+
+    if (ilanSecim && fotoSecim && tuval && durum && metinKutu) {
+      const bul = (): PaylasimIlan => veri.find((i) => i.id === ilanSecim.value) ?? veri[0];
 
     /** Portal fotoğrafı kendi alan adımızdan geçiyor ki canvas kirlenmesin. */
     const araci = (adres) =>
@@ -203,6 +213,7 @@ const ayar = {
       fotolariKur();
       tazele();
     });
+    }
   }
 </script>
 
