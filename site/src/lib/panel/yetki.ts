@@ -127,6 +127,12 @@ export async function accessKimligi(istek: Request): Promise<AccessKimlik | null
 export async function paneleGiris(
   istek: Request
 ): Promise<{ kimlik: AccessKimlik } | { yanit: Response }> {
+  // Yerel geliştirmede (localhost) Cloudflare Access katmanı bulunmadığı için
+  // geliştirici kimliğiyle paneli doğrudan açıyoruz.
+  if (import.meta.env.DEV) {
+    return { kimlik: { eposta: 'dogukan@edmyapigayrimenkul.com', kimlik: 'yerel-gelistirici' } };
+  }
+
   const kimlik = await accessKimligi(istek);
 
   if (!kimlik) {
