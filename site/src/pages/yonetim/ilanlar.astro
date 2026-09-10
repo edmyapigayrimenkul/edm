@@ -178,7 +178,7 @@ const c=await fetch('https://edmyapigayrimenkul.com/api/gorsel-aktar',{method:'P
   eposta={giris.kimlik.eposta}
   ozet={`${ilanlar.filter((i) => i.durum === 'aktif').length} aktif · ${ilanlar.filter((i) => i.durum === 'pasif').length} pasif`}
 >
-  <a href="#elle-ekle" class="pd pd--kirmizi" slot="eylem">Portalda olmayan ilan ekle</a>
+  <a href="/yonetim/ilan-ekle" class="pd pd--kirmizi font-semibold" slot="eylem">+ Yeni İlan Ekle</a>
 
   {bildirim && <div class={`bildirim bildirim--${bildirim.tur}`}>{bildirim.metin}</div>}
 
@@ -282,8 +282,9 @@ const c=await fetch('https://edmyapigayrimenkul.com/api/gorsel-aktar',{method:'P
                             {i.gizli === 1 ? 'Göster' : 'Gizle'}
                           </button>
                         </form>
-                        <a href={`?duzenle=${i.id}#d${i.id}`} class="pd pd--sade">Metni düzelt</a>
+                        <a href={`/yonetim/ilan-duzenle/${i.id}`} class="pd pd--birincil">Detaylı Düzenle</a>
                         <a href={`/yonetim/gorsel/${i.id}`} class="pd pd--sade">Fotoğraflar</a>
+                        <a href={`?duzenle=${i.id}#d${i.id}`} class="pd pd--sade">Hızlı Başlık</a>
                       </div>
                     </td>
                   </tr>

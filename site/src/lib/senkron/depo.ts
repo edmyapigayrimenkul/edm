@@ -6,6 +6,7 @@
  */
 
 import type { HamIlan } from './emlakjet';
+import type { AyrintiliIlanGirdisi } from '../ilan-bilgileri';
 
 export const SEMA = `
 CREATE TABLE IF NOT EXISTS ilanlar (
@@ -130,6 +131,8 @@ export async function semayiKur(vt: D1Database): Promise<void> {
     `ALTER TABLE talepler ADD COLUMN ic_not TEXT`,
     `ALTER TABLE talepler ADD COLUMN ilgilenen TEXT`,
     `ALTER TABLE talepler ADD COLUMN kapanma TEXT`,
+    `ALTER TABLE ilan_duzenleme ADD COLUMN ozellikler TEXT`,
+    `ALTER TABLE ilan_duzenleme ADD COLUMN donanim TEXT`,
     `CREATE UNIQUE INDEX IF NOT EXISTS yorum_dis_kimlik ON yorumlar (dis_kimlik)`,
   ];
   for (const sql of ekSorgular) {
@@ -347,3 +350,190 @@ export async function sonSenkron(
     .prepare('SELECT bitis, bulunan FROM senkron_gunlugu WHERE hata IS NULL ORDER BY id DESC LIMIT 1')
     .first<{ bitis: string | null; bulunan: number | null }>();
 }
+
+export interface DuzenlemeKaydi {
+  ilan_id: string;
+  baslik?: string | null;
+  aciklama?: string | null;
+  ozellikler?: string | null;
+  donanim?: string | null;
+}
+
+export async function duzenlemeleriGetir(
+  vt: D1Database
+): Promise<Map<string, DuzenlemeKaydi>> {
+  try {
+    const sonuc = await vt
+      .prepare(`SELECT ilan_id, baslik, aciklama, ozellikler, donanim FROM ilan_duzenleme`)
+      .all<DuzenlemeKaydi>();
+    return new Map((sonuc.results ?? []).map((r) => [r.ilan_id, r]));
+  } catch {
+    try {
+      const fallback = await vt
+        .prepare(`SELECT ilan_id, baslik, aciklama FROM ilan_duzenleme`)
+        .all<DuzenlemeKaydi>();
+      return new Map((fallback.results ?? []).map((r) => [r.ilan_id, r]));
+    } catch {
+      return new Map();
+    }
+  }
+}
+
+/**
+ * İlan ekleme veya güncelleme.
+ *
+ * Elle eklenen ilanlar doğrudan ilanlar tablosuna yazılır;
+ * Portaldan gelen ilanlarda ise hem anında görünmesi için ilanlar
+ * güncellenir hem de senkronun ezmemesi için ilan_duzenleme'ye işlenir.
+ */
+export async function ilanKaydetVeyaGuncelle(
+  vt: D1Database,
+  veri: AyrintiliIlanGirdisi,
+  id?: string
+): Promise<string> {
+  const suAn = new Date().toISOString();
+  const ozelliklerJson = JSON.stringify(veri.ozellikler);
+  const donanimJson = JSON.stringify(veri.donanim ?? []);
+  const gorsellerJson = JSON.stringify(veri.gorseller ?? []);
+
+  if (id) {
+    const mevcut = await vt
+      .prepare('SELECT id, kaynak FROM ilanlar WHERE id = ?')
+      .bind(id)
+      .first<{ id: string; kaynak: string }>();
+
+    if (!mevcut) throw new Error(`İlan bulunamadı: ${id}`);
+
+    if (mevcut.kaynak === 'elle') {
+      await vt
+        .prepare(
+          `UPDATE ilanlar SET
+             baslik = ?, aciklama = ?, fiyat = ?, para_birimi = ?, islem = ?,
+             kategori = ?, tip = ?, tip_grup = ?, oda = ?, m2 = ?, il = ?,
+             ilce = ?, mahalle = ?, ozellikler = ?, donanim = ?, gorseller = ?,
+             danisman_slug = ?, guncellenme = ?
+           WHERE id = ?`
+        )
+        .bind(
+          veri.baslik,
+          veri.aciklama,
+          veri.fiyat,
+          veri.paraBirimi,
+          veri.islem,
+          veri.kategori,
+          veri.tip,
+          veri.tipGrup,
+          veri.oda,
+          veri.m2,
+          veri.il,
+          veri.ilce,
+          veri.mahalle,
+          ozelliklerJson,
+          donanimJson,
+          gorsellerJson,
+          veri.danismanSlug,
+          suAn,
+          id
+        )
+        .run();
+    } else {
+      await vt
+        .prepare(
+          `INSERT INTO ilan_duzenleme (ilan_id, baslik, aciklama, ozellikler, donanim, guncelleme)
+           VALUES (?, ?, ?, ?, ?, ?)
+           ON CONFLICT(ilan_id) DO UPDATE SET
+             baslik = excluded.baslik,
+             aciklama = excluded.aciklama,
+             ozellikler = excluded.ozellikler,
+             donanim = excluded.donanim,
+             guncelleme = excluded.guncelleme`
+        )
+        .bind(id, veri.baslik, veri.aciklama, ozelliklerJson, donanimJson, suAn)
+        .run()
+        .catch(async () => {
+          await vt
+            .prepare(
+              `INSERT INTO ilan_duzenleme (ilan_id, baslik, aciklama, guncelleme)
+               VALUES (?, ?, ?, ?)
+               ON CONFLICT(ilan_id) DO UPDATE SET
+                 baslik = excluded.baslik,
+                 aciklama = excluded.aciklama,
+                 guncelleme = excluded.guncelleme`
+            )
+            .bind(id, veri.baslik, veri.aciklama, suAn)
+            .run();
+        });
+
+      await vt
+        .prepare(
+          `UPDATE ilanlar SET
+             baslik = ?, aciklama = ?, fiyat = ?, para_birimi = ?, islem = ?,
+             kategori = ?, tip = ?, tip_grup = ?, oda = ?, m2 = ?, il = ?,
+             ilce = ?, mahalle = ?, ozellikler = ?, donanim = ?, danisman_slug = ?,
+             guncellenme = ?
+           WHERE id = ?`
+        )
+        .bind(
+          veri.baslik,
+          veri.aciklama,
+          veri.fiyat,
+          veri.paraBirimi,
+          veri.islem,
+          veri.kategori,
+          veri.tip,
+          veri.tipGrup,
+          veri.oda,
+          veri.m2,
+          veri.il,
+          veri.ilce,
+          veri.mahalle,
+          ozelliklerJson,
+          donanimJson,
+          veri.danismanSlug,
+          suAn,
+          id
+        )
+        .run();
+    }
+
+    return id;
+  }
+
+  const yeniId = `elle-${Date.now().toString(36)}`;
+  await vt
+    .prepare(
+      `INSERT INTO ilanlar (
+         id, kaynak, kaynak_url, baslik, aciklama, fiyat, para_birimi, islem,
+         kategori, tip, tip_grup, oda, m2, il, ilce, mahalle, ozellikler,
+         donanim, gorseller, danisman_slug, guncellenme, ilk_gorulme, son_gorulme,
+         durum, pasif_tarihi
+       ) VALUES (?, 'elle', '', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'aktif', NULL)`
+    )
+    .bind(
+      yeniId,
+      veri.baslik,
+      veri.aciklama,
+      veri.fiyat,
+      veri.paraBirimi,
+      veri.islem,
+      veri.kategori,
+      veri.tip,
+      veri.tipGrup,
+      veri.oda,
+      veri.m2,
+      veri.il,
+      veri.ilce,
+      veri.mahalle,
+      ozelliklerJson,
+      donanimJson,
+      gorsellerJson,
+      veri.danismanSlug,
+      suAn,
+      suAn,
+      suAn
+    )
+    .run();
+
+  return yeniId;
+}
+

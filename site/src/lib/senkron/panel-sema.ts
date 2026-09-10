@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS ilan_duzenleme (
   ilan_id     TEXT PRIMARY KEY,
   baslik      TEXT,
   aciklama    TEXT,
+  ozellikler  TEXT,
+  donanim     TEXT,
   one_cikan   INTEGER NOT NULL DEFAULT 0,
   gizli       INTEGER NOT NULL DEFAULT 0,
   guncelleme  TEXT NOT NULL

@@ -146,6 +146,22 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
                 </label>
               </div>
 
+              <div class="gonderim-hata" data-gonderim-hata role="alert" tabindex="-1" hidden>
+                <p class="font-medium" data-gonderim-hata-metni>
+                  Mesaj şu anda gönderilemedi. Bilgileriniz formda duruyor; yeniden
+                  deneyebilir veya WhatsApp’tan iletebilirsiniz.
+                </p>
+                <a
+                  href={whatsappBaglanti(iletisim.whatsapp, 'Merhaba, EDM Yapı & Gayrimenkul ile görüşmek istiyorum.')}
+                  data-wa-hata
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="mt-2 inline-block alt-cizgi font-medium"
+                >
+                  WhatsApp’tan gönder
+                </a>
+              </div>
+
               <button type="submit" class="dugme dugme--kirmizi w-full !py-4" data-gonder>
                 Mesajı gönder
               </button>
@@ -309,6 +325,16 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
     overflow: hidden;
   }
 
+  .gonderim-hata {
+    border: 1px solid color-mix(in oklab, var(--color-kirmizi) 32%, transparent);
+    border-radius: 6px;
+    padding: 0.9rem 1rem;
+    background: color-mix(in oklab, var(--color-kirmizi) 7%, #fff);
+    color: var(--color-kirmizi-derin);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+  }
+
   .basari-isaret {
     display: grid;
     place-items: center;
@@ -336,8 +362,15 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
   const basari = document.querySelector<HTMLElement>('[data-basari]');
   const waBaglanti = document.querySelector<HTMLAnchorElement>('[data-wa-baglanti]');
 
-  if (form && basari) {
+  if (form && basari && form.dataset.kuruldu !== 'evet') {
+    // herSayfada ilk açılışta iki kez çağrılabilir; aynı formun iki talep
+    // göndermemesi için dinleyicileri yalnızca bir kez bağlıyoruz.
+    form.dataset.kuruldu = 'evet';
+
     const gonderDugme = form.querySelector<HTMLButtonElement>('[data-gonder]')!;
+    const hataKutusu = form.querySelector<HTMLElement>('[data-gonderim-hata]');
+    const hataMetni = form.querySelector<HTMLElement>('[data-gonderim-hata-metni]');
+    const waHata = form.querySelector<HTMLAnchorElement>('[data-wa-hata]');
 
     function alanDogrula(alan: HTMLInputElement | HTMLTextAreaElement): boolean {
       const sarmal = alan.closest<HTMLElement>('.alan');
@@ -389,20 +422,43 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
           '',
           veri.mesaj,
         ].join('\n');
-        waBaglanti.href = `https://wa.me/${waNumara}?text=${encodeURIComponent(metin)}`;
+        const waAdresi = `https://wa.me/${waNumara}?text=${encodeURIComponent(metin)}`;
+        waBaglanti.href = waAdresi;
+        if (waHata) waHata.href = waAdresi;
       }
 
+      if (hataKutusu) hataKutusu.hidden = true;
       gonderDugme.disabled = true;
       gonderDugme.textContent = 'Gönderiliyor…';
 
+      let kullaniciHatasi =
+        'Mesaj şu anda gönderilemedi. Bilgileriniz formda duruyor; yeniden deneyebilir veya WhatsApp’tan iletebilirsiniz.';
+
       try {
-        await fetch('/api/talep', {
+        const yanit = await fetch('/api/talep', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...veri, tur: 'iletisim', kaynak: location.pathname }),
         });
+
+        const sonuc = (await yanit.json().catch(() => null)) as
+          | { tamam?: boolean; hata?: string }
+          | null;
+
+        if (!yanit.ok || !sonuc?.tamam) {
+          if (sonuc?.hata) kullaniciHatasi = sonuc.hata;
+          throw new Error('Talep kaydedilmedi.');
+        }
       } catch {
-        // Sunucuya ulaşılamazsa WhatsApp yedeği devrede.
+        if (hataMetni) hataMetni.textContent = kullaniciHatasi;
+        if (hataKutusu) {
+          hataKutusu.hidden = false;
+          hataKutusu.focus({ preventScroll: true });
+          hataKutusu.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        gonderDugme.disabled = false;
+        gonderDugme.textContent = 'Yeniden dene';
+        return;
       }
 
       form.hidden = true;

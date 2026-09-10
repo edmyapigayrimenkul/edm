@@ -1,0 +1,964 @@
+---
+import Panel from '../../../layouts/Panel.astro';
+import { paneleGiris } from '../../../lib/panel/yetki';
+import { env } from 'cloudflare:workers';
+import { onbellegiTemizle, baslikTemizle } from '../../../lib/ilanlar';
+import { icerik } from '../../../lib/icerik';
+import { ilanSatiri, duzenlemeleriGetir, ilanKaydetVeyaGuncelle } from '../../../lib/senkron/depo';
+import {
+  ISLEM_TURLERI,
+  TIP_GRUPLARI,
+  MULK_TIPLERI,
+  PARA_BIRIMLERI,
+  PAZARLIK_DURUMLARI,
+  TAKAS_DURUMLARI,
+  KREDI_UYGUNLUKLARI,
+  ODA_SECENEKLERI,
+  BINA_YASLARI,
+  KAT_SECENEKLERI,
+  ISITMA_TIPLERI,
+  BANYO_SAYILARI,
+  BALKON_DURUMLARI,
+  OTOPARK_DURUMLARI,
+  ESYA_DURUMLARI,
+  KULLANIM_DURUMLARI,
+  TAPU_DURUMLARI,
+  YAPI_DURUMLARI,
+  YAPI_TIPLERI,
+  IMAR_DURUMLARI,
+  KAKS_EMSAL_SECENEKLERI,
+  GABARI_SECENEKLERI,
+  ARSA_YOL_DURUMLARI,
+  ZEMIN_YAPILARI,
+  DONANIM_KATALOGU,
+  formdanIlanVerisi,
+} from '../../../lib/ilan-bilgileri';
+
+const giris = await paneleGiris(Astro.request);
+if ('yanit' in giris) return giris.yanit;
+
+const vt = env.VT as D1Database;
+const id = Astro.params.id!;
+const satir = await ilanSatiri(vt, id);
+
+if (!satir) return Astro.rewrite('/404');
+
+const { ekip } = await icerik();
+const duzenlemeler = await duzenlemeleriGetir(vt);
+const duz = duzenlemeler.get(id);
+
+let bildirim: { tur: 'basari' | 'hata'; metin: string } | null = null;
+
+if (Astro.request.method === 'POST') {
+  try {
+    const form = await Astro.request.formData();
+    const veri = formdanIlanVerisi(form);
+
+    if (!veri.baslik) throw new Error('İlan başlığı zorunludur.');
+    if (!veri.fiyat) throw new Error('İlan fiyatı zorunludur.');
+
+    await ilanKaydetVeyaGuncelle(vt, veri, id);
+    onbellegiTemizle();
+
+    bildirim = {
+      tur: 'basari',
+      metin: 'İlan başarıyla güncellendi. Değişiklikler sitede anında yayına alındı.',
+    };
+  } catch (hata) {
+    bildirim = { tur: 'hata', metin: (hata as Error).message };
+  }
+}
+
+// Güncel veriyi hazırla
+const guncelSatir = (await ilanSatiri(vt, id)) ?? satir;
+const guncelDuzenleme = (await duzenlemeleriGetir(vt)).get(id) ?? duz;
+
+const guvenliJson = <T,>(m: string | null | undefined, v: T): T => {
+  try {
+    return m ? (JSON.parse(m) as T) : v;
+  } catch {
+    return v;
+  }
+};
+
+const hamOz = guvenliJson<Record<string, string>>(guncelSatir.ozellikler, {});
+const duzOz = guncelDuzenleme?.ozellikler
+  ? guvenliJson<Record<string, string>>(guncelDuzenleme.ozellikler, {})
+  : {};
+const oz = { ...hamOz, ...duzOz };
+
+const hamDonanim = guvenliJson<string[]>(guncelSatir.donanim ?? '[]', []);
+const duzDonanim = guncelDuzenleme?.donanim
+  ? guvenliJson<string[]>(guncelDuzenleme.donanim, [])
+  : null;
+const seciliDonanim = new Set(duzDonanim && duzDonanim.length ? duzDonanim : hamDonanim);
+
+const gorsellerDizi = guvenliJson<string[]>(guncelSatir.gorseller, []);
+const gorselMetin = gorsellerDizi.join('\n');
+
+const baslik = guncelDuzenleme?.baslik ?? baslikTemizle(guncelSatir.baslik);
+const aciklama = guncelDuzenleme?.aciklama ?? guncelSatir.aciklama;
+
+// Sayısal temizleme yardımcıları
+const sayiAl = (val?: string) => {
+  if (!val) return '';
+  const m = val.match(/\d+/);
+  return m ? m[0] : '';
+};
+---
+
+<Panel baslik={`İlan Düzenle: ${baslik}`} eposta={giris.kimlik.eposta} ozet={`No: ${id} · Kaynak: ${satir.kaynak}`}>
+  <div slot="eylem" class="flex items-center gap-2">
+    <a href={`/yonetim/gorsel/${id}`} class="pd pd--birincil">Fotoğraf Sıralama & Kapak Yönetimi</a>
+    <a href="/yonetim/ilanlar" class="pd pd--sade">← İlan Listesine Dön</a>
+  </div>
+
+  {bildirim && <div class={`bildirim bildirim--${bildirim.tur}`}>{bildirim.metin}</div>}
+
+  <form method="POST" class="ilan-form-alani">
+    <!-- 1. TEMEL VE TİCARİ BİLGİLER -->
+    <section class="kutu">
+      <div class="kutu-bas">
+        <h2>1. Temel & Ticari Bilgiler</h2>
+        <span class="kutu-alt-not">İlan vitrin ve fiyat ayarları</span>
+      </div>
+
+      <div class="p-izgara">
+        <label class="p-alan col-span-full">
+          <span>İlan Başlığı *</span>
+          <input type="text" name="baslik" required maxlength="160" value={baslik} />
+        </label>
+
+        <label class="p-alan">
+          <span>İşlem Türü *</span>
+          <select name="islem" required>
+            {ISLEM_TURLERI.map((i) => (
+              <option value={i.deger} selected={guncelSatir.islem === i.deger}>
+                {i.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label class="p-alan">
+          <span>Mülk Grubu *</span>
+          <select name="tip_grup" id="secim-tip-grup" required>
+            {TIP_GRUPLARI.map((tg) => (
+              <option value={tg.deger} selected={guncelSatir.tip_grup === tg.deger}>
+                {tg.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label class="p-alan">
+          <span>Mülk Tipi (Alt Kategori) *</span>
+          <select name="tip" id="secim-tip" required>
+            {(MULK_TIPLERI[guncelSatir.tip_grup] || MULK_TIPLERI.konut).map((t) => (
+              <option value={t.deger} selected={guncelSatir.tip === t.deger}>
+                {t.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label class="p-alan">
+          <span>Kategori Başlığı</span>
+          <input type="text" name="kategori" value={guncelSatir.kategori} />
+        </label>
+
+        <label class="p-alan">
+          <span>Fiyat *</span>
+          <input
+            type="number"
+            name="fiyat"
+            id="fiyat-girdi"
+            min="0"
+            required
+            inputmode="numeric"
+            value={guncelSatir.fiyat ?? ''}
+          />
+        </label>
+
+        <label class="p-alan">
+          <span>Para Birimi</span>
+          <select name="para_birimi">
+            {PARA_BIRIMLERI.map((p) => (
+              <option value={p.deger} selected={guncelSatir.para_birimi === p.deger}>
+                {p.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label class="p-alan">
+          <span>Pazarlık Durumu</span>
+          <select name="pazarlik">
+            {PAZARLIK_DURUMLARI.map((p) => (
+              <option value={p.deger} selected={oz['Pazarlık'] === p.deger}>
+                {p.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label class="p-alan">
+          <span>Takas Durumu</span>
+          <select name="takas">
+            {TAKAS_DURUMLARI.map((t) => (
+              <option value={t.deger} selected={oz['Takas'] === t.deger}>
+                {t.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label class="p-alan">
+          <span>Krediye Uygunluk</span>
+          <select name="kredi_uygunluk">
+            {KREDI_UYGUNLUKLARI.map((k) => (
+              <option value={k.deger} selected={oz['Krediye Uygunluk'] === k.deger}>
+                {k.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label class="p-alan">
+          <span>Sorumlu Danışman</span>
+          <select name="danisman_slug">
+            <option value="">Ofis Ortak Portföyü</option>
+            {ekip.map((d) => (
+              <option
+                value={d.emlakjetSlug || d.slug}
+                selected={guncelSatir.danisman_slug === (d.emlakjetSlug || d.slug)}
+              >
+                {d.ad} ({d.unvan})
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label class="p-alan">
+          <span>Kira Getirisi (₺)</span>
+          <input type="number" name="kira_getirisi" min="0" value={sayiAl(oz['Kira Getirisi'])} />
+        </label>
+      </div>
+    </section>
+
+    <!-- 2. KONUM VE KADASTRO -->
+    <section class="kutu" style="margin-top:1.5rem">
+      <div class="kutu-bas">
+        <h2>2. Konum & Kadastro Bilgileri</h2>
+        <span class="kutu-alt-not">İl, ilçe, ada, parsel ve harita</span>
+      </div>
+
+      <div class="p-izgara">
+        <label class="p-alan">
+          <span>İl *</span>
+          <input type="text" name="il" required value={guncelSatir.il ?? 'İstanbul'} />
+        </label>
+
+        <label class="p-alan">
+          <span>İlçe *</span>
+          <input type="text" name="ilce" required value={guncelSatir.ilce ?? 'Silivri'} />
+        </label>
+
+        <label class="p-alan">
+          <span>Mahalle / Köy *</span>
+          <input type="text" name="mahalle" required value={guncelSatir.mahalle ?? ''} />
+        </label>
+
+        <label class="p-alan">
+          <span>Cadde / Sokak / Mevkii</span>
+          <input type="text" name="mevkii" value={oz['Mevkii'] ?? ''} />
+        </label>
+
+        <label class="p-alan">
+          <span>Ada No</span>
+          <input type="text" name="ada" value={oz['Ada'] ?? ''} />
+        </label>
+
+        <label class="p-alan">
+          <span>Parsel No</span>
+          <input type="text" name="parsel" value={oz['Parsel'] ?? ''} />
+        </label>
+
+        <label class="p-alan">
+          <span>Pafta No</span>
+          <input type="text" name="pafta" value={oz['Pafta'] ?? ''} />
+        </label>
+
+        <label class="p-alan">
+          <span>Harita Enlem (Opsiyonel)</span>
+          <input type="text" name="enlem" value={oz['Enlem'] ?? ''} />
+        </label>
+
+        <label class="p-alan">
+          <span>Harita Boylam (Opsiyonel)</span>
+          <input type="text" name="boylam" value={oz['Boylam'] ?? ''} />
+        </label>
+      </div>
+    </section>
+
+    <!-- 3. MÜLK DETAYLARI -->
+    <section class="kutu" style="margin-top:1.5rem">
+      <div class="kutu-bas">
+        <h2>3. Mülk Teknik Detayları & Ölçüleri</h2>
+        <span class="kutu-alt-not">Kategoriye özgü detay alanları</span>
+      </div>
+
+      <div class="m2-ozet-kutusu">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <label class="p-alan">
+            <span>Ana Metrekare (m²) *</span>
+            <input
+              type="number"
+              name="m2"
+              id="ana-m2"
+              min="1"
+              required
+              value={guncelSatir.m2 ?? ''}
+            />
+          </label>
+          <div class="hesaplanan-kutu">
+            <span class="hesap-etiket">Hesaplanan m² Birim Fiyatı:</span>
+            <span class="hesap-deger font-veri" id="birim-fiyat-gosterge">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KONUT ALANLARI -->
+      <div
+        id="alanlar-konut"
+        class="kategori-bolumu p-izgara mt-4"
+        style={guncelSatir.tip_grup === 'konut' ? 'display:grid' : 'display:none'}
+      >
+        <label class="p-alan">
+          <span>Brüt Metrekare</span>
+          <input type="number" name="m2_brut" min="1" value={sayiAl(oz['Brüt Metrekare'])} />
+        </label>
+        <label class="p-alan">
+          <span>Net Metrekare</span>
+          <input type="number" name="m2_net" min="1" value={sayiAl(oz['Net Metrekare'])} />
+        </label>
+        <label class="p-alan">
+          <span>Açık Alan / Bahçe (m²)</span>
+          <input type="number" name="m2_acik" min="0" value={sayiAl(oz['Açık Alan / Bahçe'])} />
+        </label>
+
+        <label class="p-alan">
+          <span>Oda Sayısı</span>
+          <select name="oda">
+            <option value="">Seçiniz</option>
+            {ODA_SECENEKLERI.map((o) => (
+              <option value={o.deger} selected={(guncelSatir.oda || oz['Oda Sayısı']) === o.deger}>
+                {o.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label class="p-alan">
+          <span>Salon Sayısı</span>
+          <select name="salon_sayisi">
+            <option value="1" selected={oz['Salon Sayısı'] === '1'}>1 Salon</option>
+            <option value="2" selected={oz['Salon Sayısı'] === '2'}>2 Salon</option>
+            <option value="3" selected={oz['Salon Sayısı'] === '3'}>3+ Salon</option>
+          </select>
+        </label>
+        <label class="p-alan">
+          <span>Bina Yaşı</span>
+          <select name="bina_yasi">
+            <option value="">Seçiniz</option>
+            {BINA_YASLARI.map((b) => (
+              <option value={b.deger} selected={oz['Bina Yaşı'] === b.deger}>
+                {b.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label class="p-alan">
+          <span>Bulunduğu Kat</span>
+          <select name="bulundugu_kat">
+            <option value="">Seçiniz</option>
+            {KAT_SECENEKLERI.map((k) => (
+              <option value={k.deger} selected={oz['Bulunduğu Kat'] === k.deger}>
+                {k.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label class="p-alan">
+          <span>Binadaki Kat Sayısı</span>
+          <input type="number" name="kat_sayisi" min="1" max="60" value={sayiAl(oz['Kat Sayısı'])} />
+        </label>
+        <label class="p-alan">
+          <span>Isıtma Tipi</span>
+          <select name="isitma_tipi">
+            <option value="">Seçiniz</option>
+            {ISITMA_TIPLERI.map((i) => (
+              <option value={i.deger} selected={oz['Isıtma Tipi'] === i.deger}>
+                {i.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label class="p-alan">
+          <span>Banyo Sayısı</span>
+          <select name="banyo_sayisi">
+            <option value="">Seçiniz</option>
+            {BANYO_SAYILARI.map((b) => (
+              <option value={b.deger} selected={oz['Banyo Sayısı'] === b.deger}>
+                {b.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label class="p-alan">
+          <span>Tuvalet / WC</span>
+          <select name="tuvalet_sayisi">
+            <option value="">Seçiniz</option>
+            <option value="1" selected={oz['Tuvalet Sayısı'] === '1'}>1 Tuvalet</option>
+            <option value="2" selected={oz['Tuvalet Sayısı'] === '2'}>2 Tuvalet</option>
+            <option value="3+" selected={oz['Tuvalet Sayısı'] === '3+'}>3+ Tuvalet</option>
+          </select>
+        </label>
+        <label class="p-alan">
+          <span>Balkon</span>
+          <select name="balkon">
+            <option value="">Seçiniz</option>
+            {BALKON_DURUMLARI.map((b) => (
+              <option value={b.deger} selected={oz['Balkon'] === b.deger}>
+                {b.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label class="p-alan">
+          <span>Asansör</span>
+          <select name="asansor">
+            <option value="Var" selected={oz['Asansör'] === 'Var'}>Var</option>
+            <option value="Yok" selected={oz['Asansör'] === 'Yok'}>Yok</option>
+          </select>
+        </label>
+        <label class="p-alan">
+          <span>Otopark</span>
+          <select name="otopark">
+            <option value="">Seçiniz</option>
+            {OTOPARK_DURUMLARI.map((o) => (
+              <option value={o.deger} selected={oz['Otopark'] === o.deger}>
+                {o.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label class="p-alan">
+          <span>Eşya Durumu</span>
+          <select name="esya_durumu">
+            {ESYA_DURUMLARI.map((e) => (
+              <option value={e.deger} selected={oz['Eşya Durumu'] === e.deger}>
+                {e.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label class="p-alan">
+          <span>Kullanım Durumu</span>
+          <select name="kullanim_durumu">
+            {KULLANIM_DURUMLARI.map((k) => (
+              <option value={k.deger} selected={oz['Kullanım Durumu'] === k.deger}>
+                {k.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label class="p-alan">
+          <span>Site İçerisinde</span>
+          <select name="site_icerisinde">
+            <option value="Hayır" selected={oz['Site İçerisinde'] === 'Hayır'}>Hayır</option>
+            <option value="Evet" selected={oz['Site İçerisinde'] === 'Evet'}>Evet</option>
+          </select>
+        </label>
+        <label class="p-alan">
+          <span>Site / Proje Adı</span>
+          <input type="text" name="site_adi" value={oz['Site / Proje Adı'] ?? ''} />
+        </label>
+
+        <label class="p-alan">
+          <span>Aidat Tutarı (₺ / ay)</span>
+          <input type="number" name="aidat" min="0" value={sayiAl(oz['Aidat'])} />
+        </label>
+        <label class="p-alan">
+          <span>Depozito (₺ - Kiralık için)</span>
+          <input type="number" name="depozito" min="0" value={sayiAl(oz['Depozito'])} />
+        </label>
+        <label class="p-alan">
+          <span>Tapu Durumu</span>
+          <select name="tapu_durumu">
+            <option value="">Seçiniz</option>
+            {TAPU_DURUMLARI.map((t) => (
+              <option value={t.deger} selected={oz['Tapu Durumu'] === t.deger}>
+                {t.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label class="p-alan">
+          <span>Yapı Durumu</span>
+          <select name="yapi_durumu">
+            <option value="">Seçiniz</option>
+            {YAPI_DURUMLARI.map((y) => (
+              <option value={y.deger} selected={oz['Yapı Durumu'] === y.deger}>
+                {y.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label class="p-alan">
+          <span>Yapı Tipi</span>
+          <select name="yapi_tipi">
+            <option value="">Seçiniz</option>
+            {YAPI_TIPLERI.map((y) => (
+              <option value={y.deger} selected={oz['Yapı Tipi'] === y.deger}>
+                {y.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <div class="p-alan col-span-full">
+          <span>Cephe</span>
+          <div class="flex flex-wrap gap-4 mt-1">
+            {['Kuzey', 'Güney', 'Doğu', 'Batı'].map((cephe) => (
+              <label class="inline-flex items-center gap-1.5 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="cephe"
+                  value={cephe}
+                  checked={(oz['Cephe'] ?? '').includes(cephe)}
+                />
+                <span>{cephe}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- ARSA ALANLARI -->
+      <div
+        id="alanlar-arsa"
+        class="kategori-bolumu p-izgara mt-4"
+        style={guncelSatir.tip_grup === 'arsa' ? 'display:grid' : 'display:none'}
+      >
+        <label class="p-alan">
+          <span>İmar Durumu *</span>
+          <select name="imar_durumu">
+            <option value="">Seçiniz</option>
+            {IMAR_DURUMLARI.map((i) => (
+              <option value={i.deger} selected={oz['İmar Durumu'] === i.deger}>
+                {i.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label class="p-alan">
+          <span>Satılan Hisse Alanı (m²)</span>
+          <input type="number" name="hisse_m2" min="1" value={sayiAl(oz['Satılan Hisse Alanı'])} />
+        </label>
+        <label class="p-alan">
+          <span>KAKS (Emsal)</span>
+          <select name="kaks">
+            <option value="">Seçiniz</option>
+            {KAKS_EMSAL_SECENEKLERI.map((k) => (
+              <option value={k.deger} selected={oz['KAKS (Emsal)'] === k.deger}>
+                {k.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label class="p-alan">
+          <span>Gabari / Kat İzni</span>
+          <select name="gabari">
+            <option value="">Seçiniz</option>
+            {GABARI_SECENEKLERI.map((g) => (
+              <option value={g.deger} selected={oz['Gabari'] === g.deger}>
+                {g.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label class="p-alan">
+          <span>TAKS (%)</span>
+          <input type="number" name="taks" min="1" max="100" value={sayiAl(oz['TAKS'])} />
+        </label>
+        <label class="p-alan">
+          <span>Yol Durumu</span>
+          <select name="yol_durumu">
+            <option value="">Seçiniz</option>
+            {ARSA_YOL_DURUMLARI.map((y) => (
+              <option value={y.deger} selected={oz['Yol Durumu'] === y.deger}>
+                {y.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label class="p-alan">
+          <span>Yola Cephe Uzunluğu (Metre)</span>
+          <input type="number" name="yola_cephe" min="1" value={sayiAl(oz['Yola Cephe'])} />
+        </label>
+        <label class="p-alan">
+          <span>Zemin / Arazi Yapısı</span>
+          <select name="zemin_yapisi">
+            <option value="">Seçiniz</option>
+            {ZEMIN_YAPILARI.map((z) => (
+              <option value={z.deger} selected={oz['Zemin Yapısı'] === z.deger}>
+                {z.etiket}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <!-- İŞ YERİ ALANLARI -->
+      <div
+        id="alanlar-isyeri"
+        class="kategori-bolumu p-izgara mt-4"
+        style={guncelSatir.tip_grup === 'isyeri' ? 'display:grid' : 'display:none'}
+      >
+        <label class="p-alan">
+          <span>Kapalı Alan (m²)</span>
+          <input type="number" name="kapali_alan" min="1" value={sayiAl(oz['Kapalı Alan'])} />
+        </label>
+        <label class="p-alan">
+          <span>Bölüm / Oda Sayısı</span>
+          <input type="text" name="ticari_bolum" value={oz['Bölüm / Oda Sayısı'] ?? ''} />
+        </label>
+        <label class="p-alan">
+          <span>Tavan Yüksekliği (m)</span>
+          <input type="text" name="tavan_yuksekligi" value={oz['Tavan Yüksekliği'] ?? ''} />
+        </label>
+        <label class="p-alan">
+          <span>Vitrin Genişliği (m)</span>
+          <input type="text" name="vitrin_genisligi" value={oz['Vitrin Genişliği'] ?? ''} />
+        </label>
+        <label class="p-alan">
+          <span>Elektrik Gücü (kW)</span>
+          <input type="number" name="elektrik_gucu" min="0" value={sayiAl(oz['Elektrik Gücü'])} />
+        </label>
+        <label class="p-alan">
+          <span>Ruhsat & Baca</span>
+          <select name="ruhsat_baca">
+            <option value="Bacalı / Gıdaya Uygun" selected={oz['Ruhsat & Baca'] === 'Bacalı / Gıdaya Uygun'}>
+              Bacalı / Gıdaya Uygun
+            </option>
+            <option value="Bacasız" selected={oz['Ruhsat & Baca'] === 'Bacasız'}>
+              Bacasız
+            </option>
+            <option value="Ruhsat Alınabilir" selected={oz['Ruhsat & Baca'] === 'Ruhsat Alınabilir'}>
+              Ruhsata Uygun
+            </option>
+          </select>
+        </label>
+        <label class="p-alan">
+          <span>Yük Asansörü</span>
+          <select name="yuk_asansoru">
+            <option value="Yok" selected={oz['Yük Asansörü'] === 'Yok'}>Yok</option>
+            <option value="Var" selected={oz['Yük Asansörü'] === 'Var'}>Var</option>
+          </select>
+        </label>
+        <label class="p-alan">
+          <span>Devren</span>
+          <select name="devren">
+            <option value="Hayır" selected={oz['Devren'] === 'Hayır'}>Hayır</option>
+            <option value="Evet" selected={oz['Devren'] === 'Evet'}>Evet</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <!-- 4. DONANIM ÇİPLERİ -->
+    <section class="kutu" style="margin-top:1.5rem">
+      <div class="kutu-bas">
+        <div>
+          <h2>4. Donanım & Özellik Çipleri</h2>
+          <span class="kutu-alt-not">Sahibinden, Hepsiemlak ve Emlakjet onaylı liste</span>
+        </div>
+        <input
+          type="text"
+          id="donanim-ara"
+          placeholder="Özellik ara..."
+          class="cip-arama-girdi"
+        />
+      </div>
+
+      <div class="space-y-6 mt-4">
+        {DONANIM_KATALOGU.map((grup) => (
+          <div class="donanim-grup-kutu">
+            <div class="donanim-grup-baslik">
+              <h3>{grup.baslik}</h3>
+              <span class="text-xs text-kursun">{grup.aciklama}</span>
+            </div>
+            <div class="donanim-izgara">
+              {grup.ogeListesi.map((oge) => (
+                <label class="donanim-etiket" data-etiket={oge.toLocaleLowerCase('tr')}>
+                  <input
+                    type="checkbox"
+                    name="donanim"
+                    value={oge}
+                    checked={seciliDonanim.has(oge)}
+                  />
+                  <span>{oge}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- 5. FOTOĞRAFLAR VE MEDYA -->
+    <section class="kutu" style="margin-top:1.5rem">
+      <div class="kutu-bas">
+        <div>
+          <h2>5. Fotoğraflar & Medya</h2>
+          <span class="kutu-alt-not">Görseller ve video bağlantıları</span>
+        </div>
+        <a href={`/yonetim/gorsel/${id}`} class="pd pd--birincil text-xs">
+          Kapak ve Sıralamayı Değiştir ({gorsellerDizi.length} Fotoğraf) →
+        </a>
+      </div>
+
+      <div class="space-y-4">
+        <label class="p-alan">
+          <span>Fotoğraf Adresleri (Her satıra bir web linki)</span>
+          <textarea name="gorseller" rows="5">{gorselMetin}</textarea>
+        </label>
+
+        <div class="p-izgara">
+          <label class="p-alan">
+            <span>YouTube Video Bağlantısı</span>
+            <input type="url" name="video_url" value={oz['Video URL'] ?? ''} />
+          </label>
+          <label class="p-alan">
+            <span>360° Sanal Tur Bağlantısı</span>
+            <input type="url" name="sanal_tur_url" value={oz['Sanal Tur URL'] ?? ''} />
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. PORTALLAR VE AÇIKLAMA -->
+    <section class="kutu" style="margin-top:1.5rem">
+      <div class="kutu-bas">
+        <h2>6. Portal Referansları & Açıklama Metni</h2>
+        <span class="kutu-alt-not">Dış portallar ve detay metni</span>
+      </div>
+
+      <div class="p-izgara">
+        <label class="p-alan">
+          <span>Sahibinden.com İlan No</span>
+          <input type="text" name="sahibinden_no" value={oz['Sahibinden No'] ?? ''} />
+        </label>
+        <label class="p-alan">
+          <span>Hepsiemlak İlan No</span>
+          <input type="text" name="hepsiemlak_no" value={oz['Hepsiemlak No'] ?? ''} />
+        </label>
+        <label class="p-alan">
+          <span>Emlakjet İlan No</span>
+          <input type="text" name="emlakjet_no" value={oz['Emlakjet No'] ?? (satir.kaynak === 'emlakjet' ? satir.id : '')} />
+        </label>
+      </div>
+
+      <label class="p-alan mt-4">
+        <span>Detaylı Açıklama *</span>
+        <textarea name="aciklama" rows="8" required>{aciklama}</textarea>
+      </label>
+
+      <div class="form-kaydet-serit mt-6">
+        <button type="submit" class="pd pd--kirmizi text-base py-3 px-8">
+          Değişiklikleri Kaydet
+        </button>
+        <a href="/yonetim/ilanlar" class="pd pd--sade py-3 px-6">Vazgeç</a>
+      </div>
+    </section>
+  </form>
+</Panel>
+
+<script is:inline define:vars={{ mulkTipleri: MULK_TIPLERI, varsayilanTip: guncelSatir.tip }}>
+  const tipGrupSelect = document.getElementById('secim-tip-grup');
+  const tipSelect = document.getElementById('secim-tip');
+  const alanKonut = document.getElementById('alanlar-konut');
+  const alanArsa = document.getElementById('alanlar-arsa');
+  const alanIsyeri = document.getElementById('alanlar-isyeri');
+
+  function grupGuncelle() {
+    const secilen = tipGrupSelect.value;
+    const tipler = mulkTipleri[secilen] || mulkTipleri.diger || [];
+    tipSelect.innerHTML = tipler
+      .map((t) => `<option value="${t.deger}" ${t.deger === varsayilanTip ? 'selected' : ''}>${t.etiket}</option>`)
+      .join('');
+
+    if (secilen === 'arsa') {
+      alanKonut.style.display = 'none';
+      alanArsa.style.display = 'grid';
+      alanIsyeri.style.display = 'none';
+    } else if (secilen === 'isyeri') {
+      alanKonut.style.display = 'none';
+      alanArsa.style.display = 'none';
+      alanIsyeri.style.display = 'grid';
+    } else {
+      alanKonut.style.display = 'grid';
+      alanArsa.style.display = 'none';
+      alanIsyeri.style.display = 'none';
+    }
+  }
+
+  tipGrupSelect.addEventListener('change', grupGuncelle);
+
+  // Canlı birim fiyat
+  const fiyatGirdi = document.getElementById('fiyat-girdi');
+  const m2Girdi = document.getElementById('ana-m2');
+  const birimFiyatGosterge = document.getElementById('birim-fiyat-gosterge');
+
+  function birimFiyatHesapla() {
+    const fiyat = Number(fiyatGirdi.value) || 0;
+    const m2 = Number(m2Girdi.value) || 0;
+    if (fiyat > 0 && m2 > 0) {
+      const birim = Math.round(fiyat / m2);
+      birimFiyatGosterge.textContent = `${birim.toLocaleString('tr-TR')} ₺/m²`;
+    } else {
+      birimFiyatGosterge.textContent = '—';
+    }
+  }
+
+  fiyatGirdi.addEventListener('input', birimFiyatHesapla);
+  m2Girdi.addEventListener('input', birimFiyatHesapla);
+  birimFiyatHesapla();
+
+  // Donanım arama
+  const donanimAra = document.getElementById('donanim-ara');
+  const donanimEtiketleri = document.querySelectorAll('.donanim-etiket');
+
+  donanimAra.addEventListener('input', (e) => {
+    const aranan = e.target.value.toLocaleLowerCase('tr').trim();
+    donanimEtiketleri.forEach((etiket) => {
+      const metin = etiket.getAttribute('data-etiket') || '';
+      if (!aranan || metin.includes(aranan)) {
+        etiket.style.display = 'inline-flex';
+      } else {
+        etiket.style.display = 'none';
+      }
+    });
+  });
+</script>
+
+<style>
+  .kutu-alt-not {
+    font-size: 0.75rem;
+    color: var(--color-kursun);
+    font-weight: normal;
+  }
+
+  .m2-ozet-kutusu {
+    background: color-mix(in oklab, var(--color-kagit) 80%, white);
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .hesaplanan-kutu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: #fff;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 8%, transparent);
+  }
+
+  .hesap-etiket {
+    font-size: 0.6875rem;
+    color: var(--color-kursun);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .hesap-deger {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-kirmizi);
+    margin-top: 0.25rem;
+  }
+
+  .cip-arama-girdi {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8125rem;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 15%, transparent);
+    border-radius: 4px;
+    background: #fff;
+    width: 18rem;
+    max-width: 100%;
+  }
+
+  .donanim-grup-kutu {
+    border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 8%, transparent);
+    padding-top: 1rem;
+  }
+
+  .donanim-grup-baslik {
+    margin-bottom: 0.75rem;
+  }
+
+  .donanim-grup-baslik h3 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-murekkep);
+  }
+
+  .donanim-izgara {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+    gap: 0.5rem 1rem;
+  }
+
+  .donanim-etiket {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--color-metin-2);
+    cursor: pointer;
+    user-select: none;
+    padding: 0.25rem 0.4rem;
+    border-radius: 4px;
+    transition: background 0.15s;
+  }
+
+  .donanim-etiket:hover {
+    background: color-mix(in oklab, var(--color-kirmizi) 5%, transparent);
+    color: var(--color-murekkep);
+  }
+
+  .donanim-etiket input[type='checkbox'] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--color-kirmizi);
+    cursor: pointer;
+  }
+
+  .form-kaydet-serit {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    padding-top: 1.25rem;
+  }
+</style>

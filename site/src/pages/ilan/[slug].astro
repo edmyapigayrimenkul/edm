@@ -8,6 +8,7 @@ import { PORTALLAR, KURUM } from '../../lib/site';
 import { icerik, whatsappBaglanti } from '../../lib/icerik';
 import FavoriDugme from '../../components/FavoriDugme.astro';
 import PaylasDugme from '../../components/PaylasDugme.astro';
+import { kunyeGrupla, donanimGrupla } from '../../lib/ilan-bilgileri';
 
 const { slug } = Astro.params;
 const ilan = slug ? await ilanBul(slug) : undefined;
@@ -21,13 +22,11 @@ if (ilan.slug !== slug) return Astro.redirect(ilan.yol, 301);
 const benzer = await benzerIlanlar(ilan, 3);
 const paragraflar = await aciklamaParcala(ilan);
 const { ekip, iletisim } = await icerik();
-const danisman = ekip.find((d) => d.emlakjetSlug && d.emlakjetSlug === ilan.danismanSlug);
-
-/** Künyede gösterilmeyecek alanlar — ya başka yerde var ya da anlamsız. */
-const gizliOzellikler = new Set(['İlan Numarası', 'Kategori', 'İlan Güncelleme Tarihi']);
-const ozellikler = Object.entries(ilan.ozellikler)
-  .filter(([ad, deger]) => !gizliOzellikler.has(ad) && deger && deger !== 'Belirtilmemiş')
-  .sort((a, b) => a[0].localeCompare(b[0], 'tr'));
+const danisman = ekip.find(
+  (d) =>
+    (d.emlakjetSlug && d.emlakjetSlug === ilan.danismanSlug) ||
+    d.slug === ilan.danismanSlug
+);
 
 const guncellemeTarihi = ilan.guncellenme
   ? new Date(ilan.guncellenme).toLocaleDateString('tr-TR', {
@@ -37,13 +36,53 @@ const guncellemeTarihi = ilan.guncellenme
     })
   : null;
 
-const waMesaj = `Merhaba, ${ilan.kaynakUrl.includes('emlakjet') ? '' : ''}"${ilan.baslikTemiz}" ilanı (No: ${ilan.id}) hakkında bilgi almak istiyorum.`;
+const waMesaj = `Merhaba, "${ilan.baslikTemiz}" ilanı (No: ${ilan.id}) hakkında bilgi almak istiyorum.`;
 
-/** Kart üstünde gösterilen ana ölçüler. */
+/** 3 Büyük Platform Referansları */
+const sahibindenNo = ilan.ozellikler['Sahibinden No'];
+const hepsiemlakNo = ilan.ozellikler['Hepsiemlak No'];
+const emlakjetNo =
+  ilan.ozellikler['Emlakjet No'] || (ilan.kaynak === 'emlakjet' ? ilan.id : undefined);
+
+/** Video ve Sanal Tur */
+const videoUrl = ilan.ozellikler['Video URL'];
+const videoId = videoUrl
+  ? videoUrl.match(
+      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/
+    )?.[1]
+  : null;
+const sanalTurUrl = ilan.ozellikler['Sanal Tur URL'];
+
+/** Kadastro (Ada / Parsel / Pafta) */
+const ada = ilan.ozellikler['Ada'];
+const parsel = ilan.ozellikler['Parsel'];
+const pafta = ilan.ozellikler['Pafta'];
+const kadastroVar = Boolean(ada || parsel || pafta);
+
+/** 3 Platform Standardında Gruplandırılmış Künye & Donanım */
+const gruplanmisKunye = kunyeGrupla(
+  ilan.tipGrup,
+  ilan.ozellikler,
+  ilan.fiyatMetin,
+  ilan.birimFiyat
+);
+const gruplanmisDonanim = donanimGrupla(ilan.donanim);
+
+/** Kart üstünde gösterilen ana ölçüler (Hızlı Künye Şeridi). */
+const brutAlan = ilan.ozellikler['Brüt Metrekare'];
+const netAlan = ilan.ozellikler['Net Metrekare'];
+const alanDeger =
+  brutAlan && netAlan
+    ? `Brüt ${brutAlan} · Net ${netAlan}`
+    : ilan.m2Metin ?? '—';
+
 const kunye = [
   ilan.oda && { etiket: 'Oda', deger: ilan.oda },
-  ilan.m2Metin && { etiket: ilan.tipGrup === 'arsa' ? 'Arsa alanı' : 'Alan', deger: ilan.m2Metin },
-  ilan.birimFiyat && { etiket: 'Birim fiyat', deger: ilan.birimFiyat },
+  { etiket: ilan.tipGrup === 'arsa' ? 'Arsa Alanı' : 'Kullanım Alanı', deger: alanDeger },
+  ilan.birimFiyat && { etiket: 'Birim Fiyat', deger: ilan.birimFiyat },
+  ilan.ozellikler['Bulunduğu Kat'] && { etiket: 'Kat', deger: ilan.ozellikler['Bulunduğu Kat'] },
+  ilan.ozellikler['İmar Durumu'] && { etiket: 'İmar', deger: ilan.ozellikler['İmar Durumu'] },
+  ilan.ozellikler['Bina Yaşı'] && { etiket: 'Bina Yaşı', deger: ilan.ozellikler['Bina Yaşı'] },
 ].filter(Boolean) as Array<{ etiket: string; deger: string }>;
 
 const jsonLd = {
@@ -55,6 +94,17 @@ const jsonLd = {
   image: ilan.gorseller.slice(0, 8),
   datePosted: ilan.ilkGorulme,
   ...(ilan.guncellenme ? { dateModified: ilan.guncellenme } : {}),
+  ...(ilan.oda ? { numberOfRooms: ilan.oda } : {}),
+  ...(ilan.m2 ? { floorSize: { '@type': 'QuantitativeValue', value: ilan.m2, unitCode: 'MTK' } } : {}),
+  ...(ilan.koordinat
+    ? {
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: ilan.koordinat.enlem,
+          longitude: ilan.koordinat.boylam,
+        },
+      }
+    : {}),
   offers: {
     '@type': 'Offer',
     price: ilan.fiyat ?? undefined,
@@ -162,33 +212,97 @@ const izYolu = {
             </div>
           </section>
 
-          <!-- Özellikler -->
+          <!-- Tanıtım Videosu -->
           {
-            ozellikler.length > 0 && (
+            videoId && (
               <section class="mt-12">
-                <h2 class="baslik-orta">Özellikler</h2>
-                <dl class="ozellik-izgara mt-5">
-                  {ozellikler.map(([ad, deger]) => (
-                    <div class="ozellik-satir">
-                      <dt>{ad}</dt>
-                      <dd>{deger}</dd>
-                    </div>
-                  ))}
-                </dl>
+                <h2 class="baslik-orta">Tanıtım Videosu</h2>
+                <div class="video-sarici mt-5">
+                  <iframe
+                    src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+                    title={`${ilan.baslikTemiz} Videosu`}
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    class="video-iframe"
+                  />
+                </div>
               </section>
             )
           }
 
-          <!-- Donanım -->
+          <!-- Tapu & Kadastro Vurgusu (Arsa / Müstakil) -->
           {
-            ilan.donanim.length > 0 && (
+            kadastroVar && (
+              <section class="mt-10 kadastro-vurgu-kart">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <span class="etiket text-kursun">Resmi Kadastro & Parsel Bilgisi</span>
+                    <p class="font-veri text-xl font-bold text-murekkep mt-1">
+                      {[ada && `Ada: ${ada}`, parsel && `Parsel: ${parsel}`, pafta && `Pafta: ${pafta}`]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </p>
+                    <p class="text-xs text-metin-2 mt-1">
+                      {[ilan.mahalle, ilan.ilce, ilan.il].filter(Boolean).join(' · ')}
+                    </p>
+                  </div>
+                  <a
+                    href="https://parselsorgu.tkgm.gov.tr/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="dugme dugme--hayalet text-xs"
+                  >
+                    TKGM Parsel Sorgu ↗
+                  </a>
+                </div>
+              </section>
+            )
+          }
+
+          <!-- Özellikler (3 Platform Standartlarında Gruplanmış) -->
+          {
+            gruplanmisKunye.length > 0 && (
+              <section class="mt-12">
+                <h2 class="baslik-orta">Mülk Özellikleri & Künye</h2>
+                <div class="space-y-8 mt-6">
+                  {gruplanmisKunye.map((grup) => (
+                    <div class="kunye-grup-kutu">
+                      <h3 class="kunye-grup-baslik">{grup.baslik}</h3>
+                      <dl class="ozellik-izgara mt-2">
+                        {grup.satirlar.map((s) => (
+                          <div class="ozellik-satir">
+                            <dt>{s.etiket}</dt>
+                            <dd class:list={[s.vurgulu && 'font-semibold text-murekkep', 'font-veri']}>
+                              {s.deger}
+                            </dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )
+          }
+
+          <!-- Donanım (Kategorize Edilmiş Çipler) -->
+          {
+            gruplanmisDonanim.length > 0 && (
               <section class="mt-12">
                 <h2 class="baslik-orta">Bu mülkte neler var</h2>
-                <ul class="donanim-liste mt-5">
-                  {ilan.donanim.map((d) => (
-                    <li class="donanim">{d}</li>
+                <div class="space-y-8 mt-6">
+                  {gruplanmisDonanim.map((grup) => (
+                    <div class="donanim-kategori-kutu">
+                      <h3 class="donanim-kategori-baslik">{grup.baslik}</h3>
+                      <ul class="donanim-liste mt-3">
+                        {grup.ogeler.map((d) => (
+                          <li class="donanim">{d}</li>
+                        ))}
+                      </ul>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </section>
             )
           }
@@ -312,26 +426,54 @@ const izYolu = {
           </div>
 
           <div class="portal-kutu">
-            <p class="etiket">Diğer portallarda</p>
-            <div class="mt-3 flex flex-wrap gap-2">
-              <a href={ilan.kaynakUrl} target="_blank" rel="noopener noreferrer" class="portal-pil">
-                {PORTALLAR.emlakjet.ad}
-              </a>
+            <p class="etiket">3 Büyük Portaldaki İlanlarımız</p>
+            <div class="mt-3 flex flex-col gap-2">
               <a
-                href={PORTALLAR.hepsiemlak.ofis}
+                href={
+                  sahibindenNo
+                    ? `https://www.sahibinden.com/ilan/${sahibindenNo}/detay`
+                    : PORTALLAR.sahibinden.ofis
+                }
                 target="_blank"
                 rel="noopener noreferrer"
-                class="portal-pil"
+                class="portal-kart"
               >
-                {PORTALLAR.hepsiemlak.ad}
+                <span class="portal-kart-ad">{PORTALLAR.sahibinden.ad}</span>
+                <span class="portal-kart-no font-veri">
+                  {sahibindenNo ? `No: ${sahibindenNo}` : 'Ofis Portföyü ↗'}
+                </span>
               </a>
+
               <a
-                href={PORTALLAR.sahibinden.ofis}
+                href={
+                  hepsiemlakNo
+                    ? `https://www.hepsiemlak.com/${hepsiemlakNo}`
+                    : PORTALLAR.hepsiemlak.ofis
+                }
                 target="_blank"
                 rel="noopener noreferrer"
-                class="portal-pil"
+                class="portal-kart"
               >
-                {PORTALLAR.sahibinden.ad}
+                <span class="portal-kart-ad">{PORTALLAR.hepsiemlak.ad}</span>
+                <span class="portal-kart-no font-veri">
+                  {hepsiemlakNo ? `No: ${hepsiemlakNo}` : 'Ofis Portföyü ↗'}
+                </span>
+              </a>
+
+              <a
+                href={
+                  emlakjetNo
+                    ? `https://www.emlakjet.com/ilan/${emlakjetNo}`
+                    : ilan.kaynakUrl || PORTALLAR.emlakjet.ofis
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                class="portal-kart"
+              >
+                <span class="portal-kart-ad">{PORTALLAR.emlakjet.ad}</span>
+                <span class="portal-kart-no font-veri">
+                  {emlakjetNo ? `No: ${emlakjetNo}` : ilan.id ? `No: ${ilan.id}` : 'Ofis Portföyü ↗'}
+                </span>
               </a>
             </div>
           </div>
@@ -534,20 +676,126 @@ const izYolu = {
     border-radius: var(--radius-kart);
     padding: 1.15rem 1.5rem 1.35rem;
   }
-  .portal-pil {
-    display: inline-flex;
+  .portal-kart {
+    display: flex;
     align-items: center;
-    height: 1.95rem;
-    padding-inline: 0.7rem;
-    border-radius: 999px;
-    border: 1px solid color-mix(in oklab, var(--color-murekkep) 12%, transparent);
-    font-size: 0.75rem;
-    color: var(--color-metin-2);
-    transition: border-color 0.3s var(--ease-yumusak), color 0.3s var(--ease-yumusak);
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.65rem 0.85rem;
+    background: var(--color-kagit-2, #fafafa);
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 8%, transparent);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.25s var(--ease-yumusak);
   }
-  .portal-pil:hover {
+  .portal-kart:hover {
+    background: #fff;
     border-color: var(--color-murekkep);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-ince);
+  }
+  .portal-kart-ad {
+    font-size: 0.8125rem;
+    font-weight: 600;
     color: var(--color-murekkep);
+  }
+  .portal-kart-no {
+    font-size: 0.75rem;
+    color: var(--color-kursun);
+  }
+
+  /* Kadastro / Arsa İmar Vurgu Kartı */
+  .kadastro-vurgu-kart {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    gap: 1px;
+    background: color-mix(in oklab, var(--color-murekkep) 12%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 12%, transparent);
+    border-radius: var(--radius-kart);
+    overflow: hidden;
+    margin-top: 1rem;
+  }
+  .kadastro-vurgu-kart > div {
+    background: #fff;
+    padding: 1rem 1.15rem;
+    text-align: left;
+  }
+  .kadastro-vurgu-etiket {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-kursun);
+    margin-bottom: 0.25rem;
+  }
+  .kadastro-vurgu-deger {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-murekkep);
+  }
+
+  /* Künye & Donanım Grupları */
+  .kunye-grup-kutu {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-murekkep) 8%, transparent);
+  }
+  .kunye-grup-kutu:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .kunye-grup-baslik {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-murekkep);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .kunye-grup-baslik::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--color-kirmizi);
+  }
+
+  .donanim-kategori-kutu {
+    background: #fff;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 8%, transparent);
+    border-radius: var(--radius-kart);
+    padding: 1.25rem 1.5rem;
+  }
+  .donanim-kategori-baslik {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-kursun);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-murekkep) 6%, transparent);
+  }
+
+  /* Video & 360 Tur */
+  .video-sarici {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    background: #000;
+    border-radius: var(--radius-kart);
+    overflow: hidden;
+    box-shadow: var(--shadow-kart);
+  }
+  .video-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
   }
 
   .truncate {

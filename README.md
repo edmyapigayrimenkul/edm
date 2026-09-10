@@ -3,6 +3,10 @@
 [edmyapigayrimenkul.com](https://edmyapigayrimenkul.com) — Silivri merkezli emlak ofisinin
 kurumsal sitesi ve marka kimliği.
 
+Projenin yaşayan hafızası, sıralı iş listesi ve çalışma günlüğü:
+[`codex.md`](./codex.md). Yeni bir geliştirmeye başlamadan önce bu dosya okunur ve
+iş tamamlandığında görev durumu aynı dosyada güncellenir.
+
 ## Klasörler
 
 | Klasör | İçerik |

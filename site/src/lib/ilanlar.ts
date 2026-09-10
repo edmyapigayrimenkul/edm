@@ -9,7 +9,13 @@
  */
 
 import { env } from 'cloudflare:workers';
-import { aktifIlanSatirlari, sonSenkron, type SatirIlan } from './senkron/depo';
+import {
+  aktifIlanSatirlari,
+  sonSenkron,
+  duzenlemeleriGetir,
+  type SatirIlan,
+  type DuzenlemeKaydi,
+} from './senkron/depo';
 import { koordinatHaritasi, konumAnahtari, type Koordinat } from './senkron/konum';
 import { yuklenenFotograflar } from './senkron/foto-sema';
 
@@ -295,12 +301,16 @@ function satirdanIlan(
   s: SatirIlan,
   koordinatlar: Map<string, Koordinat>,
   duzen?: GorselDuzen,
-  yuklenen?: string[]
+  yuklenen?: string[],
+  duzenleme?: DuzenlemeKaydi
 ): Ilan {
   const baslikTemiz = baslikTemizle(s.baslik);
   const slug = `${slugla(baslikTemiz)}-${s.id}`;
   const islem = (s.islem === 'kiralik' ? 'kiralik' : 'satilik') as Islem;
-  const ozellikler = guvenliJson<Record<string, string>>(s.ozellikler, {});
+  const hamOzellikler = guvenliJson<Record<string, string>>(s.ozellikler, {});
+  const duzOzellikler = duzenleme?.ozellikler ? guvenliJson<Record<string, string>>(duzenleme.ozellikler, {}) : {};
+  const ozellikler = { ...hamOzellikler, ...duzOzellikler };
+
   // Hepsiemlak görselleri varsa onları kullan: yatay çekim, daha yüksek
   // çözünürlük ve üzerinde rakip portalın değil ofisin kendi logosu var.
   const emlakjetGorselleri = guvenliJson<string[]>(s.gorseller, []);
@@ -316,7 +326,9 @@ function satirdanIlan(
   const gorseller = gorselleriDuzenle(hamGorseller, duzen);
   const zaman = Date.parse(s.guncellenme ?? s.ilk_gorulme);
   const etiketler = etiketleriSec(s.oda, s.m2, ozellikler);
-  const donanim = guvenliJson<string[]>(s.donanim ?? '[]', []);
+  const hamDonanim = guvenliJson<string[]>(s.donanim ?? '[]', []);
+  const duzDonanim = duzenleme?.donanim ? guvenliJson<string[]>(duzenleme.donanim, []) : null;
+  const donanim = duzDonanim && duzDonanim.length ? duzDonanim : hamDonanim;
 
   return {
     id: s.id,
@@ -416,14 +428,21 @@ export async function portfoy(): Promise<Portfoy> {
   if (onbellek && Date.now() - onbellek.zaman < ONBELLEK_MS) return onbellek.veri;
 
   const vt = env.VT as D1Database;
-  const [satirlar, koordinatlar, duzenler, yuklenenler] = await Promise.all([
+  const [satirlar, koordinatlar, duzenler, yuklenenler, duzenlemeler] = await Promise.all([
     aktifIlanSatirlari(vt),
     koordinatHaritasi(vt),
     gorselDuzenleri(vt),
     yuklenenFotograflar(vt),
+    duzenlemeleriGetir(vt),
   ]);
   const ilanlar = satirlar.map((satir) =>
-    satirdanIlan(satir, koordinatlar, duzenler.get(satir.id), yuklenenler.get(satir.id))
+    satirdanIlan(
+      satir,
+      koordinatlar,
+      duzenler.get(satir.id),
+      yuklenenler.get(satir.id),
+      duzenlemeler.get(satir.id)
+    )
   );
   const senkron = await sonSenkron(vt).catch(() => null);
 
@@ -482,9 +501,23 @@ export async function ilanBul(slug: string): Promise<Ilan | undefined> {
   const { ilanlar } = await portfoy();
   const bulunan = ilanlar.find((i) => i.slug === slug);
   if (bulunan) return bulunan;
-  // Başlık değişip slug kaydığında ilan numarasından yakala
+
+  // Başlık değişip slug kaydığında ilan numarasından yakala (en az 6 haneli rakam)
   const idEsleme = slug.match(/(\d{6,})$/);
-  return idEsleme ? ilanlar.find((i) => i.id === idEsleme[1]) : undefined;
+  if (idEsleme) {
+    const idIle = ilanlar.find((i) => i.id === idEsleme[1]);
+    if (idIle) return idIle;
+  }
+
+  // elle- veya serbest id eşleşmesi (slug sonundaki id parçası)
+  const sonTire = slug.lastIndexOf('-');
+  if (sonTire > -1) {
+    const adayId = slug.slice(sonTire + 1);
+    const adayIle = ilanlar.find((i) => i.id === adayId || i.id === `elle-${adayId}`);
+    if (adayIle) return adayIle;
+  }
+
+  return ilanlar.find((i) => i.id === slug);
 }
 
 export async function danismaninIlanlari(emlakjetSlug: string): Promise<Ilan[]> {
