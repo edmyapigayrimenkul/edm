@@ -44,7 +44,10 @@ Arşivleme sırasında D1 medya referansları değişirse manifest yazmaz.
 kimliğini, SQL ve her R2 nesnesinin özgün/yedek anahtarını, boyutunu ve SHA-256
 değerini içerir. Başarısız veya eksik koşu manifest üretmez; yalnız manifesti
 oluşmuş koşular tam yedek kabul edilir. Geçici yerel kopyalar işlem sonunda silinir.
-Bu komutlar yalnız elle çalıştırılır; **düzenli zamanlayıcı henüz kurulmadı.**
+Günlük GitHub iş akışı hazırlanmıştır; **zamanlayıcı henüz etkinleştirilmedi.**
+Sınırlı kimlikler ve gerçek kabul koşuları için [otomasyon kılavuzu](./yedek-otomasyonu.md)
+izlenir. CI kaynak D1/R2'yi salt okunur API kimliğiyle okur, arşivi yalnız iki
+yedek kovasına erişen ayrı S3 kimliğiyle yazar.
 
 Arşivdeki SQL'i geri almak için `manifest.json` içindeki `yedekAnahtari`
 değerini kullan:
@@ -101,7 +104,12 @@ fotoğrafları dış kaynaklı olduğundan üretim R2 kovası bu tarihte boştu.
 
 ## Açık koruma işi
 
-Günlük zamanlama ve başarısız yedek uyarısı henüz kurulmadı. 90 gün sonunda
+Günlük zamanlama, bağımsız güncellik kontrolü ve hata e-postası iş akışı
+GitHub'a eklenmiştir; sınırlı kalıcı kimlikler, iki gerçek üretim CI arşivi,
+e-posta teslimi ve ilk zamanlanmış koşu henüz doğrulanmadı. 2 Ekim 2026'da
+yalnız staging yedek kovasına erişen 15 dakikalık S3 kimliğiyle 9.285 bayt
+SQL arşivi geri okuma/hash kontrolünden geçti; güncellik kontrolü de başarılı.
+90 gün sonunda
 otomatik silme kuralı da yok; saklama maliyeti ve geçmiş koşular düzenli izlenmeli.
 R2 kilit kuralı yanlış silmeyi önler; aynı hesap yöneticisinin kuralı
 kaldırmasına karşı bağımsız hesapta ikinci kopya sağlamaz.
