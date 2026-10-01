@@ -22,6 +22,8 @@ on:
       - '.github/workflows/gunluk-yedek.yml'
       - 'site/scripts/**'
       - 'site/tests/yedekleme.test.mjs'
+      - 'site/tests/yedek-kimlik-gir.test.py'
+      - 'site/docs/yedek-otomasyonu.md'
       - 'site/wrangler.yedek.jsonc'
 
 permissions:
@@ -46,6 +48,7 @@ jobs:
         with:
           node-version: '22'
       - run: node --test site/tests/yedekleme.test.mjs
+      - run: python3 -B site/tests/yedek-kimlik-gir.test.py
 
   yedek:
     name: Arşiv veya güncellik kontrolü

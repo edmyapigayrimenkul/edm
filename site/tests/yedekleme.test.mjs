@@ -88,6 +88,17 @@ test('API 200 dönse bile alıcı reddedilmişse bildirim başarılı sayılmaz'
   }
 });
 
+test('kapalı Email Sending teşhis edilir; API hata metni günlüğe sızmaz', async () => {
+  await assert.rejects(yedekHatasiniBildir(bildirimOrtami, async () => Response.json({
+    success: false, errors: [{ code: 10203, message: 'test-gizli signed_url=https://ornek.invalid/secret' }],
+  }, { status: 403 })), (hata) => {
+    assert.match(hata.message, /HTTP 403.*Kod 10203.*Email Sending kapalı/);
+    assert.ok(!hata.message.includes('test-gizli'));
+    assert.ok(!hata.message.includes('signed_url'));
+    return true;
+  });
+});
+
 test('başka depo veya sahte koşu adresi ağ isteği göndermeden reddedilir', async () => {
   let istek = false;
   const getir = async () => { istek = true; };
