@@ -1,6 +1,6 @@
 /**
  * Cloudflare API'sine küçük bir sarmalayıcı.
- * Kimlik bilgileri .env'den okunur, hiçbir yere yazdırılmaz.
+ * Yerelde .env, CI'da yalnız süreç ortamı okunur; kimlik bilgileri yazdırılmaz.
  */
 
 import { readFileSync } from 'node:fs';
@@ -9,12 +9,12 @@ import { fileURLToPath } from 'node:url';
 
 const KOK = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
-export function ortam() {
+export function ortam({ degiskenler = process.env, envYolu = resolve(KOK, '.env') } = {}) {
   let ham = '';
   try {
-    ham = readFileSync(resolve(KOK, '.env'), 'utf8');
-  } catch {
-    throw new Error('.env bulunamadı. CLOUDFLARE_API_TOKEN ve CLOUDFLARE_ACCOUNT_ID gerekli.');
+    if (degiskenler.GITHUB_ACTIONS !== 'true') ham = readFileSync(envYolu, 'utf8');
+  } catch (hata) {
+    if (hata.code !== 'ENOENT') throw new Error('.env okunamadı.');
   }
 
   const deger = {};
@@ -29,12 +29,18 @@ export function ortam() {
       .replace(/^["']|["']$/g, '');
   }
 
-  const token = deger.CLOUDFLARE_API_TOKEN;
-  const hesap = deger.CLOUDFLARE_ACCOUNT_ID;
+  // Boş bir CI secret'ı da yereldeki geniş yetkili anahtara geri düşmemeli.
+  const oku = (ad) => Object.hasOwn(degiskenler, ad) ? degiskenler[ad] : deger[ad];
+  const token = oku('CLOUDFLARE_API_TOKEN');
+  const hesap = oku('CLOUDFLARE_ACCOUNT_ID');
   if (!token || token.startsWith('buraya')) throw new Error('CLOUDFLARE_API_TOKEN dolu değil.');
   if (!hesap || hesap.startsWith('buraya')) throw new Error('CLOUDFLARE_ACCOUNT_ID dolu değil.');
 
-  return { token, hesap };
+  return {
+    token,
+    hesap,
+    panelAdminEpostalari: oku('PANEL_ADMIN_EPOSTALARI') ?? '',
+  };
 }
 
 export async function cf(yol, secenek = {}) {

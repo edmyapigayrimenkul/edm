@@ -1,0 +1,118 @@
+name: Günlük doğrulanmış yedek
+
+on:
+  schedule:
+    # Türkiye: günlük arşiv 02:17, bağımsız güncellik kontrolü 15:47.
+    - cron: '17 23 * * *'
+    - cron: '47 12 * * *'
+  workflow_dispatch:
+    inputs:
+      ortam:
+        description: Yedek ortamı
+        type: choice
+        options: [staging, production]
+        default: staging
+      islem:
+        description: İşlem
+        type: choice
+        options: [yedekle, kontrol, hata-bildirimi-testi]
+        default: yedekle
+  pull_request:
+    paths:
+      - '.github/workflows/gunluk-yedek.yml'
+      - 'site/scripts/**'
+      - 'site/tests/yedekleme.test.mjs'
+      - 'site/wrangler.yedek.jsonc'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: edm-yedek-${{ github.event.inputs.ortam || 'production' }}-${{ github.event_name == 'pull_request' && github.ref || 'isletim' }}
+  cancel-in-progress: false
+
+jobs:
+  dogrula:
+    name: Yedek güvenlik ve hata senaryoları
+    # Sırlar ve gerçek koşular doğrulanana kadar günlük çalışma kapalı kalır.
+    if: github.event_name != 'schedule' || vars.YEDEK_ZAMANLAYICI_HAZIR == '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - run: node --test site/tests/yedekleme.test.mjs
+
+  yedek:
+    name: Arşiv veya güncellik kontrolü
+    needs: dogrula
+    if: >-
+      github.event_name != 'pull_request' && github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' || vars.YEDEK_ZAMANLAYICI_HAZIR == '1')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: site
+    env:
+      CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV: 'false'
+      WRANGLER_SEND_METRICS: 'false'
+      YEDEK_ORTAMI: ${{ inputs.ortam || 'production' }}
+      YEDEK_ISLEMI: ${{ inputs.islem || (github.event.schedule == '47 12 * * *' && 'kontrol' || 'yedekle') }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            site/package-lock.json
+            site/scripts/yedekleme/package-lock.json
+      - name: Çalışma bağımlılıkları
+        run: |
+          npm ci --no-audit --no-fund
+          npm ci --prefix scripts/yedekleme --ignore-scripts --no-audit --no-fund
+      - name: Yedeği doğrula
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_YEDEK_OKUMA_TOKEN }}
+          R2_YEDEK_ERISIM_KIMLIGI: ${{ secrets.R2_YEDEK_ERISIM_KIMLIGI }}
+          R2_YEDEK_GIZLI_ANAHTARI: ${{ secrets.R2_YEDEK_GIZLI_ANAHTARI }}
+        run: |
+          case "$YEDEK_ISLEMI" in
+            yedekle) node scripts/yedekle.mjs "$YEDEK_ORTAMI"; node scripts/yedek-durum.mjs "$YEDEK_ORTAMI" ;;
+            kontrol) node scripts/yedek-durum.mjs "$YEDEK_ORTAMI" ;;
+            hata-bildirimi-testi)
+              test "$YEDEK_ORTAMI" = staging || { echo 'Bildirim testi yalnız staging için çalıştırılır.'; exit 1; }
+              echo 'Kontrollü hata: bildirim adımı doğrulanacak; veri işlemi yapılmadı.'
+              exit 1 ;;
+            *) echo 'Bilinmeyen yedek işlemi.'; exit 1 ;;
+          esac
+
+  bildir:
+    name: Başarısızlık bildirimi
+    needs: [dogrula, yedek]
+    if: >-
+      always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' &&
+      (needs.dogrula.result == 'failure' || needs.yedek.result == 'failure' || needs.yedek.result == 'cancelled')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - name: Doğukan'a e-posta
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_BILDIRIM_API_TOKEN: ${{ secrets.CLOUDFLARE_YEDEK_BILDIRIM_TOKEN }}
+          YEDEK_BILDIRIM_TESTI: ${{ inputs.islem == 'hata-bildirimi-testi' && inputs.ortam == 'staging' && '1' || '0' }}
+        run: node site/scripts/yedek-bildir.mjs
