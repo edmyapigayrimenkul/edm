@@ -23,7 +23,18 @@ export async function yedekHatasiniBildir(degiskenler = process.env, getir = fet
   const sonuc = govde.result;
   if (!cevap.ok || govde.success !== true || sonuc?.permanent_bounces?.includes(alici) ||
       (!sonuc?.delivered?.includes(alici) && !sonuc?.queued?.includes(alici))) {
-    throw new Error(`Yedek hata bildirimi kabul edilmedi (HTTP ${cevap.status}).`);
+    // Sunucunun serbest metnini günlükte göstermeden bilinen kurulum hatasını ayır.
+    const nedenler = new Map([
+      [10101, 'Bildirim anahtarı geçersiz.'],
+      [10102, 'Bildirim anahtarının Email Sending izni eksik.'],
+      [10103, 'Bildirim anahtarı türü bu uç için uygun değil.'],
+      [10105, 'Hesabın Email Sending erişimi etkin değil.'],
+      [10203, 'Hesap veya alan adı için Email Sending kapalı.'],
+    ]);
+    const kod = (Array.isArray(govde.errors) ? govde.errors : [])
+      .find((hata) => nedenler.has(hata?.code))?.code;
+    const ayrinti = kod ? ` Kod ${kod}: ${nedenler.get(kod)}` : '';
+    throw new Error(`Yedek hata bildirimi kabul edilmedi (HTTP ${cevap.status}).${ayrinti}`);
   }
   return sonuc.delivered?.includes(alici) ? 'teslim-edildi' : 'kuyrukta';
 }

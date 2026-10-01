@@ -15,10 +15,17 @@ Mevcut `site/.env` anahtarını GitHub'a kopyalama. Aşağıdaki üç ayrı kiml
 oluştur; oluşturma ekranında gerçek hesabı seç. Tokenları sohbetten gönderme.
 
 1. [Profil → API Tokens → Create Custom Token](https://dash.cloudflare.com/profile/api-tokens):
-   ad `EDM yedek okuma`. İzinler `Account / D1 / Read` ve
+   ad `EDM yedek okuma` (ilk kurulumdan kalan ad). İzinler `Account / D1 / Edit` ve
    `Account / Workers R2 Storage / Read`; hesap kaynakları yalnız EDM hesabı.
-   Bu REST izinleri seçili hesaptaki D1/R2 verilerini okuyabilir, R2 yazımı veya
-   Worker/DNS/Access değişikliği yapamaz. Token → `CLOUDFLARE_API_TOKEN`.
+   D1 Edit export'a özel değildir; seçili hesaptaki D1 veritabanlarına yazma
+   yetkisi de verir. Yedek iş akışı yalnız sorgu ve SQL export çalıştırır.
+   R2 kaynağı salt okunur; Worker/DNS/Access değişikliği izni yoktur.
+   Token → `CLOUDFLARE_API_TOKEN`.
+   **2 Ekim kabul testi:** İlk D1 Read izniyle SELECT başarılı, SQL export ise
+   HTTP 401 / kod 10000 döndü. Kullanıcı yalnız D1'i Edit yaptıktan sonra gerçek
+   staging GitHub yedeği başarılı oldu (koşu `36939362503`). R2 izni ve hesap
+   kapsamı genişletilmemeli. GitHub `CLOUDFLARE_YEDEK_OKUMA_TOKEN` secret adı
+   uyumluluk için korunur; adındaki OKUMA, D1 tokenının salt okunur olduğu anlamına gelmez.
 2. Cloudflare → R2 Object Storage → Manage API Tokens → Create API Token:
    ad `EDM yedek kovaları`. `Object Read & Write`; **Specific buckets**
    yalnız `edm-yedek` ve `edm-yedek-staging`. Kaynak `edm-gorseller` ve
@@ -32,6 +39,15 @@ oluştur; oluşturma ekranında gerçek hesabı seç. Tokenları sohbetten gönd
    Sabit gönderici `bildirim@edmyapigayrimenkul.com`, alıcı
    `ozdogandogukan@gmail.com`. Gerçek gönderim testi alan adı/hesap yetkisini
    de doğrular. [Email Sending REST API](https://developers.cloudflare.com/email-service/api/send-emails/rest-api/).
+   **2 Ekim kabul testi:** Anahtar GitHub'a kuruldu; gerçek bildirim isteği
+   HTTP 403 / `10203` (`sending_disabled`) döndü. Token oluşturmak gönderim
+   hizmetini tek başına açmaz. Compute → Email Service → Email Sending altında
+   gönderici alan adının kurulumu incelenmeli; Email Routing kurulumu ayrıdır.
+   [Alan adı kurulumu](https://developers.cloudflare.com/email-service/get-started/send-emails/).
+   Doğrulanmış hedef adreslerine gönderim tüm planlarda ücretsizdir; rastgele
+   alıcılara gönderim Workers Paid gerektirir. Bu akış yalnız doğrulanmış
+   Doğukan adresini kullanmalı; ücretli yükseltme kabul şartı değildir.
+   [Güncel ücretlendirme](https://developers.cloudflare.com/email-service/platform/pricing/).
 
 Kimlikleri git dışında `site/.env.yedek` dosyasına yaz:
 
@@ -44,7 +60,17 @@ CLOUDFLARE_BILDIRIM_API_TOKEN=buraya_bildirim_tokeni
 ```
 
 Bu dosya `0600` izinleriyle saklanır ve `.gitignore` içindedir. Dosyayı
-doldurduktan sonra `site/` içinde:
+elle düzenlemek yerine `site/` içinde gizli terminal girişi kullanılabilir:
+
+```bash
+python3 scripts/yedek-kimlik-gir.py okuma
+python3 scripts/yedek-kimlik-gir.py r2
+python3 scripts/yedek-kimlik-gir.py bildirim
+```
+
+Her değeri iki kez yapıştırıp Enter'a bas. Karakterler ekranda görünmez.
+Bu komutlar yalnız yerel dosyayı günceller; anahtarı komutun sonuna ekleme.
+Dosyayı doldurduktan sonra `site/` içinde:
 
 ```bash
 npm ci --prefix scripts/yedekleme --ignore-scripts
@@ -83,4 +109,8 @@ kilit her arşiv öncesi kontrol edilir. Kısmi arşivde manifest yazılmaz. Kay
 R2 dosyası eksikse veya medya referansları koşu sırasında değişirse işlem durur.
 90 günlük kilit bir silme takvimi değildir; otomatik saklama temizliği bu
 iş akışında yoktur. Güncellik çıktısı SQL boyutu, R2 adet ve bayt toplamını verir.
+Arşiv yalnız kaynak R2 kovasındaki gerçek dosyaları kopyalar. Portal/CDN
+fotoğraflarının D1'deki URL kayıtları SQL'de korunur; bu dış dosyaların baytları
+indirilen arşive dahil değildir. R2 adedinin sıfır olması, sitede fotoğraf
+bulunmadığı anlamına gelmez. Dış görsellerin kalıcı kopyası ayrı bir geliştirmedir.
 Geri yükleme için [D1 kurtarma prosedürü](./d1-kurtarma.md) izlenir.
