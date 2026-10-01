@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "edm-yedekleme-komutlari",
+  "compatibility_date": "2026-09-01",
+  // Bu dosya yalnız veri komutları içindir; Worker giriş noktası veya cron yoktur.
+  "d1_databases": [{
+    "binding": "VT",
+    "database_name": "edm-talepler",
+    "database_id": "30d4df58-b49f-43c8-95c5-5a538ce44f68"
+  }],
+  "r2_buckets": [{ "binding": "GORSELLER", "bucket_name": "edm-gorseller" }],
+  "env": {
+    "staging": {
+      "d1_databases": [{
+        "binding": "VT",
+        "database_name": "edm-talepler-staging",
+        "database_id": "17ca546e-1a76-46ab-9b73-95a944a97603"
+      }],
+      "r2_buckets": [{ "binding": "GORSELLER", "bucket_name": "edm-gorseller-staging" }],
+      "vars": { "STAGING_ORTAMI": "1" }
+    }
+  }
+}
