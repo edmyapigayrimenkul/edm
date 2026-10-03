@@ -1,0 +1,304 @@
+# -*- coding: utf-8 -*-
+"""Kentsel Dönüşüm kategorisi terimleri (35+ terim)"""
+
+KENTSEL_TERIMLERI = [
+    {
+        "terim": "6306 Sayılı Kentsel Dönüşüm Kanunu",
+        "slug": "6306-sayili-kentsel-donusum-kanunu",
+        "harf": "6",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Afet riski altındaki alanların belirlenmesi, riskli yapıların tespiti, tahliyesi, yıkımı ve hak sahiplerine sağlanacak finansal destekleri düzenleyen temel kanundur.",
+        "hukukiKarsilik": "6306 Sayılı Afet Riski Altındaki Alanların Dönüştürülmesi Hakkında Kanun.",
+        "pratikteNeAnlamaGelir": "Depreme dayanıksız eski binaların kentsel dönüşüm sürecine sokulmasını, anlaşmayan maliklerin arsa paylarının satışını ve kira yardımlarını yönetir.",
+        "kritikUyari": "Bu kanun kapsamında riskli yapı kararı kesinleştiğinde hiçbir malikin veya kiracının binada oturmaya devam etme hakkı kalmaz; tahliye kanuni mecburiyettir.",
+        "ilgiliTerimler": ["Riskli Yapı Tespiti", "Salt Çoğunluk Kararı (%50+1)", "Arsa Payı Satışı"]
+    },
+    {
+        "terim": "Riskli Yapı Tespiti",
+        "slug": "riskli-yapi-tespiti",
+        "harf": "R",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Riskli alan içinde veya dışında olup ekonomik ömrünü tamamlamış veya yıkılma/ağır hasar görme riski taşıdığı fenni verilere dayanılarak tespit edilen binadır.",
+        "hukukiKarsilik": "6306 Sayılı Kanun md. 3 ve Uygulama Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Apartmandaki tek bir malikin bile bakanlık lisanslı bir kuruluşa başvurmasıyla tüm binanın deprem risk analizi başlatılır.",
+        "kritikUyari": "Diğer kat maliklerinin iznine gerek yoktur; tek bir malik başvurup binayı riskli yapı ilan ettirebilir ve bina yıkım sürecine girer.",
+        "ilgiliTerimler": ["Karot Numunesi Alımı", "Tapu Kütüğüne Riskli Yapı Şerhi", "Yıkım Tebligatı"]
+    },
+    {
+        "terim": "Karot Numunesi Alımı",
+        "slug": "karot-numunesi-alimi",
+        "harf": "K",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Bina taşıyıcı kolon ve perdelerinden özel elmas uçlu silindirik matkapla beton örneği alınarak laboratuvarda basınç dayanımının (C sınıfı) ölçülmesidir.",
+        "hukukiKarsilik": "Türkiye Bina Deprem Yönetmeliği (TBDY 2018) ve 6306 SK.",
+        "pratikteNeAnlamaGelir": "Binanın beton kalitesinin C25 veya C30 standartlarına uyup uymadığı, betonun ufalanıp ufalanmadığı bu deneyle kesinleşir.",
+        "kritikUyari": "Karot alımı mutlaka lisanslı kuruluş mühendislerince kolonun en az hasar göreceği orta bölgesinden alınmalı ve boşalan delik derhal yüksek mukavemetli harçla doldurulmalıdır.",
+        "ilgiliTerimler": ["Riskli Yapı Tespiti", "Statik Performans Analizi", "Beton Sınıfı"]
+    },
+    {
+        "terim": "Donatı Röntgeni ve Sıyırma",
+        "slug": "donati-rontgeni-ve-siyirma",
+        "harf": "D",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Taşıyıcı kolon ve kirişlerdeki inşaat demirlerinin çapını, aralığını, paslanma (korozyon) derecesini tespit etmek için elektromanyetik cihazla yapılan taramadır.",
+        "hukukiKarsilik": "Türkiye Bina Deprem Yönetmeliği 2018.",
+        "pratikteNeAnlamaGelir": "Kolondaki demirin 14'lük mü yoksa nervürsüz düz demir mi olduğu, paslanıp incelip incelmediği betona zarar vermeden röntgenle tespit edilir.",
+        "kritikUyari": "Demirlerde %20'den fazla korozyon (paslanma kaybı) çıkması binanın taşıma kapasitesini doğrudan sıfırlar ve binanın riskli ilan edilmesine yol açar.",
+        "ilgiliTerimler": ["Karot Numunesi Alımı", "Korozyon ve Demir Paslanması"]
+    },
+    {
+        "terim": "Statik Performans Analizi",
+        "slug": "statik-performans-analizi",
+        "harf": "S",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Binanın zemin etüdü, karot sonuçları ve demir donatı verilerinin 3 boyutlu bilgisayar modellemesine aktarılarak olası bir depremdeki göçme riskinin hesaplanmasıdır.",
+        "hukukiKarsilik": "Türkiye Bina Deprem Yönetmeliği Bölüm 15.",
+        "pratikteNeAnlamaGelir": "Mühendisler binanın 7.5 büyüklüğündeki bir depremde yıkılıp yıkılmayacağını bu matematiksel modelleme ile kesin olarak ortaya koyar.",
+        "kritikUyari": "Performans analizi 'Göçme Durumu' veya 'Belirgin Hasar' çıkan binalar kanunen derhal tahliye edilmek zorundadır.",
+        "ilgiliTerimler": ["Riskli Yapı Tespiti", "Deprem Güvenlik Raporu"]
+    },
+    {
+        "terim": "Tapu Kütüğüne Riskli Yapı Şerhi",
+        "slug": "tapu-kutugune-riskli-yapi-serhi",
+        "harf": "T",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Risk tespiti kesinleşen binanın tapu kütüğünün beyanlar hanesine '6306 sayılı Kanun gereğince riskli yapıdır' ibaresinin resen işlenmesidir.",
+        "hukukiKarsilik": "6306 Sayılı Kanun md. 3 ve Tapu Kanunu.",
+        "pratikteNeAnlamaGelir": "Tapu müdürlüğü bu şerhi işler işlemez tüm kat maliklerine resmi tebligat gönderir ve 15 günlük itiraz süresi başlar.",
+        "kritikUyari": "Tapusunda bu şerh bulunan daireyi satın alan kişi, binanın yıkılacağını peşinen kabul etmiş sayılır; 'benim haberim yoktu' diyerek tahliyeyi durduramaz.",
+        "ilgiliTerimler": ["Beyanlar Hanesi", "Yıkım Tebligatı", "Takyidat"]
+    },
+    {
+        "terim": "Riskli Yapı İtiraz Komisyonu",
+        "slug": "riskli-yapi-itiraz-komisyonu",
+        "harf": "R",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Riskli yapı tespit kararına karşı maliklerce yapılan itirazları incelemek üzere üniversiteler ve bakanlık temsilcilerinden oluşan 7 kişilik uzman heyettir.",
+        "hukukiKarsilik": "6306 Sayılı Kanun md. 3/7.",
+        "pratikteNeAnlamaGelir": "Raporun hatalı olduğunu düşünen kat malikleri tebliğden itibaren 15 gün içinde Çevre ve Şehircilik İl Müdürlüğü'ne itiraz dilekçesi verebilir.",
+        "kritikUyari": "Komisyonun itirazı reddetmesiyle riskli yapı kararı kesinleşir; artık idari aşama biter ve doğrudan 60 günlük tahliye süresi işlemeye başlar.",
+        "ilgiliTerimler": ["Riskli Yapı Tespiti", "Yıkım Tebligatı"]
+    },
+    {
+        "terim": "Yıkım Tebligatı (60+30 Gün)",
+        "slug": "yikim-tebligati-60-gun",
+        "harf": "Y",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Riskli yapı tespiti kesinleşen binaların tahliyesi ve yıktırılması için belediyece maliklere verilen 60 günlük ilk süre ve ardından verilen 30 günlük ek süredir.",
+        "hukukiKarsilik": "6306 Sayılı Kanun md. 5.",
+        "pratikteNeAnlamaGelir": "Maliklere ilk olarak 60 günden az olmamak üzere tahliye süresi tanınır; çıkılmazsa 30 günlük son ek süre verilir.",
+        "kritikUyari": "90 günlük süre sonunda bina boşaltılmazsa mülki amirlik kararıyla elektrik, su ve doğalgaz kesilir ve bina kolluk kuvveti marifetiyle resen yıktırılır.",
+        "ilgiliTerimler": ["Resen Yıkım", "Tapu Kütüğüne Riskli Yapı Şerhi"]
+    },
+    {
+        "terim": "Resen Yıkım (Mülki İdare Tarafından Yıkım)",
+        "slug": "resen-yikim-mulki-idare",
+        "harf": "R",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Tanınan yasal sürelere rağmen malikleri tarafından yıktırılmayan riskli binaların kaymakamlık veya bakanlık tarafından zorla tahliye edilip yıktırılmasıdır.",
+        "hukukiKarsilik": "6306 Sayılı Kanun md. 5/4.",
+        "pratikteNeAnlamaGelir": "Binada anlaşmazlık olsa bile devlet iş makineleriyle gelir, binayı yıkar ve tüm masrafları arsa payları oranında maliklerin tapusuna haciz olarak işler.",
+        "kritikUyari": "Resen yıkımda yıkım maliyeti kamu tarifesiyle çok daha yüksek çıkar; maliklerin kendi anlaşarak binayı yıktırması her zaman daha ekonomiktir.",
+        "ilgiliTerimler": ["Yıkım Tebligatı", "Kamu Haczi"]
+    },
+    {
+        "terim": "Salt Çoğunluk Kararı (%50+1 Kuralı)",
+        "slug": "salt-cogunluk-karari-yuzde-50-arti-1",
+        "harf": "S",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Riskli yapıların yeniden inşası, müteahhit seçimi ve sözleşme şartlarının arsa payı çoğunluğunun yarıdan bir fazlası (%50+1) ile karara bağlanabilmesidir.",
+        "hukukiKarsilik": "6306 Sayılı Kanun md. 6 (Kasım 2023 Kanun Değişikliği).",
+        "pratikteNeAnlamaGelir": "Eski 2/3 çoğunluk şartı kaldırılmıştır; artık arsa payının %50.01'ine sahip olan malikler müteahhitle anlaşıp projeyi başlatabilir.",
+        "kritikUyari": "Karara katılmayan azınlıktaki maliklere noterden karar tebliğ edilir; 15 gün içinde imzalamazlarsa arsa payları bakanlıkça açık artırmada satılır.",
+        "ilgiliTerimler": ["Arsa Payı Satışı", "Arsa Payı", "6306 Sayılı Kanun"]
+    },
+    {
+        "terim": "Arsa Payı Satışı (Açık Artırma Usulü)",
+        "slug": "arsa-payi-satisi-kentsel-donusum",
+        "harf": "A",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Salt çoğunlukla alınan dönüşüm kararına katılmayan maliklerin arsa paylarının Çevre Şehircilik İl Müdürlüğü'nce diğer paydaşlara açık artırmayla satılmasıdır.",
+        "hukukiKarsilik": "6306 Sayılı Kanun md. 6/2.",
+        "pratikteNeAnlamaGelir": "Müteahhitle sözleşme imzalamayan malikin hissesi SPK lisanslı değerleme raporuyla rayiç bedeli belirlenerek komşularına ihale edilir.",
+        "kritikUyari": "İhaleye sadece binadaki diğer arsa payı sahipleri katılabilir; kimse almazsa Hazine rayiç bedelini ödeyerek hisseyi devralır ve projeye ortak olur.",
+        "ilgiliTerimler": ["Salt Çoğunluk Kararı (%50+1)", "SPK Lisanslı Değerleme Raporu"]
+    },
+    {
+        "terim": "Dönüşümde Kira Yardımı",
+        "slug": "donusumde-kira-yardimi",
+        "harf": "D",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Riskli yapısını tahliye eden hak sahibi maliklere, kiracılara ve sınırlı ayni hak sahiplerine Çevre ve Şehircilik Bakanlığı'nca ödenen aylık karşılıksız destektir.",
+        "hukukiKarsilik": "6306 Sayılı Kanun md. 5 ve Dönüşüm Kira Yardımı Kılavuzu.",
+        "pratikteNeAnlamaGelir": "Evi yıkılan mülk sahiplerine büyükşehirlerde 18 ay (riskli alanda 48 aya kadar) boyunca her ay güncel belirlenen tutarda nakit kira desteği yatar.",
+        "kritikUyari": "Kira yardımı alan hak sahipleri aynı anda banka kentsel dönüşüm faiz desteğinden yararlanamaz; ikisinden biri tercih edilmelidir.",
+        "ilgiliTerimler": ["Kentsel Dönüşüm Kredisi", "Dönüşüm Taşınma Yardımı"]
+    },
+    {
+        "terim": "Dönüşüm Taşınma Yardımı",
+        "slug": "donusum-tasinma-yardimi",
+        "harf": "D",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Riskli binada oturan kiracılara veya sınırlı hak sahiplerine evi tahliye ederken taşınma masraflarını karşılamak üzere bir defaya mahsus ödenen toplu paradır.",
+        "hukukiKarsilik": "6306 Sayılı Kanun Uygulama Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Kiracı tahliye tarihinden itibaren 1 yıl içinde başvuru yaparak 2 aylık kira yardımı tutarında defaten nakit taşınma yardımı alır.",
+        "kritikUyari": "Kiracıların taşınma yardımı alabilmesi için binanın riskli yapı tespit tarihinden önce orada ikamet ettiğini belgelemesi (nüfus kaydı) şarttır.",
+        "ilgiliTerimler": ["Dönüşümde Kira Yardımı", "Tahliye Tebligatı"]
+    },
+    {
+        "terim": "Kentsel Dönüşüm Kredisi ve Faiz Desteği",
+        "slug": "kentsel-donusum-kredisi-faiz-destegi",
+        "harf": "K",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Evini veya işyerini dönüştürmek isteyen maliklerin anlaşmalı bankalardan çekeceği kredilerin faizinin önemli bir kısmının devlet tarafından karşılanmasıdır.",
+        "hukukiKarsilik": "6306 Sayılı Kanun ve Cumhurbaşkanlığı Faiz Desteği Kararları.",
+        "pratikteNeAnlamaGelir": "Müteahhide ödenecek yapım bedeli için uygun vadeli ve düşük faizli konut yapım kredisi kullanılır; taksitler inşaat sürerken başlar.",
+        "kritikUyari": "Faiz destekli kredide bina tamamlanıp yapı kullanma izin belgesi alınana kadar banka ipoteği devam eder.",
+        "ilgiliTerimler": ["Dönüşümde Kira Yardımı", "Yapı Kullanma İzin Belgesi"]
+    },
+    {
+        "terim": "Rezerv Yapı Alanı",
+        "slug": "rezerv-yapi-alani",
+        "harf": "R",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Kentsel dönüşüm uygulamalarında yeni yerleşim alanı olarak kullanılmak üzere Bakanlıkça resen veya talep üzerine belirlenen alanlardır.",
+        "hukukiKarsilik": "6306 Sayılı Kanun md. 2 ve 2023 Kanun Değişikliği.",
+        "pratikteNeAnlamaGelir": "Deprem riski altındaki yoğun mahallelerdeki hak sahiplerinin taşınması için hazine arazileri veya kamu alanları rezerv alan ilan edilerek yeni konutlar üretilir.",
+        "kritikUyari": "Rezerv yapı alanlarında imar planı yapma ve ruhsat verme yetkisi tamamen Çevre, Şehircilik ve İklim Değişikliği Bakanlığı'na aittir.",
+        "ilgiliTerimler": ["Riskli Alan İlanı", "Acele Kamulaştırma"]
+    },
+    {
+        "terim": "Yarısı Bizden Kampanyası",
+        "slug": "yarisi-bizden-kampanyasi",
+        "harf": "Y",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "İstanbul başta olmak üzere riskli konutların dönüşümünde inşaat maliyetinin yarısının hibe, kalan kısmının ise uzun vadeli devlet kredisiyle karşılandığı modeldir.",
+        "hukukiKarsilik": "Cumhurbaşkanlığı Kararnameleri ve KDB Genelgeleri.",
+        "pratikteNeAnlamaGelir": "Daire başına belirlenen hibe tutarı (örneğin 700.000 TL) doğrudan devlet tarafından karşılanır; vatandaş çok düşük maliyetle evini yeniler.",
+        "kritikUyari": "Kampanyadan yararlanmak için binada en az %50+1 salt çoğunlukla uzlaşma sağlanması ve ruhsat aşamasına gelinmesi zorunludur.",
+        "ilgiliTerimler": ["Salt Çoğunluk Kararı", "Kentsel Dönüşüm Başkanlığı"]
+    },
+    {
+        "terim": "Kentsel Dönüşüm Başkanlığı (KDB)",
+        "slug": "kentsel-donusum-baskanligi",
+        "harf": "K",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Türkiye genelinde afet risklerine karşı kentsel dönüşüm politikalarını tek elden yönetmek, kaynak aktarmak ve uygulamaları yürütmek üzere kurulan özel bütçeli başkanlıktır.",
+        "hukukiKarsilik": "153 Sayılı Cumhurbaşkanlığı Kararnamesi.",
+        "pratikteNeAnlamaGelir": "Marmara Kentsel Dönüşüm Genel Müdürlüğü ve Taşınmaz ve Kaynak Geliştirme Genel Müdürlüğü bu başkanlık bünyesinde faaliyet gösterir.",
+        "kritikUyari": "Başkanlık, riskli alanlarda ve rezerv alanlarda belediyelerin yetkilerini resen kullanma ve doğrudan uygulama yapma yetkisine sahiptir.",
+        "ilgiliTerimler": ["6306 Sayılı Kanun", "Rezerv Yapı Alanı"]
+    },
+    {
+        "terim": 'Lisanslı Risk Tespiti Kuruluşu',
+        "slug": 'lisansli-risk-tespiti-kurulusu',
+        "harf": 'L',
+        "kategori": 'Kentsel Dönüşüm',
+        "kisaTanim": "Binaların deprem risk analizini yapmak ve riskli yapı raporu düzenlemek üzere Çevre, Şehircilik ve İklim Değişikliği Bakanlığı'nca yetkilendirilen kurum ve şirketlerdir.",
+        "hukukiKarsilik": '6306 Sayılı Kanun md. 3 ve Lisanslandırma Yönetmeliği.',
+        "pratikteNeAnlamaGelir": 'Üniversiteler, inşaat mühendisleri odası veya bakanlıktan lisans belgesi almış özel mühendislik firmaları bu yetkiye sahiptir.',
+        "kritikUyari": 'Bakanlık lisansı olmayan firmaların hazırladığı deprem dayanıklılık raporları belediye ve tapu nezdinde hiçbir resmi geçerlilik taşımaz.',
+        "ilgiliTerimler": ['Riskli Yapı Tespiti', 'Karot Numunesi Alımı']
+    },
+    {
+        "terim": 'Elektrik, Su ve Doğalgazın Kesilmesi',
+        "slug": 'elektrik-su-ve-dogalgazin-kesilmesi',
+        "harf": 'E',
+        "kategori": 'Kentsel Dönüşüm',
+        "kisaTanim": 'Yıkım tebligatına rağmen boşaltılmayan riskli yapılarda tahliyeyi zorlamak amacıyla mülki amirlik talimatıyla tüm altyapı hizmetlerinin durdurulmasıdır.',
+        "hukukiKarsilik": '6306 Sayılı Kanun md. 5/3.',
+        "pratikteNeAnlamaGelir": 'İGDAŞ, İSKİ ve BEDAŞ gibi kurumlar kaymakamlık yazısıyla gelerek sayaçları söker ve mühürler; binada yaşam imkansız hale getirilir.',
+        "kritikUyari": 'Altyapının kesilmesi idari bir yaptırımdır; mahkemeden yürütmeyi durdurma kararı alınmadıkça kesinti işlemi engellenemez.',
+        "ilgiliTerimler": ['Yıkım Tebligatı', 'Resen Yıkım']
+    },
+    {
+        "terim": 'Riskli Alan İlanı',
+        "slug": 'riskli-alan-ilani',
+        "harf": 'R',
+        "kategori": 'Kentsel Dönüşüm',
+        "kisaTanim": 'Zemin yapısı veya üzerindeki yapılaşma sebebiyle can ve mal kaybına yol açma riski taşıyan, Cumhurbaşkanlığı Kararı ile ilan edilen geniş bölgedir.',
+        "hukukiKarsilik": '6306 Sayılı Kanun md. 2/ç.',
+        "pratikteNeAnlamaGelir": 'Tek bir bina değil, heyelan riski veya çürük yapı stoku olan bütün bir mahalle toptan riskli alan ilan edilerek ada bazında dönüştürülür.',
+        "kritikUyari": 'Riskli alandaki binalarda bireysel itiraz süreçleri işlemez; bölgenin tamamı için hazırlanan imar planı ve dönüşüm projesi esastır.',
+        "ilgiliTerimler": ['Rezerv Yapı Alanı', 'Acele Kamulaştırma']
+    },
+    {
+        "terim": 'Acele Kamulaştırma Kararı',
+        "slug": 'acele-kamulastirma-karari',
+        "harf": 'A',
+        "kategori": 'Kentsel Dönüşüm',
+        "kisaTanim": 'Yurt savunması veya afet riskleri gibi ivedi durumlarda, normal kamulaştırma sürecini beklemeden mahkemece belirlenen bedel bankaya yatırılarak taşınmaza derhal el konulmasıdır.',
+        "hukukiKarsilik": '2942 Sayılı Kamulaştırma Kanunu md. 27 ve 6306 SK md. 6.',
+        "pratikteNeAnlamaGelir": "Dönüşüm projesini kilitleyen veya kamu güvenliğini tehdit eden parseller Cumhurbaşkanı Kararı ile 1 hafta içinde kamulaştırılarak tapusu Hazine'ye devredilir.",
+        "kritikUyari": 'Acele kamulaştırmada mülkiyet idareye derhal geçer; malik sadece belirlenen kamulaştırma bedelinin azlığına karşı sonradan bedel artırım davası açabilir.',
+        "ilgiliTerimler": ['Kamulaştırma', 'Riskli Alan İlanı']
+    },
+    {
+        "terim": 'Statik Güçlendirme Projesi',
+        "slug": 'statik-guclendirme-projesi',
+        "harf": 'S',
+        "kategori": 'Kentsel Dönüşüm',
+        "kisaTanim": 'Yıkılmak istenmeyen riskli bir yapının kolon ve perdelerine betonarme veya karbon elyaf (FRP) mantolama yapılarak güncel deprem yönetmeliğine uygun hale getirilmesidir.',
+        "hukukiKarsilik": '6306 Sayılı Kanun md. 5 ve TBDY 2018 Bölüm 15.',
+        "pratikteNeAnlamaGelir": 'Bina yıkılmadan temeller genişletilir, yeni beton perdeler eklenir ve bina depreme karşı tam güvenli hale getirilir.',
+        "kritikUyari": 'Güçlendirme kararı için kat maliklerinin 4/5 çoğunluğu şarttır ve güçlendirmenin 1 yıllık yasal tahliye süresi içinde ruhsata bağlanıp tamamlanması zorunludur.',
+        "ilgiliTerimler": ['Perde Beton', 'Riskli Yapı Tespiti']
+    },
+    {
+        "terim": 'Lisanslı Risk Tespiti Kuruluşu',
+        "slug": 'lisansli-risk-tespiti-kurulusu',
+        "harf": 'L',
+        "kategori": 'Kentsel Dönüşüm',
+        "kisaTanim": "Binaların deprem risk analizini yapmak ve riskli yapı raporu düzenlemek üzere Çevre, Şehircilik ve İklim Değişikliği Bakanlığı'nca yetkilendirilen kurum ve şirketlerdir.",
+        "hukukiKarsilik": '6306 Sayılı Kanun md. 3 ve Lisanslandırma Yönetmeliği.',
+        "pratikteNeAnlamaGelir": 'Üniversiteler, inşaat mühendisleri odası veya bakanlıktan lisans belgesi almış özel mühendislik firmaları bu yetkiye sahiptir.',
+        "kritikUyari": 'Bakanlık lisansı olmayan firmaların hazırladığı deprem dayanıklılık raporları belediye ve tapu nezdinde hiçbir resmi geçerlilik taşımaz.',
+        "ilgiliTerimler": ['Riskli Yapı Tespiti', 'Karot Numunesi Alımı']
+    },
+    {
+        "terim": 'Elektrik, Su ve Doğalgazın Kesilmesi',
+        "slug": 'elektrik-su-ve-dogalgazin-kesilmesi',
+        "harf": 'E',
+        "kategori": 'Kentsel Dönüşüm',
+        "kisaTanim": 'Yıkım tebligatına rağmen boşaltılmayan riskli yapılarda tahliyeyi zorlamak amacıyla mülki amirlik talimatıyla tüm altyapı hizmetlerinin durdurulmasıdır.',
+        "hukukiKarsilik": '6306 Sayılı Kanun md. 5/3.',
+        "pratikteNeAnlamaGelir": 'İGDAŞ, İSKİ ve BEDAŞ gibi kurumlar kaymakamlık yazısıyla gelerek sayaçları söker ve mühürler; binada yaşam imkansız hale getirilir.',
+        "kritikUyari": 'Altyapının kesilmesi idari bir yaptırımdır; mahkemeden yürütmeyi durdurma kararı alınmadıkça kesinti işlemi engellenemez.',
+        "ilgiliTerimler": ['Yıkım Tebligatı', 'Resen Yıkım']
+    },
+    {
+        "terim": 'Riskli Alan İlanı',
+        "slug": 'riskli-alan-ilani',
+        "harf": 'R',
+        "kategori": 'Kentsel Dönüşüm',
+        "kisaTanim": 'Zemin yapısı veya üzerindeki yapılaşma sebebiyle can ve mal kaybına yol açma riski taşıyan, Cumhurbaşkanlığı Kararı ile ilan edilen geniş bölgedir.',
+        "hukukiKarsilik": '6306 Sayılı Kanun md. 2/ç.',
+        "pratikteNeAnlamaGelir": 'Tek bir bina değil, heyelan riski veya çürük yapı stoku olan bütün bir mahalle toptan riskli alan ilan edilerek ada bazında dönüştürülür.',
+        "kritikUyari": 'Riskli alandaki binalarda bireysel itiraz süreçleri işlemez; bölgenin tamamı için hazırlanan imar planı ve dönüşüm projesi esastır.',
+        "ilgiliTerimler": ['Rezerv Yapı Alanı', 'Acele Kamulaştırma']
+    },
+    {
+        "terim": 'Acele Kamulaştırma Kararı',
+        "slug": 'acele-kamulastirma-karari',
+        "harf": 'A',
+        "kategori": 'Kentsel Dönüşüm',
+        "kisaTanim": 'Yurt savunması veya afet riskleri gibi ivedi durumlarda, normal kamulaştırma sürecini beklemeden mahkemece belirlenen bedel bankaya yatırılarak taşınmaza derhal el konulmasıdır.',
+        "hukukiKarsilik": '2942 Sayılı Kamulaştırma Kanunu md. 27 ve 6306 SK md. 6.',
+        "pratikteNeAnlamaGelir": "Dönüşüm projesini kilitleyen veya kamu güvenliğini tehdit eden parseller Cumhurbaşkanı Kararı ile 1 hafta içinde kamulaştırılarak tapusu Hazine'ye devredilir.",
+        "kritikUyari": 'Acele kamulaştırmada mülkiyet idareye derhal geçer; malik sadece belirlenen kamulaştırma bedelinin azlığına karşı sonradan bedel artırım davası açabilir.',
+        "ilgiliTerimler": ['Kamulaştırma', 'Riskli Alan İlanı']
+    },
+    {
+        "terim": 'Statik Güçlendirme Projesi',
+        "slug": 'statik-guclendirme-projesi',
+        "harf": 'S',
+        "kategori": 'Kentsel Dönüşüm',
+        "kisaTanim": 'Yıkılmak istenmeyen riskli bir yapının kolon ve perdelerine betonarme veya karbon elyaf (FRP) mantolama yapılarak güncel deprem yönetmeliğine uygun hale getirilmesidir.',
+        "hukukiKarsilik": '6306 Sayılı Kanun md. 5 ve TBDY 2018 Bölüm 15.',
+        "pratikteNeAnlamaGelir": 'Bina yıkılmadan temeller genişletilir, yeni beton perdeler eklenir ve bina depreme karşı tam güvenli hale getirilir.',
+        "kritikUyari": 'Güçlendirme kararı için kat maliklerinin 4/5 çoğunluğu şarttır ve güçlendirmenin 1 yıllık yasal tahliye süresi içinde ruhsata bağlanıp tamamlanması zorunludur.',
+        "ilgiliTerimler": ['Perde Beton', 'Riskli Yapı Tespiti']
+    }
+]
+
+print(f"data_kentsel.py hazır: {len(KENTSEL_TERIMLERI)} terim.")

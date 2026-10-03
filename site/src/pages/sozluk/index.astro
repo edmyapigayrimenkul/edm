@@ -3,7 +3,16 @@ import Temel from '../../layouts/Temel.astro';
 import { SOZLUK_TERIMLERI } from '../../lib/sozluk';
 
 const harfler = Array.from(new Set(SOZLUK_TERIMLERI.map((t) => t.harf))).sort((a, b) => a.localeCompare('tr'));
-const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & Tahliye', 'Vergi & Harç'];
+const kategoriler = [
+  'Tümü',
+  'Tapu & Mülkiyet',
+  'İmar & Kadastro',
+  'Kira & Tahliye',
+  'Vergi & Harç',
+  'Kentsel Dönüşüm',
+  'İnşaat & Mimarlık',
+  'Değerleme & Finans',
+];
 ---
 
 <Temel
