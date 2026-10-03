@@ -24,7 +24,7 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
             Emlak Terimleri Sözlüğü
           </h1>
           <p class="mt-1.5 text-xs sm:text-sm text-metin-2 max-w-xl leading-relaxed">
-            Kelimeler varsayılan olarak kompakt dizilmiştir. Detayını, saha gerçeğini ve kritik uyarısını görmek istediğiniz <strong>kelimeye tıklayarak büyütebilirsiniz</strong>.
+            Detayını ve saha gerçeğini öğrenmek istediğiniz <strong>kelimeye tıklayarak büyütebilirsiniz</strong>.
           </p>
         </div>
 
@@ -33,7 +33,7 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
           <button
             type="button"
             id="tumunu-ac-kapat"
-            class="px-2.5 py-1 rounded bg-kagit-2 text-murekkep font-semibold hover:bg-murekkep hover:text-white transition-colors border border-murekkep/10"
+            class="px-2.5 py-1 rounded bg-kagit-2 text-murekkep font-semibold hover:bg-murekkep hover:text-white transition-colors border border-murekkep/10 cursor-pointer"
           >
             Tümünü Büyüt
           </button>
@@ -57,7 +57,7 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
           <button
             type="button"
             id="arama-temizle"
-            class="hidden absolute right-2.5 top-2 text-[11px] font-mono text-kursun hover:text-kirmizi transition-colors px-1.5 py-0.5 rounded bg-kagit-2"
+            class="hidden absolute right-2.5 top-2 text-[11px] font-mono text-kursun hover:text-kirmizi transition-colors px-1.5 py-0.5 rounded bg-kagit-2 cursor-pointer"
           >
             ✕
           </button>
@@ -70,7 +70,7 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
             {kategoriler.map((kat, index) => (
               <button
                 type="button"
-                class={`kategori-buton px-2.5 py-1 rounded-full text-[11px] transition-all ${
+                class={`kategori-buton px-2.5 py-1 rounded-full text-[11px] cursor-pointer transition-all ${
                   index === 0
                     ? 'bg-murekkep text-white font-bold shadow-sm'
                     : 'bg-kagit text-metin-2 hover:bg-murekkep/10 hover:text-murekkep'
@@ -115,7 +115,7 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
         <button
           type="button"
           id="filtreleri-sifirla"
-          class="mt-3 px-3 py-1.5 rounded bg-murekkep text-white text-xs font-mono font-semibold hover:bg-kirmizi transition-colors"
+          class="mt-3 px-3 py-1.5 rounded bg-murekkep text-white text-xs font-mono font-semibold hover:bg-kirmizi transition-colors cursor-pointer"
         >
           Filtreleri Sıfırla
         </button>
@@ -143,8 +143,8 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
               </div>
 
               <!-- Kompakt Kelime Izgarası (Tıklanınca Büyür) -->
-              <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {buHarftekiTerimler.map((t, idx) => (
+              <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 items-start">
+                {buHarftekiTerimler.map((t) => (
                   <div
                     class="terim-kapsayici group transition-all duration-200"
                     data-terim-adi={t.terim.toLowerCase()}
@@ -171,7 +171,7 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
                         <span class="text-[10px] font-mono text-kursun bg-kagit px-2 py-0.5 rounded border border-murekkep/8">
                           {t.kategori.split(' ')[0]}
                         </span>
-                        <span class="w-6 h-6 rounded-full bg-kagit flex items-center justify-center text-xs font-mono text-kursun group-hover:bg-kirmizi group-hover:text-white transition-colors">
+                        <span class="w-6 h-6 rounded-full bg-kagit flex items-center justify-center text-xs font-mono font-bold text-kursun group-hover:bg-kirmizi group-hover:text-white transition-colors">
                           +
                         </span>
                       </div>
@@ -179,7 +179,7 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
 
                     <!-- 2. TIKLANDIĞINDA: BÜYÜYEN INSTAGRAM POST KARTI HALİ -->
                     <article
-                      class="terim-acik hidden relative flex-col justify-between rounded-2xl bg-[#121316] text-[#f4f4f3] p-6 shadow-2xl border border-white/12 overflow-hidden transition-all duration-200"
+                      class="terim-acik relative flex-col justify-between rounded-2xl bg-[#121316] text-[#f4f4f3] p-5 sm:p-6 shadow-2xl border border-white/12 overflow-hidden transition-all duration-200"
                     >
                       <!-- Arka Plan Filigranı (Instagram Slide Damgası) -->
                       <span class="absolute right-3 -bottom-4 font-serif text-8xl font-black text-white/[0.03] select-none pointer-events-none leading-none">
@@ -209,7 +209,7 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
                             <!-- Küçült Butonu -->
                             <button
                               type="button"
-                              class="terim-kapat-btn text-[10px] font-mono text-white/60 hover:text-kirmizi bg-white/[0.06] hover:bg-white/10 px-2 py-1 rounded transition-colors"
+                              class="terim-kapat-btn text-[10px] font-mono text-white/70 hover:text-white bg-white/[0.08] hover:bg-kirmizi px-2 py-1 rounded transition-colors cursor-pointer"
                               title="Kartı küçült"
                             >
                               ✕ Küçült
@@ -276,216 +276,216 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
   </section>
 </Temel>
 
-<script>
-  // İstemci tarafı: Tıklayınca büyüme, arama ve filtreleme mantığı
-  const aramaGirdisi = document.getElementById('terim-arama') as HTMLInputElement | null;
-  const aramaTemizle = document.getElementById('arama-temizle') as HTMLButtonElement | null;
-  const filtreleriSifirla = document.getElementById('filtreleri-sifirla') as HTMLButtonElement | null;
-  const tumunuAcKapatBtn = document.getElementById('tumunu-ac-kapat') as HTMLButtonElement | null;
-  const kategoriButonlari = document.querySelectorAll('.kategori-buton');
-  const kapsayicilar = document.querySelectorAll<HTMLElement>('.terim-kapsayici');
-  const harfBolumleri = document.querySelectorAll<HTMLElement>('.harf-bolumu');
-  const harfBaglantilari = document.querySelectorAll<HTMLElement>('.harf-baglanti');
-  const bosDurum = document.getElementById('bos-durum');
-  const aramaSayac = document.getElementById('arama-sayac');
-
-  let seciliKategori = 'hepsi';
-  let aktifSorgu = '';
-  let hepsiAcik = false;
-
-  // 1. TIKLAYINCA BÜYÜME / KÜÇÜLME (ACCORDION / GROW)
-  kapsayicilar.forEach((kapsayici) => {
-    const kapaliButon = kapsayici.querySelector('.terim-kapali') as HTMLElement | null;
-    const acikKart = kapsayici.querySelector('.terim-acik') as HTMLElement | null;
-    const kapatBtn = kapsayici.querySelector('.terim-kapat-btn') as HTMLElement | null;
-
-    function ac() {
-      if (kapaliButon && acikKart) {
-        kapaliButon.style.display = 'none';
-        acikKart.style.display = 'flex';
-        kapsayici.setAttribute('data-durum', 'acik');
-      }
-    }
-
-    function kapat() {
-      if (kapaliButon && acikKart) {
-        acikKart.style.display = 'none';
-        kapaliButon.style.display = 'flex';
-        kapsayici.setAttribute('data-durum', 'kapali');
-      }
-    }
-
-    kapaliButon?.addEventListener('click', () => {
-      ac();
-    });
-
-    kapatBtn?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      kapat();
-    });
-  });
-
-  // 2. TÜMÜNÜ BÜYÜT / KÜÇÜLT
-  tumunuAcKapatBtn?.addEventListener('click', () => {
-    hepsiAcik = !hepsiAcik;
-    tumunuAcKapatBtn.textContent = hepsiAcik ? 'Tümünü Küçült' : 'Tümünü Büyüt';
-
-    kapsayicilar.forEach((kapsayici) => {
-      // Sadece filtrelenmiş görünen kartları etkile
-      if (kapsayici.style.display !== 'none') {
-        const kapaliButon = kapsayici.querySelector('.terim-kapali') as HTMLElement | null;
-        const acikKart = kapsayici.querySelector('.terim-acik') as HTMLElement | null;
-
-        if (hepsiAcik) {
-          if (kapaliButon) kapaliButon.style.display = 'none';
-          if (acikKart) acikKart.style.display = 'flex';
-          kapsayici.setAttribute('data-durum', 'acik');
-        } else {
-          if (acikKart) acikKart.style.display = 'none';
-          if (kapaliButon) kapaliButon.style.display = 'flex';
-          kapsayici.setAttribute('data-durum', 'kapali');
-        }
-      }
-    });
-  });
-
-  // 3. FİLTRELEME & CANLI ARAMA
-  function filtrele() {
-    let gorunenSayisi = 0;
-    const gorunenHarfler = new Set<string>();
-
-    kapsayicilar.forEach((kapsayici) => {
-      const metin = kapsayici.getAttribute('data-terim-metin') || '';
-      const kategori = kapsayici.getAttribute('data-terim-kategori') || '';
-      const harf = kapsayici.getAttribute('data-terim-harf') || '';
-
-      const sorguUyumu = !aktifSorgu || metin.includes(aktifSorgu);
-      const kategoriUyumu = seciliKategori === 'hepsi' || kategori === seciliKategori;
-
-      if (sorguUyumu && kategoriUyumu) {
-        kapsayici.style.display = 'block';
-        gorunenSayisi++;
-        if (harf) gorunenHarfler.add(harf);
-
-        // Arama yapıldıysa aranan terimleri otomatik büyüt
-        if (aktifSorgu.length >= 2) {
-          const kapaliButon = kapsayici.querySelector('.terim-kapali') as HTMLElement | null;
-          const acikKart = kapsayici.querySelector('.terim-acik') as HTMLElement | null;
-          if (kapaliButon) kapaliButon.style.display = 'none';
-          if (acikKart) acikKart.style.display = 'flex';
-          kapsayici.setAttribute('data-durum', 'acik');
-        }
-      } else {
-        kapsayici.style.display = 'none';
-      }
-    });
-
-    // Harf bölümlerini görünürlük durumuna göre göster/gizle
-    harfBolumleri.forEach((bolum) => {
-      const harf = bolum.getAttribute('data-harf-bolumu') || '';
-      if (gorunenHarfler.has(harf)) {
-        bolum.style.display = 'block';
-      } else {
-        bolum.style.display = 'none';
-      }
-    });
-
-    // Alfabe butonlarını pasif/aktif yap
-    harfBaglantilari.forEach((baglanti) => {
-      const harf = baglanti.getAttribute('data-harf-hedef') || '';
-      if (gorunenHarfler.has(harf)) {
-        baglanti.style.opacity = '1';
-        baglanti.style.pointerEvents = 'auto';
-      } else {
-        baglanti.style.opacity = '0.3';
-        baglanti.style.pointerEvents = 'none';
-      }
-    });
-
-    // Boş durum bildirimi
-    if (bosDurum) {
-      bosDurum.style.display = gorunenSayisi === 0 ? 'block' : 'none';
-    }
-
-    // Sayaç güncelle
-    if (aramaSayac) {
-      if (aktifSorgu || seciliKategori !== 'hepsi') {
-        aramaSayac.textContent = `${gorunenSayisi} terim bulundu`;
-      } else {
-        aramaSayac.textContent = `${gorunenSayisi} terim listeleniyor`;
-      }
-    }
-
-    // Temizle butonunu göster/gizle
-    if (aramaTemizle) {
-      aramaTemizle.style.display = aktifSorgu ? 'inline-block' : 'none';
-    }
+<style>
+  /* Kapalı durum (Kompakt kelime görünümü) */
+  .terim-kapsayici .terim-acik {
+    display: none !important;
+  }
+  .terim-kapsayici .terim-kapali {
+    display: flex !important;
   }
 
-  // Arama girdisi dinleyicisi
-  aramaGirdisi?.addEventListener('input', (e) => {
-    aktifSorgu = (e.target as HTMLInputElement).value.trim().toLocaleLowerCase('tr');
-    filtrele();
-  });
+  /* Açık durum (Büyümüş Instagram Gönderisi) */
+  .terim-kapsayici[data-durum="acik"] .terim-acik {
+    display: flex !important;
+    animation: slideGrow 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .terim-kapsayici[data-durum="acik"] .terim-kapali {
+    display: none !important;
+  }
 
-  // Arama temizleme butonu
-  aramaTemizle?.addEventListener('click', () => {
-    if (aramaGirdisi) {
-      aramaGirdisi.value = '';
-      aktifSorgu = '';
-      filtrele();
-      aramaGirdisi.focus();
+  @keyframes slideGrow {
+    from {
+      opacity: 0;
+      transform: scale(0.97);
     }
-  });
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+</style>
 
-  // Kategori butonları dinleyicisi
-  kategoriButonlari.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      kategoriButonlari.forEach((b) => {
-        b.classList.remove('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
-        b.classList.add('bg-kagit', 'text-metin-2');
+<script>
+  import { herSayfada } from '../../scripts/sayfa';
+
+  function sozlukKur() {
+    const aramaGirdisi = document.getElementById('terim-arama') as HTMLInputElement | null;
+    const aramaTemizle = document.getElementById('arama-temizle') as HTMLButtonElement | null;
+    const filtreleriSifirla = document.getElementById('filtreleri-sifirla') as HTMLButtonElement | null;
+    const tumunuAcKapatBtn = document.getElementById('tumunu-ac-kapat') as HTMLButtonElement | null;
+    const kategoriButonlari = document.querySelectorAll('.kategori-buton');
+    const kapsayicilar = document.querySelectorAll<HTMLElement>('.terim-kapsayici');
+    const harfBolumleri = document.querySelectorAll<HTMLElement>('.harf-bolumu');
+    const harfBaglantilari = document.querySelectorAll<HTMLElement>('.harf-baglanti');
+    const bosDurum = document.getElementById('bos-durum');
+    const aramaSayac = document.getElementById('arama-sayac');
+
+    let seciliKategori = 'hepsi';
+    let aktifSorgu = '';
+    let hepsiAcik = false;
+
+    // 1. TIKLAYINCA BÜYÜME VE KÜÇÜLME MANTIĞI
+    kapsayicilar.forEach((kapsayici) => {
+      const kapaliButon = kapsayici.querySelector('.terim-kapali') as HTMLElement | null;
+      const kapatBtn = kapsayici.querySelector('.terim-kapat-btn') as HTMLElement | null;
+
+      kapaliButon?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        kapsayici.setAttribute('data-durum', 'acik');
       });
 
-      btn.classList.remove('bg-kagit', 'text-metin-2');
-      btn.classList.add('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
+      kapatBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        kapsayici.setAttribute('data-durum', 'kapali');
+      });
+    });
 
-      seciliKategori = btn.getAttribute('data-kategori-deger') || 'hepsi';
+    // 2. TÜMÜNÜ BÜYÜT / KÜÇÜLT
+    tumunuAcKapatBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      hepsiAcik = !hepsiAcik;
+      tumunuAcKapatBtn.textContent = hepsiAcik ? 'Tümünü Küçült' : 'Tümünü Büyüt';
+
+      kapsayicilar.forEach((kapsayici) => {
+        if (kapsayici.style.display !== 'none') {
+          kapsayici.setAttribute('data-durum', hepsiAcik ? 'acik' : 'kapali');
+        }
+      });
+    });
+
+    // 3. FİLTRELEME & CANLI ARAMA
+    function filtrele() {
+      let gorunenSayisi = 0;
+      const gorunenHarfler = new Set<string>();
+
+      kapsayicilar.forEach((kapsayici) => {
+        const metin = kapsayici.getAttribute('data-terim-metin') || '';
+        const kategori = kapsayici.getAttribute('data-terim-kategori') || '';
+        const harf = kapsayici.getAttribute('data-terim-harf') || '';
+
+        const sorguUyumu = !aktifSorgu || metin.includes(aktifSorgu);
+        const kategoriUyumu = seciliKategori === 'hepsi' || kategori === seciliKategori;
+
+        if (sorguUyumu && kategoriUyumu) {
+          kapsayici.style.display = 'block';
+          gorunenSayisi++;
+          if (harf) gorunenHarfler.add(harf);
+
+          // Arama kutusuna en az 2 harf girilirse aranan terimleri otomatik büyüt
+          if (aktifSorgu.length >= 2) {
+            kapsayici.setAttribute('data-durum', 'acik');
+          }
+        } else {
+          kapsayici.style.display = 'none';
+        }
+      });
+
+      // Harf bölümlerini göster/gizle
+      harfBolumleri.forEach((bolum) => {
+        const harf = bolum.getAttribute('data-harf-bolumu') || '';
+        if (gorunenHarfler.has(harf)) {
+          bolum.style.display = 'block';
+        } else {
+          bolum.style.display = 'none';
+        }
+      });
+
+      // Alfabe linklerini aktif/pasif yap
+      harfBaglantilari.forEach((baglanti) => {
+        const harf = baglanti.getAttribute('data-harf-hedef') || '';
+        if (gorunenHarfler.has(harf)) {
+          baglanti.style.opacity = '1';
+          baglanti.style.pointerEvents = 'auto';
+        } else {
+          baglanti.style.opacity = '0.3';
+          baglanti.style.pointerEvents = 'none';
+        }
+      });
+
+      // Boş durum bildirimi
+      if (bosDurum) {
+        bosDurum.style.display = gorunenSayisi === 0 ? 'block' : 'none';
+      }
+
+      // Sayaç güncelle
+      if (aramaSayac) {
+        if (aktifSorgu || seciliKategori !== 'hepsi') {
+          aramaSayac.textContent = `${gorunenSayisi} terim bulundu`;
+        } else {
+          aramaSayac.textContent = `${gorunenSayisi} terim listeleniyor`;
+        }
+      }
+
+      // Temizle butonunu göster/gizle
+      if (aramaTemizle) {
+        aramaTemizle.style.display = aktifSorgu ? 'inline-block' : 'none';
+      }
+    }
+
+    // Arama dinleyicisi
+    aramaGirdisi?.addEventListener('input', (e) => {
+      aktifSorgu = (e.target as HTMLInputElement).value.trim().toLocaleLowerCase('tr');
       filtrele();
     });
-  });
 
-  // Sıfırlama butonu
-  filtreleriSifirla?.addEventListener('click', () => {
-    if (aramaGirdisi) aramaGirdisi.value = '';
-    aktifSorgu = '';
-    seciliKategori = 'hepsi';
-
-    kategoriButonlari.forEach((b, index) => {
-      if (index === 0) {
-        b.classList.add('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
-        b.classList.remove('bg-kagit', 'text-metin-2');
-      } else {
-        b.classList.remove('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
-        b.classList.add('bg-kagit', 'text-metin-2');
+    // Arama temizleme
+    aramaTemizle?.addEventListener('click', () => {
+      if (aramaGirdisi) {
+        aramaGirdisi.value = '';
+        aktifSorgu = '';
+        filtrele();
+        aramaGirdisi.focus();
       }
     });
 
-    filtrele();
-  });
+    // Kategori butonları dinleyicisi
+    kategoriButonlari.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        kategoriButonlari.forEach((b) => {
+          b.classList.remove('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
+          b.classList.add('bg-kagit', 'text-metin-2');
+        });
 
-  // URL hash kontrolü (örn. /sozluk#sufa-onalim-hakki ile gelinirse doğrudan o terimi büyüt)
-  if (window.location.hash) {
-    const slug = window.location.hash.replace('#', '');
-    const hedefKapsayici = document.querySelector(`[data-terim-slug="${slug}"]`);
-    if (hedefKapsayici) {
-      const kapaliButon = hedefKapsayici.querySelector('.terim-kapali') as HTMLElement | null;
-      const acikKart = hedefKapsayici.querySelector('.terim-acik') as HTMLElement | null;
-      if (kapaliButon && acikKart) {
-        kapaliButon.style.display = 'none';
-        acikKart.style.display = 'flex';
+        btn.classList.remove('bg-kagit', 'text-metin-2');
+        btn.classList.add('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
+
+        seciliKategori = btn.getAttribute('data-kategori-deger') || 'hepsi';
+        filtrele();
+      });
+    });
+
+    // Sıfırlama butonu
+    filtreleriSifirla?.addEventListener('click', () => {
+      if (aramaGirdisi) aramaGirdisi.value = '';
+      aktifSorgu = '';
+      seciliKategori = 'hepsi';
+
+      kategoriButonlari.forEach((b, index) => {
+        if (index === 0) {
+          b.classList.add('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
+          b.classList.remove('bg-kagit', 'text-metin-2');
+        } else {
+          b.classList.remove('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
+          b.classList.add('bg-kagit', 'text-metin-2');
+        }
+      });
+
+      filtrele();
+    });
+
+    // URL hash kontrolü (örn. /sozluk#sufa-onalim-hakki ile gelinirse doğrudan o terimi büyüt)
+    if (window.location.hash) {
+      const slug = window.location.hash.replace('#', '');
+      const hedefKapsayici = document.querySelector(`[data-terim-slug="${slug}"]`);
+      if (hedefKapsayici) {
         hedefKapsayici.setAttribute('data-durum', 'acik');
         hedefKapsayici.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
   }
+
+  herSayfada(sozlukKur);
 </script>
