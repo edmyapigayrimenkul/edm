@@ -22,6 +22,11 @@ export default defineConfig({
   // basılma anında getiriyor: hızın neredeyse tamamı, israfın hiçbiri.
   prefetch: { prefetchAll: false, defaultStrategy: 'tap' },
 
-  vite: { plugins: [tailwind()] },
+  vite: {
+    plugins: [tailwind()],
+    optimizeDeps: {
+      exclude: ['astro'],
+    },
+  },
   build: { inlineStylesheets: 'auto' },
 });

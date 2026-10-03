@@ -276,7 +276,7 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
   </section>
 </Temel>
 
-<style>
+<style is:global>
   /* Kapalı durum (Kompakt kelime görünümü) */
   .terim-kapsayici .terim-acik {
     display: none !important;
@@ -288,7 +288,7 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
   /* Açık durum (Büyümüş Instagram Gönderisi) */
   .terim-kapsayici[data-durum="acik"] .terim-acik {
     display: flex !important;
-    animation: slideGrow 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: slideGrow 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .terim-kapsayici[data-durum="acik"] .terim-kapali {
     display: none !important;
@@ -297,195 +297,196 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
   @keyframes slideGrow {
     from {
       opacity: 0;
-      transform: scale(0.97);
+      transform: scale(0.96) translateY(-4px);
     }
     to {
       opacity: 1;
-      transform: scale(1);
+      transform: scale(1) translateY(0);
     }
   }
 </style>
 
-<script>
-  import { herSayfada } from '../../scripts/sayfa';
-
-  function sozlukKur() {
-    const aramaGirdisi = document.getElementById('terim-arama') as HTMLInputElement | null;
-    const aramaTemizle = document.getElementById('arama-temizle') as HTMLButtonElement | null;
-    const filtreleriSifirla = document.getElementById('filtreleri-sifirla') as HTMLButtonElement | null;
-    const tumunuAcKapatBtn = document.getElementById('tumunu-ac-kapat') as HTMLButtonElement | null;
-    const kategoriButonlari = document.querySelectorAll('.kategori-buton');
-    const kapsayicilar = document.querySelectorAll<HTMLElement>('.terim-kapsayici');
-    const harfBolumleri = document.querySelectorAll<HTMLElement>('.harf-bolumu');
-    const harfBaglantilari = document.querySelectorAll<HTMLElement>('.harf-baglanti');
-    const bosDurum = document.getElementById('bos-durum');
-    const aramaSayac = document.getElementById('arama-sayac');
-
-    let seciliKategori = 'hepsi';
-    let aktifSorgu = '';
-    let hepsiAcik = false;
-
-    // 1. TIKLAYINCA BÜYÜME VE KÜÇÜLME MANTIĞI
-    kapsayicilar.forEach((kapsayici) => {
-      const kapaliButon = kapsayici.querySelector('.terim-kapali') as HTMLElement | null;
-      const kapatBtn = kapsayici.querySelector('.terim-kapat-btn') as HTMLElement | null;
-
-      kapaliButon?.addEventListener('click', (e) => {
+<script is:inline>
+  (() => {
+    // 1. TIKLAYINCA BÜYÜME VE KÜÇÜLME (EVENT DELEGATION: EN SAĞLAM YÖNTEM)
+    document.addEventListener('click', (e) => {
+      // Kapalı kart tıklandı -> BÜYÜT
+      const kapaliBtn = e.target.closest('.terim-kapali');
+      if (kapaliBtn) {
         e.preventDefault();
-        e.stopPropagation();
-        kapsayici.setAttribute('data-durum', 'acik');
-      });
-
-      kapatBtn?.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        kapsayici.setAttribute('data-durum', 'kapali');
-      });
-    });
-
-    // 2. TÜMÜNÜ BÜYÜT / KÜÇÜLT
-    tumunuAcKapatBtn?.addEventListener('click', (e) => {
-      e.preventDefault();
-      hepsiAcik = !hepsiAcik;
-      tumunuAcKapatBtn.textContent = hepsiAcik ? 'Tümünü Küçült' : 'Tümünü Büyüt';
-
-      kapsayicilar.forEach((kapsayici) => {
-        if (kapsayici.style.display !== 'none') {
-          kapsayici.setAttribute('data-durum', hepsiAcik ? 'acik' : 'kapali');
+        const kapsayici = kapaliBtn.closest('.terim-kapsayici');
+        if (kapsayici) {
+          kapsayici.setAttribute('data-durum', 'acik');
         }
-      });
+        return;
+      }
+
+      // Küçült butonu tıklandı -> KÜÇÜLT
+      const kapatBtn = e.target.closest('.terim-kapat-btn');
+      if (kapatBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const kapsayici = kapatBtn.closest('.terim-kapsayici');
+        if (kapsayici) {
+          kapsayici.setAttribute('data-durum', 'kapali');
+        }
+        return;
+      }
     });
 
-    // 3. FİLTRELEME & CANLI ARAMA
-    function filtrele() {
-      let gorunenSayisi = 0;
-      const gorunenHarfler = new Set<string>();
+    function sayfaBagla() {
+      const aramaGirdisi = document.getElementById('terim-arama');
+      const aramaTemizle = document.getElementById('arama-temizle');
+      const filtreleriSifirla = document.getElementById('filtreleri-sifirla');
+      const tumunuAcKapatBtn = document.getElementById('tumunu-ac-kapat');
+      const kategoriButonlari = document.querySelectorAll('.kategori-buton');
+      const kapsayicilar = document.querySelectorAll('.terim-kapsayici');
+      const harfBolumleri = document.querySelectorAll('.harf-bolumu');
+      const harfBaglantilari = document.querySelectorAll('.harf-baglanti');
+      const bosDurum = document.getElementById('bos-durum');
+      const aramaSayac = document.getElementById('arama-sayac');
 
-      kapsayicilar.forEach((kapsayici) => {
-        const metin = kapsayici.getAttribute('data-terim-metin') || '';
-        const kategori = kapsayici.getAttribute('data-terim-kategori') || '';
-        const harf = kapsayici.getAttribute('data-terim-harf') || '';
+      let seciliKategori = 'hepsi';
+      let aktifSorgu = '';
+      let hepsiAcik = false;
 
-        const sorguUyumu = !aktifSorgu || metin.includes(aktifSorgu);
-        const kategoriUyumu = seciliKategori === 'hepsi' || kategori === seciliKategori;
+      // Tümünü Büyüt / Küçült
+      tumunuAcKapatBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        hepsiAcik = !hepsiAcik;
+        tumunuAcKapatBtn.textContent = hepsiAcik ? 'Tümünü Küçült' : 'Tümünü Büyüt';
 
-        if (sorguUyumu && kategoriUyumu) {
-          kapsayici.style.display = 'block';
-          gorunenSayisi++;
-          if (harf) gorunenHarfler.add(harf);
-
-          // Arama kutusuna en az 2 harf girilirse aranan terimleri otomatik büyüt
-          if (aktifSorgu.length >= 2) {
-            kapsayici.setAttribute('data-durum', 'acik');
+        kapsayicilar.forEach((kapsayici) => {
+          if (kapsayici.style.display !== 'none') {
+            kapsayici.setAttribute('data-durum', hepsiAcik ? 'acik' : 'kapali');
           }
-        } else {
-          kapsayici.style.display = 'none';
-        }
+        });
       });
 
-      // Harf bölümlerini göster/gizle
-      harfBolumleri.forEach((bolum) => {
-        const harf = bolum.getAttribute('data-harf-bolumu') || '';
-        if (gorunenHarfler.has(harf)) {
-          bolum.style.display = 'block';
-        } else {
-          bolum.style.display = 'none';
-        }
-      });
+      // Filtreleme fonksiyonu
+      function filtrele() {
+        let gorunenSayisi = 0;
+        const gorunenHarfler = new Set();
 
-      // Alfabe linklerini aktif/pasif yap
-      harfBaglantilari.forEach((baglanti) => {
-        const harf = baglanti.getAttribute('data-harf-hedef') || '';
-        if (gorunenHarfler.has(harf)) {
-          baglanti.style.opacity = '1';
-          baglanti.style.pointerEvents = 'auto';
-        } else {
-          baglanti.style.opacity = '0.3';
-          baglanti.style.pointerEvents = 'none';
-        }
-      });
+        kapsayicilar.forEach((kapsayici) => {
+          const metin = kapsayici.getAttribute('data-terim-metin') || '';
+          const kategori = kapsayici.getAttribute('data-terim-kategori') || '';
+          const harf = kapsayici.getAttribute('data-terim-harf') || '';
 
-      // Boş durum bildirimi
-      if (bosDurum) {
-        bosDurum.style.display = gorunenSayisi === 0 ? 'block' : 'none';
-      }
+          const sorguUyumu = !aktifSorgu || metin.includes(aktifSorgu);
+          const kategoriUyumu = seciliKategori === 'hepsi' || kategori === seciliKategori;
 
-      // Sayaç güncelle
-      if (aramaSayac) {
-        if (aktifSorgu || seciliKategori !== 'hepsi') {
-          aramaSayac.textContent = `${gorunenSayisi} terim bulundu`;
-        } else {
-          aramaSayac.textContent = `${gorunenSayisi} terim listeleniyor`;
-        }
-      }
+          if (sorguUyumu && kategoriUyumu) {
+            kapsayici.style.display = 'block';
+            gorunenSayisi++;
+            if (harf) gorunenHarfler.add(harf);
 
-      // Temizle butonunu göster/gizle
-      if (aramaTemizle) {
-        aramaTemizle.style.display = aktifSorgu ? 'inline-block' : 'none';
-      }
-    }
-
-    // Arama dinleyicisi
-    aramaGirdisi?.addEventListener('input', (e) => {
-      aktifSorgu = (e.target as HTMLInputElement).value.trim().toLocaleLowerCase('tr');
-      filtrele();
-    });
-
-    // Arama temizleme
-    aramaTemizle?.addEventListener('click', () => {
-      if (aramaGirdisi) {
-        aramaGirdisi.value = '';
-        aktifSorgu = '';
-        filtrele();
-        aramaGirdisi.focus();
-      }
-    });
-
-    // Kategori butonları dinleyicisi
-    kategoriButonlari.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        kategoriButonlari.forEach((b) => {
-          b.classList.remove('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
-          b.classList.add('bg-kagit', 'text-metin-2');
+            // Arama yapıldıysa eşleşen terimleri otomatik büyüt
+            if (aktifSorgu.length >= 2) {
+              kapsayici.setAttribute('data-durum', 'acik');
+            }
+          } else {
+            kapsayici.style.display = 'none';
+          }
         });
 
-        btn.classList.remove('bg-kagit', 'text-metin-2');
-        btn.classList.add('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
+        // Harf başlıklarını göster/gizle
+        harfBolumleri.forEach((bolum) => {
+          const harf = bolum.getAttribute('data-harf-bolumu') || '';
+          bolum.style.display = gorunenHarfler.has(harf) ? 'block' : 'none';
+        });
 
-        seciliKategori = btn.getAttribute('data-kategori-deger') || 'hepsi';
+        // Alfabe butonlarını pasif/aktif yap
+        harfBaglantilari.forEach((baglanti) => {
+          const harf = baglanti.getAttribute('data-harf-hedef') || '';
+          if (gorunenHarfler.has(harf)) {
+            baglanti.style.opacity = '1';
+            baglanti.style.pointerEvents = 'auto';
+          } else {
+            baglanti.style.opacity = '0.3';
+            baglanti.style.pointerEvents = 'none';
+          }
+        });
+
+        // Boş durum bildirimi
+        if (bosDurum) {
+          bosDurum.style.display = gorunenSayisi === 0 ? 'block' : 'none';
+        }
+
+        // Sayaç güncelle
+        if (aramaSayac) {
+          if (aktifSorgu || seciliKategori !== 'hepsi') {
+            aramaSayac.textContent = `${gorunenSayisi} terim bulundu`;
+          } else {
+            aramaSayac.textContent = `${gorunenSayisi} terim listeleniyor`;
+          }
+        }
+
+        // Temizle butonunu göster/gizle
+        if (aramaTemizle) {
+          aramaTemizle.style.display = aktifSorgu ? 'inline-block' : 'none';
+        }
+      }
+
+      aramaGirdisi?.addEventListener('input', (e) => {
+        aktifSorgu = e.target.value.trim().toLocaleLowerCase('tr');
         filtrele();
       });
-    });
 
-    // Sıfırlama butonu
-    filtreleriSifirla?.addEventListener('click', () => {
-      if (aramaGirdisi) aramaGirdisi.value = '';
-      aktifSorgu = '';
-      seciliKategori = 'hepsi';
-
-      kategoriButonlari.forEach((b, index) => {
-        if (index === 0) {
-          b.classList.add('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
-          b.classList.remove('bg-kagit', 'text-metin-2');
-        } else {
-          b.classList.remove('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
-          b.classList.add('bg-kagit', 'text-metin-2');
+      aramaTemizle?.addEventListener('click', () => {
+        if (aramaGirdisi) {
+          aramaGirdisi.value = '';
+          aktifSorgu = '';
+          filtrele();
+          aramaGirdisi.focus();
         }
       });
 
-      filtrele();
-    });
+      kategoriButonlari.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          kategoriButonlari.forEach((b) => {
+            b.classList.remove('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
+            b.classList.add('bg-kagit', 'text-metin-2');
+          });
 
-    // URL hash kontrolü (örn. /sozluk#sufa-onalim-hakki ile gelinirse doğrudan o terimi büyüt)
-    if (window.location.hash) {
-      const slug = window.location.hash.replace('#', '');
-      const hedefKapsayici = document.querySelector(`[data-terim-slug="${slug}"]`);
-      if (hedefKapsayici) {
-        hedefKapsayici.setAttribute('data-durum', 'acik');
-        hedefKapsayici.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          btn.classList.remove('bg-kagit', 'text-metin-2');
+          btn.classList.add('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
+
+          seciliKategori = btn.getAttribute('data-kategori-deger') || 'hepsi';
+          filtrele();
+        });
+      });
+
+      filtreleriSifirla?.addEventListener('click', () => {
+        if (aramaGirdisi) aramaGirdisi.value = '';
+        aktifSorgu = '';
+        seciliKategori = 'hepsi';
+
+        kategoriButonlari.forEach((b, index) => {
+          if (index === 0) {
+            b.classList.add('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
+            b.classList.remove('bg-kagit', 'text-metin-2');
+          } else {
+            b.classList.remove('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
+            b.classList.add('bg-kagit', 'text-metin-2');
+          }
+        });
+
+        filtrele();
+      });
+
+      // URL hash varsa doğrudan büyüt
+      if (window.location.hash) {
+        const slug = window.location.hash.replace('#', '');
+        const hedef = document.querySelector(`[data-terim-slug="${slug}"]`);
+        if (hedef) {
+          hedef.setAttribute('data-durum', 'acik');
+          hedef.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
       }
     }
-  }
 
-  herSayfada(sozlukKur);
+    sayfaBagla();
+    document.addEventListener('astro:page-load', sayfaBagla);
+  })();
 </script>
