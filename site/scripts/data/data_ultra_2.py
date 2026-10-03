@@ -1,0 +1,560 @@
+# -*- coding: utf-8 -*-
+"""
+data_ultra_2.py — EDM Emlak Sözlüğü Ultra Genişletme Paketi Bölüm 2 (50 Terim)
+Kira hukuku, kat mülkiyeti, vergi muafiyetleri ve finansal değerleme terimleri.
+"""
+
+ULTRA_TERIMLER_2 = [
+    {
+        "terim": "Kira Tespitinde Hakkaniyet ve Rayiç İndirimi",
+        "slug": "kira-tespitinde-hakkaniyet-indirimi",
+        "harf": "K",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "5 yılı dolduran kiracılarda mahkemenin belirlediği piyasa rayiç kira bedeli üzerinden eski kiracı lehine uyguladığı %10 ila %20 arasındaki hakkaniyet indirimidir.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 344/3 ve Yargıtay Hukuk Genel Kurulu Kararları.",
+        "pratikteNeAnlamaGelir": "Bilirkişi dairenin boş rayiç kirasını 30.000 TL tespit etse dahi hakim 'eski kiracı indirimi' uygulayarak yeni kirayı 25.000 - 27.000 TL olarak belirler.",
+        "kritikUyari": "Dava açılmadan önce arabuluculuk sürecinin tamamlanması ve dava şartı arabuluculuk tutanağının mahkemeye sunulması zorunludur.",
+        "ilgiliTerimler": ["Kira Tespit Davası (5 Yıl Kuralı)", "Zorunlu Arabuluculuk (Kira)"]
+    },
+    {
+        "terim": "10 Yıllık Uzama Süresi İhtar Süresi Hesabı",
+        "slug": "10-yillik-uzama-ihtar-sure-hesabi",
+        "harf": "1",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "1 yıllık konut kira sözleşmelerinde 1 yılın bitiminden sonra başlayan 10 yıllık uzama süresi sonunda kiraya verenin hiçbir gerekçe göstermeden fesih hakkıdır.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 347/1.",
+        "pratikteNeAnlamaGelir": "Toplamda 11 yıl oturan kiracıya, 11. yılın bitiminden en az 3 ay önce noterden fesih bildirimi gönderilerek tahliye davası açılabilir.",
+        "kritikUyari": "3 aylık ihtar süresi kaçırılırsa sözleşme 1 yıl daha kendiliğinden uzar ve mülk sahibi 1 yıl daha dava açamaz.",
+        "ilgiliTerimler": ["10 Yıllık Uzama Süresi Nedeniyle Tahliye", "Belirli Süreli Kira Sözleşmesi"]
+    },
+    {
+        "terim": "Tahliye Emri ve İcra Takibi (İİK Örnek No: 14)",
+        "slug": "tahliye-emri-ornek-14",
+        "harf": "T",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Yazılı tahliye taahhüdüne dayanılarak icra dairesi aracılığıyla kiracıya gönderilen ve 15 gün içinde taşınmazın boşaltılmasını emreden resmi tebligattır.",
+        "hukukiKarsilik": "İcra ve İflas Kanunu md. 272-275.",
+        "pratikteNeAnlamaGelir": "Kiracı tahliye taahhüdündeki tarihte evi boşaltmazsa dava açmadan doğrudan icra takibiyle taşınmazın tahliyesi başlatılır.",
+        "kritikUyari": "Kiracı tebligatı aldıktan sonra 7 gün içinde imzaya veya taahhüde itiraz ederse takip durur; mülk sahibi İcra Hukuk Mahkemesinde itirazın kaldırılması davası açmalıdır.",
+        "ilgiliTerimler": ["Tahliye Taahhütnamesi", "Kira İcra Takibi (Örnek: 13)"]
+    },
+    {
+        "terim": "Kiralananın Alt Soy veya Üst Soy İhtiyacıyla Tahliyesi",
+        "slug": "kiralananin-alt-ust-soy-ihtiyaci",
+        "harf": "K",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Kiraya verenin kendisi, eşi, alt soyu (çocukları, torunları) veya üst soyu (anne, babası) için konut veya işyeri ihtiyacı doğması sebebiyle açtığı tahliye davasıdır.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 350/1.",
+        "pratikteNeAnlamaGelir": "Ev sahibinin evlenen oğlunun veya üniversite kazanan kızının oturması için kiracıdan evi tahliye etmesi yasal bir haktır.",
+        "kritikUyari": "İhtiyacın samimi, gerçek ve zorunlu olması şarttır; tahliye edilen ev 3 yıl boyunca eski kiracıdan başkasına kiraya verilemez, verilirse tazminat ödenir.",
+        "ilgiliTerimler": ["İhtiyaç Nedeniyle Tahliye", "Yeniden Kiralama Yasağı (3 Yıl Kuralı)"]
+    },
+    {
+        "terim": "İşyeri Kiralarında Tacirler Arası Serbest İrade İlkesi",
+        "slug": "isyeri-tacir-serbest-irade",
+        "harf": "İ",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Kiracının Türk Ticaret Kanunu'na göre tacir veya tüzel kişi olduğu işyeri kiralarında, kira bedeli artışı ve sözleşme şartlarında tarafların serbestçe anlaşabilmesidir.",
+        "hukukiKarsilik": "6217 Sayılı Kanun Geçici md. 2 ve TBK md. 344/4.",
+        "pratikteNeAnlamaGelir": "Kurumsal şirketler veya tacir kiracılar için konutlardaki gibi zorunlu yasal tavan sınırlamaları yerine sözleşmedeki serbest artış maddeleri uygulanabilir.",
+        "kritikUyari": "Sözleşmede artış oranı kararlaştırılmamışsa yine TÜFE 12 aylık ortalaması tavan olarak kabul edilir.",
+        "ilgiliTerimler": ["TÜFE Tavan Artış Oranı", "Kira Stopajı"]
+    },
+    {
+        "terim": "Ortak Gider Aidatında %5 Gecikme Tazminatı",
+        "slug": "aidat-yuzde-5-gecikme-tazminati",
+        "harf": "O",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Aidat borcunu gününde ödemeyen kat maliki veya kiracıya, yasal faizden bağımsız olarak kanun gereği aylık yüzde 5 oranında işletilen gecikme cezasıdır.",
+        "hukukiKarsilik": "634 Sayılı Kat Mülkiyeti Kanunu md. 20/c.",
+        "pratikteNeAnlamaGelir": "Aidatı 2 ay geciktiren malik anapara borcunun üzerine her ay için %5 (yıllık %60) gecikme tazminatını icra takibiyle ödemek zorunda kalır.",
+        "kritikUyari": "Yönetici icra takibi başlatırken hem asıl alacağı hem de %5 gecikme tazminatını talep edebilir; hakim bu oranı kendiliğinden düşüremez.",
+        "ilgiliTerimler": ["Kat Mülkiyeti Kanunu", "Kat Malikleri Kurulu"]
+    },
+    {
+        "terim": "Kat Malikleri Kurulunda Çift Çoğunluk Kuralı",
+        "slug": "cift-cogunluk-kurali-kmk",
+        "harf": "Ç",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Apartman genel kurulunda karar alınabilmesi için hem toplantıya katılan malik sayısının (sayıca) hem de arsa payı toplamının çoğunluğunun aranması kuralıdır.",
+        "hukukiKarsilik": "634 Sayılı Kat Mülkiyeti Kanunu md. 30 ve 32.",
+        "pratikteNeAnlamaGelir": "Binadaki en büyük penthouse'a sahip tek bir malik, sayı çoğunluğunu sağlayamazsa tek başına genel kurulda istediği kararı çıkartamaz.",
+        "kritikUyari": "Yönetici seçimi için birinci toplantıda hem sayı hem arsa payı çoğunluğu şarttır; sağlanamazsa ikinci toplantıda katılanların çoğunluğu yeterlidir.",
+        "ilgiliTerimler": ["Kat Malikleri Kurulu", "Arsa Payı"]
+    },
+    {
+        "terim": "Apartman Yöneticisine Sulh Hukuk Mahkemesinden Kayyum Atanması",
+        "slug": "yoneticiye-kayyum-atanmasi-kmk",
+        "harf": "A",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Kat malikleri kurulu toplanamaz veya yönetici seçemezse herhangi bir malikin başvurusu üzerine hakimin dışarıdan resen bir yönetici (kayyum) atamasıdır.",
+        "hukukiKarsilik": "634 Sayılı Kat Mülkiyeti Kanunu md. 34/6.",
+        "pratikteNeAnlamaGelir": "Kavgalı, sahipsiz kalmış veya aidat toplanamayan binalara mahkeme profesyonel bir avukat veya yönetim şirketini zorunlu yönetici tayin eder.",
+        "kritikUyari": "Mahkemenin atadığı yönetici 6 ay geçmedikçe kat malikleri kurulunca görevden alınamaz.",
+        "ilgiliTerimler": ["Kat Malikleri Kurulu", "Yönetim Planı"]
+    },
+    {
+        "terim": "Ortak Alan İşgali ve Eski Hale Getirme Davası",
+        "slug": "ortak-alan-isgali-eski-hale-getirme",
+        "harf": "O",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Çatı arasını evine katan, sığınağı depo yapan veya bahçeyi çitle çeviren daire sahibine karşı ortak alanın projeye uygun hale getirilmesi için açılan davadır.",
+        "hukukiKarsilik": "634 Sayılı Kat Mülkiyeti Kanunu md. 19 ve 33.",
+        "pratikteNeAnlamaGelir": "Komşunuz ortak terası kapatıp kış bahçesi yaptıysa Sulh Hukuk Mahkemesi'ne başvurarak masrafları komşuya ait olmak üzere yapıyı yıktırabilirsiniz.",
+        "kritikUyari": "Ortak alan müdahalelerinde zamanaşımı işlemez; haksız işgal 20 yıl sürse dahi her malik tek başına eski hale getirme davası açabilir.",
+        "ilgiliTerimler": ["Ortak Alanlar", "Müdahalenin Meni Davası"]
+    },
+    {
+        "terim": "Evcil Hayvan Besleme Yasağı ve Yönetim Planı",
+        "slug": "evcil-hayvan-besleme-yonetim-plani",
+        "harf": "E",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Tapudaki resmi yönetim planında 'bağımsız bölümlerde kedi, köpek beslenemez' maddesi varsa komşuların şikayetiyle hayvanın tahliyesinin istenebilmesidir.",
+        "hukukiKarsilik": "634 Sayılı Kat Mülkiyeti Kanunu md. 28 ve Yargıtay 18. Hukuk Dairesi İçtihatları.",
+        "pratikteNeAnlamaGelir": "Ev alırken veya kiralarken hayvan besleyen birinin mutlaka tapu sicilindeki yönetim planını okuyup bu yasağın olup olmadığını kontrol etmesi gerekir.",
+        "kritikUyari": "Yönetim planında açık yasak varsa hayvan gürültü yapmasa dahi mahkeme tahliyesine karar verir; sonradan yasak eklemek için maliklerin 4/5 oyu gerekir.",
+        "ilgiliTerimler": ["Yönetim Planı", "Bağımsız Bölüm"]
+    },
+    {
+        "terim": "Erken Tahliyede Makul Süre Tazminatı",
+        "slug": "erken-tahliyede-makul-sure-tazminati",
+        "harf": "E",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Kiracının kira süresi bitmeden evi aniden boşaltması durumunda, evin benzer koşullarla yeniden kiraya verilebileceği süre kadar (genelde 1-3 ay) kira ödeme yükümlülüğüdür.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 325.",
+        "pratikteNeAnlamaGelir": "1 yıllık sözleşmenin 4. ayında anahtarı bırakıp giden kiracı, ev 2 ay boş kalırsa o 2 ayın kirasını ev sahibine tazminat olarak ödemek zorundadır.",
+        "kritikUyari": "Kiracı kiraya verenden kabul edilebilir yeni bir kiracı bulursa makul süre tazminatı ödemekten derhal kurtulur.",
+        "ilgiliTerimler": ["Anahtar Teslim Tutanağı", "Güvence Bedeli (Kira Depozitosu)"]
+    },
+    {
+        "terim": "Kira Depozitosunun Vadeli Hesaba Yatırılması Kuralı",
+        "slug": "kira-depozitosu-vadeli-hesap",
+        "harf": "K",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Konut ve çatılı işyeri kiralarında en fazla 3 aylık kira tutarında alınabilen depozitonun kiracı adına bankada vadeli ortak tasarruf hesabına yatırılması zorunluluğudur.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 342.",
+        "pratikteNeAnlamaGelir": "Ev sahibi depozitoyu şahsi hesabına alıp harcayamaz; banka her iki tarafın rızası veya kesinleşmiş mahkeme kararı olmadan parayı kimseye ödemez.",
+        "kritikUyari": "Elden veya ev sahibinin hesabına yatırılan depozitolarda enflasyon karşısında değer kaybı uyuşmazlığı çıkar; banka vadeli hesabı değerini korur.",
+        "ilgiliTerimler": ["Güvence Bedeli (Kira Depozitosu)", "Kira Sözleşmesi"]
+    },
+    {
+        "terim": "Kira Sözleşmesinde Kefilin Sorumluluk Sınırları",
+        "slug": "kira-kefil-sorumluluk-sinirlari",
+        "harf": "K",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Kira sözleşmesine imza atan kefilin el yazısıyla azami kefalet miktarını ve kefalet tarihini belirtmediği durumlarda kefaletin geçersiz sayılması kuralıdır.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 583 ve 584.",
+        "pratikteNeAnlamaGelir": "Kefil matbu sözleşmeye sadece imza atmışsa borçtan sorumlu tutulamaz; '... TL tutarına kadar kefilim' cümlesini bizzat elle yazmalıdır.",
+        "kritikUyari": "Kefalet süresi sözleşmede açıkça belirtilmemişse kira sözleşmesi uzasa dahi kefilin sorumluluğu yalnızca ilk 1 yıllık süreyle sınırlıdır.",
+        "ilgiliTerimler": ["Kira Sözleşmesi", "Kira İcra Takibi (Örnek: 13)"]
+    },
+    {
+        "terim": "Yİ-ÜFE %10 Artış Eşiği Kuralı",
+        "slug": "yi-ufe-yuzde-10-artis-esigi",
+        "harf": "Y",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "Gayrimenkulün alış ve satış bedelleri endekslenirken, iki tarih arasındaki Yİ-ÜFE artış oranının en az %10 olması halinde endekslemenin geçerli sayılması şartıdır.",
+        "hukukiKarsilik": "193 Sayılı Gelir Vergisi Kanunu Mükerrer md. 80.",
+        "pratikteNeAnlamaGelir": "Satın alma ile satış arasındaki enflasyon artışı %10'u aşmışsa alış bedeli güncel değere yükseltilerek ödenecek gelir vergisi ciddi oranda azaltılır.",
+        "kritikUyari": "Enflasyon artışı %10'un altında kalırsa endeksleme yapılamaz ve alış bedeli ile satış bedeli arasındaki farkın tamamı üzerinden vergi hesaplanır.",
+        "ilgiliTerimler": ["Değer Artış Kazancı Vergisi", "Endeksleme (Yİ-ÜFE)"]
+    },
+    {
+        "terim": "İvazsız (Miras ve Bağış) İktisaplarda Değer Artış Muafiyeti",
+        "slug": "ivazsiz-iktisap-deger-artis-muafiyeti",
+        "harf": "İ",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "Miras veya bağış yoluyla bedelsiz kazanılan gayrimenkullerin 5 yıllık süreye bakılmaksızın ne zaman ve kaça satılırsa satılsın gelir vergisinden muaf olmasıdır.",
+        "hukukiKarsilik": "193 Sayılı Gelir Vergisi Kanunu Mükerrer md. 80/6.",
+        "pratikteNeAnlamaGelir": "Babanızdan miras kalan evi ertesi gün 10 milyon TL kârla dahi satsanız tek kuruş değer artış kazancı vergisi ödemezsiniz.",
+        "kritikUyari": "Ancak miras intikali sırasında tahakkuk eden 'Veraset ve İntikal Vergisi'nin beyan edilip ödenmiş olması şarttır.",
+        "ilgiliTerimler": ["Veraset ve İntikal Vergisi", "Miras İntikali"]
+    },
+    {
+        "terim": "Arsa Payı Karşılığı İnşaatta Müteahhidin KDV Pozisyonu",
+        "slug": "kat-karsiligi-muteahhit-kdv-pozisyonu",
+        "harf": "K",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "Müteahhidin arsa sahibine teslim ettiği bağımsız bölümler için emsal bedel üzerinden fatura düzenleyerek KDV hesaplama ve indirim konusu yapma zorunluluğudur.",
+        "hukukiKarsilik": "3065 Sayılı KDV Kanunu md. 2/5 ve KDV Genel Uygulama Tebliği.",
+        "pratikteNeAnlamaGelir": "Arsa sahibine verilen daireler için arsa sahibinden nakit para alınmasa da müteahhit bu dairelerin KDV'sini vergi dairesine beyan etmekle mükelleftir.",
+        "kritikUyari": "Sözleşmede 'Dairelere ait KDV kime aittir?' maddesi açıkça yazılmazsa müteahhit ile arsa sahibi arasında ciddi fatura davaları patlak verir.",
+        "ilgiliTerimler": ["Konut Tesliminde KDV Oranları", "Şantiye İlerleme ve Hakediş Tutanağı"]
+    },
+    {
+        "terim": "Trampa İşleminde Tapu Harcı Matrahı",
+        "slug": "trampa-tapu-harci-matrahi",
+        "harf": "T",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "İki gayrimenkulün birbiriyle takas edilmesi işleminde tapu harcının emlak beyan değerinden az olmamak üzere her iki mülkün değeri üzerinden ayrı ayrı ödenmesidir.",
+        "hukukiKarsilik": "492 Sayılı Harçlar Kanunu (4) Sayılı Tarife Pozisyon 20/a.",
+        "pratikteNeAnlamaGelir": "A taşınmazı 2 milyon, B taşınmazı 3 milyon TL ise; her iki taraf da kendi devrettiği mülkün beyan değeri üzerinden binde 20 harç öder.",
+        "kritikUyari": "Aralarında nakit para farkı ödenmişse bu farkın da sözleşmede belirtilmesi ve harca dahil edilmesi gerekir; gizlenirse cezalı tarhiyat uygulanır.",
+        "ilgiliTerimler": ["Trampa (Mülk Takası)", "Tapu Harcı"]
+    },
+    {
+        "terim": "Kira Gelirinde Amortisman İndirimi",
+        "slug": "kira-gelirinde-amortisman-indirimi",
+        "harf": "K",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "Gerçek gider yöntemini seçen ev sahiplerinin, kiraya verdikleri konutun iktisap bedelinin yıllık %2'sini kira gelirinden amortisman gideri olarak düşebilmesidir.",
+        "hukukiKarsilik": "193 Sayılı Gelir Vergisi Kanunu md. 74/6 ve VUK md. 315.",
+        "pratikteNeAnlamaGelir": "5 milyon TL'ye alınan bir evin yıllık 100 bin TL'si doğrudan kira gelirinden masraf olarak silinir ve ödenecek gelir vergisi sıfıra yaklaşır.",
+        "kritikUyari": "Amortisman indirimi yalnızca 'Gerçek Gider Yöntemi' seçildiğinde uygulanabilir; götürü gider yöntemini seçenler amortisman ayıramaz.",
+        "ilgiliTerimler": ["Gerçek Gider Yöntemi", "Kira Gelir Vergisi (GMSİ)"]
+    },
+    {
+        "terim": "Geriye Dönük Emlak Vergisi Tarhiyatı ve Usulsüzlük",
+        "slug": "geriye-donuk-emlak-vergisi-tarhiyati",
+        "harf": "G",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "Satın aldığı taşınmaz için belediyeye zamanında emlak vergisi bildirimi vermeyen malike son 5 yıl için geriye dönük vergi ve vergi ziyaı cezası kesilmesidir.",
+        "hukukiKarsilik": "1319 Sayılı Emlak Vergisi Kanunu md. 23 ve 32; 213 Sayılı VUK md. 114.",
+        "pratikteNeAnlamaGelir": "Evi satın aldığınız yılın sonuna kadar belediyeye beyanda bulunmazsanız, belediye durumu tespit ettiğinde 5 yıllık gecikme faiziyle birlikte tahsil eder.",
+        "kritikUyari": "Emlak vergisinde zamanaşımı süresi 5 yıldır; 5 yıldan eski yıllar için belediye geriye dönük vergi tarh edemez.",
+        "ilgiliTerimler": ["Emlak Vergisi", "Rayiç Bedel"]
+    },
+    {
+        "terim": "Konut Kredisi BSMV ve KKDF Muafiyeti",
+        "slug": "konut-kredisi-bsmv-kkdf-muafiyeti",
+        "harf": "K",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "Gerçek kişilerin konut edinimi amacıyla kullandıkları konut finansmanı kredilerinin Banka ve Sigorta Muameleleri Vergisi ile Kaynak Kullanımını Destekleme Fonu'ndan muaf tutulmasıdır.",
+        "hukukiKarsilik": "6802 Sayılı Gider Vergileri Kanunu md. 29/x ve BKK Kararları.",
+        "pratikteNeAnlamaGelir": "İhtiyaç veya taşıt kredilerinde faizin üzerine binen %15 BSMV ve %15 KKDF yükü konut kredilerinde alınmaz; kredi maliyeti ucuzlar.",
+        "kritikUyari": "Kredi konut kredisi değil de ticari kredi veya tüketici kredisi olarak çekilip ev alınırsa bu vergi istisnasından faydalanılamaz.",
+        "ilgiliTerimler": ["Konut Finansmanı Kredisi (Mortgage)", "Refinansman"]
+    },
+    {
+        "terim": "Yabancı Gerçek Kişilerin Vergi Kimlik Numarası Edinimi",
+        "slug": "yabanci-vergi-kimlik-numarasi",
+        "harf": "Y",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "Türkiye'de taşınmaz satın alacak yabancı uyrukluların tapu harcı, döviz bozdurma ve banka işlemleri için vergi dairesinden aldığı 10 haneli resmi kimlik kodudur.",
+        "hukukiKarsilik": "213 Sayılı Vergi Usul Kanunu Genel Tebliği (Sıra No: 247).",
+        "pratikteNeAnlamaGelir": "Pasaport tercümesiyle internet vergi dairesi üzerinden dakikalar içinde alınır; tapu devrinin ve banka hesap açılışının ilk adımıdır.",
+        "kritikUyari": "Vergi kimlik numarasındaki isim ve soyisim harfleri pasaporttaki Latin harfli yazılışla birebir uyuşmazsa Web-Tapu ve banka onay vermez.",
+        "ilgiliTerimler": ["Web-Tapu Sistemi", "Döviz Alım Belgesi (DAB)"]
+    },
+    {
+        "terim": "Net Faaliyet Geliri (NOI - Net Operating Income)",
+        "slug": "net-faaliyet-geliri-noi",
+        "harf": "N",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Ticari bir gayrimenkulün brüt kira gelirinden boşluk oranı, bakım-onarım, emlak vergisi ve sigorta gibi işletme giderlerinin düşülmesiyle bulunan net nakit kârdır.",
+        "hukukiKarsilik": "Uluslararası Değerleme Standartları (IVS) ve SPK Tebliğleri.",
+        "pratikteNeAnlamaGelir": "Bir AVM, otel veya plazanın gerçek nakit yaratma gücünü gösterir; amortisman ve kredi finansman faizi bu hesaba dahil edilmez.",
+        "kritikUyari": "Yatırımcılar brüt kira getirisine değil doğrudan NOI rakamına bakmalıdır; yüksek işletme giderleri brüt getirisi yüksek bir binayı batırabilir.",
+        "ilgiliTerimler": ["Kapitalizasyon Oranı (Cap Rate)", "Brüt Kira Çarpanı (GRM)"]
+    },
+    {
+        "terim": "Brüt Kira Çarpanı (GRM - Gross Rent Multiplier)",
+        "slug": "brut-kira-carpani-grm",
+        "harf": "B",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Bir gayrimenkulün satış fiyatının yıllık brüt kira gelirine bölünmesiyle hesaplanan ve yatırımın kira ile kaç yılda geri döneceğini gösteren katsayıdır.",
+        "hukukiKarsilik": "SPK Gayrimenkul Değerleme Esasları.",
+        "pratikteNeAnlamaGelir": "Fiyatı 3.600.000 TL ve aylık kirası 15.000 TL (yıllık 180.000 TL) olan bir konutun GRM çarpanı 20 yıldır (3.600.000 / 180.000 = 20).",
+        "kritikUyari": "GRM işletme masraflarını ve vergi yükünü hesaba katmaz; bu nedenle ticari plazalarda tek başına değil NOI ve Cap Rate ile birlikte kullanılmalıdır.",
+        "ilgiliTerimler": ["Net Faaliyet Geliri (NOI)", "Yatırım Geri Dönüş Süresi"]
+    },
+    {
+        "terim": "Kapitalizasyon Oranı (Cap Rate)",
+        "slug": "kapitalizasyon-orani-cap-rate",
+        "harf": "K",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Ticari gayrimenkulün yıllık Net Faaliyet Gelirinin (NOI) mülkün piyasa değerine oranlanmasıyla bulunan yıllık net yüzde getiri oranıdır.",
+        "hukukiKarsilik": "Uluslararası Değerleme Standartları (IVS 105).",
+        "pratikteNeAnlamaGelir": "Mülk borçsuz peşin parayla satın alındığında yıllık net yüzde kaç getiri sağlayacağını gösterir; Cap Rate arttıkça yatırımın getirisi artar.",
+        "kritikUyari": "Cap Rate oranı risksiz devlet tahvili faiz oranından ve enflasyondan düşükse o gayrimenkulün fiyatı piyasada aşırı şişmiş (aşırı pahalı) demektir.",
+        "ilgiliTerimler": ["Net Faaliyet Geliri (NOI)", "İç Verim Oranı (IRR)"]
+    },
+    {
+        "terim": "İndirgenmiş Nakit Akımları (DCF) ve İskonto Oranı",
+        "slug": "indirgenmis-nakit-akimlari-dcf",
+        "harf": "İ",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Taşınmazın gelecek 5-10 yıl boyunca üreteceği tahmini net nakit akımlarının belirli bir iskonto oranı (WACC) ile bugünkü para değerine indirgenerek toplanmasıdır.",
+        "hukukiKarsilik": "SPK Değerleme Standartları Gelir Yaklaşımı.",
+        "pratikteNeAnlamaGelir": "Otel, lojistik depo veya AVM gibi gelecekteki geliri dalgalanan büyük tesislerin bugünkü adil satın alma değerini en bilimsel yöntemle belirler.",
+        "kritikUyari": "Gelecek projeksiyonlarında kira artışı veya doluluk oranı %5 fazla varsayılırsa rapor mülk değerini milyonlarca lira yanıltıcı yüksek çıkarabilir.",
+        "ilgiliTerimler": ["Net Bugünkü Değer (NPV)", "İç Verim Oranı (IRR)"]
+    },
+    {
+        "terim": "A Sınıfı Ofis Binası Kriterleri",
+        "slug": "a-sinifi-ofis-binasi-kriterleri",
+        "harf": "A",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Merkezi iş alanında (MİA) yer alan, modern iklimlendirme, çift jeneratör, LEED/BREEAM sertifikası, yüksek tavan ve yeterli otoparka sahip en lüks ticari binalardır.",
+        "hukukiKarsilik": "Ticari Gayrimenkul Standartları ve BREEAM/LEED Yeşil Bina Kriterleri.",
+        "pratikteNeAnlamaGelir": "Çok uluslu kurumsal şirketlerin kiracı olduğu, kira tahsilat riski minimum, döviz bazlı yüksek kira getirisi sağlayan prestijli yatırımlardır.",
+        "kritikUyari": "Otopark kapasitesi her 50-70 m²'ye 1 araç düşmeyen binalar uluslararası kurumsal kiracılar tarafından kesinlikle kiralanmaz ve A sınıfı sayılmaz.",
+        "ilgiliTerimler": ["Otopark Yönetmeliği", "VRF Merkezi Klima Sistemi"]
+    },
+    {
+        "terim": "AVM Kiralamalarında Ciro Kirası Modeli",
+        "slug": "avm-ciro-kirasi-modeli",
+        "harf": "A",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Kiracının aylık asgari bir taban kira ödediği, mağazanın cirosunun belirli bir yüzdesi (genelde %6-%12) asgari kirayı aştığında aradaki farkı ödediği kira sistemidir.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 299 vd. (Sözleşme Serbestisi).",
+        "pratikteNeAnlamaGelir": "AVM yönetimi ile mağaza ortağı gibi çalışır; işler çok iyi gittiğinde mülk sahibi yüksek ciro primi alır, kriz döneminde asgari taban kira devreye girer.",
+        "kritikUyari": "Ciro takibi için mağazanın yazar kasa POS sistemlerinin AVM merkezi otomasyonuna entegre olması ve bağımsız denetimden geçmesi zorunludur.",
+        "ilgiliTerimler": ["Kira Sözleşmesi", "Net Faaliyet Geliri (NOI)"]
+    },
+    {
+        "terim": "Sat ve Geri Kirala (Sale and Leaseback)",
+        "slug": "sat-ve-geri-kirala-sale-and-leaseback",
+        "harf": "S",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Bir şirketin mülkiyetindeki fabrika veya genel müdürlük binasını bir fona satıp nakit kaynak yaratması, ardından aynı binada uzun vadeli kiracı olarak kalmasıdır.",
+        "hukukiKarsilik": "6361 Sayılı Finansal Kiralama Kanunu ve Kurumlar Vergisi Kanunu md. 5/1-j.",
+        "pratikteNeAnlamaGelir": "Şirket taşınmaza bağladığı atıl sermayeyi nakde çevirerek ana işinde büyümek için kullanır, fabrikasında hiçbir üretim kesintisi yaşamadan çalışmaya devam eder.",
+        "kritikUyari": "Leaseback işlemlerinde sağlanan kurumlar vergisi ve tapu harcı istisnaları için mevzuatta belirtilen süre boyunca binanın kiralanması zorunludur.",
+        "ilgiliTerimler": ["Gayrimenkul Yatırım Fonu (GYF)", "Tapu Harcı"]
+    },
+    {
+        "terim": "Gayrimenkul Sertifikası Halka Arzı",
+        "slug": "gayrimenkul-sertifikasi-halka-arzi",
+        "harf": "G",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Büyük konut projelerinin metrekare veya santimetrekare bazında paylara bölünerek Borsa İstanbul'da hisse senedi gibi halka arz edilmesi sistemidir.",
+        "hukukiKarsilik": "6362 Sayılı Sermaye Piyasası Kanunu ve SPK Gayrimenkul Sertifikaları Tebliği.",
+        "pratikteNeAnlamaGelir": "Bir daireyi tek başına alacak parası olmayan küçük yatırımcı, örneğin projenin 5 metrekarelik sertifikasını borsadan alarak projeye ortak olur.",
+        "kritikUyari": "Vade sonunda yeterli sayıda sertifika toplayan yatırımcı dairenin anahtarını alır; toplayamayanlara ise ihraççı tarafından sertifika bedeli nakden ödenir.",
+        "ilgiliTerimler": ["Gayrimenkul Yatırım Ortaklığı (GYO)", "SPK Lisanslı Değerleme Raporu"]
+    },
+    {
+        "terim": "Ekspertiz Raporunda Yasal Değer ve Mevcut Durum Değeri",
+        "slug": "yasal-deger-mevcut-durum-degeri-farki",
+        "harf": "E",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Yasal değer binanın belediye arşivindeki onaylı projesine uygun kısımlarının değeri; mevcut durum değeri ise ruhsata aykırı kaçak büyümeler dahil piyasa değeridir.",
+        "hukukiKarsilik": "SPK Değerleme Standartları ve BDDK Kredi Teminat Değerleme Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Bankalar konut kredisi verirken evin kaçak büyütülmüş balkonuna veya bodrumuna bakmaz; yalnızca resmi 'Yasal Değer' üzerinden kredi kullandırır.",
+        "kritikUyari": "Mevcut durum değeri 10 milyon, yasal değeri 6 milyon olan bir evde banka kredisi 6 milyon üzerinden hesaplanır; aradaki 4 milyonu alıcı cebinden nakit ödemelidir.",
+        "ilgiliTerimler": ["SPK Lisanslı Değerleme Raporu", "Kredi Kullandırım Oranı (LTV)"]
+    },
+    {
+        "terim": "Kira Sözleşmesinde Hava Parası (Peştemaliye) Yasağı",
+        "slug": "hava-parasi-pestemaliye-yasagi",
+        "harf": "H",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Kiraya verenin, kira sözleşmesi yapılması karşılığında kiracıdan kira bedeli ve güvence bedeli (depozito) dışında hiçbir ek menfaat veya para talep edemeyeceği kuralıdır.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 346.",
+        "pratikteNeAnlamaGelir": "Dükkan sahibinin 'burayı sana kiralarım ama bana elden 500 bin TL hava parası vereceksin' talebi kanunen geçersiz ve yasaktır.",
+        "kritikUyari": "Kiracı bu bedeli ödemiş olsa dahi dekont ve tanıkla kanıtlayarak sebepsiz zenginleşme davasıyla geriye dönük iadesini isteyebilir.",
+        "ilgiliTerimler": ["Kira Sözleşmesi", "Güvence Bedeli (Kira Depozitosu)"]
+    },
+    {
+        "terim": "Çapraz Teminat (Cross-Collateralization) İpotekleri",
+        "slug": "capraz-teminat-ipotekleri",
+        "harf": "Ç",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Birden fazla taşınmazın tek bir kredi borcuna teminat gösterildiği veya bir mülk üzerindeki ipoteğin borçlunun diğer tüm kredilerini de kapsadığı finansman yapısıdır.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 855 (Birlikte Rehin).",
+        "pratikteNeAnlamaGelir": "A mülkünün kredi borcunu tamamen ödeseniz dahi, banka B mülkünüzün veya şirketinizin kredi borcu devam ettiği gerekçesiyle A mülkünün ipoteğini fek etmez.",
+        "kritikUyari": "Banka genel kredi sözleşmesi imzalanırken ipoteğin 'münferit bir borç için mi yoksa doğmuş ve doğacak tüm borçlar için mi' kurulduğuna çok dikkat edilmelidir.",
+        "ilgiliTerimler": ["İpotek", "İpotek Terkini (Fekki)"]
+    },
+    {
+        "terim": "Bina Kimlik Sistemi (BKS) ve QR Kodlu Sertifika",
+        "slug": "bina-kimlik-sistemi-bks",
+        "harf": "B",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Çevre ve Şehircilik Bakanlığı'nca tamamlanan binaların girişine takılan, binanın kat planları, statik projesi ve denetim geçmişini içeren çipli ve QR kodlu levhadır.",
+        "hukukiKarsilik": "Yapı Denetimi Uygulama Yönetmeliği Ek Düzenlemeleri.",
+        "pratikteNeAnlamaGelir": "Deprem veya yangın anında itfaiye ve AFAD ekipleri tableti QR koda yaklaştırarak binada kaç kişi yaşadığını, kolon yerleşimini ve kaçış yollarını anında görür.",
+        "kritikUyari": "Bina girişindeki BKS levhasının sökülmesi veya tahrip edilmesi kanunen suçtur; bina sakinleri mülk alırken bu kodu okutarak binanın geçmişini inceleyebilir.",
+        "ilgiliTerimler": ["Yapı Denetim Kuruluşu", "Yapı Kullanma İzin Belgesi"]
+    },
+    {
+        "terim": "Hasar Tespit Aşamaları (Az, Orta, Ağır Hasarlı)",
+        "slug": "hasar-tespit-asamalari-afet",
+        "harf": "H",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Deprem sonrası Çevre ve Şehircilik Bakanlığı ekiplerince binanın taşıyıcı elemanlarının incelenerek hasarsız, az, orta, ağır veya acil yıkılacak olarak derecelendirilmesidir.",
+        "hukukiKarsilik": "7269 Sayılı Umumi Hayata Müessir Afetler Kanunu.",
+        "pratikteNeAnlamaGelir": "Az hasarlı binalarda oturulabilir; ağır hasarlı binalar derhal tahliye edilip yıkılır; orta hasarlılar ise 1 yıl içinde güçlendirilmezse ağır hasarlı sayılıp yıkılır.",
+        "kritikUyari": "Orta hasarlı binalarda güçlendirme ruhsatı alıp inşaata başlamayan binaların elektrik ve suları kesilerek resen yıkım işlemi başlatılır.",
+        "ilgiliTerimler": ["Riskli Yapı Tespiti", "Yıkım Tebligatı (60 Gün)"]
+    },
+    {
+        "terim": "Bina Ortak Karar Protokolü",
+        "slug": "bina-ortak-karar-protokolu",
+        "harf": "B",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Riskli yapı ilan edilen binada maliklerin dönüşüm yöntemini, müteahhit seçimini ve bağımsız bölüm paylaşımını belirleyip imzaladıkları resmi sözleşmedir.",
+        "hukukiKarsilik": "6306 Sayılı Kanun md. 6 ve Uygulama Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Arsa payı çoğunluğunun sağlandığı toplantıda alınan kararlar protokole bağlanır; katılmayan diğer azınlık maliklere noterden tebliğ edilir.",
+        "kritikUyari": "Karara katılmayan maliklere noter ihtarı çekilerek 15 gün içinde protokolü imzalamaları istenir; imzalamazlarsa payları açık artırmayla satılır.",
+        "ilgiliTerimler": ["Salt Çoğunluk Kararı (%50+1)", "Arsa Payı Satışı (Kentsel Dönüşüm)"]
+    },
+    {
+        "terim": "Yapı Müteahhidi Sınıflandırma ve Yetki Belgesi Grupları",
+        "slug": "yapi-muteahhidi-siniflandirma-gruplari",
+        "harf": "Y",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Çevre ve Şehircilik Bakanlığı'nca müteahhitlerin ekonomik, mali ve teknik yeterliliklerine göre A'dan H'ye kadar sınıflandırıldığı resmi yetki belgesidir.",
+        "hukukiKarsilik": "Yapı Müteahhitlerinin Sınıflandırılması ve Kayıtlarının Tutulması Hakkında Yönetmelik.",
+        "pratikteNeAnlamaGelir": "H grubu acemi bir müteahhit en fazla 500 m² inşaat yapabilirken, A grubu büyük inşaat firmaları sınırsız metrekarede mega projeler yürütebilir.",
+        "kritikUyari": "Kentsel dönüşümde bina büyüklüğünüzün gerektirdiği yetki belgesi grubuna sahip olmayan bir müteahhitle sözleşme yaparsanız belediye yapı ruhsatı vermez.",
+        "ilgiliTerimler": ["Yapı Ruhsatı", "Şantiye Şefi Sorumluluğu"]
+    },
+    {
+        "terim": "İtirazın Kaldırılması ve Tahliye Davası (İcra Hukuk Mahkemesi)",
+        "slug": "itirazin-kaldirilmasi-ve-tahliye-davasi",
+        "harf": "İ",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Kira borcunu ödemeyen veya tahliye taahhüdüne itiraz eden kiracının haksız itirazını iptal ettirip tahliyesini sağlamak için İcra Hukuk Mahkemesinde açılan seri davadır.",
+        "hukukiKarsilik": "İcra ve İflas Kanunu md. 269/a-d ve md. 275.",
+        "pratikteNeAnlamaGelir": "Sulh Hukuk Mahkemesindeki klasik tahliye davalarına göre çok daha hızlı sonuçlanır; noter onaylı belgelere karşı kiracının itirazı kolayca düşürülür.",
+        "kritikUyari": "Kira sözleşmesindeki imza inkar edilmişse ve sözleşme noterde yapılmamışsa dava Sulh Hukuk Mahkemesine kayar ve süreç uzar.",
+        "ilgiliTerimler": ["Tahliye Emri (Örnek: 14)", "Kira İcra Takibi (Örnek: 13)"]
+    },
+    {
+        "terim": "Site Yönetiminde Denetçi Raporu ve İbra",
+        "slug": "denetci-raporu-ve-ibra-kmk",
+        "harf": "D",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Apartman veya site denetçisinin yöneticinin hesaplarını, banka hareketlerini ve harcama faturalarını inceleyerek yılda en az bir kez genel kurula sunduğu resmi rapordur.",
+        "hukukiKarsilik": "634 Sayılı Kat Mülkiyeti Kanunu md. 41.",
+        "pratikteNeAnlamaGelir": "Genel kurulda yöneticinin mali açıdan aklanmasını (ibra edilmesini) sağlar; usulsüz harcama tespit edilirse yönetici ibra edilmez ve dava açılır.",
+        "kritikUyari": "İbra edilmeyen yönetici hakkında 'güveni kötüye kullanma' suçundan savcılığa suç duyurusunda bulunulabilir ve zararın tazmini istenir.",
+        "ilgiliTerimler": ["Kat Malikleri Kurulu", "Yönetim Planı"]
+    },
+    {
+        "terim": "Kira Bedelinin Yabancı Para (Döviz) Olarak Kararlaştırılması Yasağı",
+        "slug": "kira-doviz-yasagi-32-sayili-karar",
+        "harf": "K",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Türkiye'de yerleşik kişilerin kendi aralarında akdedecekleri konut ve çatılı işyeri kira sözleşmelerinde kira bedelinin döviz cinsinden veya dövize endeksli kararlaştırılamaması kuralıdır.",
+        "hukukiKarsilik": "Türk Parasının Kıymetini Koruma Hakkında 32 Sayılı Karar ve Tebliğler.",
+        "pratikteNeAnlamaGelir": "Türk vatandaşları arasındaki kira sözleşmelerinde dolar veya euro cinsinden kira belirlenemez; sözleşmeler Türk Lirası'na çevrilmek zorundadır.",
+        "kritikUyari": "Yabancı uyruklu kiracılar veya serbest bölgedeki şirketler bu yasaktan muaftır; yasağa aykırı dövizli sözleşme yapanlara idari para cezası kesilir.",
+        "ilgiliTerimler": ["Kira Sözleşmesi", "TÜFE Tavan Artış Oranı"]
+    },
+    {
+        "terim": "Kat Mülkiyetinde Çatı Arası ve Dubleks İhtilafları",
+        "slug": "cati-arasi-dubleks-ihtilaflari",
+        "harf": "Ç",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Mimari projede ortak alan çatı boşluğu veya teras olarak görünen yerlerin üst kat dairesine kaçak merdivenle bağlanarak dubleks haline getirilmesi uyuşmazlığıdır.",
+        "hukukiKarsilik": "634 Sayılı Kat Mülkiyeti Kanunu md. 4 ve 19.",
+        "pratikteNeAnlamaGelir": "Tapuda çatı piyesli daire yazmıyorsa ve ortak çatı kapatılmışsa diğer komşular dava açarak çatı katını kırdırıp eski haline döndürebilir.",
+        "kritikUyari": "Çatı dubleksi alırken tapu dairesindeki onaylı mimari proje incelenmeli; projesinde çatı piyesi olmayan evlere kesinlikle dubleks parası ödenmemelidir.",
+        "ilgiliTerimler": ["Çatı Piyesi (Çatı Dubleksi)", "Ortak Alanlar"]
+    },
+    {
+        "terim": "Geçit Hakkı Bedelinin Belirlenmesi ve Kamulaştırma Kıyası",
+        "slug": "gecit-hakki-bedel-belirlenmesi",
+        "harf": "G",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Genel yola çıkışı olmayan bir parselin komşu parselden geçit hakkı talep etmesi durumunda mahkemece komşu taşınmaz malikine ödenecek adil tazminat bedelidir.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 747.",
+        "pratikteNeAnlamaGelir": "Mahkeme bilirkişisi komşu tarlanın geçit için ayrılan şeridindeki metrekare kaybını ve kullanım kısıtlılığını hesaplayarak peşin tazminat tayin eder.",
+        "kritikUyari": "Geçit hakkı komşuya en az zarar verecek güzergahtan kurulmak zorundadır; geçit bedeli mahkeme veznesine depo edilmeden tapuya tescil yapılamaz.",
+        "ilgiliTerimler": ["Geçit Hakkı", "Kör Parsel (Mahreçsiz Parsel)"]
+    },
+    {
+        "terim": "Mirasbırakanın Sağlararası Karşılıksız Kazandırmaları (Tenkis Matrahı)",
+        "slug": "mirasbikarinin-karşiliksiz-kazandirmalari",
+        "harf": "M",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Mirasbırakanın ölümünden önceki son 1 yıl içinde yaptığı bağışların veya saklı payları zedelemek kastıyla yaptığı tüm karşılıksız mülk devirlerinin terekeye eklenmesidir.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 565.",
+        "pratikteNeAnlamaGelir": "Bir kişi ölmeden 6 ay önce tüm dairesini bir arkadaşına bağışlasa dahi saklı paylı çocukları tenkis davası açarak o dairenin bedelini geri alır.",
+        "kritikUyari": "Geleneksel hediyeleşmeler (düğün takısı, makul harçlık) tenkise tabi değildir; ancak olağan dışı gayrimenkul bağışlarının tamamı tenkise dahildir.",
+        "ilgiliTerimler": ["Tenkis Davası", "Muris Muvazaası"]
+    },
+    {
+        "terim": "Tasarrufun İptali Davası (İcra ve İflas Kanunu md. 277)",
+        "slug": "tasarrufun-iptali-davasi-iik-277",
+        "harf": "T",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Borçlunun alacaklılarından mal kaçırmak amacıyla gayrimenkullerini akrabalarına veya düşük bedelle üçüncü kişilere devretmesi halinde alacaklının açtığı iptal davasıdır.",
+        "hukukiKarsilik": "İcra ve İflas Kanunu md. 277-284.",
+        "pratikteNeAnlamaGelir": "Hakkında haciz gelmek üzere olan biri evini aceleyle kardeşine satsa dahi alacaklı dava açarak o evi haczettirip icradan sattırabilir.",
+        "kritikUyari": "Satın alan 3. kişi evin borçlu tarafından mal kaçırmak için satıldığını biliyorsa veya bilebilecek durumdaysa (akraba, iş ortağı) tapusu hacze açılır.",
+        "ilgiliTerimler": ["Haciz Şerhi", "İhtiyati Haciz"]
+    },
+    {
+        "terim": "Kamulaştırmada Uzlaşma Komisyonu ve Anlaşma Tutanağı",
+        "slug": "kamulastirmada-uzlasma-komisyonu",
+        "harf": "K",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "İdarenin mülkü kamulaştırmadan önce malikle pazarlık masasına oturup bedel üzerinde anlaşmak üzere kurduğu resmi kıymet takdir ve uzlaşma kuruludur.",
+        "hukukiKarsilik": "2942 Sayılı Kamulaştırma Kanunu md. 8.",
+        "pratikteNeAnlamaGelir": "Uzlaşma tutanağı imzalanırsa para peşin ödenir, tapu idareye devredilir ve taraflar hiçbir dava açamaz; süreç 1 ayda tamamlanır.",
+        "kritikUyari": "Uzlaşma sağlanamazsa idare Asliye Hukuk Mahkemesinde 'Bedel Tespiti ve Tescil Davası' açmak zorundadır; mahkeme bedeli bilirkişiyle belirler.",
+        "ilgiliTerimler": ["Kamulaştırma (İstimlak)", "Acele Kamulaştırma Kararı"]
+    },
+    {
+        "terim": "İmar Planı Değişikliğinde Değer Artış Payı Oranları",
+        "slug": "deger-artis-payi-oranlari-imar",
+        "harf": "İ",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Taşınmaz sahibinin talebiyle parselin emsalinin artırılması veya konuttan ticarete çevrilmesi sonucu oluşan rant artışının %100'ünün kamuya ödenmesi kuralıdır.",
+        "hukukiKarsilik": "3194 Sayılı İmar Kanunu Ek Madde 8 ve Değer Artış Payı Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Arsanızın emsalini 1.00'den 2.00'ye yükselttirdiğinizde SPK lisanslı iki değerleme uzmanı değer artışını hesaplar; oluşan farkın tamamı devlete peşin yatırılır.",
+        "kritikUyari": "Değer artış payı ödenmeden belediye yapı ruhsatı düzenleyemez ve tapu kütüğüne satış şerhi konulur.",
+        "ilgiliTerimler": ["Emsal (KAKS)", "İmar Planı"]
+    },
+    {
+        "terim": "Kıyı Kenar Çizgisi İçinde Kalan Taşınmazlarda Tapu İptali",
+        "slug": "kiyi-kenar-cizgisi-tapu-iptali",
+        "harf": "K",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Deniz, göl veya akarsu kıyısında kalan özel mülk tapularının, kıyıların devletin hüküm ve tasarrufu altında olması ilkesi gereğince Hazinece bedelsiz iptal ettirilmesidir.",
+        "hukukiKarsilik": "3621 Sayılı Kıyı Kanunu ve Anayasa md. 43.",
+        "pratikteNeAnlamaGelir": "Denize sıfır arsanızın bir kısmı sonradan geçirilen kıyı kenar çizgisi içinde kalırsa tapusu iptal edilip kamuya terk edilir.",
+        "kritikUyari": "AİHM ve Anayasa Mahkemesi kararları uyarınca tapusu iptal edilen vatandaşa devlet rayiç bedel üzerinden tazminat ödemekle yükümlüdür.",
+        "ilgiliTerimler": ["Kıyı Kenar Çizgisi", "Sahil Şeridi"]
+    },
+    {
+        "terim": "Miras Taksim Sözleşmesi",
+        "slug": "miras-taksim-sozlesmesi",
+        "harf": "M",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Mirasçıların terekeye dahil olan taşınmazları aralarında hangi maliklere paylaştıracaklarını noterde yazılı olarak kararlaştırdıkları resmi sözleşmedir.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 676.",
+        "pratikteNeAnlamaGelir": "Miras kalan 3 evi 3 kardeş kavga etmeden noterde paylaşır; her kardeş kendi evinin tek başına müstakil tapusunu alır.",
+        "kritikUyari": "Taksim sözleşmesinin geçerli olması için istisnasız tüm mirasçıların ıslak imzasının bulunması şarttır; tek bir mirasçı dahi imza atmazsa sözleşme geçersizdir.",
+        "ilgiliTerimler": ["Miras İntikali", "Rızaen Taksim"]
+    },
+    {
+        "terim": "Hazine Taşınmazlarının Doğrudan Satışı (4706 Sayılı Kanun)",
+        "slug": "hazine-tasinmazi-dogrudan-satis",
+        "harf": "H",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Hazineye ait hisseli arsalarda paydaş olan vatandaşlara veya üzerinde yasal binası bulunan hak sahiplerine ihalesiz doğrudan satın alma hakkı tanınmasıdır.",
+        "hukukiKarsilik": "4706 Sayılı Hazineye Ait Taşınmazların Değerlendirilmesi Hakkında Kanun.",
+        "pratikteNeAnlamaGelir": "Arsanızda Hazine hissesi varsa ihaleye çıkmadan belediye rayiç bedeli üzerinden taksitle Hazine payını satın alıp tapunuzu müstakile çevirebilirsiniz.",
+        "kritikUyari": "Taksitler zamanında ödenmezse doğrudan satış kararı iptal edilir ve ödenen paralar Hazineye irat kaydedilebilir.",
+        "ilgiliTerimler": ["Hisseli Tapu", "İhdas (Yoldan İhdas)"]
+    },
+    {
+        "terim": "Kat Mülkiyetinde İntifa Hakkı Sahibinin Oy Yetkisi",
+        "slug": "intifa-hakki-sahibinin-oy-yetkisi-kmk",
+        "harf": "İ",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Taşınmaz üzerinde intifa (kullanım) hakkı kurulmuşsa, Kat Malikleri Kurulu toplantılarına kuru mülkiyet sahibinin değil intifa hakkı sahibinin katılıp oy kullanmasıdır.",
+        "hukukiKarsilik": "634 Sayılı Kat Mülkiyeti Kanunu md. 31/3.",
+        "pratikteNeAnlamaGelir": "Evin çıplak mülkiyeti çocukta, intifa hakkı babadaysa; apartman toplantısında yönetici seçimi ve aidat kararlarında imza yetkisi babadadır.",
+        "kritikUyari": "Ancak binanın yıkılıp yeniden yapılması veya kentsel dönüşüm gibi doğrudan ana mülkiyeti ilgilendiren kararlarda oy hakkı çıplak mülkiyet sahibine aittir.",
+        "ilgiliTerimler": ["İntifa Hakkı", "Kat Malikleri Kurulu"]
+    },
+    {
+        "terim": "Tahliye Taahhüdünde 1 Aylık Hak Düşürücü Süre",
+        "slug": "tahliye-taahhudunde-1-aylik-hak-dusurucu-sure",
+        "harf": "T",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Kiracının taahhüt ettiği tahliye tarihinden itibaren kiraya verenin en geç 1 ay içinde icra takibi başlatması veya tahliye davası açması zorunluluğudur.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 352/1 ve İcra ve İflas Kanunu md. 272.",
+        "pratikteNeAnlamaGelir": "Kiracı taahhüt ettiği 1 Temmuz'da çıkmadıysa, ev sahibi 1 Ağustos mesai bitimine kadar icraya başvurmazsa tahliye taahhütnamesi tamamen yanar.",
+        "kritikUyari": "1 aylık süre içinde dava açmayıp kiracıya noterden ihtarname çekilirse dava açma süresi o kira yılı sonuna kadar uzatılmış sayılır.",
+        "ilgiliTerimler": ["Tahliye Taahhütnamesi", "Tahliye Emri (Örnek: 14)"]
+    }
+]
+
+print(f"data_ultra_2.py hazır: {len(ULTRA_TERIMLER_2)} terim.")

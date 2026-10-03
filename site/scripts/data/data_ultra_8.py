@@ -1,0 +1,560 @@
+# -*- coding: utf-8 -*-
+"""
+data_ultra_8.py — EDM Emlak Sözlüğü Ultra Genişletme Paketi Bölüm 8 (50 Terim)
+Vergi denetimleri, EİDS ilan kuralları, SPK değerleme cezaları ve kamu ihale hukuku.
+"""
+
+ULTRA_TERIMLER_8 = [
+    {
+        "terim": "Konut Kredisi Erken Ödeme Tazminatı Tavanı (%2 Kuralı)",
+        "slug": "konut-kredisi-erken-odeme-tazminati",
+        "harf": "K",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Sabit faizli konut kredisini vadesinden önce topluca kapatan tüketiciden bankanın alabileceği erken kapama cezasının kalan anaparanın %2'sini geçememesidir.",
+        "hukukiKarsilik": "6502 Sayılı Tüketicinin Korunması Hakkında Kanun md. 37.",
+        "pratikteNeAnlamaGelir": "Kalan vadesi 36 aydan az olan kredilerde ceza tavanı %1, 36 aydan fazla olanlarda ise en fazla %2 olarak uygulanır; banka fazlasını tahsil edemez.",
+        "kritikUyari": "Değişken faizli kredilerde erken ödeme tazminatı alınamaz; bankanın %2'den fazla kestiği tutarlar Tüketici Hakem Heyeti kararıyla iade alınır.",
+        "ilgiliTerimler": ["Konut Finansmanı Kredisi (Mortgage)", "Refinansman"]
+    },
+    {
+        "terim": "DASK Zorunlu Deprem Sigortasında Enflasyon Koruması ve Zeyilname",
+        "slug": "dask-enflasyon-korumasi-ve-zeyilname",
+        "harf": "D",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "İnşaat maliyetleri arttıkça DASK azami teminat tutarının yükseltilmesi üzerine poliçeye ek prim ödenerek teminatın güncel bedele çıkarılması işlemidir.",
+        "hukukiKarsilik": "6305 Sayılı Afet Sigortaları Kanunu ve DASK Tarife Tebliği.",
+        "pratikteNeAnlamaGelir": "Zeyilname yaptırmazsanız depremde eviniz yıkıldığında eski düşük teminatı alırsınız; zeyilname yaptıranlar güncel tavan bedelden tam tazminat alır.",
+        "kritikUyari": "DASK poliçesi her yıl yenilenmeli ve her teminat artışında sigorta acentesine başvurularak zeyilname düzenlettirilmelidir.",
+        "ilgiliTerimler": ["DASK Azami Teminat Limiti", "Bina Tamamlama Sigortası"]
+    },
+    {
+        "terim": "Elektronik İlan Doğrulama Sistemi (EİDS)",
+        "slug": "elektronik-ilan-dogrulama-sistemi-eids",
+        "harf": "E",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "İnternet portallarında gayrimenkul ilanı vermeden önce mülk sahibinin e-Devlet üzerinden emlak işletmesine yetki vermesini zorunlu kılan sistemdir.",
+        "hukukiKarsilik": "Taşınmaz Ticareti Hakkında Yönetmelik md. 15/A.",
+        "pratikteNeAnlamaGelir": "Yetkisiz korsan emlakçıların sahte fotoğraflarla ve sahte ucuz fiyatlarla aldatıcı 'olmayan ev ilanı' girmesini kesin olarak bitirmiştir.",
+        "kritikUyari": "EİDS onayı olmayan ilanlar portallarda yayınlanamaz; izinsiz ve sahte ilan giren işletmelere ilan başına 100.000 TL idari para cezası kesilir.",
+        "ilgiliTerimler": ["Yetkilendirme Sözleşmesi", "Taşınmaz Ticareti Yetki Belgesi"]
+    },
+    {
+        "terim": "Kira Gelirinde Emsal Kira Bedeli Esası (VUK md. 73)",
+        "slug": "emsal-kira-bedeli-esasi-vuk",
+        "harf": "E",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "Bir konutun kira bedeli belirtilmemişse veya beyan edilen kira emlak vergisi değerinin yıllık %5'inden düşükse verginin bu asgari %5 üzerinden hesaplanmasıdır.",
+        "hukukiKarsilik": "193 Sayılı Gelir Vergisi Kanunu md. 73.",
+        "pratikteNeAnlamaGelir": "Belediye değeri 2 milyon olan bir evi 'arkadaşıma bedelsiz verdim' veya 'aylık 1000 TL'ye kiraladım' deseniz de Maliye yıllık 100 bin TL kira geliri varsayar.",
+        "kritikUyari": "Ancak anne, baba, çocuk veya kardeşlerin ikametine bedelsiz tahsis edilen tek bir mesken için emsal kira bedeli kuralı uygulanmaz (istisna).",
+        "ilgiliTerimler": ["Kira Gelir Vergisi (GMSİ)", "Emlak Vergisi"]
+    },
+    {
+        "terim": "Anne, Baba ve Çocuklara Bedelsiz Konut Tahsis İstisnası",
+        "slug": "aileye-bedelsiz-konut-tahsis-istisnasi",
+        "harf": "A",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "Mülk sahibinin boş duran dairesini annesine, babasına, çocuğuna veya kardeşine kira almadan oturmaları için vermesi durumunda vergi doğmaması kuralıdır.",
+        "hukukiKarsilik": "193 Sayılı Gelir Vergisi Kanunu md. 73/1.",
+        "pratikteNeAnlamaGelir": "Oğlunuza veya annenize tahsis ettiğiniz ev için Maliye sizden 'neden kira almadın' diyerek vergi isteyemez; vergi dairesine bildirim dilekçesi yeterlidir.",
+        "kritikUyari": "Bu istisna yalnızca konutlar için geçerlidir; dükkan veya işyerinizi oğlunuza bedelsiz verirseniz emsal kira üzerinden stopaj ve vergi tahakkuk eder.",
+        "ilgiliTerimler": ["Emsal Kira Bedeli", "Kira Stopajı"]
+    },
+    {
+        "terim": "Yurt Dışında Yaşayan Vatandaşların GMSİ Vergilendirmesi",
+        "slug": "gurbetci-kira-geliri-vergilendirmesi",
+        "harf": "G",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "Yurt dışında yaşayan gurbetçilerin Türkiye'deki gayrimenkullerinden elde ettikleri kira gelirlerini dar mükellef sıfatıyla beyan edip vergilendirmesidir.",
+        "hukukiKarsilik": "193 Sayılı Gelir Vergisi Kanunu md. 6 ve Çifte Vergilendirmeyi Önleme Anlaşmaları (ÇVÖA).",
+        "pratikteNeAnlamaGelir": "Gurbetçi Türkiye'deki konut kirasını beyan eder ve mesken istisnasından yararlanır; işyeri kirasında ise stopaj kesilmişse ayrıca beyanname vermez.",
+        "kritikUyari": "Almanya veya Fransa gibi ülkelerle yapılan vergi anlaşmaları gereği Türkiye'de ödenen kira vergileri yurt dışındaki gelir vergisinden mahsup edilebilir.",
+        "ilgiliTerimler": ["Kira Gelir Vergisi (GMSİ)", "Mesken İstisnası"]
+    },
+    {
+        "terim": "Şirket Taşınmazlarının Ortaklara Düşük Bedelle Devri (Örtülü Kazanç)",
+        "slug": "sirket-tasinmazi-ortaklara-dusuk-bedel-devir",
+        "harf": "S",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "Şirket aktifinde kayıtlı bir gayrimenkulün piyasa rayicinin çok altında şirket ortağına satılarak vergi matrahının aşındırılması ve örtülü kâr dağıtımı suçudur.",
+        "hukukiKarsilik": "5520 Sayılı Kurumlar Vergisi Kanunu md. 13 ve 213 Sayılı VUK.",
+        "pratikteNeAnlamaGelir": "10 milyonluk şirket villasını ortağa 2 milyona devreden şirkete Maliye müfettişleri aradaki 8 milyon için cezalı kurumlar vergisi ve KDV tarh eder.",
+        "kritikUyari": "Ayrıca düşük bedelle alan şirket ortağına kâr payı stopajı ve vergi ziyaı cezası kesilir; mutlaka SPK ekspertiz raporu alınarak satış yapılmalıdır.",
+        "ilgiliTerimler": ["Vergi Ziyaı Cezası", "SPK Lisanslı Değerleme Raporu"]
+    },
+    {
+        "terim": "Tapu Harcında 'İdarenin Bilgi İstemesi' ve İzah Süreci",
+        "slug": "tapu-harcinda-izaha-davet-sureci",
+        "harf": "T",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "Banka havalesi ile tapuda gösterilen satış bedeli arasında büyük fark tespit eden Gelir İdaresi'nin alıcı ve satıcıya gönderdiği resmi açıklama yazısıdır.",
+        "hukukiKarsilik": "213 Sayılı Vergi Usul Kanunu md. 370 (İzaha Davet).",
+        "pratikteNeAnlamaGelir": "Maliye yazısına 30 gün içinde cevap verip harç farkını pişmanlıkla ödeyenler, %100 oranındaki ağır vergi ziyaı cezasından kurtulur ve sadece %20 ceza öder.",
+        "kritikUyari": "İzaha davet yazısına sessiz kalanlar doğrudan vergi incelemesine sevk edilir ve tapu harcı 1 kat vergi ziyaı cezası ve gecikme faiziyle tahsil edilir.",
+        "ilgiliTerimler": ["Pişmanlık Beyannamesi", "Tapu Harcı"]
+    },
+    {
+        "terim": "Tarhiyat Öncesi ve Sonrası Uzlaşma Komisyonu",
+        "slug": "vergi-uzlasma-komisyonu-tapu-harci",
+        "harf": "V",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "Gayrimenkul alım-satımından dolayı kesilen vergi ve cezalar için mükellefin Vergi Dairesi Başkanlığı uzlaşma masasına oturup pazarlıkla indirimi talep etmesidir.",
+        "hukukiKarsilik": "213 Sayılı Vergi Usul Kanunu Ek md. 1-11.",
+        "pratikteNeAnlamaGelir": "Uzlaşma komisyonu kesilen vergi ziyaı cezasının %80 ila %90'ını silebilir; borçlu anaparayı ve uzlaşılan cezayı 1 ay içinde ödeyerek dosyayı kapatır.",
+        "kritikUyari": "Uzlaşma tutanağı imzalandığı anda kesinleşir; uzlaşılan vergi ve cezalara karşı vergi mahkemesinde hiçbir şekilde dava açılamaz.",
+        "ilgiliTerimler": ["Vergi Ziyaı Cezası", "İzaha Davet Süreci"]
+    },
+    {
+        "terim": "Taşınmaz Ticaretinde Yetki Belgesiz Faaliyet Cezası",
+        "slug": "yetki-belgesiz-tasinmaz-ticareti-cezasi",
+        "harf": "Y",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Ticaret Bakanlığı'ndan 'Taşınmaz Ticareti Yetki Belgesi' almadan kaçak emlakçılık veya komisyonculuk yapan şahıslara uygulanan ağır idari para cezasıdır.",
+        "hukukiKarsilik": "Taşınmaz Ticareti Hakkında Yönetmelik md. 5 ve 6585 Sayılı Kanun.",
+        "pratikteNeAnlamaGelir": "Vergi kaydı, mesleki yeterlilik belgesi ve ofis şartlarını sağlamayan merdiven altı emlakçılara Ticaret İl Müdürlüğü'nce yüz binlerce lira ceza kesilir.",
+        "kritikUyari": "Yetki belgesi olmayan aracılar mahkemede hizmet bedeli (komisyon) davası açamaz; açtıkları davalar yetki belgesi yokluğundan derhal reddedilir.",
+        "ilgiliTerimler": ["Taşınmaz Ticareti Yetki Belgesi", "Hizmet Bedeli"]
+    },
+    {
+        "terim": "Gayrimenkul İlanında Sosyal Medya Fiyat Şeffaflığı Kuralı",
+        "slug": "sosyal-medya-ilan-fiyat-seffafligi",
+        "harf": "S",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Instagram veya Facebook gibi platformlarda gayrimenkul paylaşımı yaparken 'fiyat için DM' yazmanın yasaklanması ve net fiyatın yazılması zorunluluğudur.",
+        "hukukiKarsilik": "Ticari Reklam ve Haksız Ticari Uygulamalar Yönetmeliği ve Ticaret Bakanlığı Tebliğleri.",
+        "pratikteNeAnlamaGelir": "Tüketiciyi yanıltıcı ve fiyat ayrımcılığı yapan paylaşımlara son verilmiştir; ilan fotoğrafının veya videosunun üzerinde mülkün satış fiyatı açıkça yazmalıdır.",
+        "kritikUyari": "Fiyatsız reklam yapan veya kişiye göre farklı fiyat veren emlak işletmelerine Reklam Kurulu tarafından yüksek idari para cezası uygulanır.",
+        "ilgiliTerimler": ["Elektronik İlan Doğrulama Sistemi", "Hizmet Bedeli"]
+    },
+    {
+        "terim": "Hileli Ekspertiz Raporu Düzenleyen Uzmanın Cezai Sorumluluğu",
+        "slug": "hileli-ekspertiz-raporu-cezai-sorumluluk",
+        "harf": "H",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Banka kredisini fazla çıkartmak veya yabancıya vatandaşlık dosyasında mülk değerini bilerek şişiren SPK lisanslı değerleme uzmanına verilen hapis cezasıdır.",
+        "hukukiKarsilik": "6362 Sayılı Sermaye Piyasası Kanunu md. 115 ve TCK md. 204.",
+        "pratikteNeAnlamaGelir": "2 milyonluk eve hatır için 5 milyon rapor yazan uzmanın lisansı SPK tarafından iptal edilir ve 2 yıldan 5 yıla kadar hapis cezasıyla yargılanır.",
+        "kritikUyari": "Raporu kullanan mülk sahibi ve kredi çeken kişi de 'nitelikli dolandırıcılığa iştirak' suçundan ağır ceza mahkemesinde yargılanır.",
+        "ilgiliTerimler": ["SPK Lisanslı Değerleme Raporu", "Yabancıya Satışta Uygunluk Belgesi"]
+    },
+    {
+        "terim": "Değerleme Raporunda Emsal Teyidi ve Arşiv İncelemesi Zorunluluğu",
+        "slug": "degerleme-raporu-emsal-arsiv-zorunlulugu",
+        "harf": "D",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Değerleme uzmanının masabaşında rapor yazmasını yasaklayan, tapu müdürlüğü ve belediye arşivine bizzat gidip mimari projeyi inceleme yasal mecburiyetidir.",
+        "hukukiKarsilik": "SPK Gayrimenkul Değerleme Şirketleri Tebliği.",
+        "pratikteNeAnlamaGelir": "Uzman belediye arşivindeki projeyle yerdeki daireyi karşılaştırır, kaçak balkon veya büyütme varsa rapora yazar; alıcıyı tuzaktan korur.",
+        "kritikUyari": "Arşiv incelemesi yapılmadan düzenlenen raporlar eksik inceleme sayılır; bankanın bu rapor yüzünden uğrayacağı tüm zararı değerleme şirketi tazmin eder.",
+        "ilgiliTerimler": ["SPK Lisanslı Değerleme Raporu", "Yasal Değer ve Mevcut Durum Değeri"]
+    },
+    {
+        "terim": "Yapı Yaklaşık Maliyetinde Yapı Sınıfları (1-A'dan 5-D'ye)",
+        "slug": "yapi-yaklasik-maliyeti-yapi-siniflari",
+        "harf": "Y",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Çevre ve Şehircilik Bakanlığı'nca her yıl Resmi Gazete'de yayımlanan, basit kulübeden gökdelene kadar metrekare inşaat maliyetini belirleyen resmi cetveldir.",
+        "hukukiKarsilik": "3194 Sayılı İmar Kanunu ve Mimarlık ve Mühendislik Hizmet Bedelleri Tebliği.",
+        "pratikteNeAnlamaGelir": "Belediye ruhsat harçlarını, yapı denetim bedellerini ve sigorta primlerini bu metrekare birim maliyeti üzerinden hesaplar.",
+        "kritikUyari": "Standart bir apartman 3-B veya 4-A sınıfına girerken; akıllı kuleler, rezidanslar ve lüks AVM'ler 5-A veya 5-B en üst maliyet sınıfına dahildir.",
+        "ilgiliTerimler": ["Yapı Ruhsatı", "Yapı Denetim Kuruluşu"]
+    },
+    {
+        "terim": "İnşaat Müteahhitlik İş Bitirme Belgesi (EKAP)",
+        "slug": "insaat-is-bitirme-belgesi-ekap",
+        "harf": "İ",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Müteahhidin kamuya veya özel sektöre yaptığı inşaatları ruhsatına uygun eksiksiz bitirdiğini kanıtlayan ve EKAP sistemine kaydedilen resmi tecrübe belgesidir.",
+        "hukukiKarsilik": "4734 Sayılı Kamu İhale Kanunu ve Yapı Müteahhitleri Sınıflandırma Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Müteahhidin yeterlilik grubunu (A, B, C grubu) yükseltir; yeni ve daha büyük mega konut projelerine başlama yetkisi kazandırır.",
+        "kritikUyari": "İş bitirme belgesi sahte veya mükerrer düzenlenen müteahhitlerin yetki belgeleri iptal edilir ve ihalelerden yasaklanır.",
+        "ilgiliTerimler": ["Yapı Müteahhidi Sınıflandırma", "Geçici Kabul ve Kesin Kabul"]
+    },
+    {
+        "terim": "Kamu İhalelerinde Aşırı Düşük Teklif ve Sınır Değer Hesabı",
+        "slug": "asiri-dusuk-teklif-sinir-deger",
+        "harf": "A",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "İnşaat ihalesinde bir firmanın maliyetin dahi çok altında fahiş düşük fiyat vererek ihaleyi kırmasını önlemek için ihale komisyonunca hesaplanan taban barajdır.",
+        "hukukiKarsilik": "4734 Sayılı Kamu İhale Kanunu md. 38.",
+        "pratikteNeAnlamaGelir": "Sınır değerin altında kalan müteahhitten 'bu fiyata bu betonu ve demiri nasıl alacağını' yazılı analizle ispatlaması istenir; ispatlayamazsa elenir.",
+        "kritikUyari": "Aşırı düşük tekliflerin elenmesi, inşaatın yarım kalmasını ve kalitesiz eksik malzemeyle bina yapılmasını engelleyen en büyük kamu sigortasıdır.",
+        "ilgiliTerimler": ["İhale Teminatı", "Eser Sözleşmesi"]
+    },
+    {
+        "terim": "Müteahhidin Sözleşmeyi Fesih ve Tasfiye Kararnamesi",
+        "slug": "tasfiye-kararnamesi-fiyat-farki",
+        "harf": "T",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Beklenmeyen kur şokları ve malzeme enflasyonu karşısında kamu müteahhitlerine cezasız olarak sözleşmeyi feshetme veya ek fiyat farkı alma hakkı veren kanundur.",
+        "hukukiKarsilik": "4735 Sayılı Kamu İhale Sözleşmeleri Kanunu Geçici Maddeleri.",
+        "pratikteNeAnlamaGelir": "Müteahhidin iflas edip şantiyeyi batırmasını önler; teminat mektubu gelir kaydedilmeden sözleşme karşılıklı olarak tasfiye edilir.",
+        "kritikUyari": "Tasfiye edilen projelerde yapılan kısım için kesin hakediş çıkarılır ve kalan iş yeniden ihaleye verilerek tamamlanır.",
+        "ilgiliTerimler": ["Kesin Teminat Mektubu", "Hakediş Seviye Tespit Tutanağı"]
+    },
+    {
+        "terim": "İnşaatta Mücbir Sebep ve Süre Uzatımı Kararı",
+        "slug": "insaat-mucbir-sebep-sure-uzatimi",
+        "harf": "İ",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Deprem, heyelan, sel, salgın hastalık veya savaş gibi müteahhidin kusurundan kaynaklanmayan felaketlerde inşaat teslim süresinin resmi olarak uzatılmasıdır.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 136 ve Yapım İşleri Genel Şartnamesi md. 29.",
+        "pratikteNeAnlamaGelir": "Mücbir sebep süresince müteahhide gecikme cezası kesilemez; arsa sahipleri 'teslim tarihi geçti' diyerek kira tazminatı talep edemez.",
+        "kritikUyari": "Mücbir sebebin meydana geldiği tarihten itibaren en geç 20 gün içinde işverene yazılı bildirimde bulunulması ve yetkili makamlardan belge alınması şarttır.",
+        "ilgiliTerimler": ["Kat Karşılığı İnşaat Sözleşmesi", "Gecikme Tazminatı"]
+    },
+    {
+        "terim": "İnşaatta Günlük Gecikme Cezası (Nefaset Kesintisi)",
+        "slug": "insaat-gunluk-gecikme-cezasi",
+        "harf": "İ",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Müteahhidin haklı bir gerekçe olmadan inşaatı teslim tarihinde bitirememesi halinde sözleşme gereği her geciken gün için arsa sahibine ödediği maktu cezadır.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 179/2.",
+        "pratikteNeAnlamaGelir": "Örneğin günlük 5.000 TL gecikme cezası belirlenmişse, 6 ay geciken bir müteahhit arsa sahiplerine 900 bin TL ceza ödemekle yükümlü olur.",
+        "kritikUyari": "Arsa sahibi daireleri teslim alırken çekince (ihtirazi kayıt) koymalıdır; ihtirazi kayıtsız anahtar teslim tutanağı imzalanırsa geçmiş gecikme cezası hakkı düşer.",
+        "ilgiliTerimler": ["Anahtar Teslim Tutanağı", "Geçici Kabul"]
+    },
+    {
+        "terim": "Kesin Teminat Mektubunun Gelir (İrat) Kaydedilmesi",
+        "slug": "teminat-mektubu-irat-kaydedilmesi",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Müteahhidin taahhüdünü yerine getirmemesi veya inşaatı yarım bırakması durumunda bankadaki kesin teminat mektubunun nakde çevrilerek işverence tahsilidir.",
+        "hukukiKarsilik": "4735 Sayılı Kanun md. 20 ve Türk Ticaret Kanunu Banka Teminat Mektubu Hükümleri.",
+        "pratikteNeAnlamaGelir": "Banka mektup tutarını hiçbir mahkeme kararı aramadan işverenin talebi üzerine 24 saat içinde nakit olarak ödemek zorundadır.",
+        "kritikUyari": "Banka teminat mektubunu ödedikten sonra bu parayı faiziyle birlikte doğrudan müteahhidin şahsi malvarlığından ve ipoteklerinden rücuen tahsil eder.",
+        "ilgiliTerimler": ["Müteahhit Teminat Mektubu", "Nama İfa Yetkisi"]
+    },
+    {
+        "terim": "Şantiye İş Kazalarında Kusur Dağılımı ve Tazminat",
+        "slug": "santiye-is-kazasi-kusur-dagilimi",
+        "harf": "Ş",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "İskeleden düşme veya göçük gibi şantiye kazalarında müteahhit, taşeron, şantiye şefi ve iş güvenliği uzmanının kusur oranlarının bilirkişice tespitidir.",
+        "hukukiKarsilik": "6331 Sayılı İş Sağlığı ve Güvenliği Kanunu ve TCK md. 85.",
+        "pratikteNeAnlamaGelir": "Kusurlu bulunan müteahhit ve şantiye şefi hem ölen işçinin ailesine milyonlarca liralık maddi-manevi tazminat öder hem de hapis cezasıyla yargılanır.",
+        "kritikUyari": "Emniyet kemeri ve baret vermeyen ya da yaşam hattı kurmayan şantiyelerde mahkemeler 'olası kast' veya 'bilinçli taksir' hükümleriyle indirim yapmadan ceza verir.",
+        "ilgiliTerimler": ["Şantiye Şefi Sorumluluğu", "İnşaat All-Risk Sigortası"]
+    },
+    {
+        "terim": "Taşeron Sözleşmesi ve Müteselsil İşveren Sorumluluğu",
+        "slug": "taseron-sozlesmesi-muteselsil-sorumluluk",
+        "harf": "T",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Ana müteahhidin kalıp, demir veya tesisat işini alt işverene (taşerona) vermesi halinde, taşeronun işçilerinin maaş ve SGK primlerinden ana müteahhidin de sorumlu olmasıdır.",
+        "hukukiKarsilik": "4857 Sayılı İş Kanunu md. 2/6 ve 5510 Sayılı SGK Kanunu md. 12.",
+        "pratikteNeAnlamaGelir": "Taşeron işçilerin maaşını ödemeden kaçarsa işçiler doğrudan ana müteahhide dava açarak paralarını söke söke ana firmadan tahsil eder.",
+        "kritikUyari": "Ana müteahhit taşerona hakediş ödemesi yapmadan önce taşeronun işçi SGK borçsuzluk belgesini ve banka maaş dekontlarını kontrol etmek zorundadır.",
+        "ilgiliTerimler": ["Yapı Alacaklısı İpoteği", "Hakediş Seviye Tespit Tutanağı"]
+    },
+    {
+        "terim": "SGK İlişiksizlik Belgesi Olmadan İskan Alınamaması",
+        "slug": "sgk-ilisiksizlik-belgesi-iskan",
+        "harf": "S",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "İnşaatın metrekare büyüklüğüne göre hesaplanan asgari işçilik primlerinin tamamının SGK'ya ödendiğini gösteren resmi temiz belgesidir.",
+        "hukukiKarsilik": "5510 Sayılı Sosyal Sigortalar ve Genel Sağlık Sigortası Kanunu md. 90.",
+        "pratikteNeAnlamaGelir": "Bina fiziki olarak mükemmel bitmiş olsa dahi müteahhit SGK'ya asgari prim borcunu yatırmamışsa belediye tek bir daireye dahi iskan veremez.",
+        "kritikUyari": "İskan bekleyen daire sahipleri müteahhidin SGK prim borcunu ödememesi yüzünden yıllarca iskansız kalabilir ve şantiye elektriği ödemek zorunda kalır.",
+        "ilgiliTerimler": ["Yapı Kullanma İzin Belgesi (İskan)", "Şantiye Elektriği"]
+    },
+    {
+        "terim": "İmar Para Cezasının Mülk Sahibi ve Müteahhide Rücu Edilmesi",
+        "slug": "imar-para-cezasi-rucu-sureci",
+        "harf": "İ",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Belediyenin kaçak inşaat sebebiyle arsa sahibine kestiği 3194 sayılı kanun 42. madde para cezasının, kusurlu müteahhitten dava yoluyla tazmin edilmesidir.",
+        "hukukiKarsilik": "3194 Sayılı İmar Kanunu md. 42 ve Türk Borçlar Kanunu Kusur Sorumluluğu.",
+        "pratikteNeAnlamaGelir": "Müteahhit projeye aykırı kaçak kat çıktı diye cezayı belediye tapu malikine yazar; arsa sahibi cezayı ödeyip dekontla müteahhidin malına haciz koydurur.",
+        "kritikUyari": "Arsa sahipleri inşaat sözleşmesine 'ruhsata aykırılıktan doğacak tüm idari ve cezai yaptırımlar müteahhide aittir' rücu klozu koymalıdır.",
+        "ilgiliTerimler": ["İmar Para Cezası (Madde 42)", "Yapı Tatil Zaptı"]
+    },
+    {
+        "terim": "Mühür Fekki Suçu ve Şantiyede Ceza Davası",
+        "slug": "muhur-fekki-sucu-santiye",
+        "harf": "M",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Belediyenin kaçak olduğu için mühürlediği inşaatın mührünü sökerek, yırtarak veya mührü yok sayarak gizlice inşaata devam etme cürmüdür.",
+        "hukukiKarsilik": "5237 Sayılı Türk Ceza Kanunu md. 203.",
+        "pratikteNeAnlamaGelir": "Belediyenin kırmızı mühür bandını yırtıp içeriye beton mikseri sokan müteahhit ve şantiye şefi hakkında 6 aydan 3 yıla kadar hapis cezası davası açılır.",
+        "kritikUyari": "Mühür fekki suçu uzlaşmaya tabi değildir ve sabıka kaydına işler; ikinci kez mühürlenen inşaatın tüm elektrik ve su bağlantıları fiziksel olarak sökülür.",
+        "ilgiliTerimler": ["Mühür Fekki Suçu", "Yapı Tatil Zaptı"]
+    },
+    {
+        "terim": "Yapı Denetim Hizmet Bedeli Payı ve Emanet Hesap Sistemi",
+        "slug": "yapi-denetim-hizmet-bedeli-emanet",
+        "harf": "Y",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Müteahhidin yapı denetim firmasına elden para vermesini engelleyen, hizmet bedelinin belediyedeki resmi emanet hesaba yatırılıp onaylandıkça ödenmesidir.",
+        "hukukiKarsilik": "4708 Sayılı Yapı Denetimi Hakkında Kanun md. 5.",
+        "pratikteNeAnlamaGelir": "Yapı denetim firmasının müteahhide bağımlı kalmadan tarafsız denetim yapmasını garanti eder; denetçi parasını müteahhitten değil belediyeden tahsil eder.",
+        "kritikUyari": "Yapı denetim taksiti belediye emanet hesabına yatırılmadan bir sonraki katın beton döküm vizesi onaylanamaz.",
+        "ilgiliTerimler": ["Elektronik Yapı Denetim Havuzu", "Yapı Denetim Kuruluşu"]
+    },
+    {
+        "terim": "Karot Numunesinde Basınç Dayanımı Emniyet Katsayısı",
+        "slug": "karot-basinc-dayanimi-emniyet-katsayisi",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Mevcut binadan silindir şeklinde kesilerek çıkarılan beton karotun pres makinesinde kırılarak karakteristik basınç dayanımının (MPa cinsinden) ölçülmesidir.",
+        "hukukiKarsilik": "TS EN 12504-1 ve Türkiye Bina Deprem Yönetmeliği md. 15.2.",
+        "pratikteNeAnlamaGelir": "Binanın betonunun C10 mu, C20 mi yoksa un gibi ufalanan deniz kumu mu olduğunu kesin olarak ortaya koyan en güvenilir laboratuvar testidir.",
+        "kritikUyari": "Karot alınırken binanın taşıyıcı ana kolon demirlerinin kesilmemesi için önceden donatı röntgeni (pachometer) ile demir tespiti yapılması şarttır.",
+        "ilgiliTerimler": ["Karot Numunesi Alımı", "Donatı Röntgeni ve Sıyırma"]
+    },
+    {
+        "terim": "Donatıda Sıyırma Testi ve Korozyon Payı Ölçümü",
+        "slug": "donatida-siyirma-testi-korozyon",
+        "harf": "D",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Kolonun pas payı betonunun çekiçle kırılarak içindeki inşaat demirinin açığa çıkarılması ve kumpasla demir çapındaki paslanma kaybının ölçülmesidir.",
+        "hukukiKarsilik": "TBDY 2018 Bölüm 15 (Mevcut Binaların Değerlendirilmesi).",
+        "pratikteNeAnlamaGelir": "Orijinalde 16 mm olan demirin pas yüzünden 10 mm'ye düşüp düşmediğini gözle ve ölçümle tespit eder; demir erimişse bina riskli ilan edilir.",
+        "kritikUyari": "Sıyırma yapılan yer inceleme biter bitmez yüksek mukavemetli tamir harcıyla kapatılmalıdır; açık bırakılırsa demir hava alıp daha hızlı paslanır.",
+        "ilgiliTerimler": ["Donatı Röntgeni ve Sıyırma", "Karbonatlaşma Derinliği"]
+    },
+    {
+        "terim": "Betonarme Elemanlarda Mantolama ile Güçlendirme",
+        "slug": "betonarme-kolon-mantolama-guclendirme",
+        "harf": "B",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Mevcut yetersiz kolonun etrafına ilave donatı kafesi örülüp kalıp çakılarak en az 10-15 cm kalınlığında C35/C40 yüksek dayanımlı beton gömleği geçirilmesidir.",
+        "hukukiKarsilik": "TBDY 2018 Bölüm 15.7 (Eleman Düzeyinde Güçlendirme).",
+        "pratikteNeAnlamaGelir": "Binayı yıkmadan kolonların yük taşıma kapasitesini 3 katına çıkarır; binanın depremde çökmesini kesin olarak engeller.",
+        "kritikUyari": "Eski beton ile yeni betonun kaynaşması için kimyasal epoksi ankrajla donatı ekimi yapılması ve aderans artırıcı astar sürülmesi hayati önemdedir.",
+        "ilgiliTerimler": ["Statik Güçlendirme Projesi", "Epoksi Ankraj"]
+    },
+    {
+        "terim": "Çelik Çapraz (Bracing) ile Deprem Güçlendirmesi",
+        "slug": "celik-capraz-bracing-guclendirme",
+        "harf": "Ç",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Betonarme çerçevelerin içine X veya V şeklinde yüksek mukavemetli çelik boru ve profiller eklenerek binanın yanal deprem rijitliğinin artırılmasıdır.",
+        "hukukiKarsilik": "TBDY 2018 md. 15.8.",
+        "pratikteNeAnlamaGelir": "Deprem esnasında binanın sağa sola aşırı beşik gibi sallanmasını ve katların birbirine çarpmasını çelik kafeslerle sıfıra indirir.",
+        "kritikUyari": "Çelik profillerin betonarme kolon ve kirişlere birleşim plakaları özel torklu çelik kimyasal bulonlarla bağlanmalıdır.",
+        "ilgiliTerimler": ["Çelik Konstrüksiyon Yapı", "Statik Performans Analizi"]
+    },
+    {
+        "terim": "Tünel Kalıp Sisteminde Kalıp Söküm Süresi (24 Saat Kuralı)",
+        "slug": "tunel-kalip-sokum-suresi",
+        "harf": "T",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Perde ve döşeme betonunun aynı anda döküldüğü tünel kalıp binalarda sıcak hava kürü uygulanarak kalıbın ertesi gün (24 saatte) sökülebilmesidir.",
+        "hukukiKarsilik": "TS 500 ve Yapım İşleri Şartnamesi.",
+        "pratikteNeAnlamaGelir": "Büyük toplu konut şantiyelerinde her gün 1 tam kat çıkılmasını sağlar; inşaat süresini 3 kat kısaltır ve depreme son derece dayanıklıdır.",
+        "kritikUyari": "Kalıp söküldükten sonra döşeme altına hemen güvenlik dikmeleri (teleskopik direkler) çakılmalı ve en az 14 gün tutulmalıdır.",
+        "ilgiliTerimler": ["Tünel Kalıp Sistemi", "Perde Beton"]
+    },
+    {
+        "terim": "Beton Kürleme (Sulama) Süresi ve Kür Membranı Kimyasalı",
+        "slug": "beton-kurleme-sulama-suresi",
+        "harf": "B",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Yeni dökülen taze betonun içindeki suyun buharlaşmasını önlemek için en az 7 gün boyunca sabah-akşam sulanması veya sıvı kür kimyasalı püskürtülmesidir.",
+        "hukukiKarsilik": "TS EN 13670 Beton Yapıların İcrası Standardı.",
+        "pratikteNeAnlamaGelir": "Betonun tasarım dayanımına (C30/C35) ulaşmasını sağlar; sulanmayan beton çatır çatır çatlar ve mukavemeti %40 oranında zayıf kalır.",
+        "kritikUyari": "Rüzgarlı ve sıcak havalarda beton dökümünden hemen sonra beyaz renkli sıvı kür membranı sıkılmalıdır; buharlaşma çatlaklarını tamamen önler.",
+        "ilgiliTerimler": ["Beton Sınıfı", "Slump Testi"]
+    },
+    {
+        "terim": "Kış Şartlarında Beton Dökümü ve Antifrizli Katkılar",
+        "slug": "kis-sartlarinda-beton-dokumu",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Hava sıcaklığının +5°C'nin altına düştüğü günlerde betonun donmasını engellemek için ısıtılmış su, antifriz kimyasalı ve sıcak hava kürüyle dökülmesidir.",
+        "hukukiKarsilik": "TS 1248 Soğuk Havada Beton Yapım, Döküm ve Bakım Kuralları.",
+        "pratikteNeAnlamaGelir": "Kışın eksi derecelerde dahi şantiyenin durmadan ilerlemesini sağlar; donan beton taşlaşamaz, ufalanır ve çöp olur.",
+        "kritikUyari": "Kalıp yüzeyindeki buz ve kar temizlenmeden asla beton dökülemez; taze beton döküldükten sonra üzeri strafor ve brandalarla sıkıca örtülmelidir.",
+        "ilgiliTerimler": ["Beton Sınıfı", "Beton Kırım Deneyi"]
+    },
+    {
+        "terim": "Sıcak Havada Beton Dökümü ve Priz Geciktirici Katkılar",
+        "slug": "sicak-havada-beton-dokumu",
+        "harf": "S",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Yazın +35°C'yi aşan havalarda betonun mikserin içinde donup kalmasını önlemek için kimyasal priz geciktiriciler ve buzlu su kullanılarak yapılan dökümdür.",
+        "hukukiKarsilik": "TS 1247 Sıcak Havada Beton Yapım, Döküm ve Bakım Kuralları.",
+        "pratikteNeAnlamaGelir": "Betonun kalıba rahatça yayılmasını ve demirlerin arasını tam doldurmasını sağlar; aşırı hızlı donmadan doğan kılcal çatlakları önler.",
+        "kritikUyari": "Yaz aylarında beton dökümü öğle sıcağında değil, akşam serinliğinde veya gece saatlerinde yapılmalıdır.",
+        "ilgiliTerimler": ["Slump Testi", "Beton Vibrasyonu ve Segregasyon"]
+    },
+    {
+        "terim": "Brüt Beton (Görünür Mimari Beton) Kalıp Yağı",
+        "slug": "brut-beton-mimari-kalip-yagi",
+        "harf": "B",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Sıva ve boya yapılmadan çıplak bırakılacak mimari beton yüzeylerin pürüzsüz ve lekesiz çıkması için film yüzeyli marin kontrplak ve bitkisel kalıp yağı kullanımıdır.",
+        "hukukiKarsilik": "Mimari Tasarım Standartları ve TS 500.",
+        "pratikteNeAnlamaGelir": "Modern loft dairelerde ve müzelerde endüstriyel şık bir beton görünümü sunar; sıva dökülmesi derdini ve boya masrafını sıfıra indirir.",
+        "kritikUyari": "Kalıp yağı demir donatıya bulaştırılmamalıdır; demire bulaşan yağ betonun demire yapışmasını (aderansı) yok eder.",
+        "ilgiliTerimler": ["Perde Beton", "Nervürlü İnşaat Demiri"]
+    },
+    {
+        "terim": "Ahşap Çatılarda Emprenye İlaçlama ve Yangın Geciktirici",
+        "slug": "ahsap-cati-emprenye-ilaclama",
+        "harf": "A",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Çatı iskeletini oluşturan çam kerestelerinin yüksek basınçlı kazanlarda kimyasal tuzlarla vakumlanarak böcek, kurt ve yangına karşı dirençli kılınmasıdır.",
+        "hukukiKarsilik": "TS 788 Ahşabın Korunması ve Binaların Yangından Korunması Hakkında Yönetmelik.",
+        "pratikteNeAnlamaGelir": "Çatının 10 yıl sonra tahtakurtları tarafından un gibi kemirilip çökmesini önler; kerestenin alev almasını geciktirir.",
+        "kritikUyari": "Yeşil veya kahverengi renkte boyalı görünen her ahşap emprenyeli değildir; daldırma veya basınçlı otoklav sertifikası aranmalıdır.",
+        "ilgiliTerimler": ["Çatı İskeleti", "Yangın Merdiveni"]
+    },
+    {
+        "terim": "Döşemede Sehim (Bel Verme) Sınırı (L/300 Kuralı)",
+        "slug": "dosemede-sehim-bel-verme-siniri",
+        "harf": "D",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Betonarme bir kiriş veya döşemenin kendi ağırlığı ve yükler altında açıklık boyunun üç yüzde birinden (L/300) fazla aşağıya doğru çökemeyeceği sınır kuralıdır.",
+        "hukukiKarsilik": "TS 500 Betonarme Yapıların Tasarım ve Yapım Kuralları.",
+        "pratikteNeAnlamaGelir": "Tavanın ortadan aşağı doğru gözle görülür şekilde eğrilmesini ve üzerindeki bölme duvarların çatlayıp kapıların sıkışmasını engeller.",
+        "kritikUyari": "Aşırı sehim yapan döşemelerde alt kattaki alçıpan tavanlar çatlar ve tabandaki seramikler ortadan kırılır; kalıp erken sökülmemelidir.",
+        "ilgiliTerimler": ["Kirişsiz Plak", "Kaset Döşeme"]
+    },
+    {
+        "terim": "Yapısal Taşıyıcı Çatlak ile Sıva Çatlağı Ayrımı",
+        "slug": "yapisal-catlak-vs-siva-catlagi",
+        "harf": "Y",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Kolon ve kirişte 45 derece açıyla giden derin kesme çatlakları ile duvar boyasının yüzeyindeki kılcal saç teli çatlaklarının hayati güvenlik farkıdır.",
+        "hukukiKarsilik": "TBDY 2018 ve Çevre Şehircilik Hasar Tespit Kriterleri.",
+        "pratikteNeAnlamaGelir": "Sıva çatlağı tehlikesizdir ve macunla boyanır; ancak kolonda betonun yarıldığı ve demirin göründüğü taşıyıcı çatlaklar acil tahliye ve güçlendirme gerektirir.",
+        "kritikUyari": "Madeni para kalınlığından (2 mm) geniş olan ve kolon-kiriş birleşimlerinde görülen çatlaklar derhal AFAD veya yapı denetime bildirilmelidir.",
+        "ilgiliTerimler": ["Epoksi Enjeksiyon", "Statik Güçlendirme Projesi"]
+    },
+    {
+        "terim": "Farklı Oturma (Diferansiyel Oturma) ve Bina Eğilmesi",
+        "slug": "farkli-oturma-ve-bina-egilmesi",
+        "harf": "F",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Binanın temelinin bir tarafının sağlam zemine, diğer tarafının dolgu veya yumuşak zemine oturması sonucu binanın Pisa kulesi gibi yana yatmasıdır.",
+        "hukukiKarsilik": "Zemin ve Temel Etütleri Yönetmeliği ve TBDY 2018.",
+        "pratikteNeAnlamaGelir": "Bina bütünüyle yana eğilir; kapılar ve pencereler kapanmaz hale gelir, en alt kat kirişlerinde devasa kırılmalar oluşur.",
+        "kritikUyari": "Farklı oturmayı önlemek için zayıf tarafa fore kazık çakılmalı veya bina dilatasyon derziyle birbirinden tamamen bağımsız bloklara bölünmelidir.",
+        "ilgiliTerimler": ["Zemin Etüt Raporu", "Fore Kazık Sistemi"]
+    },
+    {
+        "terim": "Zemin İyileştirmede Taş Kolon (Stone Column) Yöntemi",
+        "slug": "tas-kolon-zemin-iyilestirme",
+        "harf": "T",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Yumuşak killi ve siltli zeminlere vibro-flotasyon cihazıyla kırma taş ve mıcır basılarak zemin içinde sıkıştırılmış taş sütunlar oluşturulmasıdır.",
+        "hukukiKarsilik": "Zemin ve Temel Mühendisliği Uygulama Standartları.",
+        "pratikteNeAnlamaGelir": "Zeminin taşıma kapasitesini 3 kat artırır ve deprem anında yeraltı suyunun hızla yukarı tahliye olmasını sağlayarak sıvılaşmayı engeller.",
+        "kritikUyari": "Taş kolonların aralığı ve çapı geoteknik mühendisi tarafından zemin raporuna göre belirlenmeli ve yerinde yükleme deneyi yapılmalıdır.",
+        "ilgiliTerimler": ["Zemin Sıvılaşması Riski", "Jet Grouting"]
+    },
+    {
+        "terim": "Derin Karıştırma (Deep Soil Mixing - DSM) Zemin Güçlendirmesi",
+        "slug": "derin-karistirma-dsm-zemin",
+        "harf": "D",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Döner helezonlu dev burgularla toprağın yerinde kazılmadan çimento şerbetiyle mikser gibi karıştırılarak yeraltında beton bloklar üretilmesidir.",
+        "hukukiKarsilik": "TS EN 14679 Derin Karıştırma Uygulama Standartları.",
+        "pratikteNeAnlamaGelir": "Bataklık ve gevşek alüvyon zeminleri kaya gibi sertleştirir; hafriyat toprağı çıkarmadan yerinde zemin ıslahı sağlar.",
+        "kritikUyari": "Çimento/su oranı ve karıştırma hızı otomasyonla kontrol edilmelidir; homojen karışmayan kolonlar zayıf kalır.",
+        "ilgiliTerimler": ["Jet Grouting", "Zemin Sınıfı"]
+    },
+    {
+        "terim": "Zemin Sıvılaşmasında Dinamik Kompaksiyon (Ağır Tokmaklama)",
+        "slug": "dinamik-kompaksiyon-tokmaklama",
+        "harf": "D",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "15-25 metre yüksekliğindeki vinçten 10-30 tonluk çelik kütlelerin serbest düşüşle yere bırakılarak gevşek kumlu zeminin şokla sıkıştırılmasıdır.",
+        "hukukiKarsilik": "Geoteknik Zemin İyileştirme Standartları.",
+        "pratikteNeAnlamaGelir": "Depremde su gibi kaynama ve batma riski olan gevşek sahil kumlarını derinlemesine sıkıştırarak kaya gibi oturmuş zemine çevirir.",
+        "kritikUyari": "Şehir merkezinde komşu binalara çok yakın yerlerde uygulanamaz; tokmaklama sarsıntısı komşu binaların duvarlarını çatlatabilir.",
+        "ilgiliTerimler": ["Zemin Sıvılaşması Riski", "Taşıma Gücü Kaybı"]
+    },
+    {
+        "terim": "Yeraltı Su Seviyesi Düşürmede Wellpoint (Kuyu İğne) Sistemi",
+        "slug": "wellpoint-kuyu-igne-sistemi",
+        "harf": "W",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Temel kazısı çukurunun etrafına 1-2 metre aralıklarla çakılan delikli boruların tek bir vakum pompasına bağlanarak yeraltı suyunun emilmesidir.",
+        "hukukiKarsilik": "Kazı Güvenliği Yönetmeliği ve Su Tahliye Şartnameleri.",
+        "pratikteNeAnlamaGelir": "Deniz veya göl kenarında suyun fışkırdığı balçık zeminlerde temel çukurunu kupkuru hale getirerek kuru zeminde beton dökülmesini sağlar.",
+        "kritikUyari": "Vakum pompaları temel betonu ve bodrum perdeleri dökülüp su yalıtımı bitene kadar 24 saat kesintisiz çalıştırılmalıdır; durursa temel göle döner.",
+        "ilgiliTerimler": ["Drenaj Çukuru", "Bohçalama Su Yalıtımı"]
+    },
+    {
+        "terim": "Fore Kazıkta İnklinometre ile Yatay Deplasman Ölçümü",
+        "slug": "inklinometre-yatay-deplasman-olcumu",
+        "harf": "İ",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Derin kazı iksa kazıklarının içine yerleştirilen borudan indirilen elektronik prob ile kazığın milimetrik olarak yana yatıp yatmadığının ölçülmesidir.",
+        "hukukiKarsilik": "Derin Kazı Güvenliği Standartları ve İmar Yönetmelikleri.",
+        "pratikteNeAnlamaGelir": "İksa duvarının çökme tehlikesini günler öncesinden haber verir; komşu binanın veya caddenin çukura kaymasını önler.",
+        "kritikUyari": "Yatay deplasman kritik eşiği (genelde 20-25 mm) aşarsa şantiye derhal durdurulmalı ve ilave çelik ankrajlar gerilmelidir.",
+        "ilgiliTerimler": ["Fore Kazık Sistemi", "Mini Kazık ve Zemin Ankrajı"]
+    },
+    {
+        "terim": "Şantiye Çevre Gürültü Sınırı ve Gece Çalışma İzni",
+        "slug": "santiye-gurultu-siniri-gece-calisma",
+        "harf": "Ş",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Konut alanlarındaki inşaatların sabah 07:30 ile akşam 19:00 saatleri dışında çalışmasının yasak olması ve beton dökümü için valilikten alınan özel izindir.",
+        "hukukiKarsilik": "Çevresel Gürültü Kontrol Yönetmeliği md. 15.",
+        "pratikteNeAnlamaGelir": "Pazar günleri ve gece yarısı mahalle sakinlerinin iş makinesi ve kırıcı gürültüsüyle uykusuz bırakılmasını engeller.",
+        "kritikUyari": "İzinsiz gece beton döken veya jeneratör çalıştıran müteahhitlere zabıta ve Çevre İl Müdürlüğü'nce yüz binlerce lira ceza kesilir.",
+        "ilgiliTerimler": ["Şantiye Şefi Sorumluluğu", "Akustik Şilte"]
+    },
+    {
+        "terim": "Hafriyat Toprağı Taşıma İzin Belgesi ve Çevre İzni",
+        "slug": "hafriyat-topragi-tasima-izin-belgesi",
+        "harf": "H",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Temel kazısından çıkan tonlarca toprağın ve molozun sadece Büyükşehir Belediyesi onaylı resmi döküm sahalarına dökülmesini belgeleyen izin kağıdıdır.",
+        "hukukiKarsilik": "Hafriyat Toprağı, İnşaat ve Yıkıntı Atıklarının Kontrolü Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Hafriyat kamyonlarının toprağı ormana, göl kenarına veya yol kenarına kaçak boşaltıp çevreyi mahvetmesini engeller.",
+        "kritikUyari": "Hafriyat kabul belgesi olmadan belediyeler inşaata temel üstü vizesi ve devam izni vermez.",
+        "ilgiliTerimler": ["Yapı Ruhsatı", "ÇED Raporu"]
+    },
+    {
+        "terim": "Kaçak Moloz Dökümüne Karşı Damper GPS Takip Sistemi",
+        "slug": "damperli-kamyon-gps-takip-sistemi",
+        "harf": "D",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Hafriyat kamyonlarının damperlerine takılan sensör ve araç takip cihazıyla, kamyonun nerede damper kaldırdığının uydu üzerinden anlık izlenmesidir.",
+        "hukukiKarsilik": "Çevre Kanunu ve Büyükşehir Belediyesi Hafriyat Otomasyon Yönergeleri.",
+        "pratikteNeAnlamaGelir": "Kamyon şoförü resmi döküm sahası dışındaki bir ormanda damper kaldırdığı anda belediye zabıta merkezine alarm düşer ve anında yakalanır.",
+        "kritikUyari": "GPS cihazı sökülen veya bozuk olan hafriyat kamyonlarının trafiğe çıkması ve şantiyeye girmesi kesinlikle yasaktır; araç bağlanır.",
+        "ilgiliTerimler": ["Hafriyat Taşıma İzin Belgesi", "Çevre Koruma"]
+    },
+    {
+        "terim": "İnşaatta Kule Vinç Periyodik Kontrol ve Tork Raporu",
+        "slug": "kule-vinc-periyodik-kontrol-raporu",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Şantiyedeki kule vincin çelik halatları, kule gövdesi bağlantı cıvataları ve frenlerinin akredite makine mühendislerince yılda en az bir kez test edilmesidir.",
+        "hukukiKarsilik": "İş Ekipmanlarının Kullanımında Sağlık ve Güvenlik Şartları Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Vincin aşırı rüzgarda veya ağır yük kaldırırken belinden kırılarak komşu apartmanların veya sokaktaki yayaların üzerine devrilmesini önler.",
+        "kritikUyari": "Periyodik muayene etiketi olmayan kule vinçlerin kullanılması durumunda Çalışma Bakanlığı iş müfettişleri şantiyeyi anında mühürler.",
+        "ilgiliTerimler": ["Kule Vinç Kurulumu", "Şantiye Şefi Sorumluluğu"]
+    },
+    {
+        "terim": "İskele Güvenlik Ağı ve İskele Kurulum Yetki Belgesi",
+        "slug": "iskele-guvenlik-agi-ve-kurulumu",
+        "harf": "İ",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Bina dış cephesine kurulan çelik iskelenin etrafına sarılan gözenekli file ve iskelenin duvara tijlerle ankrajlandığını onaylayan statik hesap raporudur.",
+        "hukukiKarsilik": "TS EN 12810/12811 Ön Yapımlı Cephe İskeleleri Standardı.",
+        "pratikteNeAnlamaGelir": "İskelede çalışan boyacının veya ustanın boşluğa düşmesini engeller; fırtınada iskelenin binadan ayrılarak sokağa devrilmesini önler.",
+        "kritikUyari": "Ahşap kalaslarla veya paslı derme çatma borularla kurulan korsan iskeleler yasaktır; her basamağı kilitli endüstriyel flanşlı iskele şarttır.",
+        "ilgiliTerimler": ["Şantiye Şefi Sorumluluğu", "İnşaat All-Risk Sigortası"]
+    },
+    {
+        "terim": "İnşaat Dış Cephe İskelesi Topraklaması",
+        "slug": "dis-cephe-iskelesi-topraklamasi",
+        "harf": "D",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Binanın dış cephesini saran devasa metal iskelenin yıldırım düşmesine ve elektrik kablosu kaçaklarına karşı en az 16 mm² bakır iletkenle toprağa bağlanmasıdır.",
+        "hukukiKarsilik": "Elektrik Tesislerinde Topraklamalar Yönetmeliği ve Yapı İşlerinde İSG Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "İskelede spiral taş motoru veya matkap kullanan ustanın kablo sıyrılması sonucu elektrik akımına kapılıp iskeleden düşmesini önler.",
+        "kritikUyari": "Topraklama yapılmamış iskeleler fırtınalı havalarda paratoner gibi yıldırım çeker ve iskeledeki tüm personelin ölümüne neden olur.",
+        "ilgiliTerimler": ["Kaçak Akım Rölesi", "Paratoner İniş İletkeni"]
+    }
+]
+
+print(f"data_ultra_8.py hazır: {len(ULTRA_TERIMLER_8)} terim.")

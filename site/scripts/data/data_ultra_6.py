@@ -1,0 +1,560 @@
+# -*- coding: utf-8 -*-
+"""
+data_ultra_6.py — EDM Emlak Sözlüğü Ultra Genişletme Paketi Bölüm 6 (50 Terim)
+İleri gayrimenkul davaları, kadastro uyuşmazlıkları, kamulaştırma ve miras hukuku.
+"""
+
+ULTRA_TERIMLER_6 = [
+    {
+        "terim": "Tenkis Davasında Sabit Fiyat İlkesi ve Denkleştirme",
+        "slug": "tenkis-davasi-sabit-fiyat-ilkesi",
+        "harf": "T",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Saklı payı zedelenen mirasçıların açtığı tenkis davasında, taşınmazın değerinin mirasın açıldığı ölüm tarihindeki piyasa rayicine göre hesaplanması ilkesidir.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 564 ve 565.",
+        "pratikteNeAnlamaGelir": "Dava 10 yıl sürse dahi taşınmazın değeri ölüm tarihindeki emsallere göre bulunur ve enflasyon farkıyla denkleştirilerek saklı pay sahibine nakden ödenir.",
+        "kritikUyari": "Taşınmaz bölünemeyecek nitelikteyse davalı taraf saklı pay bedelini nakden ödeyerek mülkiyetin tamamını kendi üzerinde tutmayı seçebilir.",
+        "ilgiliTerimler": ["Tenkis Davası", "Mirasbırakanın Karşılıksız Kazandırmaları"]
+    },
+    {
+        "terim": "İrade Bozuklukları Sebebiyle Tapu İptali (Hata, Hile, Korkutma)",
+        "slug": "irade-bozukluklari-tapu-iptali",
+        "harf": "İ",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Tapuda satış yaparken aldatılan (hile), tehdit edilen (korkutma) veya esaslı yanılgıya düşürülen (hata) kişinin 1 yıl içinde tapu devrini iptal ettirebilmesidir.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 30-39 ve TMK md. 1025.",
+        "pratikteNeAnlamaGelir": "Evinizi 'arsa payı devri yapıyoruz' diye kandırıp tamamını üzerinize geçiren dolandırıcılara karşı tapuyu geri alma hakkı tanır.",
+        "kritikUyari": "Hilenin veya korkutmanın öğrenildiği ya da ortadan kalktığı tarihten itibaren 1 yıl içinde dava açılmazsa devir geçerli hale gelir.",
+        "ilgiliTerimler": ["Tapu İptal ve Tescil Davası", "Yolsuz Tescil"]
+    },
+    {
+        "terim": "İnançlı İşlem ve İnanç Sözleşmesi ile Tapu İptali",
+        "slug": "inancli-islem-inanc-sozlesmesi",
+        "harf": "İ",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Bir gayrimenkulün güvence amacıyla veya borç ödenince geri devredilmek üzere bir kişiye emaneten devredilmesi ve şart gerçekleşince geri istenmesidir.",
+        "hukukiKarsilik": "05.02.1947 Tarihli 20/6 Sayılı Yargıtay İçtihadı Birleştirme Kararı ve TBK md. 19.",
+        "pratikteNeAnlamaGelir": "Borç aldığınız tefeciye veya arkadaşınıza evi emaneten devredip borcu ödediğinizde evi geri devretmezse tapu iptali davası açabilirsiniz.",
+        "kritikUyari": "İnanç sözleşmesinin mutlaka yazılı bir belgeyle (imzalı protokol, mektup, dekont açıklaması) ispatlanması şarttır; tanıkla ispat edilemez.",
+        "ilgiliTerimler": ["Tapu İptal ve Tescil Davası", "Vefa (Geri Alım) Hakkı"]
+    },
+    {
+        "terim": "Ölünceye Kadar Gelir (İrat) Sözleşmesi",
+        "slug": "olunceye-kadar-gelir-irat-sozlesmesi",
+        "harf": "Ö",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Mülk sahibinin gayrimenkulünü bir şahsa veya sigorta şirketine devretmesi karşılığında hayatı boyunca her ay düzenli bir ömür boyu maaş/irat almasıdır.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 607-610.",
+        "pratikteNeAnlamaGelir": "Emeklilikte ek gelire ihtiyaç duyan yaşlı mülk sahiplerine garantili ömür boyu nakit akışı sağlar; gelir borçlusu taksitleri aksatamaz.",
+        "kritikUyari": "Gelir taksiti ödenmezse mülk sahibi taşınmaz üzerinde yasal ipotek tesis ettirebilir veya sözleşmeyi feshedip mülkü geri isteyebilir.",
+        "ilgiliTerimler": ["Ölünceye Kadar Bakma Sözleşmesi", "İpotek"]
+    },
+    {
+        "terim": "Gaiplik Kararının Tapuya Etkisi ve Teminatla Miras",
+        "slug": "gaiplik-karari-tapu-ve-teminat",
+        "harf": "G",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Ölüm tehlikesi içinde kaybolan veya 5 yıldır haber alınamayan kişinin mahkemece ölmüş sayılması ve tapudaki mallarının mirasçılarına teminat karşılığı devredilmesidir.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 32-35 ve md. 584-588.",
+        "pratikteNeAnlamaGelir": "Kayıp kişinin sahipsiz kalan evi mirasçılarına intikal eder; mirasçılar evi satabilir veya kiraya verebilir.",
+        "kritikUyari": "Mirasçılar olası geri dönüşe karşı taşınmazın değerine göre 5 veya 15 yıl boyunca mahkemeye kefil veya ipotek teminatı vermek zorundadır.",
+        "ilgiliTerimler": ["Gaiplik Kararının Tapuya Etkisi", "Miras İntikali"]
+    },
+    {
+        "terim": "Ehliyetsizlik (Ayırt Etme Gücü Yokluğu) Sebebiyle Tapu İptali",
+        "slug": "ehliyetsizlik-sebebiyle-tapu-iptali",
+        "harf": "E",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Demans, alzheimer veya akıl zayıflığı bulunan yaşlı bir kişinin sağlık raporu olmadan tapuda yaptığı taşınmaz devirlerinin mutlak butlanla geçersiz sayılmasıdır.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 13 ve 15.",
+        "pratikteNeAnlamaGelir": "Hafıza kaybı yaşayan dedenizin evini kandırıp üzerine geçiren kişilere karşı Adli Tıp Kurumu raporu alınarak tapu devri mahkemece iptal ettirilir.",
+        "kritikUyari": "Ayırt etme gücü olmayan kişinin yaptığı tapu devri hiçbir zaman geçerlilik kazanmaz; 20 yıl geçse dahi zamanaşımı işlemez, tapu geri alınır.",
+        "ilgiliTerimler": ["65 Yaş Üstü Tapu Sağlık Raporu", "Tapu İptal ve Tescil Davası"]
+    },
+    {
+        "terim": "Tapu İptali Davasında İhtiyati Tedbir ve Teminat",
+        "slug": "tapu-iptal-davasi-ihtiyati-tedbir",
+        "harf": "T",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Dava süresince davalının gayrimenkulü üçüncü kişilere satıp kaçırmasını önlemek için mahkemenin tapu kütüğüne koyduğu 'üçüncü kişilere devredilemez' şerhidir.",
+        "hukukiKarsilik": "6100 Sayılı Hukuk Muhakemeleri Kanunu md. 389-399.",
+        "pratikteNeAnlamaGelir": "Dava devam ederken mülk başkasına satılamaz; dava kazanıldığında mülk doğrudan gerçek sahibine tescil edilir.",
+        "kritikUyari": "Hakim tedbir koymak için dava değerinin yaklaşık %10-15'i oranında nakit veya teminat mektubu yatırılmasını talep edebilir (adli yardım hariç).",
+        "ilgiliTerimler": ["İhtiyati Tedbir Şerhi", "Tapu Kütüğü"]
+    },
+    {
+        "terim": "Karayolu Kamulaştırma Şerhi ve İrtifakı",
+        "slug": "karayolu-kamulastirma-serhi",
+        "harf": "K",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Arsanızın bir kısmının otoyol, kavşak veya bağlantı yolu yapımı için Karayolları Genel Müdürlüğü'nce kamulaştırılacağını belirten tapu kütüğü şerhidir.",
+        "hukukiKarsilik": "2942 Sayılı Kamulaştırma Kanunu md. 7 ve md. 31/b.",
+        "pratikteNeAnlamaGelir": "Şerh konulduktan sonra o kısma bina veya havuz yapamazsınız; yola giden metrekarenin parası Karayolları tarafından peşin ödenir.",
+        "kritikUyari": "Şerh konulmasına rağmen idare 6 ay içinde kamulaştırma davası açmazsa malik mahkemeye başvurarak şerhin terkinini isteyebilir.",
+        "ilgiliTerimler": ["Kamulaştırma (İstimlak)", "Şerhler Sütunu"]
+    },
+    {
+        "terim": "BOTAŞ Boru Hattı İrtifak Şerhi ve Kazı Yasağı",
+        "slug": "botas-boru-hatti-irtifak-serhi",
+        "harf": "B",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Doğalgaz veya ham petrol ana iletim boru hatlarının geçtiği tarlalarda boru aksının her iki yanında 5-10 metrelik emniyet şeridinde yapılaşma ve derin kazı yasağıdır.",
+        "hukukiKarsilik": "4646 Sayılı Doğalgaz Piyasası Kanunu ve BOTAŞ Kamulaştırma Şartnamesi.",
+        "pratikteNeAnlamaGelir": "Tarlada tarım ve ekim yapabilirsiniz; ancak kesinlikle temel kazamaz, ağaç dikemez ve bina inşa edemezsiniz.",
+        "kritikUyari": "İzinsiz iş makinesiyle kazı yapıp boruyu patlatan veya hasar veren kişiler ağır hapis ve yüz binlerce liralık gaz kaybı tazminatıyla yargılanır.",
+        "ilgiliTerimler": ["İrtifak Hakları Sütunu", "Kamulaştırma"]
+    },
+    {
+        "terim": "Maden Sahası Ruhsatı ile Yüzey Mülkiyeti Ayrılığı",
+        "slug": "maden-sahasi-ruhsati-ve-mulkiyet",
+        "harf": "M",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Toprağın altındaki madenlerin mülkiyetinin devlete ait olması sebebiyle, ruhsat sahibi maden şirketinin arsa sahibinin arazisini kamulaştırabilme yetkisidir.",
+        "hukukiKarsilik": "3213 Sayılı Maden Kanunu md. 46 ve Anayasa md. 168.",
+        "pratikteNeAnlamaGelir": "Tarlanızın altında mermer veya kömür varsa MAPEG onaylı maden şirketi tarlanızı bedelini ödeyerek kamulaştırıp maden ocağına katabilir.",
+        "kritikUyari": "Arsa sahibi madencilik faaliyetine rıza göstermezse Enerji Bakanlığı 'kamu yararı kararı' alarak araziye acele el koyabilir.",
+        "ilgiliTerimler": ["Acele Kamulaştırma Kararı", "Kamulaştırma (İstimlak)"]
+    },
+    {
+        "terim": "İpotekli Taşınmazın Bölünmesi (İfrazda İpotek Dağıtımı)",
+        "slug": "ifrazda-ipotek-dagitimi-ve-rehin",
+        "harf": "İ",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Üzerinde tek bir büyük ipotek bulunan arsa birden çok parsele ifraz edildiğinde, ipotek alacaklısının borcu yeni parsellere eşit veya paylı dağıtmasıdır.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 889 ve Tapu Sicili Tüzüğü.",
+        "pratikteNeAnlamaGelir": "Arsasını 10 parsele bölen malik, bankayla anlaşıp borcu parsellere böler; böylece her parsel satıldıkça kendi borcu ödenip ipoteği tek tek kalkar.",
+        "kritikUyari": "Anlaşma yapılmazsa banka ipoteğin tamamını yeni oluşan tüm parsellerin üzerine aynen taşır (birlikte rehin) ve her parsel tüm borçtan sorumlu olur.",
+        "ilgiliTerimler": ["İpotek", "İfraz (Ayırma)"]
+    },
+    {
+        "terim": "Borç Ödendiği Halde Kaldırılmayan İpotek İçin Fek Davası",
+        "slug": "ipotegin-fekki-davasi-mahkeme",
+        "harf": "İ",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Kredi borcunu son kuruşuna kadar kapatan malike alacaklının ipotek fek yazısı vermekten kaçınması veya alacaklıya ulaşılamaması halinde açılan davadır.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 883.",
+        "pratikteNeAnlamaGelir": "Mahkeme borcun ödendiğini banka dekontlarıyla tespit eder ve tapu idaresine resmi müzekkere yazarak ipoteği hakim kararıyla resen siler.",
+        "kritikUyari": "Alacaklı şirket tasfiye edilmiş veya şahıs vefat etmişse Sulh Hukuk Mahkemesi'ne depo kararı çıkartılarak para mahkeme veznesine yatırılıp ipotek çözülür.",
+        "ilgiliTerimler": ["İpotek Terkini (Fekki)", "İpotek"]
+    },
+    {
+        "terim": "Mirasçılık Sıfatından Çıkarma (Iskat / Evlatlıktan Reddetme)",
+        "slug": "mirasciliktan-cikarma-iskat-tmk",
+        "harf": "M",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Mirasbırakana veya aile üyelerine ağır suç işleyen ya da aile yükümlülüklerini ağır şekilde yerine getirmeyen saklı paylı mirasçının mirastan tamamen mahrum edilmesidir.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 510-513.",
+        "pratikteNeAnlamaGelir": "Mirasbırakan resmi vasiyetnameyle gerekçesini açıkça yazarak hayırsız evladını mirasından çıkarır; o evlat saklı payını dahi talep edemez.",
+        "kritikUyari": "Gerekçenin vasiyetnamede somut delillerle kanıtlanması şarttır; 'beni arayıp sormadı' gibi soyut iddialarla yapılan ıskat mahkemece iptal edilir.",
+        "ilgiliTerimler": ["Resmi Vasiyetname", "Tenkis Davası"]
+    },
+    {
+        "terim": "Mirastan Feragat Sözleşmesi (İvazlı ve İvazsız)",
+        "slug": "mirastan-feragat-sozlesmesi-turleri",
+        "harf": "M",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Mirasçının mirasbırakan hayattayken bir bedel karşılığında (ivazlı) veya bedelsiz (ivazsız) olarak gelecekteki miras hakkından noterde resmen vazgeçmesidir.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 528-530.",
+        "pratikteNeAnlamaGelir": "Babadan sağlığında bir fabrika alan çocuk, 'ileride babam vefat ettiğinde diğer kardeşlerin evlerine mirasçı olmayacağım' diyerek feragat imzalar.",
+        "kritikUyari": "İvazlı feragatte bulunan kişinin çocukları da mirastan pay alamaz; ancak bedelsiz (ivazsız) feragatte feragat edenin çocuklarının miras hakkı devam eder.",
+        "ilgiliTerimler": ["Mirastan Feragat Sözleşmesi", "Miras İntikali"]
+    },
+    {
+        "terim": "Murisin Sağlığında Yaptığı Harcamaların Denkleştirilmesi",
+        "slug": "murisin-harcamalarinin-denklestirilmesi",
+        "harf": "M",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Mirasbırakanın sağlığında bir çocuğuna ev alması, iş kurma sermayesi veya aşırı çeyiz vermesi halinde bu bedellerin ölümde terekeye geri iade edilmesidir.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 669-675.",
+        "pratikteNeAnlamaGelir": "Babasından sağlığında daire alan kardeş, miras paylaşılırken o dairenin güncel değerini miras hissesinden düşürmek zorundadır; adil paylaşım sağlanır.",
+        "kritikUyari": "Mirasbırakan açıkça 'bu kazandırma denkleştirmeden muaftır' şeklinde yazılı bir beyanda bulunmuşsa kural olarak iade istenemez (saklı pay hariç).",
+        "ilgiliTerimler": ["Denkleştirme Davası", "Tenkis Davası"]
+    },
+    {
+        "terim": "Tapuda Okuma Yazma Bilmeyenlerin İşlemi ve İki Tanık",
+        "slug": "okuma-yazma-bilmeyenlerin-tapu-islemi",
+        "harf": "O",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Okuma yazma bilmeyen maliklerin tapu satış veya ipotek işlemlerinde resmi senedin memurca yüksek sesle okunup iki okur-yazar tanık huzurunda sol el başparmağının basılmasıdır.",
+        "hukukiKarsilik": "Tapu Sicili Tüzüğü md. 24.",
+        "pratikteNeAnlamaGelir": "Yaşlı veya eğitimsiz vatandaşın neye imza attığını anlamadan dolandırılmasını önler; tanıklar işlemin rızayla yapıldığını resmi senede imzalayarak onaylar.",
+        "kritikUyari": "Tanıkların taraflarla birinci ve ikinci derece kan hısmı (çocuk, kardeş, eş) olmaması ve fiil ehliyetine sahip olması zorunludur.",
+        "ilgiliTerimler": ["Tapu Kütüğü", "Tapuda Vekaletname Şartları"]
+    },
+    {
+        "terim": "Görme Engellilerin Tapu İşlemlerinde Güvenlik Usulü",
+        "slug": "gorme-engellilerin-tapu-islemleri",
+        "harf": "G",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Görme engelli vatandaşların tapu işlemlerinde istemeleri halinde iki tanık bulundurabilmesi, aksi halde memurun metni sesli okuyarak imza almasıdır.",
+        "hukukiKarsilik": "Tapu Sicili Tüzüğü md. 25 ve Türk Borçlar Kanunu md. 15/3.",
+        "pratikteNeAnlamaGelir": "Eski zorunlu iki tanık şartı esnetilmiştir; görme engelli birey dilerse güvendiği iki şahidi getirir, istemezse tek başına özgürce imza atabilir.",
+        "kritikUyari": "Resmi senet görme engelli vatandaşa mutlaka kelimesi kelimesine sesli okunmalı ve onayladığı resmi tutanağa geçirilmelidir.",
+        "ilgiliTerimler": ["Tapu Kütüğü", "Tapu Sicilinde Düzeltme"]
+    },
+    {
+        "terim": "Yabancı Dildeki Vekaletnamelerde Apostil Şerhi",
+        "slug": "apostil-serhi-yabanci-vekaletname",
+        "harf": "A",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Yurt dışındaki bir noterden alınan gayrimenkul vekaletnamesinin Türkiye'deki tapu dairelerinde geçerli sayılması için basılan Lahey Konvansiyonu tasdik mührüdür.",
+        "hukukiKarsilik": "1961 Lahey Apostil Konvansiyonu ve Tapu Sicili Tüzüğü.",
+        "pratikteNeAnlamaGelir": "Almanya veya ABD'deki gurbetçi oradaki notere gidip vekaletine Apostil bastırırsa, vekalet yeminli Türkçe tercümesiyle Türkiye'de aynen geçerli olur.",
+        "kritikUyari": "Apostil anlaşmasına taraf olmayan ülkelerden (örneğin bazı Arap ülkeleri) alınan vekaletnamelerin mutlaka Türk Konsolosluğu onayından geçmesi gerekir.",
+        "ilgiliTerimler": ["Tapuda Vekaletname Şartları", "Web-Tapu Sistemi"]
+    },
+    {
+        "terim": "Yabancıya Satışta Uygunluk Belgesi ve İnceleme",
+        "slug": "yabanciya-satista-uygunluk-belgesi",
+        "harf": "Y",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Vatandaşlık amacıyla mülk alan yabancıların gayrimenkulünün değerinin en az 400.000 USD olduğunu ve paranın bankadan geldiğini teyit eden TKGM resmi onayıdır.",
+        "hukukiKarsilik": "Türk Vatandaşlığı Kanununun Uygulanmasına İlişkin Yönetmelik md. 20.",
+        "pratikteNeAnlamaGelir": "Bu belge olmadan yabancı yatırımcı Nüfus ve Vatandaşlık İşleri Genel Müdürlüğü'ne istisnai Türk vatandaşlığı başvurusu yapamaz.",
+        "kritikUyari": "Ekspertiz değerleme raporunda 1 dolar dahi eksik tespit edilirse veya döviz bozdurma belgesi (DAB) eşleşmezse uygunluk belgesi düzenlenmez.",
+        "ilgiliTerimler": ["Döviz Alım Belgesi (DAB)", "SPK Lisanslı Değerleme Raporu"]
+    },
+    {
+        "terim": "Kadastro Mahkemesinin Özel Yargılama Usulü",
+        "slug": "kadastro-mahkemesi-ozel-yargilama",
+        "harf": "K",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Kadastro tespiti sırasında mülkiyeti tartışmalı parsellerin 30 günlük askı cetveli süresinde açılan davalarını karara bağlayan ihtisas mahkemesidir.",
+        "hukukiKarsilik": "3402 Sayılı Kadastro Kanunu md. 24-33.",
+        "pratikteNeAnlamaGelir": "Hakim bizzat arsanın başına keşfe gider, yaşlı köy bilirkişilerini ve tanıkları dinler; sınır ihtilafını yerinde çözerek kesin tapuyu tescil eder.",
+        "kritikUyari": "Kadastro askı ilan süresi bittikten sonra kadastro mahkemesinde dava açılamaz; uyuşmazlık genel mahkeme olan Asliye Hukuk Mahkemesi'ne kayar.",
+        "ilgiliTerimler": ["Kadastro Paftası", "22/a Kadastro Yenileme"]
+    },
+    {
+        "terim": "Orman Sınırı Düzeltme ve İtiraz Komisyonu",
+        "slug": "orman-siniri-duzeltme-itiraz",
+        "harf": "O",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Tapulu arazinizin Orman Genel Müdürlüğü ekiplerince sehven orman sınırları içine dahil edilmesi halinde sınırın düzeltilmesi için kurulan komisyondur.",
+        "hukukiKarsilik": "6831 Sayılı Orman Kanunu Ek md. 16 ve md. 2/B.",
+        "pratikteNeAnlamaGelir": "Asırlık tapulu fındıklığınız veya zeytinliğiniz harita kayması yüzünden orman yazıldıysa eski kadastro haritaları ibraz edilerek tapu ormandan kurtarılır.",
+        "kritikUyari": "Komisyon itirazı reddederse tebliğden itibaren 30 gün içinde Kadastro veya Asliye Hukuk Mahkemesi'nde 'Orman Kadastrosuna İtiraz Davası' açılmalıdır.",
+        "ilgiliTerimler": ["Orman Sınırı ve Kadastrosu", "2B Arazisi"]
+    },
+    {
+        "terim": "2B Arazilerinde Doğrudan Satın Alma Başvuru Süresi",
+        "slug": "2b-arazisi-dogrudan-satis-suresi",
+        "harf": "2",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Orman vasfını yitirmiş Hazine arazilerini fiilen kullanan zilyet vatandaşların bu yerleri rayiç bedelin %50'si üzerinden taksitle satın alabilme başvuru hakkıdır.",
+        "hukukiKarsilik": "6292 Sayılı 2B Kanunu.",
+        "pratikteNeAnlamaGelir": "Köyde dededen beri kullandığınız 2B arazisinin tapusunu ihalesiz ve doğrudan devletten kendi adınıza satın almanızı sağlar.",
+        "kritikUyari": "Kanunda belirlenen yasal başvuru süresi ve taksit ödeme takvimi kaçırılırsa doğrudan satış hakkı düşer ve arazi ecrimisille Hazineye kalır.",
+        "ilgiliTerimler": ["2B Arazisi", "Ecrimisil Davası"]
+    },
+    {
+        "terim": "Kamulaştırma Bedelinin Bankada Nemalandırılması",
+        "slug": "kamulastirma-bedeli-nemalandirma",
+        "harf": "K",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Kamulaştırma davası devam ederken idarenin mahkeme kararıyla bankaya depo ettiği kamulaştırma bedelinin malik adına vadeli hesapta faiz getirmesidir.",
+        "hukukiKarsilik": "2942 Sayılı Kamulaştırma Kanunu md. 10/son.",
+        "pratikteNeAnlamaGelir": "Dava 2 yıl sürse dahi paranız bankada enflasyona karşı değer kaybetmez; dava bitip tapu devredilince birikmiş tüm faiz gelirini malik çeker.",
+        "kritikUyari": "Dava 4 ay içinde sonuçlanmazsa mahkeme 4. ayın bitiminden karar tarihine kadar kamulaştırma bedeline ayrıca yasal faiz işletmek zorundadır.",
+        "ilgiliTerimler": ["Kamulaştırma (İstimlak)", "Acele Kamulaştırma Kararı"]
+    },
+    {
+        "terim": "İştirak Halindeki Mülkiyetin Müşterek Mülkiyete Çevrilmesi Harcı",
+        "slug": "istirakin-mustereke-cevrilmesi-harci",
+        "harf": "İ",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "Mirasçılardan birinin talebiyle tapudaki elbirliği mülkiyetinin paylı mülkiyete dönüştürülmesi sırasında tahsil edilen maktu tapu harcıdır.",
+        "hukukiKarsilik": "492 Sayılı Harçlar Kanunu (4) Sayılı Tarife ve TMK md. 644.",
+        "pratikteNeAnlamaGelir": "Hisseli tapudaki paylar belirlenir; her mirasçı kendi hissesini diğer ortakların iznine ihtiyaç duymadan satabilir veya ipotek edebilir.",
+        "kritikUyari": "Tapu müdürlüğü diğer tüm mirasçılara tebligat çıkararak 15 gün süre verir; itiraz edilmezse dönüşüm resen gerçekleşir.",
+        "ilgiliTerimler": ["Elbirliği (İştirak) Mülkiyeti", "Paylı Mülkiyet"]
+    },
+    {
+        "terim": "Noterde Gayrimenkul Satış Sözleşmesi Düzenleme Yetkisi",
+        "slug": "noterde-gayrimenkul-satisi-yetkisi",
+        "harf": "N",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Tapu müdürlüklerinin yanı sıra noterliklerin de Tapu ve Kadastro Bilgi Sistemi (TAKBİS) üzerinden doğrudan kesin taşınmaz satış sözleşmesi yapabilmesidir.",
+        "hukukiKarsilik": "1512 Sayılı Noterlik Kanunu md. 61/A.",
+        "pratikteNeAnlamaGelir": "Tapu müdürlüğündeki yoğunluk veya sıra bekleme derdi olmadan nöbetçi noterlerde hafta sonu dahi ev alıp satma kolaylığı sunar.",
+        "kritikUyari": "Tapu harcına ek olarak noterlik işlem ücreti ödenir; noter satış sözleşmesini imzaladığı anda sistem tapu kütüğüne otomatik tescili yapar.",
+        "ilgiliTerimler": ["Tapu Harcı", "Web-Tapu Sistemi"]
+    },
+    {
+        "terim": "Taşınmaz Satışında Pişmanlık Akçesi (Cayma Parası) Hükmü",
+        "slug": "pismanlik-akcesi-cayma-parasi",
+        "harf": "P",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Sözleşmeden haksız yere vazgeçen tarafın karşı tarafa ödemeyi taahhüt ettiği ve sözleşmeyi tek taraflı feshetme hakkı veren cezai paradır.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 178.",
+        "pratikteNeAnlamaGelir": "Alıcı vazgeçerse verdiği kaporayı yakar; satıcı vazgeçerse aldığı paranın iki katını alıcıya ödeyerek mülkü satmaktan vazgeçebilir.",
+        "kritikUyari": "Sözleşmede bunun 'cayma parası' mı yoksa 'bağlanma parası (pey akçesi)' mi olduğu net yazılmalıdır; pey akçesinde sözleşmeden tek taraflı dönülemez.",
+        "ilgiliTerimler": ["Cayma Akçesi (Pey Akçesi)", "Taşınmaz Satış Vaadi Sözleşmesi"]
+    },
+    {
+        "terim": "Yabancıların Gayrimenkul Ediniminde 30 Hektar Sınırı",
+        "slug": "yabancilarin-gayrimenkul-30-hektar-siniri",
+        "harf": "Y",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Yabancı uyruklu bir gerçek kişinin Türkiye genelinde satın alabileceği toplam gayrimenkul alanının en fazla 30 hektar (300 dönüm) ile sınırlandırılmasıdır.",
+        "hukukiKarsilik": "2644 Sayılı Tapu Kanunu md. 35.",
+        "pratikteNeAnlamaGelir": "Bir yabancı parası ne kadar çok olursa olsun Türkiye'de 30 hektardan fazla arazi toplayamaz; Cumhurbaşkanı bu sınırı iki katına kadar artırabilir.",
+        "kritikUyari": "Ayrıca bir ilçenin özel mülkiyete konu toplam alanının yüzde 10'undan fazlası yabancılara satılamaz; bu kota dolunca o ilçede yabancıya satış kapanır.",
+        "ilgiliTerimler": ["Yabancıya Gayrimenkul Satışı Kısıtlamaları", "Tapu Kütüğü"]
+    },
+    {
+        "terim": "Askeri Yasak ve Güvenlik Bölgeleri Tapu Tahkikatı",
+        "slug": "askeri-yasak-bolge-tapu-tahkikati",
+        "harf": "A",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Stratejik askeri üsler, kışlalar veya sınır boylarındaki parsellerin yabancılara satılmasını önlemek amacıyla Genelkurmay koordinat sisteminden yapılan sorgulamadır.",
+        "hukukiKarsilik": "2565 Sayılı Askeri Yasak Bölgeler ve Güvenlik Bölgeleri Kanunu.",
+        "pratikteNeAnlamaGelir": "Parsel askeri güvenlik bölgesinde kalıyorsa yabancıya devir yapılamaz; Türk vatandaşları ise özel güvenlik izniyle mülk edinebilir.",
+        "kritikUyari": "Tapu müdürlükleri askeri bölge paftalarını sayısal ortamda gördüğü için eski 3 aylık askeri yazışma bekleme süresi artık dakikalar içinde sorgulanır.",
+        "ilgiliTerimler": ["Yabancıya Gayrimenkul Satışı Kısıtlamaları", "LİHKAB"]
+    },
+    {
+        "terim": "İmar Parselasyonunda 'Hisse Çözümü' Davası",
+        "slug": "imar-parselasyonunda-hisse-cozumu",
+        "harf": "İ",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Belediyenin 18. madde hamur kuralı sonucunda birbirini hiç tanımayan onlarca yabancı insanı aynı imar adasına hisseli ortak etmesi uyuşmazlığıdır.",
+        "hukukiKarsilik": "3194 Sayılı İmar Kanunu md. 18 ve Danıştay 6. Dairesi İçtihatları.",
+        "pratikteNeAnlamaGelir": "Müstakil tarlası olan biri imardan sonra 20 ortaklı bir arsaya paydaş yapılırsa imar planının 'parselasyon iptali' davasını açıp müstakil tahsis isteyebilir.",
+        "kritikUyari": "Danıştay, arsa sahibinin rızası veya imar zorunluluğu olmadıkça müstakil kök parsellerin hisseli dağıtılmasını hukuka aykırı bularak iptal etmektedir.",
+        "ilgiliTerimler": ["18. Madde Uygulaması (Hamur Kuralı)", "Şüyulu Arsa"]
+    },
+    {
+        "terim": "İmar Planında Eşdeğer Alan Ayrılması Kuralı",
+        "slug": "imar-planinda-esdeger-alan-kurali",
+        "harf": "İ",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Mevcut imar planındaki bir park, okul veya otopark alanının kaldırılarak konuta çevrilmesi halinde, aynı hizmet etki alanı içinde aynı büyüklükte yeni alan ayrılması şartıdır.",
+        "hukukiKarsilik": "Mekânsal Planlar Yapım Yönetmeliği md. 26.",
+        "pratikteNeAnlamaGelir": "Belediye mahalledeki çocuk parkını ranta çevirip rezidans imarına açamaz; açacaksa aynı yürüme mesafesinde eşdeğer büyüklükte yeni park tahsis etmelidir.",
+        "kritikUyari": "Eşdeğer alan gösterilmeden yapılan plan tadilatları şehircilik ilkelerine aykırılık gerekçesiyle idare mahkemelerince istisnasız iptal edilir.",
+        "ilgiliTerimler": ["Uygulama İmar Planı", "İmar Planına İtiraz Süresi"]
+    },
+    {
+        "terim": "İcra Satışında İhalenin Feshi Davası (İİK md. 134)",
+        "slug": "icra-ihalesinin-feshi-davasi",
+        "harf": "İ",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "İcra dairesince açık artırmayla satılan bir gayrimenkulün satışına fesat karıştırıldığı veya usulsüz tebligat yapıldığı gerekçesiyle ihalenin iptali davasıdır.",
+        "hukukiKarsilik": "İcra ve İflas Kanunu md. 134.",
+        "pratikteNeAnlamaGelir": "Evi icradan haksız veya değerinin çok altında satılan borçlu, 7 gün içinde dava açarak ihaleyi bozdurabilir ve mülkünü geri kazanma şansı bulur.",
+        "kritikUyari": "Dava haksız ve kötü niyetli bulunursa davacıya ihale bedelinin yüzde onu (%10) oranında para cezası kesilir.",
+        "ilgiliTerimler": ["Haciz Şerhi", "Kıymet Takdiri Raporu"]
+    },
+    {
+        "terim": "İcra İhalesinde Kıymet Takdirine İtiraz Süresi",
+        "slug": "icra-kiymet-takdirine-itiraz",
+        "harf": "İ",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "İcra bilirkişisinin gayrimenkul için belirlediği satış muhammen bedelinin fahiş düşük olduğunu iddia eden malikin 7 gün içinde İcra Mahkemesi'ne itirazıdır.",
+        "hukukiKarsilik": "İcra ve İflas Kanunu md. 128/a.",
+        "pratikteNeAnlamaGelir": "Emsal değeri 5 milyon olan daireye icra bilirkişisi 2 milyon yazmışsa, itiraz edilerek yeniden keşif yaptırılır ve satış bedeli gerçek değerine çıkarılır.",
+        "kritikUyari": "7 günlük süre tebliğden itibaren başlar; bu sürede harç yatırılıp dava açılmazsa değer kesinleşir ve ev o düşük bedelin yarısından satışa çıkar.",
+        "ilgiliTerimler": ["SPK Lisanslı Değerleme Raporu", "İhalenin Feshi Davası"]
+    },
+    {
+        "terim": "Gayrimenkul Satışında Ayıba Karşı Tekeffül Borcu",
+        "slug": "gayrimenkulde-ayiba-karsi-tekefful",
+        "harf": "G",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Satıcının, sattığı konut veya arsanın sözleşmede vaat edilen nitelikleri taşımamasından veya değerini düşüren gizli kusurlarından alıcıya karşı sorumlu olmasıdır.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 219-231.",
+        "pratikteNeAnlamaGelir": "Satın aldığınız evin temeli su alıyorsa veya tavanı akıyorsa satıcıya karşı bedelden indirim, evin tamiratını isteme veya sözleşmeden dönme davası açabilirsiniz.",
+        "kritikUyari": "Taşınmaz satışında ayıp nedeniyle dava açma zamanaşımı süresi devir tarihinden itibaren 5 yıldır; hileyle gizlenmişse zamanaşımı işlemez.",
+        "ilgiliTerimler": ["Gayrimenkulde Maddi Ayıp", "Gayrimenkulde Hukuki Ayıp"]
+    },
+    {
+        "terim": "Gizli Ayıp İhbar Süresi ve Dürüstlük Kuralı",
+        "slug": "gizli-ayip-ihbar-suresi",
+        "harf": "G",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "İlk bakışta gözle görülemeyen, ancak kış gelip yağmur yağdığında ortaya çıkan bina kusurlarının alıcı tarafından öğrenildiği anda derhal satıcıya bildirilmesidir.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 223/2.",
+        "pratikteNeAnlamaGelir": "Gizli ayıp öğrenilir öğrenilmez noterden satıcıya derhal ihtarname çekilmelidir; gecikilirse alıcı evi o kusuruyla kabul etmiş sayılır.",
+        "kritikUyari": "İhtarname çekmeden önce Sulh Hukuk Mahkemesi'nden delil tespiti yaptırarak kusurun inşaat hatasından kaynaklandığını raporlatmak en güvenli yoldur.",
+        "ilgiliTerimler": ["Gayrimenkulde Maddi Ayıp", "Anahtar Teslim Tutanağı"]
+    },
+    {
+        "terim": "İnşaat Sözleşmesinde Götürü Bedel Esası",
+        "slug": "insaat-sozlesmesinde-goturu-bedel",
+        "harf": "İ",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Müteahhidin inşaatı her şey dahil sabit bir toplam para karşılığında anahtar teslim bitirmeyi taahhüt ettiği ve demir-çimento zamlarını işverene yansıtamadığı sözleşmedir.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 480.",
+        "pratikteNeAnlamaGelir": "İnşaat sırasında malzeme fiyatları iki katına çıksa dahi müteahhit 'maliyetim arttı' diyerek işverenden fazladan tek kuruş para talep edemez.",
+        "kritikUyari": "Ancak olağanüstü öngörülemeyen bir afet veya savaş durumunda hakimden sözleşmenin yeni koşullara uyarlanması (fiyat farkı) istenebilir.",
+        "ilgiliTerimler": ["Anahtar Teslim Tutanağı", "Eser Sözleşmesi"]
+    },
+    {
+        "terim": "Müteahhidin İşe Zamanında Başlamaması Sebebiyle Fesih",
+        "slug": "muteahhidin-zamaninda-baslamamasi-fesih",
+        "harf": "M",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Müteahhidin sözleşmede kararlaştırılan tarihte hafriyata başlamaması veya işi o kadar geciktirmesi halinde teslim tarihini beklemeden sözleşmenin feshedilmesidir.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 473/1.",
+        "pratikteNeAnlamaGelir": "Teslim süresi 24 ay olan bir projede 12 ay geçmesine rağmen müteahhit temel dahi atmamışsa, arsa sahibi 24 ayı beklemeden sözleşmeyi derhal feshedebilir.",
+        "kritikUyari": "Fesih öncesinde müteahhide noter kanalıyla uygun bir mehil (süre) verilip ihtar çekilmesi ve işe başlaması gerektiği resmi olarak bildirilmelidir.",
+        "ilgiliTerimler": ["Kat Karşılığı İnşaat Sözleşmesi", "Yapı Ruhsatı"]
+    },
+    {
+        "terim": "Arsa Sahibinin Nama İfa Yetkisi (Müteahhit Yerine İnşaatı Bitirme)",
+        "slug": "arsa-sahibinin-nama-ifa-yetkisi",
+        "harf": "A",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "İnşaatı yarım bırakıp kaçan veya batak müteahhit yerine arsa sahibinin mahkemeden izin alarak inşaatı müteahhidin nam ve hesabına kendisinin tamamlamasıdır.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 113/1.",
+        "pratikteNeAnlamaGelir": "Mahkeme inşaatın kalan maliyetini hesaplar ve müteahhide düşen bağımsız bölümlerin satılarak inşaatın bitirilmesine yetki verir; bina mağduriyeti biter.",
+        "kritikUyari": "Müteahhidin daireleri satılarak elde edilen gelir doğrudan inşaat tamamlama emanet hesabına aktarılır; arsa sahipleri cebinden para koymadan binayı bitirir.",
+        "ilgiliTerimler": ["Şantiye İlerleme ve Hakediş Tutanağı", "Bina Tamamlama Sigortası"]
+    },
+    {
+        "terim": "Kat Karşılığı İnşaat Sözleşmesinin Tek Taraflı Feshedilememesi",
+        "slug": "kat-karsiligi-sozlesme-mahkeme-feshi",
+        "harf": "K",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Arsa payı karşılığı inşaat sözleşmelerinin noterde düzenlense dahi, taraflardan birinin tek taraflı fesih beyanıyla değil ancak mahkeme kararıyla feshedilebilmesidir.",
+        "hukukiKarsilik": "Yargıtay İçtihadı Birleştirme Genel Kurulu Kararları ve TMK md. 1009.",
+        "pratikteNeAnlamaGelir": "Arsa sahibi 'müteahhiti kovdum, sözleşmeyi feshettim' diyemez; taraflar noterde karşılıklı anlaşamazsa mutlaka fesih davası açılıp karar alınmalıdır.",
+        "kritikUyari": "Mahkeme fesih kararı vermeden arsayı başka bir müteahhide veren arsa sahipleri ilk müteahhide devasa tazminat ve kâr mahrumiyeti ödemek zorunda kalır.",
+        "ilgiliTerimler": ["Kat Karşılığı İnşaat Sözleşmesi", "Nama İfa Yetkisi"]
+    },
+    {
+        "terim": "İnşaat Sözleşmesinin Geriye Etkili Feshi ve Tasfiyesi",
+        "slug": "insaat-sozlesmesinin-geriye-etkili-feshi",
+        "harf": "İ",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "İnşaat henüz başlangıç aşamasındayken (ilerleme seviyesi %60'ın altındayken) sözleşmenin feshinde tarafların sanki hiç sözleşme yapılmamış gibi eski durumlarına dönmesidir.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 125/2.",
+        "pratikteNeAnlamaGelir": "Müteahhide avans olarak verilen tüm tapular arsa sahibine geri döner; arsa sahibi müteahhidin yaptığı temele harcadığı zorunlu masrafı öder.",
+        "kritikUyari": "Geriye etkili fesihte müteahhitten üçüncü kişilerin satın aldığı tüm dairelerin tapuları da iptal edilir; üçüncü kişiler mağdur olur.",
+        "ilgiliTerimler": ["Şantiye İlerleme ve Hakediş Tutanağı", "Tapu İptal ve Tescil Davası"]
+    },
+    {
+        "terim": "Şantiye Seviyesinin %90'ı Aşmasında İleriye Etkili Fesih",
+        "slug": "santiye-seviyesi-yuzde-90-ileriye-fesih",
+        "harf": "Ş",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "İnşaatın büyük kısmı (yaklaşık %90 veya üzeri) tamamlanmışsa, sözleşmenin geriye değil ileriye etkili feshedilerek müteahhide hak ettiği payın verilmesidir.",
+        "hukukiKarsilik": "25.01.1984 Tarihli 3/1 Sayılı Yargıtay İçtihadı Birleştirme Kararı.",
+        "pratikteNeAnlamaGelir": "Arsa sahibi binanın neredeyse tamamını bitirmiş müteahhidin tüm haklarını elinden alamaz; tamamlanan orana denk gelen daireler müteahhide bırakılır.",
+        "kritikUyari": "Arsa sahibi sadece kalan %10'luk eksik ve kusurlu imalat bedelini müteahhitten tazminat olarak keser veya kalan dairelerden mahsup eder.",
+        "ilgiliTerimler": ["Geçici Kabul ve Kesin Kabul", "Şantiye İlerleme ve Hakediş Tutanağı"]
+    },
+    {
+        "terim": "Müteahhitten Daire Alan Üçüncü Kişilerin Hukuki Durumu",
+        "slug": "muteahhitten-daire-alan-ucuncu-kisiler",
+        "harf": "M",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Müteahhidin arsa sahibine karşı inşaat yapma borcunu tam bitirmeden, kendisine düşen daireleri adi yazılı sözleşmeyle üçüncü kişilere satması durumudur.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 183-194 (Alacağın Temliki).",
+        "pratikteNeAnlamaGelir": "Üçüncü kişi ancak müteahhit inşaatı eksiksiz bitirip iskanı aldığı zaman arsa sahibinden tapuyu talep etme hakkına kavuşur.",
+        "kritikUyari": "Müteahhit inşaatı yarım bırakıp kaçarsa, arsa sahibi üçüncü kişiye tapu vermek zorunda değildir; alıcı parayı müteahhitten tahsil etmek zorunda kalır.",
+        "ilgiliTerimler": ["Ön Ödemeli Konut Satış Sözleşmesi", "Kat Karşılığı İnşaat Sözleşmesi"]
+    },
+    {
+        "terim": "Tapu Tahsis Belgesinin Mülkiyete Dönüşmesi (2981 Sayılı Kanun)",
+        "slug": "tapu-tahsis-belgesi-mulkiyete-donusum",
+        "harf": "T",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Gecekondu hak sahiplerine geçmişte verilen kullanım hakkı belgesinin, ıslah imar planı yapılıp harçları ödendikten sonra gerçek tapuya dönüştürülmesidir.",
+        "hukukiKarsilik": "2981 Sayılı İmar ve Gecekondu Mevzuatına Aykırı Yapılara Uygulanacak Bazı İşlemler Hakkında Kanun.",
+        "pratikteNeAnlamaGelir": "Yıllardır tapusu olmayan gecekondu sahibi, belediyeye arsa bedelini ödeyerek resmi müstakil veya kat mülkiyeti tapusunu eline alır.",
+        "kritikUyari": "Tahsis belgesi tek başına mülkiyet kazandırmaz; belediyeden kesin tahsis kararı alınıp tapu kütüğüne tescil yapılmadan mülk üçüncü kişiye satılamaz.",
+        "ilgiliTerimler": ["Tapu Tahsis Belgesi", "Zilyetlik"]
+    },
+    {
+        "terim": "Açık Artırma ile Taşınmaz Satışında Teminat Yatırma Şartı",
+        "slug": "acik-artirma-tasinmaz-teminat-orani",
+        "harf": "A",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "İcra veya sulh hukuk ortaklığın giderilmesi ihalelerinde teklif verebilmek için muhammen bedelin yüzde onu (%10) veya beşi oranında nakit teminat yatırılmasıdır.",
+        "hukukiKarsilik": "İcra ve İflas Kanunu md. 114 ve 124.",
+        "pratikteNeAnlamaGelir": "İhaleye sahte pey sürülmesini engeller; ihaleyi kazanan kişi 7 gün içinde paranın kalanını ödemezse yatırdığı teminat doğrudan yanar.",
+        "kritikUyari": "UYAP e-satış portalı üzerinden kredi kartı veya havale ile teminat bloke ettirilebilir; ihaleyi kaybedenlerin teminatı kesintisiz anında iade edilir.",
+        "ilgiliTerimler": ["Ortaklığın Giderilmesi (İzale-i Şüyu)", "İcra Satışı İhalenin Feshi"]
+    },
+    {
+        "terim": "İcra Satışında KDV Oranları ve Damga Vergisi Muafiyeti",
+        "slug": "icra-satisinda-kdv-ve-damga-vergisi",
+        "harf": "İ",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "İcra dairesinden satın alınan konut ve dükkanların ihale bedeli üzerinden net alanına ve lüks sınıfına göre %1, %10 veya %20 KDV tahsil edilmesidir.",
+        "hukukiKarsilik": "3065 Sayılı Katma Değer Vergisi Kanunu md. 1/3-d.",
+        "pratikteNeAnlamaGelir": "İhalede pey sürerken son fiyata KDV'nin, binde 5.69 ihale damga vergisinin ve tellaliye harcının ekleneceği peşinen hesaba katılmalıdır.",
+        "kritikUyari": "Ticari taşınmazlarda veya büyük villalarda %20 KDV alıcı tarafından ihale bedeline ek olarak icra veznesine peşin yatırılır.",
+        "ilgiliTerimler": ["Konut Tesliminde KDV Oranları", "Tapu Harcı"]
+    },
+    {
+        "terim": "Hobi Bahçesi Yapılaşmasında 5403 Sayılı Kanun Yıkım Yaptırımı",
+        "slug": "hobi-bahcesi-5403-sk-yikim-cezasi",
+        "harf": "H",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Tarımsal arazilerin kooperatif payı veya hisseli satışla bölünerek üzerine izinsiz konteyner, havuz ve tel örgü çekilmesine uygulanan ağır para ve yıkım cezasıdır.",
+        "hukukiKarsilik": "5403 Sayılı Toprak Koruma Kanunu md. 20 ve 21.",
+        "pratikteNeAnlamaGelir": "Valilik ve İl Tarım Müdürlüğü hobi bahçesindeki tüm kaçak yapıları dozerle yıkar, masrafını malikten alır ve araziyi eski tarım haline getirtir.",
+        "kritikUyari": "Tarlayı bölüp hobi bahçesi satan kooperatif yöneticileri hakkında 1 yıldan 3 yıla kadar hapis cezası istemiyle Asliye Ceza Mahkemesinde kamu davası açılır.",
+        "ilgiliTerimler": ["Asgari Tarımsal Arazi Büyüklüğü", "Kaçak Yapı (Ruhsatsız Yapı)"]
+    },
+    {
+        "terim": "Tarım Kredi Kooperatifi İpotekleri ve Tahsil Önceliği",
+        "slug": "tarim-kredi-kooperatifi-ipotekleri",
+        "harf": "T",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Çiftçilere kullandırılan tarımsal krediler karşılığında Tarım Kredi Kooperatifleri lehine konulan ve kanun gereği rüçhanlı (öncelikli) sayılan yasal ipoteklerdir.",
+        "hukukiKarsilik": "1581 Sayılı Tarım Kredi Kooperatifleri ve Birlikleri Kanunu md. 12.",
+        "pratikteNeAnlamaGelir": "Tarla icradan satıldığında satış parasından pay alma sırasında Tarım Kredi ipoteği diğer sıradan bankalardan önce parasını tahsil eder.",
+        "kritikUyari": "Tarla satın alırken tapu kütüğündeki Tarım Kredi ipoteğinin ana para ve faiz limitine çok dikkat edilmeli, kooperatiften resmi borç dökümü alınmalıdır.",
+        "ilgiliTerimler": ["İpotek", "İpotek Derecesi"]
+    },
+    {
+        "terim": "Tapu Randevu ve Başvuru Takip Sistemi (Web-Tapu)",
+        "slug": "web-tapu-randevu-basvuru-takip",
+        "harf": "W",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Taşınmaz maliklerinin e-Devlet şifresiyle mülklerini görüntülediği, tapu devir başvurusu yaptığı ve yetkisiz işlem yapılmasını kilitleyen resmi TKGM portalıdır.",
+        "hukukiKarsilik": "Tapu ve Kadastro Genel Müdürlüğü Genelgeleri ve E-Devlet Mevzuatı.",
+        "pratikteNeAnlamaGelir": "Tapu dairesine gitmeden evinizden satış evraklarını yüklersiniz; SMS ile gelen harcı ödeyip sadece imza için randevu saatinde tapuya gidersiniz.",
+        "kritikUyari": "Sistem üzerinden 'İşlem Yapılamaz Beyanı' konulduğunda, mülk sahibi bizzat kilidi kaldırmadıkça vekaletnameyle dahi hiç kimse tapuda işlem yapamaz.",
+        "ilgiliTerimler": ["Web-Tapu Sistemi", "Tapu Kütüğü"]
+    },
+    {
+        "terim": "Yabancılara Vatandaşlık Alımında 3 Yıl Satılmama Taahhüdü",
+        "slug": "vatandaslik-icin-3-yil-satilmama-serhi",
+        "harf": "V",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Türk vatandaşlığı kazanmak amacıyla en az 400.000 USD değerinde gayrimenkul alan yabancının tapu kütüğüne konulan ve 3 yıl devri yasaklayan resmi şerhtir.",
+        "hukukiKarsilik": "Türk Vatandaşlığı Kanununun Uygulanmasına İlişkin Yönetmelik md. 20/b.",
+        "pratikteNeAnlamaGelir": "Yabancı mülkü 3 yıl boyunca satamaz, devredemez ve bağışlayamaz; 3 yıl dolmadan satarsa veya ipotek ettirirse kazanılan vatandaşlık iptal edilir.",
+        "kritikUyari": "3 yıllık süre tapu kütüğüne şerh konulduğu tarihten itibaren başlar; süre bitiminde şerhin terkini için Nüfus ve Vatandaşlık onay yazısı gerekir.",
+        "ilgiliTerimler": ["Yabancıya Satışta Uygunluk Belgesi", "Döviz Alım Belgesi (DAB)"]
+    },
+    {
+        "terim": "İmar Kanunu 16. Madde (Tescile Tabi Tevhid ve İfraz)",
+        "slug": "imar-kanunu-16-madde-tescil",
+        "harf": "İ",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "İmar planı sınırları içinde parsellerin ayrılması (ifraz), birleştirilmesi (tevhid) ve yola terk işlemlerinin belediye encümeni onayıyla tapuya tescil edilmesidir.",
+        "hukukiKarsilik": "3194 Sayılı İmar Kanunu md. 15 ve 16.",
+        "pratikteNeAnlamaGelir": "Belediye encümeni onay kararını verdikten sonra dosya kadastro müdürlüğünce kontrol edilir ve 30 gün içinde tapu kütüğüne yeni parseller tescil edilir.",
+        "kritikUyari": "Belediye encümeni onayından itibaren süresi içinde tapuya tescil ettirilmeyen ifraz ve tevhid kararları hükümsüz hale gelir.",
+        "ilgiliTerimler": ["İfraz (Ayırma)", "Tevhid (Birleştirme)"]
+    },
+    {
+        "terim": "Taşınmaz Satışında Tellaliye Harcı (Belediye)",
+        "slug": "tasinmaz-satisinda-tellaliye-harci",
+        "harf": "T",
+        "kategori": "Vergi & Harç",
+        "kisaTanim": "İcra daireleri veya mahkemelerce açık artırmayla satılan gayrimenkullerin satış bedeli üzerinden belediye adına tahsil edilen binde yirmi oranındaki resmi harçtır.",
+        "hukukiKarsilik": "2464 Sayılı Belediye Gelirleri Kanunu md. 67-71.",
+        "pratikteNeAnlamaGelir": "İcradan veya sulh hukuk ortaklığın giderilmesi ihalesinden mülk alan kişinin ihale bedeline ek olarak belediyeye ödemek zorunda olduğu yasal paydır.",
+        "kritikUyari": "Tellaliye harcı ödenmeden icra dairesi tapu müdürlüğüne tescil yazısı göndermez; alıcı bu masrafı hesaba katmalıdır.",
+        "ilgiliTerimler": ["İcra Satışı İhalenin Feshi", "Tapu Harcı"]
+    }
+]
+
+print(f"data_ultra_6.py hazır: {len(ULTRA_TERIMLER_6)} terim.")

@@ -1,0 +1,560 @@
+# -*- coding: utf-8 -*-
+"""
+data_ultra.py — EDM Emlak Sözlüğü Ultra Genişletme Paketi Bölüm 1 (50 Terim)
+Tesisat, yapı malzemeleri, mimari detaylar, site yönetimi, elektrik ve ileri hukuk terimleri.
+"""
+
+ULTRA_TERIMLER = [
+    {
+        "terim": "Numarataj Krokisi ve Bina Giriş Tescili",
+        "slug": "numarataj-krokisi",
+        "harf": "N",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Belediye numarataj şefliğince düzenlenen, binanın cephe aldığı cadde/sokak adını, kapı numarasını ve iç kapı dağılımını gösteren resmi belgedir.",
+        "hukukiKarsilik": "Adres ve Numaralamaya İlişkin Yönetmelik ve 5490 Sayılı Kanun.",
+        "pratikteNeAnlamaGelir": "İnşaat bitiminde iskan başvurusu yapılmadan önce belediyeden alınır; binanın UAVT sistemine doğru işlenmesini sağlar.",
+        "kritikUyari": "Numarataj krokisindeki kapı numaraları ile tapudaki bağımsız bölüm numaraları uyuşmazsa su, elektrik ve doğalgaz saatleri birbirine karışır.",
+        "ilgiliTerimler": ["Ulusal Adres Veri Tabanı (UAVT Kodu)", "Yapı Kullanma İzin Belgesi"]
+    },
+    {
+        "terim": "Ada ve Parsel Sorgulama (Parsel Sorgu)",
+        "slug": "ada-ve-parsel-sorgulama",
+        "harf": "A",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Tapu ve Kadastro Genel Müdürlüğü'nün (TKGM) e-devlet ve internet üzerinden tüm Türkiye parsellerinin coğrafi konumunu ve alanını gösteren harita servisidir.",
+        "hukukiKarsilik": "TKGM Coğrafi Bilgi Sistemleri Mevzuatı.",
+        "pratikteNeAnlamaGelir": "Satın almayı düşündüğünüz arsanın uydu görüntüsünü, yola cephesini, şeklini ve koordinatlarını akıllı telefonunuzdan anında ücretsiz görürsünüz.",
+        "kritikUyari": "Parsel sorgudaki harita bilgilendirme amaçlıdır; hukuken geçerli resmi aplikasyon için daima LİHKAB'dan onaylı aplikasyon krokisi alınmalıdır.",
+        "ilgiliTerimler": ["Aplikasyon Krokisi", "Kadastro Paftası", "LİHKAB"]
+    },
+    {
+        "terim": "22/a Kadastro Yenileme Çalışmaları",
+        "slug": "22-a-kadastro-yenileme",
+        "harf": "2",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Eski tekniklerle yapılmış yetersiz, hatalı veya kaymış kadastro paftalarının güncel uydu ve sayısal koordinat sistemleriyle yeniden ölçülüp yenilenmesidir.",
+        "hukukiKarsilik": "3402 Sayılı Kadastro Kanunu md. 22/a.",
+        "pratikteNeAnlamaGelir": "Bölgede 22/a çalışması yapıldığında arsanızın tapudaki metrekare miktarı birkaç metre büyüyebilir veya küçülebilir; yeni sınırlar kesinleşir.",
+        "kritikUyari": "Yenileme askı cetvelleri 30 gün askıda kalır; metrekare kaybı olduğunu düşünen malik bu sürede kadastro mahkemesinde dava açmalıdır.",
+        "ilgiliTerimler": ["Kadastro Paftası", "Aplikasyon Krokisi", "Kadastro Sınır Düzeltmesi (41. Madde)"]
+    },
+    {
+        "terim": "Vaziyet Planı",
+        "slug": "vaziyet-plani",
+        "harf": "V",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Ruhsata esas mimari projede yapının arsa üzerindeki kesin konumunu, çekme mesafelerini, yola girişini, otopark ve yeşil alan yerleşimini gösteren kuşbakışı plandır.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 57.",
+        "pratikteNeAnlamaGelir": "Binanın arsanın neresine oturtulduğunu, hangi dairenin havuz veya cadde yönüne baktığını vaziyet planından anlarsınız.",
+        "kritikUyari": "İnşaat vaziyet planındaki konuma aykırı olarak parselde kayık inşa edilirse yola veya komşuya tecavüz sayılır ve ruhsata aykırılıktan mühürlenir.",
+        "ilgiliTerimler": ["İstikamet Rölevesi", "Çekme Mesafesi", "Mimari Uygulama Projesi"]
+    },
+    {
+        "terim": "Kaçak Akım Rölesi (30 mA ve 300 mA)",
+        "slug": "kacak-akim-rolesi",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Faz ve nötr hatları arasındaki akım dengesizliğini anında algılayarak elektrik akımını saliseler içinde kesen hayat ve yangın koruma şalteridir.",
+        "hukukiKarsilik": "Elektrik İç Tesisleri Yönetmeliği ve Binaların Yangından Korunması Hakkında Yönetmelik.",
+        "pratikteNeAnlamaGelir": "Daire içinde 30 mA röle insanı elektrik çarpmasından ölümden kurtarır; bina ana girişindeki 300 mA röle ise elektriksel kıvılcım yangınlarını engeller.",
+        "kritikUyari": "Kaçak akım rölesi bulunmayan veya sürekli attığı için köprülenerek iptal edilen binalara elektrik idaresi kesin abonelik vermez ve iskan bağlanamaz.",
+        "ilgiliTerimler": ["Elektrik Tesisat Projesi", "Yapı Kullanma İzin Belgesi"]
+    },
+    {
+        "terim": "Yangın Sprinkler Sistemi",
+        "slug": "yangin-sprinkler-sistemi",
+        "harf": "Y",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Yangın anında ortam sıcaklığı 68°C'ye ulaştığında cam tüpü patlayarak alevlerin üzerine otomatik olarak basınçlı su püskürten tavan söndürme sistemidir.",
+        "hukukiKarsilik": "Binaların Yangından Korunması Hakkında Yönetmelik md. 96.",
+        "pratikteNeAnlamaGelir": "Kapalı otoparklarda, AVM'lerde ve yüksek binaların koridorlarında yangının yayılmasını itfaiye gelmeden saniyeler içinde durdurur.",
+        "kritikUyari": "Sprinkler vanalarının kapalı tutulması veya borulardaki suyun donması durumunda yangın faciasında can kayıplarının sorumluluğu doğrudan bina yöneticisindedir.",
+        "ilgiliTerimler": ["Su Deposu ve Yangın Rezervi", "Yangın Merdiveni ve Kaçış Holü"]
+    },
+    {
+        "terim": "VRF / VRV Merkezi Klima Sistemi",
+        "slug": "vrf-vrv-merkezi-klima-sistemi",
+        "harf": "V",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Çatıdaki tek bir dış üniteye bağlı olarak her odadaki iç ünitenin birbirinden bağımsız ısıtma veya soğutma yapmasını sağlayan değişken gaz debili iklimlendirme sistemidir.",
+        "hukukiKarsilik": "Binalarda Enerji Performansı Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Binanın dış cephesinde çirkin klima motoru kalabalığı oluşmaz; salon soğutulurken aynı anda yatak odası ısıtılabilir ve yüksek elektrik tasarrufu sağlanır.",
+        "kritikUyari": "VRF borulama hatlarında bakır boru kaynaklarının azot gazı altında yapılması şarttır; aksi halde sistem gaz kaçırır ve kompresör kilitlenir.",
+        "ilgiliTerimler": ["Enerji Kimlik Belgesi (EKB)", "Mekanik Tesisat Projesi"]
+    },
+    {
+        "terim": "Çekvalf (Kanalizasyon Geri Tepme Önleyici)",
+        "slug": "cekvalf-kanalizasyon-geri-tepme",
+        "harf": "Ç",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Aşırı yağışlarda ana şehir kanalizasyon hattındaki pis suların geri teperek bodrum ve zemin katlardaki daireleri basmasını engelleyen tek yönlü mekanik klapedir.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 52.",
+        "pratikteNeAnlamaGelir": "Binanın ana atık su çıkışına takılır; su sadece dışarı doğru akar, dışarıdan içeriye lağım suyu veya fare girmesi fiziksel olarak engellenir.",
+        "kritikUyari": "Çekvalfi bulunmayan bodrum katları şiddetli sağanaklarda lağım suyu basması riskiyle karşı karşıya kalır; sigorta şirketleri çekvalfsiz evlere su teminatı vermez.",
+        "ilgiliTerimler": ["Kanal Bağlantı Belgesi", "Drenaj Hattı"]
+    },
+    {
+        "terim": "Geotekstil Keçe ve Drenaj Koruması",
+        "slug": "geotekstil-kece-drenaj-korumasi",
+        "harf": "G",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Temel çevresindeki drenaj borularının ve su yalıtım membranlarının çamur, balçık ve sivri taşlarla tıkanıp delinmesini önleyen gözenekli sentetik örtüdür.",
+        "hukukiKarsilik": "Binalarda Su Yalıtımı Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Mıcır dolgunun etrafına sarılarak filtre görevi görür; suyun drenaj borusuna geçmesine izin verirken toprağın boruyu tıkamasını engeller.",
+        "kritikUyari": "Geotekstil keçe kullanılmadan yapılan temel dolgularında drenaj hatları 2 yıl içinde çamurla dolar ve bina temelden rutubet almaya başlar.",
+        "ilgiliTerimler": ["Drenaj Hattı", "Bohçalama Su Yalıtımı"]
+    },
+    {
+        "terim": "Monoblok Çelik Kapı Güvenlik Standardı",
+        "slug": "monoblok-celik-kapi-guvenlik",
+        "harf": "M",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Daire giriş kapılarında kilit mekanizmasının kapının üst, alt ve yanlarından çoklu çelik millerle kasaya kilitlendiği zırhlı kapı sistemidir.",
+        "hukukiKarsilik": "TS EN 1627 (Hırsızlığa Karşı Direnç Standartları).",
+        "pratikteNeAnlamaGelir": "Levye veya kriko ile kanırtıldığında kapı esnemez ve açılmaz; daire sakinlerine en üst düzey fiziki güvenlik sağlar.",
+        "kritikUyari": "İçi mukavva petek dolgulu sac kapılar çelik kapı sayılmaz; gerçek çelik kapının içinde en az 2 mm dikey takviye profilleri ve taşyünü yalıtım bulunmalıdır.",
+        "ilgiliTerimler": ["Bağımsız Bölüm", "Akustik Performans Raporu"]
+    },
+    {
+        "terim": "Plaka Tanıma Sistemi (Site PTS)",
+        "slug": "plaka-tanima-sistemi-pts",
+        "harf": "P",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Site ve otopark girişlerindeki kameraların aracın plakasını optik olarak okuyarak izinli sakinler için bariyeri otomatik açmasını sağlayan akıllı otomasyondur.",
+        "hukukiKarsilik": "Otopark Yönetmeliği ve Kişisel Verilerin Korunması Kanunu (KVKK).",
+        "pratikteNeAnlamaGelir": "Kumanda arama veya kart okutma derdi olmadan araç yaklaştığında bariyer açılır; yabancı ve misafir araçlar güvenliğe yönlendirilir.",
+        "kritikUyari": "Kamera kayıtlarının KVKK mevzuatına uygun olarak tutulması ve site girişine 'Güvenlik Kamerasıyla İzlenmektedir' aydınlatma levhası asılması zorunludur.",
+        "ilgiliTerimler": ["Otopark Yönetmeliği", "Mekanik Otopark"]
+    },
+    {
+        "terim": "Münhasır (Tek Yetkili) Sözleşme",
+        "slug": "munhasir-tek-yetkili-sozlesme",
+        "harf": "M",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Mülk sahibinin gayrimenkulün pazarlanması ve satışı için belirli bir süre boyunca yalnızca tek bir yetkili emlak işletmesine hak tanıdığı resmi sözleşmedir.",
+        "hukukiKarsilik": "Taşınmaz Ticareti Hakkında Yönetmelik md. 15.",
+        "pratikteNeAnlamaGelir": "Mülk 10 farklı emlakçının elinde farklı fiyatlarla dolaşıp değer kaybetmez; tek bir kurumsal ofis profesyonel tanıtım bütçesi ayırarak mülkü satar.",
+        "kritikUyari": "Sözleşme süresince malik mülkü kendisi satsa dahi sözleşmedeki şartlara göre yetkili emlak işletmesine hizmet bedelini ödemekle yükümlü olabilir.",
+        "ilgiliTerimler": ["Yetkilendirme Sözleşmesi", "Hizmet Bedeli"]
+    },
+    {
+        "terim": "İpotekli Konutun Borç Nakliyle Satışı",
+        "slug": "ipotekli-konutun-borc-nakliyle-satisi",
+        "harf": "İ",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Üzerinde banka konut kredisi ipoteği bulunan bir dairenin, mevcut kredi borcunun yeni alıcı tarafından banka onayıyla üstlenilerek (borcun nakli) devredilmesidir.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 195-204 ve TMK md. 888.",
+        "pratikteNeAnlamaGelir": "Alıcı kalan kredi borcunu kendi üzerine geçirir, satıcıya sadece aradaki özkaynak farkını öder; böylece erken kapama cezası ödenmez.",
+        "kritikUyari": "Banka alıcının kredi notunu ve gelirini onaylamadıkça borcun nakli gerçekleşmez; banka onayı olmadan tapuda ipotekli devir satıcıyı borçtan kurtarmaz.",
+        "ilgiliTerimler": ["İpotek", "Konut Finansmanı Kredisi (Mortgage)"]
+    },
+    {
+        "terim": "Mirasçıların Önalım (Şufa) Hakkından Feragati",
+        "slug": "mirascilarin-onalim-hakkindan-feragati",
+        "harf": "M",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Hisseli bir taşınmazda paydaşların, ileride bir hisse satışı yapıldığında şufa davası açmayacaklarını noterde resmi senetle peşinen kabul etmeleridir.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 733/2.",
+        "pratikteNeAnlamaGelir": "Hisseli yerden pay satın alacak alıcı, diğer paydaşlardan noterden önalımdan feragat belgesi alırsa daha sonra yerin elinden alınma riski tamamen biter.",
+        "kritikUyari": "Önalım hakkından feragat sözleşmesinin resmi şekilde yapılması ve tapu kütüğüne şerh verilmesi şarttır; adi yazılı feragatler hukuken geçersizdir.",
+        "ilgiliTerimler": ["Şufa (Önalım) Hakkı", "Hisseli Tapu", "Tapu Şerhi"]
+    },
+    {
+        "terim": "Darbe Emici Zemin Standartları (Site Çocuk Parkı)",
+        "slug": "darbe-emici-zemin-standartlari",
+        "harf": "D",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Site bahçelerindeki çocuk oyun alanlarında düşme anında yaralanmaları ve kafa travmasını önlemek üzere uygulanan dökme EPDM veya kauçuk karo zemin kaplamasıdır.",
+        "hukukiKarsilik": "TS EN 1176 ve TS EN 1177 (Oyun Alanı Güvenlik Standartları).",
+        "pratikteNeAnlamaGelir": "Beton veya sert zemin üzerine salıncak ve kaydırak konulması yasaktır; düşme yüksekliğine göre en az 20-50 mm kalınlığında esnek kauçuk döşenir.",
+        "kritikUyari": "Standardı taşımayan zeminlerde meydana gelen çocuk yaralanmalarında site yönetimi ve müteahhit 'taksirle yaralamaya neden olma' suçundan yargılanır.",
+        "ilgiliTerimler": ["Ortak Alanlar", "Kat Malikleri Kurulu"]
+    },
+    {
+        "terim": "Asmolen Döşeme",
+        "slug": "asmolen-doseme",
+        "harf": "A",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Kirişlerin tavan altına sarkmaması için döşeme aralarına hafif tuğla, bims veya gazbeton bloklar doldurularak düz tavan elde edilen nervürlü döşemedir.",
+        "hukukiKarsilik": "Türkiye Bina Deprem Yönetmeliği (TBDY 2018) md. 4.3.4.",
+        "pratikteNeAnlamaGelir": "İç mimaride oda tavanında kiriş çıkıntısı görülmez, düz tavan sağlar; ancak deprem esnasında yanal rijitliği klasik plak döşemelere göre daha düşüktür.",
+        "kritikUyari": "TBDY 2018 ile yüksek deprem tehlikesi olan bölgelerde asmolen döşemeli binalara zorunlu süneklik ve perde beton şartları getirilmiştir; perdeleri yetersizse risk taşır.",
+        "ilgiliTerimler": ["Kaset Döşeme", "Kirişsiz Plak", "Perde Beton"]
+    },
+    {
+        "terim": "Kaset Döşeme",
+        "slug": "kaset-doseme",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Geniş açıklıklı alanlarda (AVM, otopark, konferans salonu) iki doğrultuda birbirini dik kesen sık kirişçiklerle oluşturulan ızgara tipli betonarme döşemedir.",
+        "hukukiKarsilik": "TS 500 ve TBDY 2018.",
+        "pratikteNeAnlamaGelir": "Ortada hiçbir kolon olmadan 10-15 metrelik devasa ferah açıklıkların geçilmesine imkan tanır; modern mimaride estetik tavan görünümü sunar.",
+        "kritikUyari": "Kalıp işçiliği ve beton dökümü büyük titizlik gerektirir; kaset yuvalarında donatının doğru yerleştirilmemesi sehim (bel verme) sorunlarına yol açar.",
+        "ilgiliTerimler": ["Asmolen Döşeme", "Kirişsiz Plak"]
+    },
+    {
+        "terim": "Kirişsiz Plak (Mantar Döşeme)",
+        "slug": "kirissiz-plak-mantar-doseme",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Döşeme yükünün ara kirişler olmadan doğrudan kolonlara aktarıldığı, kolon başlarında zımbalama dayanımını artırmak için mantar başlıklar kullanılan döşeme sistemidir.",
+        "hukukiKarsilik": "TS 500 ve TBDY 2018 md. 4.3.4.4.",
+        "pratikteNeAnlamaGelir": "Otoparklarda ve ticari binalarda tavan yüksekliğini maksimum seviyede tutar; mekanik tesisat boruları kiriş engeline takılmadan tavandan düz geçer.",
+        "kritikUyari": "En büyük tehlikesi kolonun döşemeyi delip geçmesi (zımbalama kırılması) riskidir; kolon-döşeme birleşimine özel zımbalama donatısı konulması hayati önem taşır.",
+        "ilgiliTerimler": ["Kolon", "Zımbalama Donatısı"]
+    },
+    {
+        "terim": "Epoksi Zemin Kaplaması",
+        "slug": "epoksi-zemin-kaplamasi",
+        "harf": "E",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Kapalı otopark, sığınak ve teknik hacimlerde betonun üzerine sürülen, tozuma yapmayan, kimyasallara ve ağır araç yüküne dayanıklı eksiz reçine kaplamadır.",
+        "hukukiKarsilik": "Binalarda Su Yalıtımı ve İç Mekan Standartları Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Otoparkta lastik sesi ve beton tozu oluşmaz; su geçirmez, kolay silinir, çizgiler ve yönlendirme okları üzerine net şekilde çizilir.",
+        "kritikUyari": "Alt betonun nem oranı %4'ün üzerindeyken uygulanırsa epoksi kaplama 6 ay içinde kabarıp pul pul dökülür; nem ölçümü yapılmadan dökülmemelidir.",
+        "ilgiliTerimler": ["Şap Betonu", "Otopark Yönetmeliği"]
+    },
+    {
+        "terim": "Low-E Kaplamalı Isıcam (Sinerji ve Konfor Cam)",
+        "slug": "low-e-kaplamali-isicam",
+        "harf": "L",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Çift camın iç yüzeyine mikroskobik metal oksit kaplama yapılarak kışın odadaki sıcaklığı içeri hapseden, yazın güneş ısısını dışarıda tutan enerji tasarruflu camdır.",
+        "hukukiKarsilik": "TS 825 Binalarda Isı Yalıtım Kuralları ve Enerji Performansı Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Klasik çift cama göre %50'ye varan ısı yalıtımı sağlar; camın yanında otururken kışın soğuk, yazın bunaltıcı sıcaklık hissettirmez.",
+        "kritikUyari": "Camın montajı sırasında kaplamalı yüzeyin dışa değil iç boşluğa bakması şarttır; ters takılırsa Low-E metal tabakası oksitlenerek lekelenir.",
+        "ilgiliTerimler": ["Enerji Kimlik Belgesi (EKB)", "Mantolama"]
+    },
+    {
+        "terim": "Taşyünü Cephe Yalıtımı (A1 Yangın Sınıfı)",
+        "slug": "tasyunu-cephe-yalitimi",
+        "harf": "T",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Bazalt taşının 1500°C'de eritilip elyaf haline getirilmesiyle üretilen, 1000°C'ye kadar alev almayan ve erimeyen A1 sınıfı inorganik yalıtım levhasıdır.",
+        "hukukiKarsilik": "Binaların Yangından Korunması Hakkında Yönetmelik md. 27.",
+        "pratikteNeAnlamaGelir": "Yüksek binalarda yangının cepheden kat kat sıçrayarak yayılmasını tamamen engeller; aynı zamanda mükemmel bir ses yalıtımı sunar.",
+        "kritikUyari": "Yüksekliği 28.5 metreyi aşan tüm binalarda plastik kökenli EPS/XPS strafor yasak olup taşyünü kullanımı kanunen zorunludur.",
+        "ilgiliTerimler": ["Mantolama", "Yangın Merdiveni"]
+    },
+    {
+        "terim": "EPDM Esnek Çatı Membranı",
+        "slug": "epdm-esnek-cati-membrani",
+        "harf": "E",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Teras çatılarda ve gölet izolasyonlarında uygulanan, -40°C ile +120°C arasında esnekliğini koruyan, UV ışınlarına ve ozona dayanıklı sentetik kauçuk su yalıtım örtüsüdür.",
+        "hukukiKarsilik": "Binalarda Su Yalıtımı Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Geleneksel ziftli membranlar gibi güneşte kuruyup çatlamaz; tek parça geniş rulolar halinde serilerek derz sayısı en aza indirilir.",
+        "kritikUyari": "Ek yerlerinin birleştirilmesinde özel primer ve vulkanize yapıştırıcı bant kullanılmalıdır; kaynak hatası olursa su terasın altına sızar.",
+        "ilgiliTerimler": ["Bohçalama Su Yalıtımı", "Geotekstil Keçe"]
+    },
+    {
+        "terim": "Makine Dairesiz Asansör (MRL Sistem)",
+        "slug": "makine-dairesiz-asansor-mrl",
+        "harf": "M",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Çatı katında ayrı bir betonarme asansör kulesine ihtiyaç duymayan, dişlisiz motoru doğrudan asansör kuyusunun içine monte edilen yeni nesil asansör sistemidir.",
+        "hukukiKarsilik": "Asansör Yönetmeliği (2014/33/AB) ve TS EN 81-20/50.",
+        "pratikteNeAnlamaGelir": "Çatıda çirkin betonarme asansör kulesi çıkıntısını yok eder; son kat dubleks dairelerin çatı terasını genişletir ve sessiz, sarsıntısız çalışır.",
+        "kritikUyari": "Elektrik kesintisinde kabini otomatik olarak en yakın kata getirip kapısını açan acil kurtarma akü sistemi (UPS) faal olmalıdır.",
+        "ilgiliTerimler": ["Asansör Yeşil Bilgi Etiketi", "Ortak Alanlar"]
+    },
+    {
+        "terim": "Jeneratör Otomatik Transfer Panosu (ATS)",
+        "slug": "jenerator-otomatik-transfer-panosu-ats",
+        "harf": "J",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Şebeke elektriği kesildiğinde jeneratörü 10 saniyede otomatik çalıştırıp bina yükünü üzerine alan, şebeke geldiğinde jeneratörü devreden çıkaran akıllı panodur.",
+        "hukukiKarsilik": "Elektrik Tesislerinde Topraklamalar Yönetmeliği ve Binaların Yangından Korunması Hakkında Yönetmelik.",
+        "pratikteNeAnlamaGelir": "Elektrik kesintisinde asansörlerin havada kalmasını, hidroforun ve yangın pompalarının durmasını engeller; yaşam kesintisiz devam eder.",
+        "kritikUyari": "Şebeke ile jeneratör hattının birbirine çakışmasını engelleyen mekanik ve elektriksel kilitlemenin kusursuz çalışması şarttır; aksi takdirde patlama yaşanır.",
+        "ilgiliTerimler": ["Kaçak Akım Rölesi", "Hidrofor ve Basınçlı Su Sistemi"]
+    },
+    {
+        "terim": "Yangın Damperi",
+        "slug": "yangin-damperi",
+        "harf": "Y",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Havalandırma kanallarının yangın duvarını geçtiği noktalara monte edilen, 72°C sıcaklıkta otomatik eriyen sigortasıyla kanalı kapatıp duman geçişini kesen çelik kapaktır.",
+        "hukukiKarsilik": "Binaların Yangından Korunması Hakkında Yönetmelik md. 84.",
+        "pratikteNeAnlamaGelir": "Alt kattaki bir dairede veya otoparkta çıkan zehirli dumanın havalandırma borularından diğer katlara ve dairelere yayılmasını fiziksel olarak durdurur.",
+        "kritikUyari": "İnşaat sırasında yangın damperlerinin motor ve yay mekanizmaları test edilmeden şaft kapatılırsa yangın anında tüm binayı zehirli duman boğar.",
+        "ilgiliTerimler": ["Yangın Merdiveni", "Yangın Sprinkler Sistemi"]
+    },
+    {
+        "terim": "Karbonmonoksit Algılama ve Egzoz Tahliye Sistemi",
+        "slug": "karbonmonoksit-algilama-egzoz-tahliye",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Kapalı otoparklarda araçların egzozundan çıkan zehirli CO gazını PPM seviyesinde ölçüp belirlenen eşik aşıldığında jet fanları çalıştıran otomasyondur.",
+        "hukukiKarsilik": "Binaların Yangından Korunması Hakkında Yönetmelik md. 60.",
+        "pratikteNeAnlamaGelir": "Otoparkta biriken ölümcül, kokusuz egzoz dumanını güçlü hava akımıyla dikey tahliye şaftlarına süpürerek otoparkı güvenli tutar.",
+        "kritikUyari": "CO sensörlerinin yılda bir kez kalibrasyon gazıyla test edilmesi zorunludur; bozuk sensörler duman birikmesine rağmen fanları devreye sokmaz.",
+        "ilgiliTerimler": ["Otopark Yönetmeliği", "Yangın Damperi"]
+    },
+    {
+        "terim": "Akıllı Ev KNX Otomasyon Protokolü",
+        "slug": "akilli-ev-knx-otomasyon-protokolu",
+        "harf": "A",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Aydınlatma, iklimlendirme, panjur ve alarm sistemlerini tek bir uluslararası standart kablolu veri hattı üzerinden kontrol eden açık kaynaklı bina otomasyonudur.",
+        "hukukiKarsilik": "ISO/IEC 14543 Uluslararası Ev ve Bina Elektroniği Standardı.",
+        "pratikteNeAnlamaGelir": "Evinizden çıkarken 'Evden Çıkış' butonuna bastığınızda açık kalan tüm ışıklar söner, su ve doğalgaz vanası kapanır, klimalar tasarruf moduna geçer.",
+        "kritikUyari": "KNX kablolu altyapı inşaat kaba aşamasındayken döşenmelidir; inşaat bittikten sonra kablosuz sistemlere dönülmesi bağlantı kopukluklarına neden olur.",
+        "ilgiliTerimler": ["VRF Merkezi Klima Sistemi", "Enerji Kimlik Belgesi (EKB)"]
+    },
+    {
+        "terim": "Akustik Şilte ve Darbe Sesi Yalıtımı",
+        "slug": "akustik-silte-ve-darbe-sesi-yalitimi",
+        "harf": "A",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Şap betonunun altına serilen, üst kattaki topuk, koşma, sandalye çekme gibi darbe kaynaklı seslerin alt kat tavanına geçmesini yutan elastik polietilen veya kauçuk örtüdür.",
+        "hukukiKarsilik": "Binaların Gürültüye Karşı Korunması Hakkında Yönetmelik.",
+        "pratikteNeAnlamaGelir": "Üst kattan gelen ayak sesleri ve eşya çekme gürültüsü %80 oranında kesilir; komşular arası en yaygın huzursuzluk kaynağı ortadan kalkar.",
+        "kritikUyari": "Şilte duvar kenarlarından en az 10 cm yukarı kıvrılarak süpürgelik arkasına verilmelidir; şap duvara temas ederse ses köprüsü oluşur ve yalıtım işe yaramaz.",
+        "ilgiliTerimler": ["Şap Betonu", "Bağımsız Bölüm"]
+    },
+    {
+        "terim": "Yağmur Suyu Hasadı ve Depolama Sistemi",
+        "slug": "yagmur-suyu-hasadi-ve-depolama",
+        "harf": "Y",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Bina çatısına düşen yağmur sularının filtrelenerek ayrı bir depoda toplanması ve bahçe sulaması ile klozet rezervuarlarında yeniden kullanılması sistemidir.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 57/7-a (2000 m² üzeri parsellerde zorunlu).",
+        "pratikteNeAnlamaGelir": "Sitenin şebeke suyu faturası yarı yarıya düşer; kuraklık dönemlerinde peyzajın ve yeşil alanların susuz kalması engellenir.",
+        "kritikUyari": "Parsel alanı 2000 metrekarenin üzerindeki yeni binalarda yağmur suyu depolama sistemi kurulması yapı ruhsatı ve iskan için yasal zorunluluktur.",
+        "ilgiliTerimler": ["Su Deposu ve Yangın Rezervi", "Kanal Bağlantı Belgesi"]
+    },
+    {
+        "terim": "Gri Su Arıtma Sistemi",
+        "slug": "gri-su-aritma-sistemi",
+        "harf": "G",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Lavabo, duş ve küvetlerden gelen az kirli suların biyolojik ve ultrafiltrasyon membran filtrelerle arıtılarak klozet rezervuarlarına basıldığı geri kazanım sistemidir.",
+        "hukukiKarsilik": "Su Verimliliği Yönetmeliği ve BREEAM/LEED Yeşil Bina Kriterleri.",
+        "pratikteNeAnlamaGelir": "Bir konutun içme suyu tüketimini %35 azaltır; özellikle lüks rezidans ve otel projelerinde işletme maliyetini ciddi ölçüde düşürür.",
+        "kritikUyari": "Mutfak eviyesi ve bulaşık makinesinden gelen yağlı siyah suların kesinlikle gri su hattına karıştırılmaması gerekir; aksi halde biyolojik filtreler çöker.",
+        "ilgiliTerimler": ["Yağmur Suyu Hasadı", "Kanal Bağlantı Belgesi"]
+    },
+    {
+        "terim": "Çatı Güneş Enerji Santrali (Çatı GES)",
+        "slug": "cati-gunes-enerji-santrali-ges",
+        "harf": "Ç",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Bina çatılarına kurulan fotovoltaik panellerle güneşten elektrik üretilip site ortak giderlerinde kullanıldığı ve fazlasının şebekeye satıldığı lisanssız üretim sistemidir.",
+        "hukukiKarsilik": "Elektrik Piyasasında Lisanssız Elektrik Üretim Yönetmeliği ve Kat Mülkiyeti Kanunu md. 42.",
+        "pratikteNeAnlamaGelir": "Apartmanın asansör, aydınlatma, kapalı havuz ve hidrofor elektrik giderleri sıfıra iner; aidat maliyetleri büyük oranda düşer.",
+        "kritikUyari": "Ortak çatıya GES kurabilmek için Kat Malikleri Kurulunda sayı ve arsa payı çoğunluğu ile karar alınması ve dağıtım şirketinden bağlantı anlaşması çağrı mektubu alınması şarttır.",
+        "ilgiliTerimler": ["Kat Malikleri Kurulu", "Ortak Alanlar"]
+    },
+    {
+        "terim": "Şantiye İlerleme ve Hakediş Seviye Tespit Tutanağı",
+        "slug": "santiye-ilerleme-hakedis-tutanagi",
+        "harf": "Ş",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "İnşaatın kaba, ince tesisat, çatı ve doğrama gibi imalatlarının gerçekleşme yüzdesini yapı denetim ve şantiye şefinin yerinde onayladığı resmi ilerleme raporudur.",
+        "hukukiKarsilik": "Yapı Denetimi Uygulama Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Kat karşılığı inşaatlarda arsa sahibinin müteahhide hangi katta kaç dairenin tapusunu devredeceğini bu ilerleme yüzdesi belirler.",
+        "kritikUyari": "Seviye tespit tutanağı olmadan müteahhide hak ettiğinden fazla oranda tapu devredilirse inşaatın yarım kalması durumunda arsa sahipleri mağdur olur.",
+        "ilgiliTerimler": ["Yapı Denetim Kuruluşu", "Şantiye Şefi Sorumluluğu"]
+    },
+    {
+        "terim": "Geçici Kabul ve Kesin Kabul Tutanağı",
+        "slug": "gecici-kabul-kesin-kabul-tutanagi",
+        "harf": "G",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "İnşaatın fiilen bitiminde eksik ve kusurların listelendiği geçici kabul ile 1 yıllık garanti süresi sonunda tüm kusurların giderildiğini teyit eden kesin kabul tutanağıdır.",
+        "hukukiKarsilik": "Yapım İşleri Genel Şartnamesi ve Türk Borçlar Kanunu Eser Sözleşmesi md. 471 vd.",
+        "pratikteNeAnlamaGelir": "İşverenin veya site yönetiminin müteahhitten teminat mektubunu çözmeden önce binadaki boya, tesisat ve izolasyon hatalarını bedelsiz düzelttirme güvencesidir.",
+        "kritikUyari": "Geçici kabulde tespit edilen kusurlar süresi içinde düzeltilmezse işveren müteahhidin kesin teminat mektubunu nakde çevirerek tamiratı kendisi yaptırır.",
+        "ilgiliTerimler": ["Müteahhit Teminat Mektubu", "Gayrimenkulde Maddi Ayıp"]
+    },
+    {
+        "terim": "Çelik Hasır Donatı (Q ve R Tipi Hasır)",
+        "slug": "celik-hasir-donati",
+        "harf": "Ç",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Soğuk çekilerek mukavemeti artırılmış nervürlü çelik çubukların fabrikada birbirine punta kaynağıyla birleştirilmesiyle üretilen endüstriyel beton donatısıdır.",
+        "hukukiKarsilik": "TS 4559 Betonarme için Çelik Hasır Standardı.",
+        "pratikteNeAnlamaGelir": "Plak döşemelerde, saha betonlarında, istinat duvarlarında ve tünel kalıp binalarda montaj hızını 3 katına çıkarır ve çatlakları minimize eder.",
+        "kritikUyari": "Paslanmış, kaynakları kopmuş veya bindirme boyu (en az 2-3 göz aralığı) yetersiz bırakılmış hasır çelikler döşemenin taşıma kapasitesini tehlikeye atar.",
+        "ilgiliTerimler": ["Nervürlü İnşaat Demiri", "Tünel Kalıp Sistemi"]
+    },
+    {
+        "terim": "Karbonatlaşma Derinliği ve Donatı Korozyon Riski",
+        "slug": "karbonatlasma-derinligi-korozyon",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Havadaki karbondioksitin betonun gözeneklerine nüfuz ederek bazik alkali ortamı nötrlemesi ve demiri saran pas koruyucu filmi yok etmesi sürecidir.",
+        "hukukiKarsilik": "TS EN 14630 Beton Yapıların Korunması ve Onarımı.",
+        "pratikteNeAnlamaGelir": "Karbonatlaşma donatı derinliğine ulaştığında demir su ve oksijenle temas edip paslanmaya (korozyona) başlar ve beton kabuk atar.",
+        "kritikUyari": "Fenolftalein indikatör çözeltisi püskürtülerek ölçülür; 20 yıldan eski binalarda pas payı yetersizse demir kesiti yarı yarıya erimiş olabilir.",
+        "ilgiliTerimler": ["Donatı Röntgeni ve Sıyırma", "Pas Payı (Beton Örtü Tabakası)"]
+    },
+    {
+        "terim": "Mirasın Hükmen Reddi (Terekenin Borca Batık Olması)",
+        "slug": "mirasin-hukmen-reddi",
+        "harf": "M",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Mirasbırakanın ölüm tarihinde borçlarının mal varlığından açıkça fazla olduğunun resmi olarak tespiti halinde mirasçıların hiçbir işlem yapmasa dahi mirası reddetmiş sayılmasıdır.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 605/2.",
+        "pratikteNeAnlamaGelir": "3 aylık klasik mirasın reddi süresini kaçırmış olsanız bile, murisin borca batık olduğu tespit edilirse alacaklı bankalar ve tefeciler mirası size yıkamaz.",
+        "kritikUyari": "Mirasçılar murisin terekesine ait bir taşınmazı satar, kirasını alır veya bankadaki parasını çekerse mirası zımnen kabul etmiş sayılır ve bu hakkı kaybeder.",
+        "ilgiliTerimler": ["Mirasın Reddi (Redd-i Miras)", "Terekenin Tespiti Davası"]
+    },
+    {
+        "terim": "Ölünceye Kadar Bakma Sözleşmesi",
+        "slug": "olunceye-kadar-bakma-sozlesmesi",
+        "harf": "Ö",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Bakım borçlusunun bakım alacaklısına ömrü boyunca bakıp gözetmeyi üstlendiği, karşılığında mülk sahibinin taşınmazın mülkiyetini ona devretmeyi taahhüt ettiği resmi akittir.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu md. 611-619.",
+        "pratikteNeAnlamaGelir": "Yaşlı kimseler kendilerine hayatının sonuna kadar bakacak kişiye evlerini devreder; bakım borcu yerine getirilmezse tapu iptali davası açılabilir.",
+        "kritikUyari": "Sözleşmenin mutlaka noter veya tapu müdürlüğünde resmi vasiyetname şeklinde iki tanık huzurunda yapılması şarttır; aksi halde mutlak butlanla geçersizdir.",
+        "ilgiliTerimler": ["Tapu İptal ve Tescil Davası", "Muris Muvazaası"]
+    },
+    {
+        "terim": "Taşınmaz Rehninde Sabit Derece Sistemi",
+        "slug": "tasinmaz-rehninde-sabit-derece-sistemi",
+        "harf": "T",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Bir gayrimenkul üzerinde birden fazla ipotek kurulduğunda ipoteklerin kuruluş tarihine değil tapu kütüğünde tescil edildikleri dereceye göre sıra aldığı ilkedir.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 868 vd.",
+        "pratikteNeAnlamaGelir": "1. derecedeki ipotek 1 milyon TL, 2. derecedeki ipotek 500 bin TL ise icra satışında para önce 1. dereceye ödenir; kalan para 2. dereceye aktarılır.",
+        "kritikUyari": "Öndeki derece boşalsa dahi arkadaki derece kendiliğinden öne geçemez (sabit derece ilkesi); öne geçebilmek için serbest dereceden istifade şerhi bulunmalıdır.",
+        "ilgiliTerimler": ["İpotek Derecesi", "Serbest Dereceden İstifade Hakkı Şerhi"]
+    },
+    {
+        "terim": "Serbest Dereceden İstifade Hakkı Şerhi",
+        "slug": "serbest-dereceden-istifade-hakki-serhi",
+        "harf": "S",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Alt derecedeki bir ipotek alacaklısına, kendisinden önceki ipotek borcu ödenip terkin edildiğinde boşalan üst dereceye otomatik olarak yükselme yetkisi veren tapu şerhidir.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 871.",
+        "pratikteNeAnlamaGelir": "2. derecedeki alacaklı, 1. derecedeki ipotek kapandığında doğrudan 1. sıraya tırmanır ve icra satışında parasını ilk alan kişi olur.",
+        "kritikUyari": "Bu şerh tapu kütüğüne tescil ettirilmezse, borçlu 1. dereceye yeni bir alacaklı yerleştirebilir ve 2. derecedeki alacaklı sırasını koruyamaz.",
+        "ilgiliTerimler": ["Taşınmaz Rehninde Sabit Derece Sistemi", "İpotek"]
+    },
+    {
+        "terim": "Hükmen Tescil (Mahkeme Kararıyla Mülkiyet İktisabı)",
+        "slug": "hukmen-tescil",
+        "harf": "H",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Satış vaadi, inançlı işlem veya miras davasında hakimin verdiği kesinleşmiş tescil kararıyla tapu memuruna gerek kalmadan mülkiyetin tescilden önce kazanılmasıdır.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 705/2.",
+        "pratikteNeAnlamaGelir": "Satıcı tapuya gelip devir imzası atmaktan kaçarsa mahkeme 'mülkiyetin davacı adına tesciline' karar verir ve tapu idaresi bu kararı resen uygular.",
+        "kritikUyari": "Mülkiyet karar kesinleştiği anda kazanılır; ancak üçüncü kişilere karşı tasarrufta bulunabilmek (satabilmek) için tapu kütüğüne tescil ettirilmesi zorunludur.",
+        "ilgiliTerimler": ["Tapu İptal ve Tescil Davası", "Taşınmaz Satış Vaadi Sözleşmesi"]
+    },
+    {
+        "terim": "Kamulaştırmadan Geri Alma (İade) Hakkı",
+        "slug": "kamulastirmadan-geri-alma-hakki",
+        "harf": "K",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Kamulaştırılan taşınmazın 5 yıl içinde kamu yararına uygun hiçbir amaca tahsis edilmemesi durumunda eski malikin ödenen bedeli iade ederek mülkünü geri alma hakkıdır.",
+        "hukukiKarsilik": "2942 Sayılı Kamulaştırma Kanunu md. 23.",
+        "pratikteNeAnlamaGelir": "Belediye okul yapacağım diye tarlanızı elinizden alıp 5 yıl boyunca boş bekletirse tarlanızı aldığınız bedeli iade ederek tapunuzu geri talep edebilirsiniz.",
+        "kritikUyari": "5 yıllık sürenin dolmasından itibaren 1 yıl içinde geri alma hakkı kullanılmazsa bu hak ebediyen düşer.",
+        "ilgiliTerimler": ["Kamulaştırma (İstimlak)", "Kamulaştırmasız El Atma"]
+    },
+    {
+        "terim": "İmar Kanunu 17. Madde Uygulaması (Hisseli İhdas)",
+        "slug": "imar-kanunu-17-madde-ihdas",
+        "harf": "İ",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Müstakil inşaat yapmaya elverişli olmayan küçük artık parsellerin veya kapanan yolların belediyece komşu parsele rayiç bedelle zorunlu satış yoluyla birleştirilmesidir.",
+        "hukukiKarsilik": "3194 Sayılı İmar Kanunu md. 17.",
+        "pratikteNeAnlamaGelir": "Arsanızın önündeki 15 metrekarelik atıl belediye şeridi arsanıza katılarak parseliniz yola cepheli, düzgün ve tam inşaat yapılabilir hale getirilir.",
+        "kritikUyari": "Bedelde anlaşılamazsa belediye mahkemeden kıymet takdiri ister; bedel ödenmezse komşu parsele de ruhsat verilmez.",
+        "ilgiliTerimler": ["Tevhid (Birleştirme)", "İhdas (Yoldan İhdas)"]
+    },
+    {
+        "terim": "Kentsel Tasarım Projesi",
+        "slug": "kentsel-tasarim-projesi",
+        "harf": "K",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Tarihi, turistik veya prestijli caddelerde binaların dış cephe rengi, tabela boyutu, çatı eğimi ve kaplamasını bütüncül bir estetiğe bağlayan mimari projedir.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 67 ve 3194 SK Ek md. 4.",
+        "pratikteNeAnlamaGelir": "Her müteahhit canının istediği renkte cephe kaplaması veya abuk sabuk devasa reklam panosu asamaz; caddenin silueti ve değeri korunur.",
+        "kritikUyari": "Kentsel tasarım rehberi bulunan bölgelerde belediye mimari estetik komisyonu onayı olmadan yapı ruhsatı düzenlenmez.",
+        "ilgiliTerimler": ["İmar Planı", "Görünüm ve Silüet Onayı"]
+    },
+    {
+        "terim": "ÇED Raporu (Çevresel Etki Değerlendirmesi)",
+        "slug": "ced-raporu-cevresel-etki",
+        "harf": "Ç",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Büyük sanayi tesisleri, limanlar, toplu konutlar veya AVM projelerinin çevreye, yeraltı sularına ve tarım arazilerine vereceği zararı inceleyen zorunlu rapordur.",
+        "hukukiKarsilik": "2872 Sayılı Çevre Kanunu md. 10 ve ÇED Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Projenin çevreye olumsuz etkilerini önleyici filtreleme, arıtma ve hafriyat tedbirlerinin alınmasını taahhüt altına alır.",
+        "kritikUyari": "'ÇED Olumlu' veya 'ÇED Gerekli Değildir' kararı alınmadan başlatılan dev inşaat projeleri idare mahkemesince anında durdurulur ve ruhsatı iptal edilir.",
+        "ilgiliTerimler": ["Yapı Ruhsatı", "İmar Planı"]
+    },
+    {
+        "terim": "İçme Suyu Havza Koruma Kuşakları",
+        "slug": "icme-suyu-havza-koruma-kusaklari",
+        "harf": "İ",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Baraj gölleri ve su kaynaklarının etrafında suyun kirlenmesini önlemek amacıyla belirlenen mutlak (0-300m), kısa (300-1000m), orta ve uzun mesafe koruma alanlarıdır.",
+        "hukukiKarsilik": "Su Kirliliği Kontrolü Yönetmeliği ve İSKİ/ASKİ Havza Yönetmelikleri.",
+        "pratikteNeAnlamaGelir": "Mutlak ve kısa koruma kuşağında hiçbir şekilde konut ve sanayi inşaatına izin verilmez; arsa satın alırken imar durumunun ilk kısıtlayıcı faktörüdür.",
+        "kritikUyari": "Havza kısıtlaması olan tarlalara yapılan kaçak villalar su idaresi tarafından hiçbir af kapsamına sokulmadan resen dozerle yıkılır.",
+        "ilgiliTerimler": ["Sit Alanları", "İmar Durum Belgesi"]
+    },
+    {
+        "terim": "İstikamet Rölevesi ve Subasman Vizesi",
+        "slug": "istikamet-rolevesi-subasman-vizesi",
+        "harf": "İ",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Temel atıldıktan sonra su basman seviyesine (+0.00 kotuna) gelindiğinde belediye harita mühendislerince binanın oturum kotunun ve sınırlarının yerinde denetlenmesidir.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 57.",
+        "pratikteNeAnlamaGelir": "Binanın yola tecavüzü veya komşu parsele taşması yoksa 'Subasman Vizesi' onaylanır ve üst katların betonarme inşaatına izin verilir.",
+        "kritikUyari": "Subasman vizesi alınmadan üst katlara devam edilen binalar mühürlenir; kot hatası yapılmışsa binanın temeli yıktırılabilir.",
+        "ilgiliTerimler": ["Kot Kesit Belgesi", "Yapı Tatil Zaptı"]
+    },
+    {
+        "terim": "Kırmızı Kot ve Siyah Kot",
+        "slug": "kirmizi-kot-ve-siyah-kot",
+        "harf": "K",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Siyah kot arsanın mevcut tabii zemin yüksekliğini; kırmızı kot ise yol yapımı veya tesviye sonrası oluşacak kesin tasarı yol yüksekliğini ifade eder.",
+        "hukukiKarsilik": "İmar Planı Yapım Yönetmeliği ve Karayolları Geometrik Tasarım Standartları.",
+        "pratikteNeAnlamaGelir": "Bina giriş kotu tabii zemine göre değil belediyenin belirlediği kırmızı kota (yol bordür taşı kotuna) göre belirlenir.",
+        "kritikUyari": "Kırmızı kot dikkate alınmadan yapılan evler, yol yükseltildiğinde yol seviyesinin 1 metre altında kalarak yağmurda su baskınına uğrayabilir.",
+        "ilgiliTerimler": ["Kot Kesit Belgesi", "İstikamet Rölevesi"]
+    },
+    {
+        "terim": "Asgari Tarımsal Arazi Büyüklüğü (Bölünemez Parsel)",
+        "slug": "asgari-tarimsal-arazi-buyuklugu",
+        "harf": "A",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Tarımsal arazilerin miras veya satış yoluyla küçülüp verimsizleşmesini önlemek için belirlenen mutlak tarım arazilerinde 20 dekar, dikili tarımda 5 dekar sınırıdır.",
+        "hukukiKarsilik": "5403 Sayılı Toprak Koruma ve Arazi Kullanımı Kanunu md. 8.",
+        "pratikteNeAnlamaGelir": "10 dönümlük bir tarlayı iki kardeş aralarında 5'er dönüm olarak ifraz edip iki ayrı tapuya bölemez; hisseli kalmak veya tek kişiye devretmek zorundadırlar.",
+        "kritikUyari": "Tarlayı hisselere bölüp kooperatif veya noter hissesiyle hobi bahçesi olarak satmaya çalışan girişimler kanunen geçersizdir ve idari para cezası kesilir.",
+        "ilgiliTerimler": ["Hobi Bahçesi Sınırlaması", "Büyük Ova Koruma Alanı"]
+    },
+    {
+        "terim": "Mera Vasfı ve Tahsis Amacı Değişikliği",
+        "slug": "mera-vasfi-tahsis-amaci",
+        "harf": "M",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Kamuya ait hayvan otlatma alanlarının, Bakanlıkça çok zorunlu kamu yatırımları veya kentsel dönüşüm alanları için mera vasfından çıkarılarak Hazineye tescilidir.",
+        "hukukiKarsilik": "4342 Sayılı Mera Kanunu md. 14.",
+        "pratikteNeAnlamaGelir": "Meralar özel mülkiyete geçirilemez, zamanaşımıyla kazanılamaz ve satılamaz; sadece kanuni istisnayla kamu yararına dönüştürülebilir.",
+        "kritikUyari": "Mera arazisini tel örgüyle çevirip içine konteyner koyan şahıslar hakkında 'kamu malını haksız işgal' suçundan hapis ve ecrimisil davası açılır.",
+        "ilgiliTerimler": ["Ecrimisil Davası", "Zilyetlik"]
+    },
+    {
+        "terim": "İnşaat İstinat Duvarı ve Taban Drenajı",
+        "slug": "istinat-duvari-taban-drenaji",
+        "harf": "İ",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Eğimli arazilerde toprak yükünü tutan betonarme istinat duvarının arkasında su birikip duvarı devirmesini önleyen delikli barbakan ve çakıl filtre sistemidir.",
+        "hukukiKarsilik": "TS 7994 Zemin Dayanma Yapıları ve Planlı Alanlar İmar Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Şiddetli yağmurlarda istinat duvarının aşırı hidrostatik basınçla patlayıp yoldaki araçların veya bahçenin üzerine yıkılmasını engeller.",
+        "kritikUyari": "İstinat duvarı projesiz ve statik hesapsız yapılamaz; 3 metreden yüksek duvarlarda belediye ruhsatı ve zemin emniyet katsayısı şarttır.",
+        "ilgiliTerimler": ["İstinat Duvarı (Dayanma Duvarı)", "Drenaj Hattı"]
+    }
+]
+
+print(f"data_ultra.py hazır: {len(ULTRA_TERIMLER)} terim.")

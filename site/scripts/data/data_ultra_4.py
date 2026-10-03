@@ -1,0 +1,560 @@
+# -*- coding: utf-8 -*-
+"""
+data_ultra_4.py — EDM Emlak Sözlüğü Ultra Genişletme Paketi Bölüm 4 (50 Terim)
+İleri tapu/miras davaları, şehircilik/imar planları, ticari değerleme ve gayrimenkul sermaye piyasaları.
+"""
+
+ULTRA_TERIMLER_4 = [
+    {
+        "terim": "Miras Sebebiyle İstihkak Davası",
+        "slug": "miras-sebebiyle-istihkak-davasi",
+        "harf": "M",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Yasal veya atanmış mirasçının, terekeye dahil olan taşınmazları haksız yere elinde bulunduran zilyetlere karşı mülkiyeti geri almak için açtığı davadır.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 637-639.",
+        "pratikteNeAnlamaGelir": "Murisin ölümünden sonra sahte mirasçılık belgesiyle veya habersizce evi üzerine geçiren kişiden tapuyu geri alıp gerçek mirasçılara tescil ettirir.",
+        "kritikUyari": "Mirasçının hakkını öğrendiği tarihten itibaren 1 yıl ve her halükarda murisin ölümünden itibaren 10 yıl içinde dava açılmalıdır.",
+        "ilgiliTerimler": ["Veraset İlamı", "Tapu İptal ve Tescil Davası"]
+    },
+    {
+        "terim": "Vasiyeti Yerine Getirme Görevlisi (Vasiyet Tenfiz Memuru)",
+        "slug": "vasiyet-tenfiz-memuru",
+        "harf": "V",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Mirasbırakanın vasiyetnamesinde atadığı veya sulh hakimince tayin edilen, gayrimenkullerin vasiyete uygun olarak paylaştırılmasını yöneten resmi yetkilidir.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 550-556.",
+        "pratikteNeAnlamaGelir": "Mirasçılar birbirine girse dahi tenfiz memuru tereke mallarını korur, kiraları toplar, borçları öder ve tapu devirlerini bizzat yürütür.",
+        "kritikUyari": "Görevli Sulh Hukuk Mahkemesi'nin denetimi altındadır; kusurlu veya taraflı işlemlerinden ötürü mirasçılara karşı şahsen tazminatla sorumludur.",
+        "ilgiliTerimler": ["Resmi Vasiyetname", "Terekenin Tespiti Davası"]
+    },
+    {
+        "terim": "Terekenin Resmi Defterinin Tutulması",
+        "slug": "terekenin-resmi-defterinin-tutulmasi",
+        "harf": "T",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Mirasbırakanın borçlarından korkan mirasçıların mirası peşinen reddetmek yerine Sulh Hukuk Mahkemesi'nden tüm aktif ve pasif malvarlığının resmi tespitini istemesidir.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 619-631.",
+        "pratikteNeAnlamaGelir": "Mahkeme gazeteyle alacaklılara çağrı yapar ve 1 ayda tüm borçları deftere yazar; mirasçı resmi deftere yazılmayan gizli borçlardan asla sorumlu olmaz.",
+        "kritikUyari": "Mirasçı defter tutulması bittikten sonra mirası kabul ederse yalnızca resmi defterde yazılı borçlar kadar sorumlu olur; şahsi malvarlığı korunur.",
+        "ilgiliTerimler": ["Mirasın Reddi (Redd-i Miras)", "Terekenin Tespiti Davası"]
+    },
+    {
+        "terim": "Paydaşlıktan Çıkarma Davası",
+        "slug": "paydasliktan-cikarma-davasi",
+        "harf": "P",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Müşterek veya hisseli bir taşınmazda yükümlülüklerini ağır şekilde ihlal ederek diğer paydaşlar için birlikte yaşamayı çekilmez kılan ortağın ortaklıktan atılması davasıdır.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 696-697.",
+        "pratikteNeAnlamaGelir": "Binayı yakmaya kalkan, sürekli terör estiren veya ortak giderleri kasten ödemeyen sorunlu paydaşın payı mahkemece zorla diğer ortaklara devrettirilir.",
+        "kritikUyari": "Davanın açılabilmesi için pay ve paydaş çoğunluğunun kararı şarttır; mahkeme çıkarılan paydaşa payının rayiç bedelinin peşin ödenmesine hükmeder.",
+        "ilgiliTerimler": ["Paylı Mülkiyet", "Ortaklığın Giderilmesi (İzale-i Şüyu)"]
+    },
+    {
+        "terim": "İflas ve Konkordato Mühleti Tapu Kısıtlamaları",
+        "slug": "iflas-ve-konkordato-tapu-kisitlamasi",
+        "harf": "İ",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Mali krizdeki bir şirketin konkordato ilan etmesi veya iflasına karar verilmesi üzerine mahkemece tapu kütüğüne konulan ve mal devrini yasaklayan resmi şerhtir.",
+        "hukukiKarsilik": "İcra ve İflas Kanunu md. 288 ve 297.",
+        "pratikteNeAnlamaGelir": "Konkordato mühleti alan müteahhit komiserin ve mahkemenin izni olmadan tapuda daire devredemez, şirket adına ipotek tesis edemez.",
+        "kritikUyari": "Konkordatodaki şirketten komiser onayı olmadan noter satış vaadi veya tapu devri alan alıcıların işlemleri hükümsüz sayılır ve tapu iptal edilir.",
+        "ilgiliTerimler": ["Tapu Kütüğü", "Haciz Şerhi"]
+    },
+    {
+        "terim": "Sermaye Olarak Gayrimenkul Konulması ve Ayni Sermaye Tescili",
+        "slug": "sermaye-gayrimenkul-ayni-sermaye",
+        "harf": "S",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Bir şirketin kuruluşunda veya sermaye artırımında ortakların nakit para yerine mülkiyetlerindeki arsa veya fabrikayı şirkete devrederek pay sahibi olmasıdır.",
+        "hukukiKarsilik": "Türk Ticaret Kanunu md. 128 ve 342-343; TMK md. 1007.",
+        "pratikteNeAnlamaGelir": "Asliye Ticaret Mahkemesi'nin atadığı bilirkişi gayrimenkulün değerini tespit eder; şirket ticaret siciline tescil edilince tapu resen şirket adına geçer.",
+        "kritikUyari": "Üzerinde tedbir, haciz veya önleyici ipotek bulunan gayrimenkuller kanun gereği şirketlere sermaye olarak konulamaz.",
+        "ilgiliTerimler": ["Ticari Gayrimenkul", "Tapu Kütüğü"]
+    },
+    {
+        "terim": "Hisseli Tapuda Fiili Taksim Sözleşmesi ve İspatı",
+        "slug": "fiili-taksim-sozlesmesi-ve-ispati",
+        "harf": "F",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Hisseli arazide ortakların noter resmi senedi olmasa dahi aralarında sınırları tel örgüyle belirleyip yıllardır kendi parsellerini kullandıklarını ispat eden eylemli paylaşımdır.",
+        "hukukiKarsilik": "Yargıtay Hukuk Genel Kurulu ve Türk Medeni Kanunu md. 732 İçtihatları.",
+        "pratikteNeAnlamaGelir": "Fiili taksim olan bir yerde bir hissedar kendi kullandığı yeri 3. bir kişiye satarsa, diğer hissedarlar 'şufa (önalım) davası' açamaz; dava reddedilir.",
+        "kritikUyari": "Fiili taksimin varlığı uydu fotoğrafları, çitler, su-elektrik abonelikleri ve tanık beyanlarıyla mahkemede şüpheye yer bırakmayacak şekilde kanıtlanmalıdır.",
+        "ilgiliTerimler": ["Şufa (Önalım) Hakkı", "Hisseli Tapu"]
+    },
+    {
+        "terim": "Arsa Payı Düzeltme Davasında Zamanaşımı Bulunmaması",
+        "slug": "arsa-payi-duzeltme-zamanasimi-yoklugu",
+        "harf": "A",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Binanın kuruluşunda bağımsız bölümlerin büyüklüğü, konumu ve şerefiyesiyle orantısız dağıtılan arsa paylarının düzeltilmesi davasının hiçbir süre kısıtlamasına tabi olmamasıdır.",
+        "hukukiKarsilik": "634 Sayılı Kat Mülkiyeti Kanunu md. 3 ve Yargıtay İçtihatları Birleştirme Kararları.",
+        "pratikteNeAnlamaGelir": "Bina 40 yıllık dahi olsa arsa payınız komşununkinden haksız şekilde düşük yazılmışsa her zaman Sulh Hukuk Mahkemesi'nde dava açabilirsiniz.",
+        "kritikUyari": "Kentsel dönüşüm yıkım kararı alınıp bina fiilen yıkıldıktan sonra açılan arsa payı düzeltme davaları kural olarak dinlenmez; bina ayaktayken açılmalıdır.",
+        "ilgiliTerimler": ["Arsa Payı Düzeltme Davası", "Kentsel Dönüşüm"]
+    },
+    {
+        "terim": "Tapu Sicilinin Tutulmasından Devletin Kusursuz Sorumluluğu",
+        "slug": "tapu-sicili-devletin-kusursuz-sorumlulugu",
+        "harf": "T",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Tapu müdürlüğündeki memurların hatası, sahte vekaletname veya evrak sahteciliği sonucu mülkünü kaybeden vatandaşa devletin hazineden doğrudan tazminat ödemesidir.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 1007.",
+        "pratikteNeAnlamaGelir": "Tapuda sahte kimlikle eviniz başkasına satılmış ve iyi niyetli 3. kişiden evi geri alamıyorsanız, mülkün güncel tüm piyasa değerini Hazine'den nakden tahsil edersiniz.",
+        "kritikUyari": "Devlete karşı açılacak tazminat davası zararın ve sorumlunun öğrenildiği tarihten itibaren 1 yıl ve her halükarda 10 yıllık zamanaşımına tabidir.",
+        "ilgiliTerimler": ["Tapu Kütüğü", "Yolsuz Tescil"]
+    },
+    {
+        "terim": "Tapu Müdürlüğü Red Kararına Karşı Bölge Müdürlüğüne İtiraz",
+        "slug": "tapu-red-kararina-itiraz-proseduru",
+        "harf": "T",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Tapu müdürünün talebi kanuna aykırı bularak yazılı olarak reddetmesi halinde ilgilinin 15 gün içinde Tapu ve Kadastro Bölge Müdürlüğü'ne itiraz etme yoludur.",
+        "hukukiKarsilik": "Tapu Sicili Tüzüğü md. 26.",
+        "pratikteNeAnlamaGelir": "Memurun keyfi veya hatalı yorumla yapmadığı bir satış, intikal veya şerh işlemini üst idareye ve gerekirse TKGM Genel Müdürlüğü'ne taşıyarak zorla yaptırabilirsiniz.",
+        "kritikUyari": "TKGM Genel Müdürlüğü de itirazı reddederse ret kararının tebliğinden itibaren 30 gün içinde idare mahkemesinde iptal davası açılması gerekir.",
+        "ilgiliTerimler": ["Tapu Kütüğü", "Yevmiye Defteri"]
+    },
+    {
+        "terim": "1/1000 Uygulama İmar Planı Askı ve İtiraz Süreci",
+        "slug": "1-1000-imar-plani-aski-itiraz",
+        "harf": "1",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Belediye meclisince kabul edilen detaylı imar planının belediye ilan panosunda ve internette 30 gün boyunca askıya çıkarılarak halkın incelemesine açılmasıdır.",
+        "hukukiKarsilik": "3194 Sayılı İmar Kanunu md. 8/b.",
+        "pratikteNeAnlamaGelir": "Arsanızın yeşil alana, yola veya okul alanına ayrıldığını bu 30 günlük askı süresinde görüp belediyeye yazılı itiraz dilekçesi vermelisiniz.",
+        "kritikUyari": "Askı süresi içinde belediyeye itiraz etmeyen malikler daha sonra doğrudan idare mahkemesinde plan iptali davası açma hakkını usulen kaybedebilir.",
+        "ilgiliTerimler": ["Uygulama İmar Planı", "İmar Planına İtiraz Süresi"]
+    },
+    {
+        "terim": "1/5000 Nazım İmar Planı ile 1/1000 Plan Uyuşmazlığı",
+        "slug": "nazim-ve-uygulama-imar-plani-uyusmazligi",
+        "harf": "N",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Alt ölçekli 1/1000'lik planın üst ölçekli 1/5000'lik ana plana aykırı yoğunluk veya donatı alanı getirmesi durumunda alt planın hukuken geçersiz sayılmasıdır.",
+        "hukukiKarsilik": "Mekânsal Planlar Yapım Yönetmeliği md. 6 ve Danıştay İçtihatları.",
+        "pratikteNeAnlamaGelir": "Üst planda yeşil alan olan bir yere ilçe belediyesi 1/1000'lik planda konut imarı veremez; verilmişse idare mahkemesince plan iptal edilir.",
+        "kritikUyari": "Arsa yatırımı yaparken sadece ilçe belediyesindeki 1/1000'lik plana değil, büyükşehir belediyesindeki 1/5000'lik nazım plana da mutlaka bakılmalıdır.",
+        "ilgiliTerimler": ["Nazım İmar Planı", "Uygulama İmar Planı"]
+    },
+    {
+        "terim": "Plan Notları (Lejant) Hükümlerinin İnşaat Hakkına Etkisi",
+        "slug": "plan-notlari-lejant-hukumleri",
+        "harf": "P",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "İmar planı paftasının kenarında yer alan, çizimlerde gösterilemeyen özel emsal artışları, çatı katı, bodrum kullanımı ve ticari fonksiyon kurallarını belirleyen yazılı metindir.",
+        "hukukiKarsilik": "Mekânsal Planlar Yapım Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Çizimde Emsal: 1.50 görünse bile plan notundaki bir madde ile 'açığa çıkan 1. bodrum kat emsale dahil değildir' denilerek inşaat alanı %30 büyüyebilir.",
+        "kritikUyari": "Ruhsat alırken belediye mimari projeyi doğrudan plan notlarına göre onaylar; plan notunu okumadan arsa değeri takdir edilemez.",
+        "ilgiliTerimler": ["Emsal (KAKS)", "İmar Planı"]
+    },
+    {
+        "terim": "Parselasyon Planına Karşı 60 Günlük Dava Açma Süresi",
+        "slug": "parselasyon-planina-karsi-60-gunluk-dava",
+        "harf": "P",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "18. madde uygulaması ile arsasından fazla DOP kesilen veya kötü yerden müstakil imar parseli verilen malikin idare mahkemesinde açacağı iptal davası süresidir.",
+        "hukukiKarsilik": "2577 Sayılı İdari Yargılama Usulü Kanunu md. 7 ve 3194 SK md. 18.",
+        "pratikteNeAnlamaGelir": "Askı süresinin bitiminden itibaren 60 gün içinde idare mahkemesinde dava açarak haksız parselasyon uygulamasını iptal ettirebilirsiniz.",
+        "kritikUyari": "Parselasyon iptal edilirse tapu kütüğündeki tesciller eski kadastral kök tapuya döner ve üzerinde yapılan inşaatların ruhsatı askıya alınır.",
+        "ilgiliTerimler": ["18. Madde Uygulaması (Hamur Kuralı)", "Düzenleme Ortaklık Payı (DOP)"]
+    },
+    {
+        "terim": "Zeytinlik Sahaların Korunması ve 3 Kilometre Kuralı",
+        "slug": "zeytinlik-sahalar-ve-3-km-kurali",
+        "harf": "Z",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Zeytinlik sahalara 3 kilometre mesafede zeytinyağı fabrikası hariç zeytinliklerin gelişmesine mani olacak toz, duman ve kimyasal atık çıkaran tesis kurma yasağıdır.",
+        "hukukiKarsilik": "3573 Sayılı Zeytinciliğin Islahı ve Yabanilerinin Aşılattırılması Hakkında Kanun md. 20.",
+        "pratikteNeAnlamaGelir": "Zeytinlik içeren veya yakınında zeytin ağaçları bulunan tarlalarda maden, taş ocağı, sanayi tesisi veya toplu konut yapılması kanunen imkansızdır.",
+        "kritikUyari": "İmar affından veya belediyeden ruhsat alınsa dahi zeytinlik kanununa aykırı tesisler Tarım Bakanlığı ve Danıştay kararlarıyla derhal kapatılır.",
+        "ilgiliTerimler": ["Tarımsal Sit Alanı", "Büyük Ova Koruma Alanı"]
+    },
+    {
+        "terim": "Sit Alanlarında Geçiş Dönemi Koruma Esasları",
+        "slug": "sit-alanlarinda-gecis-donemi-esaslari",
+        "harf": "S",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Sit alanı ilan edilen bir bölgede kalıcı 'Koruma Amaçlı İmar Planı' onaylanana kadar en fazla 3 yıl boyunca geçerli olan geçici yapılaşma ve koruma şartlarıdır.",
+        "hukukiKarsilik": "2863 Sayılı Kültür ve Tabiat Varlıklarını Koruma Kanunu md. 17.",
+        "pratikteNeAnlamaGelir": "Mevcut imar planları durur; arsanıza çivi çakabilmek için doğrudan Kültür Varlıklarını Koruma Bölge Kurulu'ndan özel izin alınması gerekir.",
+        "kritikUyari": "3 yıl içinde koruma amaçlı imar planı yapılmazsa geçiş dönemi hükümleri kendiliğinden düşer ve bölgede tam inşaat yasağı başlar.",
+        "ilgiliTerimler": ["Koruma Amaçlı İmar Planı", "Doğal Sit Alanı"]
+    },
+    {
+        "terim": "Binalarda Kotlandırma: Yoldan Kot Alma Kuralı",
+        "slug": "binalarda-kotlandirma-yoldan-kot-alma",
+        "harf": "B",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Bina giriş taban kotunun (+0.00 kotu), binanın cephe aldığı yolun kırmızı kotuna (kaldırım üst seviyesine) göre belirlenmesi kuralıdır.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 11.",
+        "pratikteNeAnlamaGelir": "Yol meyilliyse bina cephesinin orta noktasındaki bordür taşı kotu esas alınır; binanın kaç kat yükselebileceğini bu sıfır kotu belirler.",
+        "kritikUyari": "Tabii zeminden kot verilmesi gereken aşırı dik yamaçlarda hileyle yoldan kot alınırsa bina arkadan devasa bir gökdelen gibi yükselir ve ruhsat iptal edilir.",
+        "ilgiliTerimler": ["Kot Kesit Belgesi", "Kırmızı Kot ve Siyah Kot"]
+    },
+    {
+        "terim": "Ayrık, Bitişik ve Blok Nizam Yapılaşma Şartları",
+        "slug": "ayrik-bitisik-blok-nizam-sartlari",
+        "harf": "A",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Ayrık nizamda hiçbir komşuya temas etmeyen; bitişik nizamda yan parsellere dayalı; blok nizamda ise ada içinde bir cephesi birleşik yapı düzenidir.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 4.",
+        "pratikteNeAnlamaGelir": "Ayrık nizam binalarda dört tarafta da bahçe ve pencere açma özgürlüğü vardır; bitişik nizamda ise yan cephelere pencere açılamaz, yangın duvarı yapılır.",
+        "kritikUyari": "Bitişik nizam arsalarda yan komşu temel kazarken sizin binanızın altını boşaltabilir; bu nedenle derin temel kazısında bitişik komşu izlenmelidir.",
+        "ilgiliTerimler": ["Çekme Mesafesi", "İmar Durum Belgesi"]
+    },
+    {
+        "terim": "Kapalı Çıkma ve Açık Çıkma (Balkon) Emsal Hesabı",
+        "slug": "kapali-ve-acik-cikma-emsal-hesabi",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Zemin katın üzerinde yoldan ve parsel sınırından belirli çekme mesafelerini koruyarak bina gövdesinden dışarıya doğru uzatılan oda ve balkon çıkmalarıdır.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 41.",
+        "pratikteNeAnlamaGelir": "Zeminde 100 m² oturan bir bina 1. kattan itibaren kapalı çıkmalarla 130 m²'ye büyüyebilir; daireler üst katlarda belirgin biçimde genişler.",
+        "kritikUyari": "Açık balkonlar kat maliklerince sonradan cam balkonla kapatılıp odaya katılırsa emsal aşımı (kaçak inşaat) suçu oluşur.",
+        "ilgiliTerimler": ["Cam Balkon İmar Durumu", "Emsal (KAKS)"]
+    },
+    {
+        "terim": "Zemin Kat Dükkanlarda Asma Kat (Galeri) Statik Riski",
+        "slug": "zemin-kat-dukkan-asma-kat-riski",
+        "harf": "Z",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Zemin kat dükkanların iç yüksekliği en az 5.50 metre olduğunda içeriden yapılan ve dükkan taban alanının en fazla %50'sini kaplayan yarım ara kattır.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 4 ve TBDY 2018.",
+        "pratikteNeAnlamaGelir": "Mağazalarda idari ofis veya depo olarak kullanılır; ancak taşıyıcı kolonlara sonradan kaynak veya delme ile monte edilirse kolon kesitini zayıflatır.",
+        "kritikUyari": "Depremlerde yıkılan binaların büyük çoğunluğunda zemin kat dükkan sahiplerinin asma kat yapmak veya vitrini genişletmek için kolon kestiği tespit edilmiştir.",
+        "ilgiliTerimler": ["Yumuşak Kat Düzensizliği", "Kolon"]
+    },
+    {
+        "terim": "Otopark Bedeli Ödenerek Ruhsat Alınması",
+        "slug": "otopark-bedeli-odenerek-ruhsat",
+        "harf": "O",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Parselin fiziki şartları (dar sokak, aşırı eğim) parsel içinde otopark yapmaya elvermiyorsa belediyenin açtığı otopark hesabına peşin bedel yatırılmasıdır.",
+        "hukukiKarsilik": "Otopark Yönetmeliği md. 10.",
+        "pratikteNeAnlamaGelir": "Müteahhit bina altına garaj yapamadığı her bir daire için belediyeye belirlenen resmi tarifeden otopark parası ödeyerek ruhsat alır.",
+        "kritikUyari": "Belediyeler toplanan bu otopark paralarıyla en geç 3 yıl içinde bölgede bölge otoparkı yapmak zorundadır; amacı dışında başka hizmete harcayamazlar.",
+        "ilgiliTerimler": ["Otopark Yönetmeliği", "Yapı Ruhsatı"]
+    },
+    {
+        "terim": "Sığınak Zorunluluğundan Muaf Olan Yapılar",
+        "slug": "siginak-muafiyeti-olan-yapilar",
+        "harf": "S",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "12 veya daha az bağımsız bölümü olan konut yapılarının ve toplam inşaat alanı 1500 metrekareyi geçmeyen küçük binaların sığınak yapma mecburiyetinden muaf tutulmasıdır.",
+        "hukukiKarsilik": "Sığınak Yönetmeliği md. 8.",
+        "pratikteNeAnlamaGelir": "Küçük parsellerde yapılan butik 8-10 daireli apartmanlarda bodrum kat tamamen otopark veya su deposuna ayrılabilir, sığınak alanı ayrılması aranmaz.",
+        "kritikUyari": "12 daireyi 1 daire dahi aşan (13 daireli) projelerde veya karma ticari yapılarda sığınak ayrılması iskanın mutlak şartıdır.",
+        "ilgiliTerimler": ["Sığınak Yönetmeliği", "Yapı Ruhsatı"]
+    },
+    {
+        "terim": "Gayrimenkul Yatırım Fonlarında (GYF) Kurumlar Vergisi Muafiyeti",
+        "slug": "gyf-kurumlar-vergisi-muafiyeti",
+        "harf": "G",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "SPK denetimindeki Gayrimenkul Yatırım Fonlarının elde ettikleri gayrimenkul alım-satım ve kira kazançlarının %0 oranında kurumlar vergisine tabi olmasıdır.",
+        "hukukiKarsilik": "5520 Sayılı Kurumlar Vergisi Kanunu md. 5/1-d-4.",
+        "pratikteNeAnlamaGelir": "Büyük yatırımcılar yüzlerce konutu şahsen veya şirketle almak yerine GYF çatısı altında toplayarak devasa vergi avantajı ve profesyonel fon yönetimi elde eder.",
+        "kritikUyari": "Fon katılma belgelerinden elde edilen kar paylarının bireysel yatırımcılara dağıtımı esnasında güncel mevzuata göre tevkifat/stopaj oranları uygulanır.",
+        "ilgiliTerimler": ["Gayrimenkul Yatırım Fonu (GYF)", "Gayrimenkul Yatırım Ortaklığı (GYO)"]
+    },
+    {
+        "terim": "Kira Sertifikası (Sukuk-ı İcâre) ve Varlık Kiralama Şirketi",
+        "slug": "kira-sertifikasi-sukuk-i-icare",
+        "harf": "K",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Bir kamu kurumunun veya büyük şirketin gayrimenkullerini Varlık Kiralama Şirketine (VKŞ) devredip geri kiralayarak faizsiz kira sertifikası ihracıyla fon toplamasıdır.",
+        "hukukiKarsilik": "6362 Sayılı Sermaye Piyasası Kanunu md. 61 ve SPK Kira Sertifikaları Tebliği (III-61.1).",
+        "pratikteNeAnlamaGelir": "Faiz hassasiyeti olan kurumsal ve bireysel yatırımcılara gayrimenkulün kira gelirinden düzenli getiri sağlayan İslami finansman aracıdır.",
+        "kritikUyari": "İhraççı kira bedellerini ödemezse VKŞ mülkiyeti altındaki gayrimenkulü piyasada satarak sertifika sahiplerinin ana parasını tasfiye eder.",
+        "ilgiliTerimler": ["Sat ve Geri Kirala", "Gayrimenkul Sertifikası"]
+    },
+    {
+        "terim": "Değerleme Raporunun SPK Geçerlilik Süresi (1 Yıl Kuralı)",
+        "slug": "degerleme-raporu-spk-gecerlilik-suresi",
+        "harf": "D",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "SPK lisanslı değerleme kuruluşlarınca hazırlanan resmi ekspertiz raporlarının mevzuat ve bankacılık işlemlerinde en fazla 1 yıl boyunca geçerli kabul edilmesidir.",
+        "hukukiKarsilik": "SPK Gayrimenkul Değerleme Şirketleri Tebliği ve BDDK Yönetmelikleri.",
+        "pratikteNeAnlamaGelir": "Bankadan konut kredisi kullanırken veya halka açık şirketlerin bilanço dönemlerinde 1 yıldan eski ekspertiz raporları kullanılamaz, rapor yenilenir.",
+        "kritikUyari": "Yüksek enflasyon ve ani kur şoklarının yaşandığı dönemlerde bankalar 1 yıllık süreyi beklemeden 3 veya 6 ayda bir revize değerleme raporu isteyebilir.",
+        "ilgiliTerimler": ["SPK Lisanslı Değerleme Raporu", "Kredi Kullandırım Oranı (LTV)"]
+    },
+    {
+        "terim": "En Yüksek ve En İyi Kullanım Analizi (Highest and Best Use)",
+        "slug": "en-yuksek-ve-en-iyi-kullanim-analizi",
+        "harf": "E",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Bir arsanın yasal olarak izin verilen, fiziksel olarak mümkün, finansal olarak uygulanabilir ve en yüksek net geliri üreten kullanım fonksiyonunun bulunmasıdır.",
+        "hukukiKarsilik": "Uluslararası Değerleme Standartları (IVS 104).",
+        "pratikteNeAnlamaGelir": "Arsanıza AVM mi, rezidans mı, otel mi yoksa özel hastane mi yapılırsa maksimum getiri sağlayacağını bilimsel simülasyonlarla hesaplar.",
+        "kritikUyari": "Yasal olmayan veya zemin yapısının taşımayacağı fonksiyonlar ne kadar karlı görünürse görünsün en etkin kullanım analizi dışında bırakılır.",
+        "ilgiliTerimler": ["En Etkin ve Verimli Kullanım Analizi", "İmar Durum Belgesi"]
+    },
+    {
+        "terim": "Otel Değerlemesinde RevPAR ve ADR Göstergeleri",
+        "slug": "otel-degerlemesinde-revpar-ve-adr",
+        "harf": "O",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "ADR (Ortalama Günlük Oda Fiyatı) ve RevPAR (Mevcut Oda Başına Gelir), otel gayrimenkullerinin piyasa değerini belirleyen iki temel operasyonel finansal metriktir.",
+        "hukukiKarsilik": "SPK Otel ve Turizm Tesisleri Değerleme Standartları.",
+        "pratikteNeAnlamaGelir": "Otel binasının değeri sadece beton kalitesine göre değil, odalarının yıllık ortalama doluluk ve gecelik döviz oda fiyatı çarpımıyla nakit akışından bulunur.",
+        "kritikUyari": "Yalnızca yaz sezonunda 3 ay dolan bir tatil köyü ile yıl boyu %85 dolulukla çalışan bir şehir iş otelinin değerleme çarpanları taban tabana zıttır.",
+        "ilgiliTerimler": ["İndirgenmiş Nakit Akımları (DCF)", "Net Faaliyet Geliri (NOI)"]
+    },
+    {
+        "terim": "Lojistik Depo Değerlemesinde Rampa ve Tavan Yüksekliği",
+        "slug": "lojistik-depo-degerlemesi-rampa-tavan",
+        "harf": "L",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Modern sanayi depolarında net serbest tavan yüksekliğinin (en az 10-12 metre) ve her 800-1000 m²'ye en az 1 hidrolik yükleme rampası düşmesinin değer kriteri olmasıdır.",
+        "hukukiKarsilik": "Sanayi ve Lojistik Yapıları Tasarım Standartları.",
+        "pratikteNeAnlamaGelir": "Tavanı alçak eski depoların metrekaresi 50 TL'ye kiracı bulamazken, 12 metre tavanlı ve sprinkler donanımlı modern lojistik hangarları 200 TL'ye kiralanır.",
+        "kritikUyari": "Zemin taşıma kapasitesi metrekarede en az 5-7 ton olmayan depolara ağır sanayi ve yüksek istifli e-ticaret lojistik firmaları kiracı olarak girmez.",
+        "ilgiliTerimler": ["Çelik Konstrüksiyon Yapı", "Epoksi Zemin Kaplaması"]
+    },
+    {
+        "terim": "Ticari Kiralamalarda Üçlü Net Kira (Triple Net Lease - NNN)",
+        "slug": "uclu-net-kira-triple-net-nnn",
+        "harf": "U",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Kiracının kira bedeline ek olarak mülke ait emlak vergisini, tüm bina sigortalarını ve tüm bakım-onarım masraflarını üstlendiği kurumsal kira sözleşmesidir.",
+        "hukukiKarsilik": "Türk Borçlar Kanunu Kira Hükümleri ve Sözleşme Serbestisi İlkesi.",
+        "pratikteNeAnlamaGelir": "Mülk sahibinin cebinden tek kuruş işletme masrafı çıkmaz; mülk sahibi her ay net ve pürüzsüz kira tahsilatı yapar (genelde benzinlik ve kurumsal marketlerde).",
+        "kritikUyari": "Sözleşmede çatı ve ana taşıyıcı kolon tamiratlarının kimde olduğu netleştirilmelidir; aksi takdirde esaslı onarım giderleri TBK 301 gereği malike döner.",
+        "ilgiliTerimler": ["Net Faaliyet Geliri (NOI)", "Demirbaş ve Esaslı Onarım Gideri"]
+    },
+    {
+        "terim": "İpotek Teminatlı Menkul Kıymet (İTMK) İhracı",
+        "slug": "ipotek-teminatli-menkul-kiymet-itmk-ihraci",
+        "harf": "İ",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Bankaların müşterilerine kullandırdıkları konut kredisi ipotek havuzlarını teminat göstererek yurt dışı ve yurt içi piyasalarda uzun vadeli tahvil ihraç etmesidir.",
+        "hukukiKarsilik": "6362 Sayılı Kanun md. 59 ve SPK İpotek Teminatlı Menkul Kıymetler Tebliği.",
+        "pratikteNeAnlamaGelir": "Bankaların konut kredisi musluklarını açmasını sağlar; banka ipotekleri menkul kıymete çevirip satarak taze nakit bulur ve vatandaşa yeni konut kredisi verir.",
+        "kritikUyari": "Teminat havuzundaki konutların SPK lisanslı değerlemeleri düzenli yenilenir; havuzdaki mülklerin değeri düşerse banka havuza yeni teminat eklemek zorundadır.",
+        "ilgiliTerimler": ["İpotek Teminatlı Menkul Kıymet (İTMK)", "Konut Finansmanı Kredisi"]
+    },
+    {
+        "terim": "Mezanin Kredi ve Köprü Kredisi (Gayrimenkul Finansmanı)",
+        "slug": "mezanin-kredi-kopru-kredisi",
+        "harf": "M",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Büyük konut projelerinde banka kredisi ile özkaynak arasındaki finansman açığını kapatan, yüksek faizli veya kârdan pay alan ara hibrit borçlanma modelidir.",
+        "hukukiKarsilik": "Bankacılık Kanunu ve Sermaye Piyasası Mevzuatı.",
+        "pratikteNeAnlamaGelir": "Ruhsat aşamasında banka kredisi henüz çıkmamışken inşaatın temelini kazmak ve hafriyatı bitirmek için kullanılan kısa vadeli acil köprü finansmanıdır.",
+        "kritikUyari": "Proje gecikir ve konut satışları yavaşlarsa mezanin kredinin yüksek faiz yükü müteahhidin tüm kârını yutarak iflasına yol açabilir.",
+        "ilgiliTerimler": ["Ön Ödemeli Konut Satış Sözleşmesi", "Bina Tamamlama Sigortası"]
+    },
+    {
+        "terim": "Gayrimenkul Portföy Yönetim Şirketi (GPYŞ)",
+        "slug": "gayrimenkul-portfoy-yonetim-sirketi",
+        "harf": "G",
+        "kategori": "Değerleme & Finans",
+        "kisaTanim": "Sermaye Piyasası Kurulu'ndan lisans alarak münhasıran gayrimenkul yatırım fonlarını (GYF) kurmak ve yönetmek üzere faaliyet gösteren uzman mali kuruluştur.",
+        "hukukiKarsilik": "6362 Sayılı SPK Kanunu md. 55 ve Portföy Yönetim Şirketleri Tebliği.",
+        "pratikteNeAnlamaGelir": "Bireysel yatırımcıların paralarını bir havuzda toplayarak fabrikalar, hastaneler ve plazalar satın alır; profesyonel kiralama ve satış operasyonunu yönetir.",
+        "kritikUyari": "GPYŞ yöneticileri ve portföy yöneticileri SPK Düzey 3 ve Gayrimenkul Değerleme lisanslarına sahip olmak zorundadır.",
+        "ilgiliTerimler": ["Gayrimenkul Yatırım Fonu (GYF)", "SPK Lisanslı Değerleme Raporu"]
+    },
+    {
+        "terim": "Bina Akustik Projesi ve Akustik Uzman Raporu",
+        "slug": "bina-akustik-projesi-ve-raporu",
+        "harf": "B",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Yeni binalarda dış çevre gürültüsü, komşu duvar ses iletimi ve mekanik tesisat seslerinin yasal desibel sınırlarını aşmadığını gösteren zorunlu mimari projedir.",
+        "hukukiKarsilik": "Binaların Gürültüye Karşı Korunması Hakkında Yönetmelik ve Planlı Alanlar İmar Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Otoyol veya cadde kenarındaki binalarda hangi kalınlıkta cam ve ses yalıtım tuğlası kullanılacağını belirler; bina sakinini trafik gürültüsünden kurtarır.",
+        "kritikUyari": "Akustik uzmanı sertifikalı mühendislerce hazırlanan akustik proje belediyeye sunulmadan yapı ruhsatı verilmez.",
+        "ilgiliTerimler": ["Akustik Şilte", "Yapı Ruhsatı"]
+    },
+    {
+        "terim": "Isı Yalıtımında Isı Köprüsü (Termal Köprü) Etkisi",
+        "slug": "isi-koprusu-termal-kopru-etkisi",
+        "harf": "I",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Balkon çıkıntıları, kolon-kiriş birleşimleri veya pencere denizliklerinde yalıtımın kesintiye uğraması sonucu binadaki ısının hızla dışarı kaçtığı zayıf noktalardır.",
+        "hukukiKarsilik": "TS 825 Binalarda Isı Yalıtım Kuralları Standardı.",
+        "pratikteNeAnlamaGelir": "Evin duvarları mantolanmış olsa dahi içeride oda köşelerinde siyah küf, rutubet ve boya dökülmelerinin oluşmasının bir numaralı sebebidir.",
+        "kritikUyari": "Termal kamera ile bakıldığında koyu mavi (soğuk) olarak parlar; balkon alınları ve parapetler yalıtımla sarılmazsa ısı köprüsü çözülemez.",
+        "ilgiliTerimler": ["Mantolama", "Enerji Kimlik Belgesi (EKB)"]
+    },
+    {
+        "terim": "Bodrum Katlarda Radon Gazı Tahliyesi ve Havalandırma",
+        "slug": "radon-gazi-tahliyesi-ve-havalandirma",
+        "harf": "R",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Topraktaki uranyumun bozunmasıyla açığa çıkan, renksiz, kokusuz radyoaktif radon gazının bodrum katlarda birikmesini önleyen drenaj ve fan tahliye sistemidir.",
+        "hukukiKarsilik": "Türkiye Atom Enerjisi Kurumu (TENMAK) Radon Eylem Planı ve İç Ortam Hava Kalitesi Standartları.",
+        "pratikteNeAnlamaGelir": "Sigaradan sonra akciğer kanserinin en büyük ikinci nedeni olan bu sinsi gazın bodrum kat dairelere ve otoparklara dolmasını fiziksel olarak engeller.",
+        "kritikUyari": "Toprağa temas eden döşemenin altına polietilen radon gazı bariyer membranı serilmeli ve delikli tahliye boruları çatıya kadar uzatılmalıdır.",
+        "ilgiliTerimler": ["Bohçalama Su Yalıtımı", "Geotekstil Keçe"]
+    },
+    {
+        "terim": "Dış Cephe Mekanik Mermer ve Granit Kaplama Sistemi",
+        "slug": "dis-cephe-mekanik-mermer-kaplama",
+        "harf": "D",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Ağır mermer, granit veya seramik plakaların duvara harçla yapıştırılmak yerine paslanmaz çelik ankraj demirleri ve kancalarla asıldığı lüks cephe sistemidir.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği ve TS EN 1469.",
+        "pratikteNeAnlamaGelir": "Harçla yapıştırılan taşların 10 yıl sonra yayaların kafasına düşme ölümcül riskini sıfırlar; taş ile duvar arasında havalandırma boşluğu bırakır.",
+        "kritikUyari": "Ankraj demirlerinin mutlaka 304 veya 316 kalite paslanmaz çelik olması şarttır; galvaniz demir kullanılırsa paslanıp taşları bırakır.",
+        "ilgiliTerimler": ["Alüminyum Kompozit Panel", "Taşyünü Cephe Yalıtımı"]
+    },
+    {
+        "terim": "Bina Ana Giriş Engelli Asansörü ve Platformu",
+        "slug": "engelli-asansoru-ve-platformu",
+        "harf": "E",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Bina girişindeki merdiven basamaklarının yanında tekerlekli sandalyeli vatandaşların ve bebek arabalarının zahmetsizce çıkmasını sağlayan dikey elektrikli platformdur.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 26 ve TS 9111 Erişilebilirlik Standardı.",
+        "pratikteNeAnlamaGelir": "Girişinde dik merdiven olan binalarda engelli rampası için yeterli eğim ve mesafe yoksa bu asansörün konulması iskan almak için zorunludur.",
+        "kritikUyari": "Engelli asansörünün periyodik bakımı KMK gereği apartman ortak giderinden karşılanır; malikler 'biz kullanmıyoruz' diyerek gidere itiraz edemez.",
+        "ilgiliTerimler": ["Engelli Erişimi ve Rampa Standartları", "Ortak Alanlar"]
+    },
+    {
+        "terim": "Isı Pompası Sistemi (Hava ve Toprak Kaynaklı)",
+        "slug": "isi-pompasi-sistemi-hava-toprak",
+        "harf": "I",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Dış havadaki veya toprağın altındaki düşük dereceli doğal ısı enerjisini elektrik enerjisiyle yükselterek yerden ısıtma ve sıcak su sağlayan çevreci sistemdir.",
+        "hukukiKarsilik": "Binalarda Enerji Performansı Yönetmeliği ve Yenilenebilir Enerji Mevzuatı.",
+        "pratikteNeAnlamaGelir": "Doğalgaz hattı olmayan villa ve kırsal alanlarda 1 kW elektrik harcayarak 4-5 kW ısı üretir; tüp veya mazotlu kalorifere göre %70 tasarruf sağlar.",
+        "kritikUyari": "En yüksek verimi düşük sıcaklıkta çalışan yerden ısıtma boruları ile verir; eski tip döküm peteklere bağlanırsa verimi ciddi şekilde düşer.",
+        "ilgiliTerimler": ["Yerden Isıtma Sistemi", "Enerji Kimlik Belgesi (EKB)"]
+    },
+    {
+        "terim": "Havalandırma Şaftı ve Işıklık Boşluğu Ölçüleri",
+        "slug": "havalandirma-safti-isiklik-olculeri",
+        "harf": "H",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Doğrudan dışarıya penceresi olmayan banyo, tuvalet ve merdiven boşluklarının havalandırılması ve ışık alması için bırakılan düşey mimari boşluktur.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 36.",
+        "pratikteNeAnlamaGelir": "İç mekanların rutubetsiz ve kokusuz kalmasını sağlar; binanın kat adedine göre taban alanı en az 1.50 m² ila 4.50 m² arasında değişir.",
+        "kritikUyari": "Işıklık boşluğunun üzeri hava sirkülasyonunu kesecek şekilde camla tamamen kapatılamaz; yağmurdan korumak için sadece yanları panjurlu şapka konulabilir.",
+        "ilgiliTerimler": ["Bağımsız Bölüm", "Mimari Uygulama Projesi"]
+    },
+    {
+        "terim": "İmar Parselasyonunda Kalan Cami ve Okul Alanlarının Durumu",
+        "slug": "imar-parselasyonunda-dini-egitim-tesis",
+        "harf": "İ",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "18. madde uygulaması sonucunda arsanızın cami, MEB okul alanı veya sağlık ocağı sahasında kalması ve müstakil inşaat izninin kapatılması halidir.",
+        "hukukiKarsilik": "3194 Sayılı İmar Kanunu md. 18 ve Kamulaştırma Kanunu.",
+        "pratikteNeAnlamaGelir": "Bu arsaya şahsi konut yapamazsınız; ilgili kamu bakanlığının (Milli Eğitim veya Diyanet) arsayı kamulaştırıp parasını ödemesini beklemeniz gerekir.",
+        "kritikUyari": "İdare 5 yıl içinde kamulaştırma yapmazsa taşınmaz maliki 'kamulaştırmasız hukuki el atma' davası açarak arsanın rayiç bedelini faiziyle tahsil edebilir.",
+        "ilgiliTerimler": ["Kamulaştırmasız El Atma", "18. Madde Uygulaması"]
+    },
+    {
+        "terim": "Kırsal Turizm ve Eko-Turizm İmar Şartları",
+        "slug": "kirsal-turizm-eko-turizm-imar-sartlari",
+        "harf": "K",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Çevre Düzeni Planlarında tarım veya orman komşuluğundaki alanlarda doğaya uyumlu butik otel ve bungalov tesisi yapımına izin veren özel imar statüsüdür.",
+        "hukukiKarsilik": "Kültür ve Turizm Koruma ve Gelişim Bölgeleri Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Normalde imara kapalı tarlada çevre planı değişikliği ve Bakanlık onayıyla doğa oteli veya glamping tesisi kurma imkanı sunar.",
+        "kritikUyari": "Parsel büyüklüğü genellikle en az 5.000 veya 15.000 m² olmalı, inşaat emsali %10'u ve kat adedi 2'yi geçmemelidir.",
+        "ilgiliTerimler": ["Çevre Düzeni Planı", "Bağ Evi İzni"]
+    },
+    {
+        "terim": "Koruma Amaçlı İmar Planında Tescilli Kültür Varlığı Komşuluğu",
+        "slug": "tescilli-kultur-varligi-komsulugu",
+        "harf": "T",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Arsanızın tarihi bir köşk, çeşme, sur veya camiye komşu olması sebebiyle inşaat projesinin Kültür Varlıklarını Koruma Kurulu onayına tabi olmasıdır.",
+        "hukukiKarsilik": "2863 Sayılı Kültür ve Tabiat Varlıklarını Koruma Kanunu md. 8 ve 18.",
+        "pratikteNeAnlamaGelir": "Tarihi eserin siluetini kapatacak yükseklikte bina yapamazsınız; cephe malzemesi ve bina rengi bile Anıtlar Kurulu onayından geçer.",
+        "kritikUyari": "Temel kazısı Koruma Kurulu arkeologları denetiminde (müze gözetiminde) yapılır; topraktan tarihi çanak veya sikke çıkarsa inşaat derhal durdurulur.",
+        "ilgiliTerimler": ["Arkeolojik Sit Alanı", "Koruma Amaçlı İmar Planı"]
+    },
+    {
+        "terim": "Arsa İhdasında Belediyenin Şufalı Satış Prosedürü",
+        "slug": "arsa-ihdasinda-belediye-sufali-satis",
+        "harf": "A",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Kapanan eski yolların belediye adına tescil edilip, parselasyon gereği yola cephesi kapanan veya parseli genişletilmesi gereken komşu malike doğrudan teklif edilmesidir.",
+        "hukukiKarsilik": "3194 Sayılı İmar Kanunu md. 17 ve 2886 Sayılı Devlet İhale Kanunu İstisnaları.",
+        "pratikteNeAnlamaGelir": "Arsanızın yanındaki yol terkinden kalan 20 metrekarelik şerit için belediye üçüncü kişilere ihaleye çıkamaz; öncelikle komşu arsa sahibine satmak zorundadır.",
+        "kritikUyari": "Belediyenin istediği bedel fahişse Asliye Hukuk Mahkemesi'nde bedel tespiti davası açılarak rayice çekilmesi talep edilebilir.",
+        "ilgiliTerimler": ["İhdas (Yoldan İhdas)", "Tevhid (Birleştirme)"]
+    },
+    {
+        "terim": "Taşınmaz Mal Zilyetliğine Yapılan Tecavüzlerin Önlenmesi (3091 Sayılı Kanun)",
+        "slug": "tasinmaz-zilyetligine-tecavuz-3091",
+        "harf": "T",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Taşınmazınızı işgal eden kişilere karşı mahkemeye gitmeden doğrudan kaymakamlık veya valiliğe başvurarak polis zoruyla işgalcinin tahliyesini sağlayan idari yoldur.",
+        "hukukiKarsilik": "3091 Sayılı Taşınmaz Mal Zilyetliğine Yapılan Tecavüzlerin Önlenmesi Hakkında Kanun.",
+        "pratikteNeAnlamaGelir": "Tarlanıza izinsiz baraka koyan veya boş dairenizin kapısını kırıp giren şahısları 15 gün içinde kaymakamlık kararıyla kapı dışarı edersiniz.",
+        "kritikUyari": "Tecavüzün öğrenildiği tarihten itibaren 60 gün ve her halükarda tecavüzün gerçekleşmesinden itibaren 1 yıl içinde kaymakamlığa başvurulması şarttır.",
+        "ilgiliTerimler": ["Kaymakamlık Yoluyla Tahliye", "Zilyetlik"]
+    },
+    {
+        "terim": "Yapı Kayıt Belgesinin İptali Nedenleri ve Yıkım",
+        "slug": "yapi-kayit-belgesi-iptal-nedenleri",
+        "harf": "Y",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "İmar barışında 31.12.2017 tarihinden sonra yapıldığı uydu fotoğraflarıyla kanıtlanan veya orman, kıyı gibi yasak alanlarda kalan binaların belgelerinin iptalidir.",
+        "hukukiKarsilik": "3194 Sayılı İmar Kanunu Geçici md. 16 ve İmar Barışı Tebliği.",
+        "pratikteNeAnlamaGelir": "Sahte beyanla alınan yapı kayıt belgesi bakanlıkça anında iptal edilir; bina yeniden 'kaçak yapı' statüsüne düşer ve yatırılan harç devlete kalır.",
+        "kritikUyari": "Belgesi iptal edilen binaların elektrik ve suları kesilir, belediyece yıkım kararı çıkar ve malik hakkında savcılığa 'yalan beyan' davası açılır.",
+        "ilgiliTerimler": ["Yapı Kayıt Belgesi (İmar Barışı)", "Kaçak Yapı (Ruhsatsız Yapı)"]
+    },
+    {
+        "terim": "Toprak Koruma Kurulu Kararı ve Tarım Dışı Kullanım İzni",
+        "slug": "toprak-koruma-kurulu-tarim-disi-izin",
+        "harf": "T",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Verimli tarım arazilerinin sanayi, turizm veya konut imarına açılabilmesi için valilik başkanlığındaki uzman kurulun oybirliği/nitelikli çoğunlukla verdiği izindir.",
+        "hukukiKarsilik": "5403 Sayılı Toprak Koruma ve Arazi Kullanımı Kanunu md. 13.",
+        "pratikteNeAnlamaGelir": "Tarlanın tarımsal niteliğini yitirdiği ve alternatif alan bulunamadığı belgelenmedikçe tarım arazisine imar planı yapılamaz.",
+        "kritikUyari": "Kurul izin vermeden tarım arazisine fabrika veya depo yapan firmalara devasa toprak koruma idari para cezaları kesilir ve arazi eski haline getirtilir.",
+        "ilgiliTerimler": ["Asgari Tarımsal Arazi Büyüklüğü", "Büyük Ova Koruma Alanı"]
+    },
+    {
+        "terim": "Yangın Zonları ve Yangına Dayanıklı Kompartıman Bölünmesi",
+        "slug": "yangin-zonlari-ve-kompartiman",
+        "harf": "Y",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Büyük binaların yangının yayılmasını engellemek amacıyla en az 60-120 dakika yangına ve dumana dayanan özel betonarme duvar ve kapılarla hücrelere ayrılmasıdır.",
+        "hukukiKarsilik": "Binaların Yangından Korunması Hakkında Yönetmelik md. 24.",
+        "pratikteNeAnlamaGelir": "AVM'de veya kapalı otoparkta tek bir dükkanda veya araçta çıkan yangın 2 saat boyunca o zonun içinde hapsedilir; diğer bloktaki insanların hayatı kurtulur.",
+        "kritikUyari": "Zon duvarlarını delen elektrik kabloları ve boru geçişleri yangın durdurucu harç ve mastiklerle tıkanmalıdır; boşluk bırakılırsa yangın kompartımanı çöker.",
+        "ilgiliTerimler": ["Yangın Sprinkler Sistemi", "Yangın Damperi"]
+    },
+    {
+        "terim": "Merkezi Isıtma Kazan Dairesi Havalandırması ve Gaz Tahliye Menfezi",
+        "slug": "kazan-dairesi-havalandirma-menfezi",
+        "harf": "M",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Doğalgazlı merkezi kazan dairelerinde olası gaz kaçağında gazın dışarı tahliye olması için tavana ve tabana açılan doğrudan dış havaya bağlı menfezlerdir.",
+        "hukukiKarsilik": "Binaların Yangından Korunması Hakkında Yönetmelik md. 54 ve Doğalgaz Dağıtım Şartnameleri.",
+        "pratikteNeAnlamaGelir": "Bodrum kattaki kazan dairesinde gaz sıkışması sonucu yaşanabilecek devasa bina patlamalarını kesin olarak engeller.",
+        "kritikUyari": "Kışın soğuk geliyor diye kazan dairesi menfezlerinin önüne sünger tıkamak veya kapatmak intihardır; gaz dağıtım şirketleri bu menfez tıkalıysa gazı anında keser.",
+        "ilgiliTerimler": ["Merkezi Isıtma Pay Ölçer", "Doğalgaz Tesisat Projesi"]
+    },
+    {
+        "terim": "Otomatik Yangın Algılama ve Adresli Dedektör Sistemi",
+        "slug": "otomatik-yangin-algilama-adresli-dedektor",
+        "harf": "O",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Bina içindeki duman veya ısı artışını algılayıp merkezi güvenlik paneline hangi katın hangi odasında yangın olduğunu nokta atışı bildiren akıllı alarm sistemidir.",
+        "hukukiKarsilik": "Binaların Yangından Korunması Hakkında Yönetmelik md. 75 ve TS EN 54.",
+        "pratikteNeAnlamaGelir": "Güvenlik görevlisi 500 dairelik koca sitede yangının 'B Blok 4. Kat 18 No'lu Dairenin Mutfak Kısmında' olduğunu saniyesinde panoda görerek müdahale eder.",
+        "kritikUyari": "Optik duman dedektörlerinin içine toz kaçtığında asılsız yangın alarmı verir; bu nedenle yılda bir kez vakumlu cihazlarla dedektör temizliği yapılmalıdır.",
+        "ilgiliTerimler": ["Yangın Sprinkler Sistemi", "Yangın Damperi"]
+    },
+    {
+        "terim": "Daire İçi Akıllı Su Basma Dedektörü ve Selenoid Vana",
+        "slug": "su-basma-dedektoru-selenoid-vana",
+        "harf": "D",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Mutfak veya banyo zeminine su temas ettiğinde akıllı ev sistemine sinyal göndererek bina girişindeki elektrikli selenoid vanayı saniyede kapatıp suyu kesen cihazdır.",
+        "hukukiKarsilik": "Akıllı Bina Standartları ve Sigorta Risk Önleme Kriterleri.",
+        "pratikteNeAnlamaGelir": "Siz tatildeyken bulaşık makinesi hortumu patlasa dahi 5 saniyede dairenin suyunu keser; parkelerin kabarmasını ve alt kata su sızmasını önler.",
+        "kritikUyari": "Selenoid vana elektrik kesintisinde kapalı (normally closed) veya açık (normally open) tipte seçilebilir; kesintide susuz kalmamak için doğru tip tercih edilmelidir.",
+        "ilgiliTerimler": ["Akıllı Ev KNX Otomasyon Protokolü", "Islak Hacim Su Yalıtımı"]
+    }
+]
+
+print(f"data_ultra_4.py hazır: {len(ULTRA_TERIMLER_4)} terim.")

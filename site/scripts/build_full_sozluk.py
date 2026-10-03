@@ -23,12 +23,30 @@ from data.data_kentsel import KENTSEL_TERIMLERI
 from data.data_insaat import INSAAT_TERIMLERI
 from data.data_degerleme import DEGERLEME_TERIMLERI
 from data.data_pratik import PRATIK_TERIMLER
+from data.data_mega import MEGA_TERIMLER_1
+from data.data_mega_2 import MEGA_TERIMLER_2
+from data.data_mega_3 import MEGA_TERIMLER_3
+from data.data_ultra import ULTRA_TERIMLER
+from data.data_ultra_2 import ULTRA_TERIMLER_2
+from data.data_ultra_3 import ULTRA_TERIMLER_3
+from data.data_ultra_4 import ULTRA_TERIMLER_4
+from data.data_ultra_5 import ULTRA_TERIMLER_5
+from data.data_ultra_6 import ULTRA_TERIMLER_6
+from data.data_ultra_7 import ULTRA_TERIMLER_7
+from data.data_ultra_8 import ULTRA_TERIMLER_8
+from data.data_ultra_9 import ULTRA_TERIMLER_9
+from data.data_ultra_10 import ULTRA_TERIMLER_10
+from data.data_ultra_11 import ULTRA_TERIMLER_11
+from data.data_ultra_12 import ULTRA_TERIMLER_12
+from data.data_ultra_13 import ULTRA_TERIMLER_13
+from data.data_ultra_14 import ULTRA_TERIMLER_14
+from data.data_ultra_15 import ULTRA_TERIMLER_15
+from data.data_ultra_16 import ULTRA_TERIMLER_16
+from data.data_ultra_17 import ULTRA_TERIMLER_17
+from data.data_ultra_18 import ULTRA_TERIMLER_18
+from data.data_ultra_19 import ULTRA_TERIMLER_19
 
 def parse_existing_sozluk():
-    sozluk_ts = LIB_DIR / "sozluk.ts"
-    with open(sozluk_ts, "r", encoding="utf-8") as f:
-        text = f.read()
-
     pattern = re.compile(
         r"\{\s*terim:\s*['\"](.*?)['\"],\s*"
         r"slug:\s*['\"](.*?)['\"],\s*"
@@ -42,30 +60,28 @@ def parse_existing_sozluk():
     )
 
     items = {}
-    for m in pattern.finditer(text):
-        slug = m.group(2)
-        items[slug] = {
-            "terim": m.group(1),
-            "slug": slug,
-            "harf": m.group(3),
-            "kategori": m.group(4),
-            "kisaTanim": m.group(5),
-            "hukukiKarsilik": m.group(6),
-            "pratikteNeAnlamaGelir": m.group(7),
-            "kritikUyari": m.group(8)
-        }
+    for ts_file in SOZLUK_DIR.glob("*.ts"):
+        with open(ts_file, "r", encoding="utf-8") as f:
+            text = f.read()
+        for m in pattern.finditer(text):
+            slug = m.group(2)
+            items[slug] = {
+                "terim": m.group(1),
+                "slug": slug,
+                "harf": m.group(3),
+                "kategori": m.group(4),
+                "kisaTanim": m.group(5),
+                "hukukiKarsilik": m.group(6),
+                "pratikteNeAnlamaGelir": m.group(7),
+                "kritikUyari": m.group(8)
+            }
     return items
 
 def main():
     existing = parse_existing_sozluk()
-    print(f"Mevcut terimler: {len(existing)}")
+    print(f"Mevcut modüler dosyalardaki terimler: {len(existing)}")
 
     merged = {}
-    # 1. Mevcut onaylı terimleri koru
-    for slug, item in existing.items():
-        merged[slug] = item
-
-    # 2. Yeni zengin terimleri ekle
     all_new = (
         TAPU_TERIMLERI +
         IMAR_TERIMLERI +
@@ -74,13 +90,41 @@ def main():
         KENTSEL_TERIMLERI +
         INSAAT_TERIMLERI +
         DEGERLEME_TERIMLERI +
-        PRATIK_TERIMLER
+        PRATIK_TERIMLER +
+        MEGA_TERIMLER_1 +
+        MEGA_TERIMLER_2 +
+        MEGA_TERIMLER_3 +
+        ULTRA_TERIMLER +
+        ULTRA_TERIMLER_2 +
+        ULTRA_TERIMLER_3 +
+        ULTRA_TERIMLER_4 +
+        ULTRA_TERIMLER_5 +
+        ULTRA_TERIMLER_6 +
+        ULTRA_TERIMLER_7 +
+        ULTRA_TERIMLER_8 +
+        ULTRA_TERIMLER_9 +
+        ULTRA_TERIMLER_10 +
+        ULTRA_TERIMLER_11 +
+        ULTRA_TERIMLER_12 +
+        ULTRA_TERIMLER_13 +
+        ULTRA_TERIMLER_14 +
+        ULTRA_TERIMLER_15 +
+        ULTRA_TERIMLER_16 +
+        ULTRA_TERIMLER_17 +
+        ULTRA_TERIMLER_18 +
+        ULTRA_TERIMLER_19
     )
 
+    # 1. Kaynak Python dosyalarındaki saf ve eksiksiz verileri öncelikli ekle
     for item in all_new:
         slug = item["slug"]
+        merged[slug] = item
+
+    # 2. Varsa sadece dosyada olup Python'da olmayan ve kritik uyarısı dolu terimleri ekle
+    for slug, item in existing.items():
         if slug not in merged:
-            merged[slug] = item
+            if item.get("kritikUyari", "").strip() and item.get("kisaTanim", "").strip():
+                merged[slug] = item
 
     print(f"Toplam birleştirilmiş terim sayısı: {len(merged)}")
 
@@ -95,15 +139,33 @@ def main():
         "Değerleme & Finans": "degerleme-finans.ts",
     }
 
+    def kategori_tahmin(item):
+        if "kategori" in item and item["kategori"] in kategori_dosyalari:
+            return item["kategori"]
+        text = (
+            item.get("terim", "") + " " +
+            item.get("kisaTanim", "") + " " +
+            item.get("hukukiKarsilik", "") + " " +
+            item.get("pratikteNeAnlamaGelir", "")
+        ).lower()
+        if any(k in text for k in ["kira", "tahliye", "tbk 3", "kiracı", "kiralayan", "ecrimisil", "tahliye taahhüt", "aidat"]):
+            return "Kira & Tahliye"
+        if any(k in text for k in ["vergi", "harç", "kdv", "beyanname", "vuk", "veraset", "istisna", "gelir vergisi", "gib", "masak"]):
+            return "Vergi & Harç"
+        if any(k in text for k in ["kentsel dönüşüm", "6306", "riskli yapı", "rezerv yapı", "yarısı bizden", "tahliye ve yıkım"]):
+            return "Kentsel Dönüşüm"
+        if any(k in text for k in ["şantiye", "beton", "donatı", "statik", "kolon", "kiriş", "mimar", "leed", "breeam", "ekb", "asansör", "springler", "yangın", "ses yalıtım", "çatı", "tbdy", "tesisat"]):
+            return "İnşaat & Mimarlık"
+        if any(k in text for k in ["imar", "parsel", "ifraz", "tevhit", "kadastro", "18. madde", "dop", "kaks", "taks", "gabari", "kot kesit", "plankote", "kıyı", "boğaziçi", "mera", "toprak koruma", "sit alanı"]):
+            return "İmar & Kadastro"
+        if any(k in text for k in ["değerleme", "spk", "ekspertiz", "gyf", "gyo", "faiz", "kredi", "finans", "nakit", "roi", "amortisman", "cap rate"]):
+            return "Değerleme & Finans"
+        return "Tapu & Mülkiyet"
+
     gruplar = {k: [] for k in kategori_dosyalari}
     for slug, t in merged.items():
-        kat = t.get("kategori", "Tapu & Mülkiyet")
-        if kat == "Yatırım & Finans":
-            kat = "Değerleme & Finans"
-            t["kategori"] = kat
-        if kat not in gruplar:
-            kat = "Tapu & Mülkiyet"
-            t["kategori"] = kat
+        kat = kategori_tahmin(t)
+        t["kategori"] = kat
         gruplar[kat].append(t)
 
     # Modüler TypeScript dosyalarını yaz

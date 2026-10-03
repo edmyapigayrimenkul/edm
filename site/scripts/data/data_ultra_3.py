@@ -1,0 +1,560 @@
+# -*- coding: utf-8 -*-
+"""
+data_ultra_3.py — EDM Emlak Sözlüğü Ultra Genişletme Paketi Bölüm 3 (50 Terim)
+Kentsel dönüşüm mevzuatı, şantiye mühendisliği, beton-donatı detayları ve afet güvenliği.
+"""
+
+ULTRA_TERIMLER_3 = [
+    {
+        "terim": "Karot Alımının Engellenmesi ve Kolluk Zoruyla Giriş",
+        "slug": "karot-engellenmesi-kolluk-yetkisi",
+        "harf": "K",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Riskli yapı tespiti için lisanslı kuruluş görevlilerine kapıyı açmayan veya girişi engelleyen maliklere karşı kaymakamlık ve polis eşliğinde çilingirle girilmesidir.",
+        "hukukiKarsilik": "6306 Sayılı Kanun md. 3 ve md. 15/A.",
+        "pratikteNeAnlamaGelir": "Bütün apartman dönüşüm isterken tek bir dairesini kilitli tutan malik süreci tıkayamaz; savcılık ve polis izniyle kapı açılıp karot alınır.",
+        "kritikUyari": "Görevlilere direnen malikler hakkında Türk Ceza Kanunu kapsamında 'kamu görevlisinin görevini yapmasını engelleme' suçundan adli işlem yapılır.",
+        "ilgiliTerimler": ["Riskli Yapı Tespiti", "Karot Numunesi Alımı"]
+    },
+    {
+        "terim": "Kentsel Dönüşümde Açık Artırma ile Pay Satışı",
+        "slug": "kentsel-donusum-acik-artirma-pay-satisi",
+        "harf": "K",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Riskli binanın yeniden inşası için 1/2 arsa payı kararına katılmayan azınlık maliklerin arsa paylarının Çevre ve Şehircilik İl Müdürlüğü'nce açık artırmayla satılmasıdır.",
+        "hukukiKarsilik": "6306 Sayılı Kanun md. 6 ve Uygulama Yönetmeliği md. 15.",
+        "pratikteNeAnlamaGelir": "Salt çoğunlukla alınan kararı imzalamayan malikin payı öncelikle binadaki diğer anlaşan maliklere rayiç bedel üzerinden ihale edilir.",
+        "kritikUyari": "Bina sakinleri satın almazsa arsa payı Çevre ve Şehircilik Bakanlığı'nca kamulaştırılır veya üçüncü şahıslara satılır; muhalif malik tapusunu kaybeder.",
+        "ilgiliTerimler": ["Salt Çoğunluk Kararı (%50+1)", "Bina Ortak Karar Protokolü"]
+    },
+    {
+        "terim": "Kentsel Dönüşüm Kira Yardımı Süresi ve Koşulları",
+        "slug": "kentsel-donusum-kira-yardimi-suresi",
+        "harf": "K",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Riskli yapısını tahliye eden mülk sahiplerine Bakanlıkça büyükşehirlerde 18 ila 48 ay boyunca her ay karşılıksız ödenen kira destek bedelidir.",
+        "hukukiKarsilik": "6306 Sayılı Kanun md. 5 ve Bakanlık Kira Yardımı Kılavuzu.",
+        "pratikteNeAnlamaGelir": "Binası yıkılan hak sahibi yeni evine geçene kadar her ay devletten kira desteği alır; kiracılara ise tek seferlik defaten taşınma yardımı ödenir.",
+        "kritikUyari": "Devlet destekli kentsel dönüşüm faiz destekli kredisi kullanan bir hak sahibi aynı bağımsız bölüm için aynı anda kira yardımı alamaz; birini seçmelidir.",
+        "ilgiliTerimler": ["Dönüşümde Kira Yardımı", "Kentsel Dönüşüm Kredisi Faiz Desteği"]
+    },
+    {
+        "terim": "Güçlendirme Projesi Ruhsatı ve 1 Yıllık Yasal Süre",
+        "slug": "guclendirme-ruhsati-ve-1-yil-sure",
+        "harf": "G",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Riskli yapı veya orta hasarlı bina maliklerinin binayı yıktırmak yerine güçlendirmeyi seçmesi halinde 1 yıl içinde belediyeden ruhsat alıp inşaata başlama zorunluluğudur.",
+        "hukukiKarsilik": "6306 Sayılı Kanun md. 5/a ve 7269 Sayılı Kanun Geçici Hükümleri.",
+        "pratikteNeAnlamaGelir": "Kat maliklerinin 4/5 rızasıyla hazırlanan güçlendirme statik projesi belediyece onaylanır ve bina yıkılmadan kolon-perde mantolamasıyla güçlendirilir.",
+        "kritikUyari": "1 yıl içinde güçlendirme ruhsatı alınıp inşaata başlanmayan orta hasarlı ve riskli binalar kanun gereği derhal ağır hasarlı sayılıp yıktırılır.",
+        "ilgiliTerimler": ["Statik Güçlendirme Projesi", "Orta Hasarlı Bina Statüsü"]
+    },
+    {
+        "terim": "Asbest Söküm Uzmanlığı ve Temiz Hava Sertifikası",
+        "slug": "asbest-sokum-uzmanligi-sertifikasi",
+        "harf": "A",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Eski binanın yıkımına başlanmadan önce kanserojen asbestli marleylerin, boruların ve izolasyonun özel giysili uzmanlarca sökülüp mühürlü torbalarla bertaraf edilmesidir.",
+        "hukukiKarsilik": "Binaların Yıkılması Hakkında Yönetmelik ve Asbestle Çalışmalarda Sağlık ve Güvenlik Önlemleri Hakkında Yönetmelik.",
+        "pratikteNeAnlamaGelir": "Yıkım esnasında çevreye kanserojen lifli tozların yayılması önlenir; belediyeler asbest temiz raporu olmadan yıkım ruhsatı vermez.",
+        "kritikUyari": "Kaçak ve asbestsiz yıkım yapan müteahhitlere ağır para cezaları ve savcılıkça çevreyi kasten kirletme suçundan hapis cezası davası açılır.",
+        "ilgiliTerimler": ["Asbest Envanter Raporu", "Yıkım Kararı (Madde 32)"]
+    },
+    {
+        "terim": "Yıkım Ruhsatı Alınması Koşulları",
+        "slug": "yikim-ruhsati-alinmasi-kosullari",
+        "harf": "Y",
+        "kategori": "Kentsel Dönüşüm",
+        "kisaTanim": "Elektrik, su, doğalgaz ve telekom bağlantıları kesilip asbest raporu tamamlanan binanın iş makineleriyle güvenli yıkımı için belediyeden alınan resmi izindir.",
+        "hukukiKarsilik": "Binaların Yıkılması Hakkında Yönetmelik md. 6.",
+        "pratikteNeAnlamaGelir": "Yıkım planı, toz bastırma su arazözü ve çevre güvenlik perdesi olmadan bina yıkılamaz; yandaki binalara zarar verilmesi engellenir.",
+        "kritikUyari": "Yıkım ruhsatı alınmadan izinsiz başlatılan yıkımlarda şantiye mühürlenir, iş makineleri bağlanır ve ruhsatsız yıkım cezası kesilir.",
+        "ilgiliTerimler": ["Yıkım Tebligatı (60 Gün)", "Resen Yıkım"]
+    },
+    {
+        "terim": "Yapı Tatil Zaptı Tebliği ve 30 Günlük Düzeltme Süresi",
+        "slug": "yapi-tatil-zapti-30-gunluk-sure",
+        "harf": "Y",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Ruhsatsız veya ruhsata aykırı inşaat yapıldığı tespit edildiğinde belediyenin inşaatı mühürleyip yapı tatil zaptını binaya asmasıyla başlayan 30 günlük yasal süredir.",
+        "hukukiKarsilik": "3194 Sayılı İmar Kanunu md. 32.",
+        "pratikteNeAnlamaGelir": "Müteahhit veya malik bu 30 gün içinde aykırılığı yıkarak projeye uygun hale getirirse veya tadilat ruhsatı alırsa mührün kaldırılmasını talep edebilir.",
+        "kritikUyari": "30 gün içinde aykırılık giderilmezse belediye encümeni yıkım kararı alır ve fahiş imar para cezası (md. 42) kesinleşir.",
+        "ilgiliTerimler": ["Yapı Tatil Zaptı", "İmar Para Cezası (Madde 42)"]
+    },
+    {
+        "terim": "Elektronik Dağıtım (Havuz Sistemi) ile Yapı Denetim Ataması",
+        "slug": "elektronik-yapi-denetim-havuz-sistemi",
+        "harf": "E",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Müteahhidin kendi istediği yapı denetim firmasını seçmesini engelleyen, Bakanlık yazılımı üzerinden piyango usulü tarafsız otomatik denetçi atama sistemidir.",
+        "hukukiKarsilik": "4708 Sayılı Yapı Denetimi Kanunu ve 2019 Yılı Elektronik Dağıtım Genelgesi.",
+        "pratikteNeAnlamaGelir": "Müteahhit ile denetçi arasındaki ahbap-çavuş ilişkisini bitirmiştir; denetçi bağımsız olduğu için demir ve betonda hiçbir taviz vermez.",
+        "kritikUyari": "Sistem tarafından atanan yapı denetim firması haklı bir gerekçe olmadan değiştirilemez; firmanın hakedişi belediyedeki emanet hesaba yatırılır.",
+        "ilgiliTerimler": ["Yapı Denetim Kuruluşu", "Şantiye Şefi Sorumluluğu"]
+    },
+    {
+        "terim": "Şantiye Şefinin İstifası ve İnşaatın Resen Durdurulması",
+        "slug": "santiye-sefi-istifasi-insaat-durdurma",
+        "harf": "Ş",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Şantiye şefinin noter kanalıyla istifa etmesi durumunda, müteahhit yeni bir şantiye şefi atayana kadar belediyenin inşaatı derhal durdurması zorunluluğudur.",
+        "hukukiKarsilik": "Şantiye Şefleri Hakkında Yönetmelik md. 8.",
+        "pratikteNeAnlamaGelir": "Başında yetkili mimar veya inşaat mühendisi bulunmayan bir şantiyede tek bir çivi dahi çakılamaz, tek bir mikser beton dökülemez.",
+        "kritikUyari": "Şantiye şefsiz devam eden inşaatlarda meydana gelecek iş kazalarından doğrudan işveren ve müteahhit asli kusurlu olarak cezaevine girer.",
+        "ilgiliTerimler": ["Şantiye Şefi Sorumluluğu", "Yapı Ruhsatı"]
+    },
+    {
+        "terim": "Fenni Mesulün Hukuki ve Cezai Sorumluluğu",
+        "slug": "fenni-mesul-sorumlulugu",
+        "harf": "F",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Ruhsata tabi inşaatların statik, mimari, elektrik ve mekanik projelerine uygun yapıldığını kamu adına denetleyen mühendis ve mimarların yasal güvencesidir.",
+        "hukukiKarsilik": "3194 Sayılı İmar Kanunu md. 28 ve 38; TCK md. 257.",
+        "pratikteNeAnlamaGelir": "Binanın projesine aykırı yapıldığını görüp belediyeye bildirmeyen fenni mesuller, bina yıkıldığında 'bilinçli taksirle ölüme sebebiyet' suçundan yargılanır.",
+        "kritikUyari": "Fenni mesul imzası olmadan hiçbir aşamada beton dökülemez ve hak ediş onaylanamaz.",
+        "ilgiliTerimler": ["Yapı Denetim Kuruluşu", "Şantiye İlerleme ve Hakediş Tutanağı"]
+    },
+    {
+        "terim": "Slump (Çökme) Testi ve Taze Beton Kıvamı",
+        "slug": "slump-cokme-testi-taze-beton",
+        "harf": "S",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Şantiyeye gelen transmikserden alınan taze betonun koni kalıba doldurulup kaldırıldığında ne kadar çöktüğünü santimetre cinsinden ölçen işlenebilirlik testidir.",
+        "hukukiKarsilik": "TS EN 12350-2 Taze Beton Deneyleri - Slump Testi.",
+        "pratikteNeAnlamaGelir": "Betonun çok kuru veya gereğinden fazla sulu olup olmadığını saniyeler içinde gösterir; kıvamı bozuk beton kalıba yerleşmez veya zayıf kalır.",
+        "kritikUyari": "Beton pompaya kolay girsin diye miksere su ekleten müteahhitler betonun dayanımını yarı yarıya düşürür; su eklenen mikser yapı denetimce derhal şantiyeden kovulmalıdır.",
+        "ilgiliTerimler": ["Beton Sınıfı", "Beton Kırım Deneyi"]
+    },
+    {
+        "terim": "Donatıda Pas Payı (Paspayı) Takozları",
+        "slug": "paspayi-takozlari-donati-koruma",
+        "harf": "P",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Kalıp ile demir donatı arasına yerleştirilen ve beton döküldüğünde demirin dış hava ve nemle temasını kesen 3-5 cm kalınlığındaki plastik veya beton mesafe elemanıdır.",
+        "hukukiKarsilik": "TS 500 ve Türkiye Bina Deprem Yönetmeliği md. 7.2.7.",
+        "pratikteNeAnlamaGelir": "Kalıp söküldüğünde kolonun veya kirişin yüzeyinden demirlerin dışarıya fırlamasını ve 5 yıl içinde paslanarak binayı çürütmesini engeller.",
+        "kritikUyari": "Paspayı takozu yerine tahta veya kırık tuğla parçası koymak yasaktır; tahta çürüyünce içeriye su sızar ve korozyon başlar.",
+        "ilgiliTerimler": ["Pas Payı (Beton Örtü Tabakası)", "Korozyon ve Demir Paslanması"]
+    },
+    {
+        "terim": "Kolonda Çiroz (S-Demiri) Uygulaması",
+        "slug": "kolonda-ciroz-s-demiri",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Kolon ve perdelerdeki karşılıklı düşey demirleri birbirine bağlayan, deprem sarsıntısında boyuna donatının dışarı doğru fırlayıp bel vermesini (burkulmasını) önleyen kancalı çeliktir.",
+        "hukukiKarsilik": "Türkiye Bina Deprem Yönetmeliği md. 7.3.2.",
+        "pratikteNeAnlamaGelir": "Depremde kolonun ortadan ikiye yarılmasını önleyen en kritik emniyet kilitlerindendir; kolonun çekirdek betonunu sımsıkı hapseder.",
+        "kritikUyari": "Çiroz kancalarının uçları mutlaka 135 derece bükülmüş olmalıdır; 90 derece düz bırakılan kancalar sarsıntıda açılarak kolonun patlamasına yol açar.",
+        "ilgiliTerimler": ["Etriye Demiri", "Etriye Sıklaştırma Bölgesi"]
+    },
+    {
+        "terim": "Boyuna Donatıda Bindirme Eki ve Bindirme Boyu",
+        "slug": "donatida-bindirme-boyu-eki",
+        "harf": "B",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Birbirinin devamı olan inşaat demirlerinin uç uca kaynak yapılmak yerine yönetmelikte belirtilen uzunluk boyunca (genelde demir çapının 40-50 katı) yan yana getirilip telle bağlanmasıdır.",
+        "hukukiKarsilik": "TS 500 ve TBDY 2018 md. 7.2.8.",
+        "pratikteNeAnlamaGelir": "Çekme kuvvetinin bir demirden diğer demire beton aracılığıyla güvenle aktarılmasını sağlar; kolon ek yerlerinin kopmasını engeller.",
+        "kritikUyari": "Bindirme boyu kısa tutulursa depremde demirler betondan sıyrılarak çıkar ve katlar üst üste yığılarak çöker.",
+        "ilgiliTerimler": ["Nervürlü İnşaat Demiri", "Kolon"]
+    },
+    {
+        "terim": "Tij Delikleri ve Su Yalıtım Tıkacı",
+        "slug": "tij-delikleri-ve-su-yalitim-tikaci",
+        "harf": "T",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Perde beton kalıplarını tutan çelik saplama millerinin çıkarılmasından sonra kalan boru boşluklarının su sızdırmaz tıkama harcı ve lastik tıpalarla doldurulmasıdır.",
+        "hukukiKarsilik": "Binalarda Su Yalıtımı Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Bodrum kat perde duvarlarında dışarıdaki yeraltı suyunun daire veya otopark içine fıskiye gibi püskürmesini engeller.",
+        "kritikUyari": "Tij borusu çıkarılmadan sadece ağzına sıva çalınırsa ilkbaharda yeraltı suları yükseldiğinde bodrum katı su basar.",
+        "ilgiliTerimler": ["Bohçalama Su Yalıtımı", "Perde Beton"]
+    },
+    {
+        "terim": "Dilatasyon Profil ve Fitil Yalıtımı",
+        "slug": "dilatasyon-profil-fitil-yalitimi",
+        "harf": "D",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Yan yana inşa edilen bağımsız blokların arasındaki 5-10 cm'lik deprem ve genleşme boşluklarının su, rüzgar ve sese karşı alüminyum profil ve kauçuk fitille kapatılmasıdır.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği ve Binalarda Su Yalıtımı Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Binalar depremde birbirine çarpmadan bağımsız sallanırken, aradaki yarıktan alt katlara veya otoparka yağmur suyu ve rüzgar sızması engellenir.",
+        "kritikUyari": "Dilatasyon derzinin üzerine harç dökülüp kapatılması cinayettir; deprem anında bloklar birbirini çekiçleyerek ağır hasara neden olur.",
+        "ilgiliTerimler": ["Dilatasyon Derzi", "Sismik İzolatör"]
+    },
+    {
+        "terim": "Kristalize Su Yalıtımı (Beton Kılcal Damar Tıkama)",
+        "slug": "kristalize-su-yalitimi-beton",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Betonun karma suyuna eklenen veya yüzeye sürülen, su ile temas ettikçe çözünmeyen kristaller üreterek betonun gözeneklerini sonsuza kadar tıkayan kimyasal yalıtımdır.",
+        "hukukiKarsilik": "TS EN 1504-2 Beton Yapıların Korunması.",
+        "pratikteNeAnlamaGelir": "Betonun kendisini su geçirmez hale getirir; sonradan oluşacak 0.4 mm'ye kadar olan kılcal çatlakları su gördükçe kendi kendine onarır.",
+        "kritikUyari": "İçme suyu depolarında kullanılacak kristalize harçların mutlaka gıda temasına uygunluk (NSF-61) sertifikasına sahip olması gerekir.",
+        "ilgiliTerimler": ["Bohçalama Su Yalıtımı", "Su Deposu ve Yangın Rezervi"]
+    },
+    {
+        "terim": "Püskürtme Beton (Shotcrete) ile İksa Güvenliği",
+        "slug": "puskurtme-beton-shotcrete-iksa",
+        "harf": "P",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Derin temel kazılarında toprak kaymasını ve göçüğü önlemek amacıyla çelik hasır üzerine yüksek basınçlı hava hortumuyla püskürtülen özel kıvamlı beton tabakasıdır.",
+        "hukukiKarsilik": "Kazı Güvenliği ve Altyapı Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Yandaki komşu binanın veya yolun temel kazısına doğru kayıp çökmesini zemin çivileriyle birlikte engelleyen kaya gibi sağlam bir kabuk oluşturur.",
+        "kritikUyari": "Püskürtme betonun içinde priz hızlandırıcı kimyasallar dozajında kullanılmalıdır; yetersiz kalınlık göçük felaketine yol açar.",
+        "ilgiliTerimler": ["Fore Kazık Sistemi", "İstinat Duvarı"]
+    },
+    {
+        "terim": "Mini Kazık ve Zemin Ankrajı",
+        "slug": "mini-kazik-ve-zemin-ankraji",
+        "harf": "M",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Dar sokaklarda ve zayıf zeminlerde derin çelik halatların toprağın içine çakılıp gerilmesi ve küçük çaplı betonarme kazıklarla kazı çukurunun kilitlenmesidir.",
+        "hukukiKarsilik": "Zemin ve Temel Etütleri Uygulama Esasları.",
+        "pratikteNeAnlamaGelir": "Şehir merkezinde komşu binalara bitişik derin bodrum katı kazılırken komşu binaların zemininde 1 milimetre dahi oturma ve çatlama olmamasını sağlar.",
+        "kritikUyari": "Komşu parselin altından geçirilen ankraj halatları için komşu maliklerden yazılı muvafakatname alınması hukuken zorunludur.",
+        "ilgiliTerimler": ["Fore Kazık Sistemi", "Püskürtme Beton"]
+    },
+    {
+        "terim": "Diyafram Duvar (Slurry Wall) ile Su Sızdırmaz İksa",
+        "slug": "diyafram-duvar-slurry-wall",
+        "harf": "D",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Yeraltı su seviyesi yüksek deniz kenarlarında veya metro hatlarında, bentonit çamuru kullanılarak yeraltına dökülen monolitik yekpare su sızdırmaz betonarme duvardır.",
+        "hukukiKarsilik": "TS EN 1538 Diyafram Duvar Uygulama Kuralları.",
+        "pratikteNeAnlamaGelir": "Hem derin kazıda toprak basıncını tutar hem de yeraltı suyunun şantiyeyi basmasını kesin olarak engeller; kalıcı bina bodrum duvarı olarak kullanılır.",
+        "kritikUyari": "Panel birleşim derzlerindeki su tutucu bantların kusursuz yerleştirilmesi gerekir; en ufak sızıntı deniz suyunun içeri dolmasına neden olur.",
+        "ilgiliTerimler": ["Fore Kazık Sistemi", "Bohçalama Su Yalıtımı"]
+    },
+    {
+        "terim": "Kurşun Çekirdekli Kauçuk Sismik İzolatör (LRB)",
+        "slug": "kursun-cekirdekli-sismik-izolator-lrb",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Bina kolonlarının altına yerleştirilen, kauçuk katmanlar ve ortasındaki saf kurşun çekirdekle deprem enerjisini emerek üst binaya titreşim iletmeyen deprem yalıtımıdır.",
+        "hukukiKarsilik": "TBDY 2018 Bölüm 14 (Deprem Yalıtımlı Binalar).",
+        "pratikteNeAnlamaGelir": "8 büyüklüğündeki yıkıcı bir depremde dahi üst kattaki dairede masadaki bardak bile devrilmez; hastanelerde ameliyatlar kesintisiz sürer.",
+        "kritikUyari": "İzolatörlerin etrafında en az 40-50 cm'lik 'sismik boşluk' bırakılmalı ve binaya giren gaz-su boruları esnek körüklü yapılmalıdır; aksi halde borular kopar.",
+        "ilgiliTerimler": ["Sismik İzolatör", "Dilatasyon Derzi"]
+    },
+    {
+        "terim": "Sürtünmeli Sarkaç Tipi Sismik İzolatör (FPS)",
+        "slug": "surtunmeli-sarkac-sismik-izolator-fps",
+        "harf": "S",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "İçbükey küresel paslanmaz çelik yüzey üzerinde kayan mafsallı kızak mekanizmasıyla depremde sarkaç hareketi yaparak yapıyı yer hareketinden ayıran sistemdir.",
+        "hukukiKarsilik": "TBDY 2018 Bölüm 14 ve EN 15129 Antisismi Cihazlar Standardı.",
+        "pratikteNeAnlamaGelir": "Çok ağır gökdelenlerin ve köprülerin altına uygulanır; yangına karşı kauçuğa göre daha dayanıklıdır ve onlarca yıl bakım gerektirmez.",
+        "kritikUyari": "Kayma yüzeylerinin toz, moloz ve harçtan korunması şarttır; inşaat sırasında özel koruyucu kılıflarla sarılmalıdır.",
+        "ilgiliTerimler": ["Sismik İzolatör", "Kurşun Çekirdekli Kauçuk İzolatör"]
+    },
+    {
+        "terim": "C35, C40 ve C50 Yüksek Dayanımlı Hazır Beton",
+        "slug": "c35-c40-c50-hazir-beton-siniflari",
+        "harf": "C",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Santimetrekaresinde 350, 400 ve 500 kilogram basınca dayanan, yüksek katlı binalarda ve mega projelerde kolon kesitlerini küçülten ultra sağlam beton sınıflarıdır.",
+        "hukukiKarsilik": "TS EN 206 Beton Standardı ve TBDY 2018.",
+        "pratikteNeAnlamaGelir": "Eski C16-C20 binalara göre 2.5 kat daha fazla yük taşır; salonların ortasında devasa hantal kolonlar yerine daha zarif kolonlar yapılmasına imkan tanır.",
+        "kritikUyari": "C40 üzeri betonlar çok hızlı priz alır ve ısınır; çatlamaması için dökümden sonra günlerce ıslak çuvallarla sulanıp kürlenmesi şarttır.",
+        "ilgiliTerimler": ["Beton Sınıfı", "Slump Testi"]
+    },
+    {
+        "terim": "Alüminyum Kompozit Panelde A2 Yangın Dayanımı",
+        "slug": "aluminyum-kompozit-panel-a2",
+        "harf": "A",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "İki alüminyum levha arasında mineral dolgu bulunan, alev almayan ve zehirli gaz çıkarmayan A2-s1, d0 sınıfı lüks dış cephe kaplama malzemesidir.",
+        "hukukiKarsilik": "Binaların Yangından Korunması Hakkında Yönetmelik md. 27.",
+        "pratikteNeAnlamaGelir": "Gökdelenlerin dış cephesine modern metalik ve parlak bir görünüm kazandırırken yangının cepheden kule gibi tırmanmasını önler.",
+        "kritikUyari": "İçi polietilen plastik dolgulu ucuz B2 sınıfı kompozit paneller cephe yangınlarında binayı meşale gibi yakar; yüksek binalarda kullanımı kesinlikle yasaktır.",
+        "ilgiliTerimler": ["Taşyünü Cephe Yalıtımı", "Yangın Merdiveni"]
+    },
+    {
+        "terim": "Taşyünü Sandviç Panel Çatı Kaplaması",
+        "slug": "tasyunu-sandvic-panel-cati",
+        "harf": "T",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "İki boyalı galvaniz sac levha arasına yüksek yoğunlukta taşyünü yapıştırılarak üretilen, sanayi tesislerinde ve depolarda kullanılan yangına dayanıklı çatı örtüsüdür.",
+        "hukukiKarsilik": "Binalarda Enerji Performansı ve Yangın Yönetmelikleri.",
+        "pratikteNeAnlamaGelir": "Fabrika ve atölyelerde hem ısı yalıtımı sağlar hem de çatı yangınlarında itfaiye gelene kadar tavanın çökmesini engeller.",
+        "kritikUyari": "Panel montajında kullanılan akıllı vidaların EPDM contalı olması gerekir; vidası gevşeyen çatılar sağanakta fabrikaya su akıtır.",
+        "ilgiliTerimler": ["Çelik Konstrüksiyon Yapı", "Mantolama"]
+    },
+    {
+        "terim": "Yer Süzgeci Koku Kapatıcı Klape (Kuru Koku Tuzağı)",
+        "slug": "yer-suzgeci-koku-kapatici-klape",
+        "harf": "Y",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Banyo ve balkon süzgeçlerinde içindeki su buharlaşıp kuruduğunda bile mekanik yaylı veya ağırlıklı kapağıyla kanalizasyon kokusunu içeri vermeyen akıllı süzgeçtir.",
+        "hukukiKarsilik": "TS EN 1253 Bina Drenaj Elemanları ve Mekanik Tesisat Standartları.",
+        "pratikteNeAnlamaGelir": "Yaz tatilinden 1 ay sonra eve döndüğünüzde banyonun lağım gibi kokmasını tamamen önler; haşere ve böceklerin borudan çıkmasını engeller.",
+        "kritikUyari": "Klapesiz klasik süzgeçler banyo kullanılmadığı zaman suyunu kaybeder ve doğrudan kanalizasyon gazını dairenin içine salar.",
+        "ilgiliTerimler": ["Çekvalf", "Kanal Bağlantı Belgesi"]
+    },
+    {
+        "terim": "Şantiye Elektriği ve Şantiye Suyu Tarifesi",
+        "slug": "santiye-elektrigi-ve-suyu-aboneligi",
+        "harf": "Ş",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "İnşaat süresince kullanılan ve mesken tarifesine göre çok daha pahalı olan geçici şantiye aboneliğidir; iskan alınınca ferdi meskene dönüştürülür.",
+        "hukukiKarsilik": "Elektrik Piyasası Tüketici Hizmetleri Yönetmeliği ve Su Kanalizasyon İdaresi Tarifeleri.",
+        "pratikteNeAnlamaGelir": "İskanı alınmamış bir binada oturuyorsanız elektrik ve su faturanız 'şantiye tarifesinden' katlamalı ve kabarık gelir.",
+        "kritikUyari": "Müteahhit iskan alana kadar aradaki tarife farkından doğan elektrik ve su zararını yasal olarak daire sakinlerine tazmin etmekle yükümlüdür.",
+        "ilgiliTerimler": ["Yapı Kullanma İzin Belgesi (İskan)", "Kısmi İskan"]
+    },
+    {
+        "terim": "Yapı Ruhsatının 2 Yıl İçinde Başlama ve 5 Yıllık Süresi",
+        "slug": "yapi-ruhsati-2-yil-ve-5-yil-kurali",
+        "harf": "Y",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Ruhsat tarihinden itibaren 2 yıl içinde inşaata başlanması ve 5 yıl içinde inşaatın bitirilerek iskan alınması zorunluluğudur.",
+        "hukukiKarsilik": "3194 Sayılı İmar Kanunu md. 29.",
+        "pratikteNeAnlamaGelir": "2 yıl içinde temel atılmazsa ruhsat hükümsüz kalır; 5 yıl içinde bitmezse ruhsat temdidi (yenileme) yapılması şarttır.",
+        "kritikUyari": "5 yıl dolduğunda imar planı değişmiş ve emsal düşürülmüşse, eski ruhsattaki inşaat hakkı kaybedilir ve yeni plana uyulması zorunlu olur.",
+        "ilgiliTerimler": ["Yapı Ruhsatı", "Müktesep Hak (İmar)"]
+    },
+    {
+        "terim": "Hisseli Parselde Kat İrtifakı Kurulmasında Oybirliği",
+        "slug": "hisseli-parselde-kat-irtifaki-oybirligi",
+        "harf": "H",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "Henüz inşaat başlamadan önce arsa üzerindeki tüm paydaşların noterde onaylı liste ve yönetim planıyla tapuda kat irtifakı kurmak için oybirliğiyle imza vermesidir.",
+        "hukukiKarsilik": "634 Sayılı Kat Mülkiyeti Kanunu md. 10 ve 12.",
+        "pratikteNeAnlamaGelir": "100 hissedardan tek bir kişi dahi imza atmazsa tapuda bağımsız bölüm irtifak tapuları çıkarılamaz; banka kredisiyle konut satışı yapılamaz.",
+        "kritikUyari": "İmza vermeyen hissedara karşı diğer ortaklar 'Kat İrtifakı Kurulmasına İcbar' veya 'Ortaklığın Giderilmesi (İzale-i Şuyu)' davası açmak zorunda kalır.",
+        "ilgiliTerimler": ["Kat İrtifakı", "Ortaklığın Giderilmesi (İzale-i Şüyu)"]
+    },
+    {
+        "terim": "Yapı Alacaklısı İpoteği ve Tescil Süresi",
+        "slug": "yapi-alacaklisi-ipotegi-tescil-suresi",
+        "harf": "Y",
+        "kategori": "Tapu & Mülkiyet",
+        "kisaTanim": "İnşaatta çalışan taşeron, usta veya malzeme tedarikçisinin ödenmeyen alacakları için inşaat yapılan bina üzerine hakimin kararıyla resen ipotek koydurabilmesidir.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 893/3 ve md. 895.",
+        "pratikteNeAnlamaGelir": "Müteahhit işçinin veya beton firmasının parasını ödemezse işçiler inşaatın tapusuna yasal ipotek koyarak alacaklarını tapu satışından tahsil eder.",
+        "kritikUyari": "Bu ipoteğin işin tamamlanmasından itibaren en geç 3 ay içinde tapu kütüğüne tescil ettirilmesi şarttır; 3 ay geçerse bu hak düşer.",
+        "ilgiliTerimler": ["Yapı Alacaklısı İpoteği", "İpotek"]
+    },
+    {
+        "terim": "İnşaat All-Risk Sigortası (CAR Sigortası)",
+        "slug": "insaat-all-risk-sigortasi-car",
+        "harf": "İ",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Temel kazısından geçici kabule kadar şantiyede meydana gelebilecek yangın, sel, deprem, çökme, hırsızlık ve 3. şahıs mali mesuliyet zararlarını kapsayan geniş teminatlı poliçedir.",
+        "hukukiKarsilik": "Türk Ticaret Kanunu md. 1401 vd. ve Bütün Riskler (All Risks) Sigortası Genel Şartları.",
+        "pratikteNeAnlamaGelir": "Şantiyede kule vinç devrildiğinde veya su baskını olduğunda milyonlarca liralık zararı müteahhit değil sigorta şirketi karşılar.",
+        "kritikUyari": "Arsa sahipleri kat karşılığı sözleşme yaparken müteahhide CAR sigortası yaptırma ve poliçeyi arsa sahipleri adına rehinli alacaklı kılma şartı koymalıdır.",
+        "ilgiliTerimler": ["Bina Tamamlama Sigortası", "Şantiye İlerleme ve Hakediş Tutanağı"]
+    },
+    {
+        "terim": "Kule Vinç Kurulumu ve İmar Hava Sahası İhlali",
+        "slug": "kule-vinc-hava-sahasi-ihlali",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Kule vincin bom kolunun komşu parsellerin veya binaların hava sahası üzerinden geçmesi nedeniyle can güvenliği riski ve mülkiyet tecavüzü oluşturmasıdır.",
+        "hukukiKarsilik": "Türk Medeni Kanunu md. 683 ve 718; Yapı İşlerinde İş Sağlığı ve Güvenliği Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Komşu binanın çatısının üzerinden tonlarca yük taşıyan vinç bomu geçirilemez; komşu maliklerin can güvenliği gerekçesiyle savcılığa başvurma hakkı vardır.",
+        "kritikUyari": "Vincin rüzgarda serbest dönüş modu (rüzgar gülü) aktif bırakılmalı, karşı ağırlıklar düzenli tork testinden geçirilmelidir.",
+        "ilgiliTerimler": ["Şantiye Şefi Sorumluluğu", "Müdahalenin Meni Davası"]
+    },
+    {
+        "terim": "Drenaj Çukuru ve Terfi Pompası (Sump Pompası)",
+        "slug": "drenaj-cukuru-ve-terfi-pompasi",
+        "harf": "D",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Şehir kanalizasyon seviyesinin altında kalan bodrum katlardaki atık suların toplandığı hazne ve bu suyu cadde kotuna basan otomatik dalgıç pompadır.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 52.",
+        "pratikteNeAnlamaGelir": "Kot altı dairelerin ve otoparkların kendi cazibesiyle akmayan sularını şamandıralı motor yardımıyla yukarıdaki ana lağıma tahliye eder.",
+        "kritikUyari": "Dalgıç pompanın mutlaka jeneratöre bağlı olması ve yedekli (çift pompa) çalışması gerekir; elektrik kesilirse bodrumu pis su basar.",
+        "ilgiliTerimler": ["Çekvalf", "Kanal Bağlantı Belgesi"]
+    },
+    {
+        "terim": "Islak Hacim Su Yalıtımı ve Pah Bandı",
+        "slug": "islak-hacim-su-yalitimi-pah-bandi",
+        "harf": "I",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Banyo, tuvalet ve balkonlarda seramik altına sürülen sürme izolasyon ve duvar-zemin birleşim köşelerine yerleştirilen esnek kauçuk pah bandıdır.",
+        "hukukiKarsilik": "Binalarda Su Yalıtımı Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Banyo zeminindeki su sızıntılarının alt katın tavanından sarı lekeler ve damlamalar halinde akmasını kesin olarak engeller.",
+        "kritikUyari": "Pah bandı konulmadan yapılan sürme izolasyonlar bina oturduğunda köşe birleşimlerinden çatlar ve alt komşuya su akıtır.",
+        "ilgiliTerimler": ["Bohçalama Su Yalıtımı", "Şap Betonu"]
+    },
+    {
+        "terim": "Alçı Sıva ve Çimento Esaslı Kara Sıva Mukayesesi",
+        "slug": "alci-siva-kara-siva-mukayesesi",
+        "harf": "A",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "İç duvarlarda pürüzsüz boya yüzeyi sağlayan pratik alçı sıva ile neme, darbeye dayanıklı geleneksel çimento-kum esaslı kaba sıvanın teknik farkıdır.",
+        "hukukiKarsilik": "TS 1481 Sıvalar Standardı ve Çevre Şehircilik Birim Fiyat Tarifleri.",
+        "pratikteNeAnlamaGelir": "Alçı sıva odadaki nemi dengeler ve hızla kurur; ancak banyo, balkon ve bodrum gibi ıslak mekanlarda alçı sıva kabarıp çürür, buralarda mutlaka kara sıva şarttır.",
+        "kritikUyari": "Banyoda seramik altına alçı sıva uygulanırsa su buharıyla alçı yumuşar ve fayanslar duvardan kalıp gibi aşağı iner.",
+        "ilgiliTerimler": ["Gazbeton (Ytong)", "Islak Hacim Su Yalıtımı"]
+    },
+    {
+        "terim": "Parke Altı Kapron ve Nem Bariyeri",
+        "slug": "parke-alti-kapron-nem-bariyeri",
+        "harf": "P",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Laminat parke döşenmeden önce şapın üzerine serilen, hem alt kattan gelen soğuğu ve sesi kesen hem de şapın nemini parkeden uzak tutan polietilen levhadır.",
+        "hukukiKarsilik": "TS EN 13329 Laminat Zemin Kaplamaları Standardı.",
+        "pratikteNeAnlamaGelir": "Parke üzerinde yürürken gıcırtı ve takırtı sesini yutar; şap tam kurumadan döşenen parkelerin kabarıp şişmesini önler.",
+        "kritikUyari": "Şap nemi %2'nin altına düşmeden parke döşenmemelidir; kapron nemi bir dereceye kadar tutsa da aşırı ıslak şap parkeyi dalgalandırır.",
+        "ilgiliTerimler": ["Şap Betonu", "Akustik Şilte"]
+    },
+    {
+        "terim": "Yangın Kapısı Panik Bar Mekanizması",
+        "slug": "yangin-kapisi-panik-bar-mekanizmasi",
+        "harf": "Y",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Yangın merdiveni kapılarında içeriden kaçan kişinin eliyle veya vücuduyla dokunduğunda anında açılan, kilitlenemez acil tahliye barıdır.",
+        "hukukiKarsilik": "Binaların Yangından Korunması Hakkında Yönetmelik md. 47 ve TS EN 1125.",
+        "pratikteNeAnlamaGelir": "Elektrikler kesik ve ortam dumanla kaplıyken anahtar aramaya gerek kalmadan kapıyı saniyede açıp merdiven boşluğuna kaçmayı sağlar.",
+        "kritikUyari": "Yangın kapılarının asma kilitle kilitlenmesi veya zincirlenmesi ağır bir suçtur; facia anında ölümlere neden olan yöneticiler tutuklanır.",
+        "ilgiliTerimler": ["Yangın Merdiveni ve Kaçış Holü", "Yangın Sprinkler Sistemi"]
+    },
+    {
+        "terim": "Asansör Aşırı Yük Sensörü ve Frekans Kontrolü",
+        "slug": "asansor-asiri-yuk-ve-frekans-kontrolu",
+        "harf": "A",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Kabindeki ağırlık beyan edilen kapasiteyi aştığında kapıların kapanmasını engelleyip sesli uyarı veren ve VVVF sürücüyle kalkış-duruş sarsıntısını sıfırlayan sistemdir.",
+        "hukukiKarsilik": "Asansör Yönetmeliği (2014/33/AB).",
+        "pratikteNeAnlamaGelir": "Asansör katlara yaklaşırken yumuşak yavaşlar ve tam kat hizasında durur; kabin ile kat arasında takılıp düşme basamağı oluşturmaz.",
+        "kritikUyari": "Aşırı yük rölesi iptal edilen asansörlerde halat kayması ve fren aşınması nedeniyle kabin kuyu dibine çakılabilir.",
+        "ilgiliTerimler": ["Asansör Yeşil Bilgi Etiketi", "Makine Dairesiz Asansör"]
+    },
+    {
+        "terim": "Paratoner İniş İletkeni ve Topraklama Ölçümü",
+        "slug": "paratoner-inis-iletkeni-topraklama",
+        "harf": "P",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Yıldırım yakalama ucundan bina dış cephesi boyunca toprağa indirilen som bakır iletken ve topraklama direncinin 5 Ohm'un altında olduğunu belgeleyen ölçümdür.",
+        "hukukiKarsilik": "Elektrik Tesislerinde Topraklamalar Yönetmeliği ve Binaların Yangından Korunması Hakkında Yönetmelik.",
+        "pratikteNeAnlamaGelir": "Yıldırım düştüğünde milyonlarca voltluk enerjiyi bina elektrik tesisatına ve akıllı ev aletlerine zarar vermeden güvenle toprağa akıtır.",
+        "kritikUyari": "Yılda bir kez EMO yetkili elektrik mühendisince topraklama meger ölçümü yapılmalı; direnç 10 Ohm'u geçerse topraklama levhaları yenilenmelidir.",
+        "ilgiliTerimler": ["Paratoner ve Yıldırımdan Korunma", "Kaçak Akım Rölesi"]
+    },
+    {
+        "terim": "Basınç Düşürücü Su Vanası",
+        "slug": "basinc-dusurucu-su-vanasi",
+        "harf": "B",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Şebekeden veya hidrofordan gelen aşırı yüksek su basıncını (6-10 bar) daire tesisatının dayanabileceği 3-4 bar seviyesine sabitleyen emniyet vanasıdır.",
+        "hukukiKarsilik": "Mekanik Tesisat Standartları ve İSKİ İç Tesisat Şartnamesi.",
+        "pratikteNeAnlamaGelir": "Geceleri şebeke basıncı aniden yükseldiğinde çamaşır makinesi hortumunun patlamasını, kombinin su akıtmasını ve bataryaların contasının yırtılmasını önler.",
+        "kritikUyari": "Daire girişinde basınç düşürücü regülatör yoksa fleksi boru patlamalarından doğan alt kata su basma zararlarını ev sahibi öder.",
+        "ilgiliTerimler": ["Hidrofor ve Basınçlı Su Sistemi", "Islak Hacim Su Yalıtımı"]
+    },
+    {
+        "terim": "Güneş Kırıcı Mimari Paneller",
+        "slug": "gunes-kirici-mimari-paneller",
+        "harf": "G",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Bina dış cephesine yatay veya dikey açıyla monte edilen, yazın dik gelen yakıcı güneş ışınlarını kırıp gölge sağlayan alüminyum veya ahşap lamel sistemidir.",
+        "hukukiKarsilik": "Binalarda Enerji Performansı Yönetmeliği ve Yeşil Bina Sertifikasyonları.",
+        "pratikteNeAnlamaGelir": "Güney ve batı cepheli salonlarda yazın aşırı ısınmayı önleyerek klima tüketimini %40 düşürürken kışın yatay güneş ışıklarının içeri girmesine izin verir.",
+        "kritikUyari": "Panellerin rüzgar yükü hesapları statik projede onaylatılmalıdır; fırtınada kopan lamel yayaların üzerine düşebilir.",
+        "ilgiliTerimler": ["Low-E Kaplamalı Isıcam", "Enerji Kimlik Belgesi (EKB)"]
+    },
+    {
+        "terim": "Kaset Tipi Fan Coil İklimlendirme Ünitesi",
+        "slug": "kaset-tipi-fan-coil-unitesi",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Asma tavan içine gömülen, 4 yöne hava üfleyen, merkezi kazan veya soğutma grubundan (chiller) gelen su ile çalışan sessiz ısıtma-soğutma cihazıdır.",
+        "hukukiKarsilik": "Mekanik Tesisat Standartları ve Enerji Performansı Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Ofislerde ve lüks rezidanslarda duvarda radyatör veya klima iç ünitesi fazlalığını yok eder; homojen ve konforlu hava dağılımı sağlar.",
+        "kritikUyari": "Drenaj tavası eğimsiz monte edilirse tavanın içine su damlatır; asma tavan alçıpanları sararır ve küflenir.",
+        "ilgiliTerimler": ["VRF Merkezi Klima Sistemi", "Merkezi Isıtma"]
+    },
+    {
+        "terim": "Çatı Gizli Dere ve Yağmur İniş Boruları",
+        "slug": "cati-gizli-dere-yagmur-olugu",
+        "harf": "Ç",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Bina saçak ucunda dışarıdan görünmeyecek şekilde parapet arkasına gizlenen, çatı yağmur sularını toplayıp dikey borularla rögara ileten yalıtımlı oluktur.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 40.",
+        "pratikteNeAnlamaGelir": "Binanın cephesinde çirkin asma oluk görüntüsü bırakmaz, modern ve temiz bir mimari silüet oluşturur.",
+        "kritikUyari": "Gizli dere yalıtımı çift kat EPDM veya membranla yapılmalı ve süzgeçler yapraklara karşı kafesli olmalıdır; tıkanırsa su son kat tavanını basar.",
+        "ilgiliTerimler": ["EPDM Çatı Membranı", "Çatı Piyesi"]
+    },
+    {
+        "terim": "Yüzme Havuzu Filtrasyon ve Denge Tankı Sistemi",
+        "slug": "havuz-filtrasyon-denge-tanki",
+        "harf": "Y",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Üstten taşmalı site havuzlarında suyun savaklardan akarak toplandığı betonarme sarnıç ve suyu kuvars kum filtrelerinden geçirerek klorlayan arıtma sistemidir.",
+        "hukukiKarsilik": "Yüzme Havuzlarının Tabi Olacağı Sağlık Esasları Hakkında Yönetmelik.",
+        "pratikteNeAnlamaGelir": "Havuz suyunun berrak, kokusuz ve bakterilerden arınmış kalmasını sağlar; su seviyesi insan girdikçe taşmadan dengede tutulur.",
+        "kritikUyari": "Denge tankının su yalıtımı antibakteriyel seramikle kaplanmalı ve kimyasal dozaj pompaları her gün ölçüm yapmalıdır; aksi halde lejyonella ve mantar salgını başlar.",
+        "ilgiliTerimler": ["Ortak Alanlar", "Su Deposu ve Yangın Rezervi"]
+    },
+    {
+        "terim": "Otopark Kauçuk Kolon Köşe Koruyucu",
+        "slug": "otopark-kaucuk-kolon-koruyucu",
+        "harf": "O",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Kapalı otoparklardaki betonarme kolon ve perdelerin köşelerine vidalanan, fosforlu sarı-siyah reflektörlü darbeleri emen kauçuk profildir.",
+        "hukukiKarsilik": "Otopark Yönetmeliği ve İş Güvenliği Standartları.",
+        "pratikteNeAnlamaGelir": "Manevra esnasında aracın kapısının veya tamponunun kolona sürtmesi durumunda hem aracı hem de kolon betonunu ağır hasardan korur.",
+        "kritikUyari": "Reflektörlü bantlar karanlıkta far ışığında parlayarak sürücünün dar otopark köşelerini net fark etmesini sağlar.",
+        "ilgiliTerimler": ["Otopark Yönetmeliği", "Epoksi Zemin Kaplaması"]
+    },
+    {
+        "terim": "Sığınak Yönetmeliği ve Mekanik Havalandırma / Menfez",
+        "slug": "siginak-yonetmeligi-mekanik-havalandirma",
+        "harf": "S",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Belli bir büyüklüğü aşan binaların bodrum katında nükleer, biyolojik ve kimyasal (NBC) gazları filtreleyebilen aktif karbon filtreli havalandırmaya sahip sığınak ayrılmasıdır.",
+        "hukukiKarsilik": "3194 Sayılı Kanun ve Sığınak Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Savaş veya afet durumunda bina sakinlerinin günlerce güvenle barınabileceği, oksijen destekli korunaklı yaşam alanıdır.",
+        "kritikUyari": "Sığınaklar hiçbir şekilde projeye aykırı olarak depo, daireye özel ardiye veya kapıcı dairesi olarak bölünemez ve satılamaz; iskan iptal sebebidir.",
+        "ilgiliTerimler": ["Ortak Alanlar", "Yapı Kullanma İzin Belgesi"]
+    },
+    {
+        "terim": "Kapıcı Dairesi Tahsis Şartları",
+        "slug": "kapici-dairesi-tahsis-sartlari",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Konut sayısı 30'u aşan kaloriferli veya 50'yi aşan sobalı binalarda mimari projede zorunlu olarak ayrılan ve brüt alanı en az 40 m² olan ortak yerdir.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 50 ve Konut Kapıcıları Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Binanın temizlik ve güvenlik hizmetlerini yürüten kapıcının kira ve aidat ödemeden oturması için tahsis edilir; elektrik ve suyu bina giderinden karşılanır.",
+        "kritikUyari": "Kapıcı dairesi kat maliklerince kiraya verilemez veya satılamaz; kiraya verilmesi durumunda elde edilen kira tüm maliklere arsa payı oranında vergi doğurur.",
+        "ilgiliTerimler": ["Ortak Alanlar", "Kıdem Tazminatı (Apartman Görevlisi)"]
+    },
+    {
+        "terim": "Isı Pay Ölçer Manipülasyonu ve Usulsüz Isınma",
+        "slug": "isi-pay-olcer-manipulasyonu",
+        "harf": "I",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Merkezi ısıtmalı binalarda peteğin üzerindeki kalorimetre cihazını söken, üzerini yalıtım malzemesiyle kapatan veya peteği vanasından kapatıp hiç yakmayan malike ceza uygulanmasıdır.",
+        "hukukiKarsilik": "5627 Sayılı Enerji Verimliliği Kanunu ve Merkezi Isıtma ve Sıhhi Sıcak Su Paylaşım Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Merkezi binalarda bağımsız bölüm sıcaklığı kanunen 15°C'nin altına düşürülemez; petekleri tamamen kapatarak komşunun ısısıyla ısınmaya çalışanlara cezalı fatura kesilir.",
+        "kritikUyari": "Pay ölçere müdahale eden dairelere binanın en yüksek tüketen dairesinin faturasının 2 katı tutarında ceza tahakkuk ettirilir.",
+        "ilgiliTerimler": ["Merkezi Isıtma Pay Ölçer", "Ortak Gider Aidatı"]
+    },
+    {
+        "terim": "Kat Malikleri Karar Defteri Kapanış Tasdiki",
+        "slug": "karar-defteri-kapanis-tasdiki",
+        "harf": "K",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Apartman yöneticisinin her takvim yılının bitiminden itibaren 1 ay içinde (Ocak ayı sonuna kadar) karar defterini notere ibraz edip kapanış tasdiki yaptırma zorunluluğudur.",
+        "hukukiKarsilik": "634 Sayılı Kat Mülkiyeti Kanunu md. 36/son.",
+        "pratikteNeAnlamaGelir": "Defterdeki kararların sonradan değiştirilmediğini, geriye dönük sahte sayfa eklenmediğini resmi noter mührüyle kanıtlar; mahkemede kesin delil olur.",
+        "kritikUyari": "Kapanış tasdiki yaptırmayan yönetici hakkında idari para cezası uygulanır ve mahkemede karar defterinin delil niteliği tartışmalı hale gelir.",
+        "ilgiliTerimler": ["Kat Malikleri Kurulu", "Yönetim Planı"]
+    },
+    {
+        "terim": "Site Yönetiminde İşletme Projesi ve İtiraz Süresi",
+        "slug": "isletme-projesi-ve-itiraz-suresi",
+        "harf": "İ",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Yöneticinin 1 yıllık tahmini bina gelir ve giderleri ile her bağımsız bölüme düşecek aidat payını gösteren ve maliklere tebliğ edilen resmi bütçe tablosudur.",
+        "hukukiKarsilik": "634 Sayılı Kat Mülkiyeti Kanunu md. 37.",
+        "pratikteNeAnlamaGelir": "Malikler işletme projesine tebliğden itibaren 7 gün içinde itiraz edebilir; itiraz edilmezse proje kesinleşir ve doğrudan icra takibine esas olur.",
+        "kritikUyari": "Kesinleşen işletme projesine dayanan aidat alacakları için yönetici mahkeme kararı olmadan doğrudan ilamsız icra takibi başlatabilir.",
+        "ilgiliTerimler": ["Kat Malikleri Kurulu", "Ortak Gider Aidatı"]
+    }
+]
+
+print(f"data_ultra_3.py hazır: {len(ULTRA_TERIMLER_3)} terim.")

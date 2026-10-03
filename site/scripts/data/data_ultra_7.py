@@ -1,0 +1,560 @@
+# -*- coding: utf-8 -*-
+"""
+data_ultra_7.py — EDM Emlak Sözlüğü Ultra Genişletme Paketi Bölüm 7 (50 Terim)
+Şehircilik planları, sit alanları, jeolojik zemin etütleri, Boğaziçi mevzuatı ve çekme mesafeleri.
+"""
+
+ULTRA_TERIMLER_7 = [
+    {
+        "terim": "1/25000 Ölçekli Çevre Düzeni Planı Hükümleri",
+        "slug": "1-25000-cevre-duzeni-plani",
+        "harf": "1",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "İl veya havza düzeyinde tarım, orman, sanayi ve konut yerleşimlerinin ana makro sınırlarını ve koruma-kullanma dengesini çizen üst kademe plandır.",
+        "hukukiKarsilik": "Mekânsal Planlar Yapım Yönetmeliği md. 19 ve 3194 SK.",
+        "pratikteNeAnlamaGelir": "Alt ölçekli 1/5000 ve 1/1000'lik planlar bu plana aykırı olamaz; arsanızın sanayiye mi turizme mi açılacağını bu plan belirler.",
+        "kritikUyari": "1/25000 planda 'Tarımsal Niteliği Korunacak Alan' olarak işaretlenmiş tarlaya belediye konut imarı verse dahi mahkemece iptal edilir.",
+        "ilgiliTerimler": ["Çevre Düzeni Planı", "Nazım İmar Planı"]
+    },
+    {
+        "terim": "İmar Planında Önlemli Alanlar (ÖA) Kategorileri",
+        "slug": "imar-onlemli-alanlar-oa-kategorileri",
+        "harf": "İ",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "İmar planına esas jeolojik-jeoteknik etütlerde sıvılaşma, heyelan veya kayma riski taşıyan ve ancak özel temel mühendisliğiyle inşaat yapılabilen sahalardır.",
+        "hukukiKarsilik": "Afet Bölgelerinde Yapılacak Yapılar Hakkında Yönetmelik ve Çevre Şehircilik Zemin Etüt Tebliği.",
+        "pratikteNeAnlamaGelir": "Arsanız ÖA-1 veya ÖA-2 bölgesindeyse düz radye temel atamazsınız; jet-grouting, fore kazık veya zemin güçlendirmesi zorunludur.",
+        "kritikUyari": "Özel zemin iyileştirme projesi hazırlanıp belediyeye onaylatılmadan bu alanlardaki parsellere yapı ruhsatı düzenlenmez.",
+        "ilgiliTerimler": ["Zemin Etüt Raporu", "Fore Kazık Sistemi"]
+    },
+    {
+        "terim": "Uygun Olmayan Alanlar (UOA) Kesin Yapılaşma Yasağı",
+        "slug": "uygun-olmayan-alanlar-uoa-yasagi",
+        "harf": "U",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Jeolojik açıdan aktif fay hattı, aktif heyelan veya bataklık zemin nedeniyle hiçbir mühendislik önlemiyle dahi üzerine bina yapılmasına izin verilmeyen sahalardır.",
+        "hukukiKarsilik": "3194 Sayılı İmar Kanunu ve Mekânsal Planlar Yapım Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Bu sahadaki arsalara hiçbir zaman yapı ruhsatı verilmez; parseller yeşil alan veya afet parkı olarak kamuya terk edilir.",
+        "kritikUyari": "UOA bölgesinde kalan bir arsayı 'buraya yakında villa imarı gelecek' vaadiyle satan emlakçılara karşı dikkatli olunmalı, belediyeden teyit alınmalıdır.",
+        "ilgiliTerimler": ["Fay Hattı Sakınım Bandı", "İmar Durum Belgesi"]
+    },
+    {
+        "terim": "DSİ 100 Yıllık Taşkın Riski Alanı ve Yapı Kısıtlaması",
+        "slug": "dsi-100-yillik-taskin-riski",
+        "harf": "D",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Dere yataklarının etrafında Devlet Su İşleri (DSİ) tarafından son 100 yılın en büyük yağış debisi hesaplanarak belirlenen su taşkın sınırıdır.",
+        "hukukiKarsilik": "Dere Yatakları ve Taşkınlar Hakkında Başbakanlık Genelgesi (2006/27).",
+        "pratikteNeAnlamaGelir": "Taşkın bandı içinde kalan arsalarda bodrum kat yapılamaz, su basman kotu taşkın seviyesinin üzerine kaldırılır veya bina tamamen yasaklanır.",
+        "kritikUyari": "Dere yatağı ıslah edilmeden veya DSİ'den 'taşkın açısından sakınca yoktur' yazısı alınmadan belediyeler yapı ruhsatı veremez.",
+        "ilgiliTerimler": ["Kırmızı Kot ve Siyah Kot", "İstikamet Rölevesi"]
+    },
+    {
+        "terim": "Aktif Diri Fay Hattı Yüzey Faylanması Sakınım Bandı",
+        "slug": "aktif-fay-hatti-sakinim-bandi",
+        "harf": "A",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Kandilli Rasathanesi ve MTA haritalarında diri fay hattının her iki yanında depremde yüzey kırığı oluşma riski nedeniyle bırakılan yapılaşmasız koruma şerididir.",
+        "hukukiKarsilik": "Türkiye Bina Deprem Yönetmeliği (TBDY 2018) ve Fay Yasası Taslağı Esasları.",
+        "pratikteNeAnlamaGelir": "Fay kırığının tam üzerine gelen parsellerde konut, okul ve hastane inşa edilemez; alan sadece rekreasyon ve tarım amaçlı kullanılır.",
+        "kritikUyari": "Arsa alırken MTA'nın yenilenmiş Türkiye Diri Fay Haritası üzerinden parselin faya mesafesi mutlaka sorgulanmalıdır.",
+        "ilgiliTerimler": ["Uygun Olmayan Alanlar (UOA)", "Zemin Etüt Raporu"]
+    },
+    {
+        "terim": "Karstik Boşluk ve Obruk Riski Alanlarında İnşaat Kısıtı",
+        "slug": "karstik-bosluk-obruk-riski-insaat",
+        "harf": "K",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Kireçtaşı ve jipsli arazilerde yeraltı sularının erimesiyle oluşan dev mağara ve obruk tehlikesi olan bölgelerde derin jeofizik radar taraması şartıdır.",
+        "hukukiKarsilik": "Zemin ve Temel Etütleri Rapor Formatı ve İmar Yönetmelikleri.",
+        "pratikteNeAnlamaGelir": "Binanın aniden oluşan 30 metrelik bir obruğun içine gömülmesini önlemek için temel altına mikropiezometre ve sismik mikrogravite testi uygulanır.",
+        "kritikUyari": "Yeraltında 5 metre çapında karstik boşluk tespit edilen parsellere beton enjeksiyonu yapılmadan inşaat ruhsatı düzenlenmez.",
+        "ilgiliTerimler": ["Zemin Etüt Raporu", "Fore Kazık Sistemi"]
+    },
+    {
+        "terim": "Kıyı Kenar Çizgisinde İlk 50 Metrelik Sahil Şeridi Yasağı",
+        "slug": "kiyi-kenar-cizgisi-ilk-50-metre",
+        "harf": "K",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Deniz, göl ve nehir kenarındaki kıyı kenar çizgisinden kara yönüne doğru ilk 50 metrelik şeritte sadece açık yaya yolu, yeşil alan ve park yapılabilmesidir.",
+        "hukukiKarsilik": "3621 Sayılı Kıyı Kanunu md. 5 ve Uygulama Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "İlk 50 metre içinde kesinlikle konut, otel, dükkan, duvar veya tel örgü yapılamaz; halkın kıyıya ulaşımı engellenemez.",
+        "kritikUyari": "İlk 50 metre içine kaçak olarak yapılan otel locaları, çitler ve kafeler belediyece hiçbir tazminat ödenmeden iş makineleriyle yıkılır.",
+        "ilgiliTerimler": ["Kıyı Kenar Çizgisi", "Sahil Şeridi"]
+    },
+    {
+        "terim": "Sahil Şeridinin İkinci 50 Metresinde Günübirlik Tesis İzni",
+        "slug": "sahil-seridi-ikinci-50-metre-gunubirlik",
+        "harf": "S",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Kıyı kenar çizgisinden sonraki 50-100 metre arasındaki bantta sadece duş, tuvalet, soyunma kabini, kafe ve sökülüp takılabilir günübirlik tesis iznidir.",
+        "hukukiKarsilik": "3621 Sayılı Kıyı Kanunu md. 5 ve 8.",
+        "pratikteNeAnlamaGelir": "Bu şeritte kalıcı betonarme konut, rezidans veya çok katlı otel binaları yapılamaz; emsal en fazla %5 ve yükseklik 5.50 metredir.",
+        "kritikUyari": "Günübirlik tesis ruhsatı alıp içeride kaçak oda ve pansiyon işleten tesisler mühürlenir ve ruhsatları Çevre Şehircilik Bakanlığı'nca iptal edilir.",
+        "ilgiliTerimler": ["Kıyı Kenar Çizgisi", "Sahil Şeridi"]
+    },
+    {
+        "terim": "Doğal Sit Alanlarında Kesin Korunacak Hassas Alanlar",
+        "slug": "kesin-korunacak-hassas-alanlar-sit",
+        "harf": "K",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Cumhurbaşkanı kararı ile ilan edilen, endemik bitki ve yaban hayatının korunması amacıyla insan müdahalesinin ve inşaatın kesinlikle yasak olduğu en üst sit statüsüdür.",
+        "hukukiKarsilik": "Korunan Alanların Tespit, Tescil ve Onayına İlişkin Usul ve Esaslara Dair Yönetmelik.",
+        "pratikteNeAnlamaGelir": "Maden aranamaz, taş ocağı açılamaz, yol geçirilemez ve tek bir bungalov dahi dikilemez; sadece bilimsel araştırmalara izin verilir.",
+        "kritikUyari": "Bu alanlarda kalan özel mülkler devlet tarafından takas (trampa) veya kamulaştırma yoluyla vatandaşın elinden tazminatla alınır.",
+        "ilgiliTerimler": ["Doğal Sit Alanı", "Kamulaştırma (İstimlak)"]
+    },
+    {
+        "terim": "Özel Çevre Koruma Bölgesi (ÖÇK) İmar Yetkisi",
+        "slug": "ozel-cevre-koruma-bolgesi-ock",
+        "harf": "Ö",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Fethiye, Göcek, Pamukkale, Datça gibi ekolojik cennetlerde belediyelerin değil doğrudan Çevre ve Şehircilik Bakanlığı Tabiat Varlıklarını Koruma Genel Müdürlüğü'nün imar yetkisidir.",
+        "hukukiKarsilik": "1 Sayılı Cumhurbaşkanlığı Kararnamesi md. 109 ve 2872 SK.",
+        "pratikteNeAnlamaGelir": "Yerel belediyeler bu bölgelerde imar planı yapamaz ve bağımsız ruhsat veremez; her proje Bakanlık mimari onayından geçmek zorundadır.",
+        "kritikUyari": "ÖÇK bölgelerinde emsaller son derece düşüktür (genelde %10-%15); yapılaşma kurallarına uymayan lüks villalar bakanlıkça yıktırılır.",
+        "ilgiliTerimler": ["Doğal Sit Alanı", "Çevre Düzeni Planı"]
+    },
+    {
+        "terim": "Sulak Alanların Korunması (Ramsar Sözleşmesi) ve Drenaj Yasağı",
+        "slug": "sulak-alanlar-ramsar-drenaj-yasagi",
+        "harf": "S",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Göller, deltalar ve bataklıkların kurutularak arsa veya tarla haline getirilmesini ve su dengesini bozacak her türlü inşaatı yasaklayan uluslararası sözleşmedir.",
+        "hukukiKarsilik": "Ramsar Sözleşmesi ve Sulak Alanların Korunması Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Göl kenarındaki arazileri hafriyatla doldurup arsa üretme girişimleri kanunen suçtur; doldurulan hafriyat savcılık kararıyla boşalttırılır.",
+        "kritikUyari": "Sulak alan koruma bölgelerinde kalan arazilerin vasfı değiştirilemez ve imar sınırları içine dahil edilemez.",
+        "ilgiliTerimler": ["İçme Suyu Havza Koruma Kuşakları", "ÇED Raporu"]
+    },
+    {
+        "terim": "Arkeolojik Sit 1. Derece Kesin Yapılaşma Yasağı",
+        "slug": "arkeolojik-sit-1-derece-yasak",
+        "harf": "A",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Toprağın altında veya üstünde antik kent, nekropol, tümülüs veya lahit kalıntıları bulunan alanlarda çivi çakmanın dahi yasak olduğu mutlak koruma alanıdır.",
+        "hukukiKarsilik": "2863 Sayılı Kültür ve Tabiat Varlıklarını Koruma Kanunu ve Koruma Yüksek Kurulu 658 Sayılı İlke Kararı.",
+        "pratikteNeAnlamaGelir": "Arsanız 1. derece sitte kalırsa hiçbir bina yapamazsınız; tarımsal faaliyet dahi derin sürüm yapılmadan sadece çapalama ile sınırlıdır.",
+        "kritikUyari": "1. derece sitteki özel mülkler Hazine arazileriyle trampa (takas) edilerek vatandaşın mağduriyeti devletçe giderilebilir.",
+        "ilgiliTerimler": ["Arkeolojik Sit Alanı", "Trampa (Mülk Takası)"]
+    },
+    {
+        "terim": "Arkeolojik Sit 3. Derece Müze Denetiminde Temel Kazısı",
+        "slug": "arkeolojik-sit-3-derece-muze-kazisi",
+        "harf": "A",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Yeni inşaat yapılmasına Koruma Kurulu kararıyla izin verilen, ancak temel kazısının zorunlu olarak arkeoloji müzesi uzmanları eşliğinde yapıldığı sahalardır.",
+        "hukukiKarsilik": "2863 Sayılı Kanun ve Koruma Yüksek Kurulu İlke Kararları.",
+        "pratikteNeAnlamaGelir": "İş makinesi kepçeyi vururken başında müze arkeoloğu durur; temelden tarihi eser çıkmazsa inşaatın devamına izin verilir.",
+        "kritikUyari": "Kazıda tarihi mozaik veya duvar kalıntısı çıkarsa kazı anında durdurulur, alan 1. derece site yükseltilir ve inşaat izni iptal edilir.",
+        "ilgiliTerimler": ["Arkeolojik Sit Alanı", "Koruma Amaçlı İmar Planı"]
+    },
+    {
+        "terim": "Boğaziçi Öngörünüm Bölgesinde Yapı Yasağı ve Taban Alanı Sınırı",
+        "slug": "bogazici-ongorunum-bolgesi-yasaklari",
+        "harf": "B",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "İstanbul Boğazı sahil şeridinde ve öngörünüm bölgesinde tarihi korumak amacıyla yeni bina yapımının yasaklandığı ve emsalin en fazla %15 olduğu özel kanundur.",
+        "hukukiKarsilik": "2960 Sayılı Boğaziçi İmar Kanunu.",
+        "pratikteNeAnlamaGelir": "Boğazı gören öngörünümde boş arsaya sıfırdan konut veya apartman dikilemez; sadece tescilli eski eserler aslına uygun rekonstrüksiyon yapılabilir.",
+        "kritikUyari": "Mevcut yasal binalarda ise kat ilavesi veya büyüme yapılamaz, sadece basit onarım ve güçlendirme ruhsatı verilebilir; kaçak katlar dozerle yıkılır.",
+        "ilgiliTerimler": ["Boğaziçi İmar Kanunu", "Tescilli Kültür Varlığı Komşuluğu"]
+    },
+    {
+        "terim": "Boğaziçi Geri Görünüm ve Etkilenme Bölgesi İmar Hakları",
+        "slug": "bogazici-geri-gorunum-ve-etkilenme",
+        "harf": "B",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Boğaz sırtlarının arkasında kalan ve denizi doğrudan görmeyen bölgelerde sınırlı kat ve yoğunlukla konut inşaatına izin veren imar kuşağıdır.",
+        "hukukiKarsilik": "2960 Sayılı Boğaziçi Kanunu md. 10.",
+        "pratikteNeAnlamaGelir": "Öngörünüme göre inşaat izni vardır; ancak bina yükseklikleri Hmax 12.50 veya 15.50 metre ile sınırlandırılmış olup silueti bozamaz.",
+        "kritikUyari": "Ruhsatlar İBB Boğaziçi İmar Şube Müdürlüğü tarafından verilir; ilçe belediyelerinin tek başına ruhsat düzenleme yetkisi yoktur.",
+        "ilgiliTerimler": ["Boğaziçi İmar Kanunu", "Hmax (Azami Bina Yüksekliği)"]
+    },
+    {
+        "terim": "Çatı Eğim Açısı ve Yüzde 33 - Yüzde 45 Eğim Kuralı",
+        "slug": "cati-egim-acisi-yuzde-33-45",
+        "harf": "Ç",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Bina çatı meyillerinin kar ve yağmur sularını tahliye etmek üzere mahya yüksekliğine göre en az %33, en fazla %45 eğimle yapılabilmesi kuralıdır.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 40.",
+        "pratikteNeAnlamaGelir": "Çatı eğimini kasten dikleştirerek çatı arasına gizli 2 kat fazla daire sığdırma hilesini engeller; çatı gabarisini sınırlar.",
+        "kritikUyari": "%45 eğim sınırını aşan dik çatılar imar aykırılığı sayılır; belediye iskan vermez ve çatıyı kestirerek yasal eğime indirir.",
+        "ilgiliTerimler": ["Çatı Piyesi", "Gabari"]
+    },
+    {
+        "terim": "Bodrum Katların Açığa Çıkması ve İskan Edilebilir Kat Sayılması",
+        "slug": "bodrum-katin-aciga-cikmasi-iskan",
+        "harf": "B",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Eğimli arsalarda tabii zemin nedeniyle açığa çıkan bodrum katların pencerelerinin yoldan ışık alması durumunda konut veya ticari bağımsız bölüm yapılabilmesidir.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 14.",
+        "pratikteNeAnlamaGelir": "Yoldan 3 kat görünen bina arsanın arkasındaki meyil sayesinde 5 katlı hale gelebilir; açığa çıkan bodrum katlar lüks bahçe dubleksine dönüşür.",
+        "kritikUyari": "Açığa çıkan katların emsale dahil olup olmayacağı imar plan notlarında açıkça yazmalıdır; plana aykırı açığa çıkarma kaçak inşaat sayılır.",
+        "ilgiliTerimler": ["Ters Dubleks (Bahçe Katı)", "Kot Kesit Belgesi"]
+    },
+    {
+        "terim": "Arka Bahçe Mesafesi Hesabı (H/2 Kuralı)",
+        "slug": "arka-bahce-mesafesi-h-bolu-2",
+        "harf": "A",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Binanın arka cephesinin parsel arka sınırına olan asgari uzaklığının, bina yüksekliğinin yarısından (H/2) ve en az 3.00 metreden az olamayacağı formülüdür.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 23.",
+        "pratikteNeAnlamaGelir": "Bina yükseldikçe arka komşuya o kadar uzaktan oturmak zorundadır; arkadaki komşunun güneşinin ve mahremiyetinin gasp edilmesini önler.",
+        "kritikUyari": "24 metre yüksekliğindeki bir binada arka bahçe çekme mesafesi en az 12 metre (24/2 = 12) olmak zorundadır.",
+        "ilgiliTerimler": ["Çekme Mesafesi", "Gabari"]
+    },
+    {
+        "terim": "Yan Bahçe Mesafesi (En Az 3.00 Metre Kuralı)",
+        "slug": "yan-bahce-mesafesi-3-metre-kurali",
+        "harf": "Y",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Ayrık nizam binalarda parselin yan sınırlarına olan asgari mesafenin en az 3.00 metre olması ve 4 kattan sonraki her kat için 0.50 metre artırılmasıdır.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 23.",
+        "pratikteNeAnlamaGelir": "Yan komşunun penceresiyle sizin pencerenizin burun buruna gelmesini engeller; yangın anında itfaiye aracının binanın yanından arkaya geçmesini sağlar.",
+        "kritikUyari": "Yan bahçe mesafesini daraltarak parsel sınırına 1 metre yaklaşıp pencere açan binalar komşunun açacağı men davasıyla yıktırılır.",
+        "ilgiliTerimler": ["Çekme Mesafesi", "Ayrık Nizam Yapılaşma"]
+    },
+    {
+        "terim": "Ön Bahçe Mesafesi (En Az 5.00 Metre Kuralı)",
+        "slug": "on-bahce-mesafesi-5-metre-kurali",
+        "harf": "Ö",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Binanın ön cephesi ile yola bakan parsel sınırı arasında bırakılması gereken asgari 5.00 metrelik bahçe çekme mesafesidir.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 23.",
+        "pratikteNeAnlamaGelir": "Binanın doğrudan kaldırıma sıfır oturmasını önleyerek caddenin ferah kalmasını ve ön bahçede yeşil alan ve otopark yapılmasını sağlar.",
+        "kritikUyari": "Genişliği 20 metreyi aşan ana bulvarlarda ön bahçe çekme mesafesi imar planı kararıyla 7 veya 10 metreye kadar çıkarılabilir.",
+        "ilgiliTerimler": ["Çekme Mesafesi", "Vaziyet Planı"]
+    },
+    {
+        "terim": "Emsal Harici Alanlar (Ruhsatta %30 Kuralı)",
+        "slug": "emsal-harici-alanlar-yuzde-30-kurali",
+        "harf": "E",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Bodrum otoparkları, sığınak, asansör boşlukları, merdiven evi ve su depoları gibi ortak alanların toplam inşaat hakkının en fazla %30'u kadar emsal dışı tutulmasıdır.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 5.",
+        "pratikteNeAnlamaGelir": "Müteahhidin ortak alan kılıfı altında binayı kaçak olarak sınırsız büyütmesini önler; %30'u aşan ortak alanlar doğrudan satılabilir daire emsalinden düşülür.",
+        "kritikUyari": "Yangın merdivenleri ve açık balkonların belirli sınırları bu %30 hesabından tamamen muaftır.",
+        "ilgiliTerimler": ["Emsal (KAKS)", "Yapı Ruhsatı"]
+    },
+    {
+        "terim": "Otopark Rampası Azami Eğim Sınırı (%15 Kuralı)",
+        "slug": "otopark-rampasi-egim-siniri",
+        "harf": "O",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Bodrum kat kapalı otoparklarına inen araç rampalarının eğiminin düz rampalarda en fazla %15, kışın buzlanmaya karşı ısıtmalı rampalarda %20 olabilmesidir.",
+        "hukukiKarsilik": "Otopark Yönetmeliği md. 5.",
+        "pratikteNeAnlamaGelir": "Rampanın aşırı dik yapılarak araçların altının yere sürtmesini veya kışın kayarak duvara çarpmasını kesin olarak engeller.",
+        "kritikUyari": "Eğimi %15'ten dik olan rampalara belediye iskan vermez; yer darlığı varsa rampa yerine mekanik araç asansörü yapılması zorunludur.",
+        "ilgiliTerimler": ["Otopark Yönetmeliği", "Mekanik Otopark"]
+    },
+    {
+        "terim": "Mekanik Araç Asansörü ile Otopark Girişi",
+        "slug": "mekanik-arac-asansoru-otopark",
+        "harf": "M",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Parsel bahçesinde rampa yapacak yer bulunmayan dar sokaklardaki binalarda araçların bodrum kat garajına dikey hidrolik liftle indirilmesidir.",
+        "hukukiKarsilik": "Otopark Yönetmeliği ve Asansör Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Dar butik binalarda da kapalı otopark yapılabilmesini sağlar ve sokakta park yeri arama çilesini ortadan kaldırır.",
+        "kritikUyari": "Elektrik kesintilerine karşı araç asansörünün mutlaka tam kapasite jeneratöre bağlı olması şarttır; aksi halde araç garajda rehin kalır.",
+        "ilgiliTerimler": ["Otopark Yönetmeliği", "Jeneratör Otomatik Transfer Panosu"]
+    },
+    {
+        "terim": "Engelli Otopark Yeri Tahsis Standardı",
+        "slug": "engelli-otopark-yeri-tahsisi",
+        "harf": "E",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Otopark kapasitesi 20 aracı aşan binalarda her 20 araç için en az 1 adet ve asgari 3.50x5.00 metre genişliğinde engelli park yeri ayrılması zorunluluğudur.",
+        "hukukiKarsilik": "Otopark Yönetmeliği md. 6 ve TS 9111.",
+        "pratikteNeAnlamaGelir": "Tekerlekli sandalyeli sürücünün kapısını tam açarak rahatça inip binmesini sağlar; asansöre en yakın noktaya tahsis edilir ve mavi zeminle boyanır.",
+        "kritikUyari": "Engelli park yerine engelsiz araçların park etmesi yasaktır; site yönetimleri bu kuralı yönetim planında düzenleyip ceza uygulayabilir.",
+        "ilgiliTerimler": ["Otopark Yönetmeliği", "Engelli Erişimi"]
+    },
+    {
+        "terim": "Elektrikli Araç Şarj İstasyonu Altyapı Zorunluluğu",
+        "slug": "elektrikli-arac-sarj-altyapisi",
+        "harf": "E",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Yeni inşa edilen 20 ve üzeri daireli sitelerde kapalı otopark yerlerinin en az %5'inde (AVM'lerde %10) elektrikli araç şarj ünitesi kablolama şartıdır.",
+        "hukukiKarsilik": "Otopark Yönetmeliği md. 6/f.",
+        "pratikteNeAnlamaGelir": "Elektrikli araç sahipleri daire sayaçlarına bağlı prizlerle araçlarını gece evlerinde ekonomik fiyata şarj edebilir.",
+        "kritikUyari": "Elektrik projesinde ana trafo gücü bu şarj yükünü kaldıracak kapasitede çizilmelidir; yetersiz altyapı yangına ve şalter atmasına yol açar.",
+        "ilgiliTerimler": ["Otopark Yönetmeliği", "Kaçak Akım Rölesi"]
+    },
+    {
+        "terim": "Bisiklet Park Yeri Ayrılması Zorunluluğu",
+        "slug": "bisiklet-park-yeri-zorunlulugu",
+        "harf": "B",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "Yeni binalarda her bağımsız bölüm için en az 1 adet güvenli, kapalı veya korunaklı bisiklet park yeri düzenlenmesi kuralıdır.",
+        "hukukiKarsilik": "Otopark Yönetmeliği md. 6/e ve Bisiklet Yolları Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Bisikletlerin kat hollerine veya yangın merdivenlerine bırakılıp kaçış yollarını tıkamasını engeller; ortak sığınak veya bahçede kilitli park sunar.",
+        "kritikUyari": "Bisiklet park yeri gösterilmeyen büyük sitelerin mimari projeleri belediye ruhsat onayından geçemez.",
+        "ilgiliTerimler": ["Otopark Yönetmeliği", "Ortak Alanlar"]
+    },
+    {
+        "terim": "İmar Çapı ve Tevhid Krokisi Kadastro Kontrolü",
+        "slug": "imar-capi-tevhid-krokisi-kadastro",
+        "harf": "İ",
+        "kategori": "İmar & Kadastro",
+        "kisaTanim": "İki parselin birleştirilmesi veya yola terk işleminde harita mühendisinin hazırladığı dosyanın Kadastro Müdürlüğü fen elemanlarınca sahada doğrulanmasıdır.",
+        "hukukiKarsilik": "3402 Sayılı Kadastro Kanunu ve Tescile Konu Harita Genelgesi.",
+        "pratikteNeAnlamaGelir": "Yeni oluşan parselin koordinatları ve yüzölçümü kadastro kütüğüne hatasız işlenir; komşu parsellere taşma riski ortadan kaldırılır.",
+        "kritikUyari": "Kadastro onayı olmadan belediye encümen kararı tek başına tapu sicil müdürlüğünde tescil işlemi yapamaz.",
+        "ilgiliTerimler": ["Tevhid (Birleştirme)", "LİHKAB"]
+    },
+    {
+        "terim": "Yapı Ruhsatı Öncesi Statik Proje ve Deprem Hesabı Vizesi",
+        "slug": "statik-proje-deprem-hesabi-vizesi",
+        "harf": "S",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "İnşaat mühendislerince 3 boyutlu dinamik analiz yazılımlarıyla çözülen binanın kolon, perde ve temel demir donatı hesaplarının belediyece denetlenip onaylanmasıdır.",
+        "hukukiKarsilik": "TBDY 2018 ve Planlı Alanlar İmar Yönetmeliği md. 57.",
+        "pratikteNeAnlamaGelir": "Binanın depremde yıkılmayacağını matematiksel ve mühendislik olarak garanti altına alır; kolon ve perde boyutları bu projeyle kesinleşir.",
+        "kritikUyari": "Statik projede gösterilen donatı çapı ve adedi şantiyede 1 demir dahi eksik konulamaz; yapı denetim eksik demir tespit ederse beton dökümünü durdurur.",
+        "ilgiliTerimler": ["Yapı Ruhsatı", "Türkiye Bina Deprem Yönetmeliği"]
+    },
+    {
+        "terim": "Yapı Kullanma İzni Öncesi İtfaiye Uygunluk Raporu",
+        "slug": "iskan-oncesi-itfaiye-uygunluk-raporu",
+        "harf": "İ",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "İnşaat bittiğinde Büyükşehir Belediyesi İtfaiye Daire Başkanlığı ekiplerinin binadaki yangın merdiveni, sprinkler, duman dedektörü ve vanaları yerinde test etmesidir.",
+        "hukukiKarsilik": "Binaların Yangından Korunması Hakkında Yönetmelik md. 130.",
+        "pratikteNeAnlamaGelir": "İtfaiye yangın pompalarını çalıştırıp su basıncını ve duman tahliye fanlarını bizzat test eder; 'İtfaiye Olur Raporu' olmadan hiçbir belediye iskan veremez.",
+        "kritikUyari": "Yangın kapısı standarda uymayan veya yangın deposu boş olan binalara itfaiye onay vermez; bina iskansız kalır.",
+        "ilgiliTerimler": ["Yapı Kullanma İzin Belgesi (İskan)", "Yangın Sprinkler Sistemi"]
+    },
+    {
+        "terim": "Numarataj ve UAVT Eşleştirmesi ile Doğalgaz Aboneliği",
+        "slug": "numarataj-uavt-dogalgaz-aboneligi",
+        "harf": "N",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Binanın iskanı alındıktan sonra belediye numarataj şefliğince sisteme işlenen bağımsız bölüm UAVT kodunun doğalgaz ve elektrik dağıtım şirketine tanıtılmasıdır.",
+        "hukukiKarsilik": "Adres Kayıt Sistemi Yönetmeliği ve Enerji Piyasası Mevzuatı.",
+        "pratikteNeAnlamaGelir": "Evinize ait resmi 10 haneli adres koduyla e-Devletten tek tıkla kendi adınıza doğalgaz ve elektrik aboneliği açtırabilmenizi sağlar.",
+        "kritikUyari": "Numarataj hatası yapılırsa sizin doğalgaz saatiniz komşunun dairesiyle eşleşebilir ve komşunun gaz tüketim faturasını siz ödemek zorunda kalabilirsiniz.",
+        "ilgiliTerimler": ["Ulusal Adres Veri Tabanı (UAVT)", "Numarataj Krokisi"]
+    },
+    {
+        "terim": "Gezilebilen Teras ve Gezilemeyen Teras Ayrımı",
+        "slug": "gezilebilen-ve-gezilemeyen-teras",
+        "harf": "G",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Üzerinde insanların oturup güneşlenebileceği seramik/deck kaplı teras ile sadece bakım amaçlı çıkılan çakıl kaplı çatı terası arasındaki imar ve yük farkıdır.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 40 ve TS 498 Yük Standartları.",
+        "pratikteNeAnlamaGelir": "Gezilebilen terasların döşeme betonu metrekarede en az 350-500 kg canlı yüke göre demirle donatılır ve 110 cm korkuluk yapılır.",
+        "kritikUyari": "Gezilemeyen teras sonradan kaçak kafeye veya balkona çevrilirse aşırı yükten ötürü teras döşemesi sarkar ve alttaki daireye su akıtır.",
+        "ilgiliTerimler": ["Çatı Terası", "EPDM Çatı Membranı"]
+    },
+    {
+        "terim": "Fransız Tipi Drenaj (Açık Çakıl Hendek Drenajı)",
+        "slug": "fransiz-tipi-hendek-drenaji",
+        "harf": "F",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Bina temelinin veya bahçenin etrafına açılan, dibine delikli boru yatırılıp üzerine yıkanmış dere çakılı doldurulan yer çekimli drenaj kanalıdır.",
+        "hukukiKarsilik": "Binalarda Su Yalıtımı Yönetmeliği ve Altyapı Standartları.",
+        "pratikteNeAnlamaGelir": "Aşırı yağmur sularını toprağın üstünden hızla emerek bodrum kata veya istinat duvarına baskı yapmadan rögara tahliye eder.",
+        "kritikUyari": "Çakıl dolgunun etrafına geotekstil keçe sarılmazsa çamur çakılların arasına dolar ve 2 yıl içinde drenaj kanalı tamamen tıkanır.",
+        "ilgiliTerimler": ["Geotekstil Keçe", "Drenaj Hattı"]
+    },
+    {
+        "terim": "Bina Ana Giriş Rüzgarlığı ve Hava Perdesi",
+        "slug": "bina-giris-ruzgarligi-hava-perdesi",
+        "harf": "B",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Bina kapısının üzerine takılan ve kapı açıldığında aşağı doğru güçlü sıcak veya soğuk hava üfleyerek dış ortam havasının içeri girmesini kesen cihazdır.",
+        "hukukiKarsilik": "Binalarda Enerji Performansı Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Sürekli insanların girip çıktığı site ve plaza lobilerinde kışın soğuk rüzgarın içeri dalmasını ve bina ısıtmasının boşa gitmesini engeller.",
+        "kritikUyari": "Hava perdesinin üfleme hızı kapı yüksekliğine göre ayarlanmalıdır; zayıf hava perdesi rüzgar basıncını kıramaz.",
+        "ilgiliTerimler": ["Enerji Kimlik Belgesi (EKB)", "Fotoselli Otomatik Kayar Kapı"]
+    },
+    {
+        "terim": "Merdiven Basamak Genişliği ve Rıht Formülü (2a+b Kuralı)",
+        "slug": "merdiven-basamak-riht-formulu",
+        "harf": "M",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "İki rıht yüksekliği ile bir basamak genişliğinin toplamının (2a+b) 60 ila 64 cm arasında olması gerektiğini belirten uluslararası ergonomi ve güvenlik formülüdür.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 32.",
+        "pratikteNeAnlamaGelir": "Merdiven çıkarken insanın yorulmasını, inerken de ayağın boşa basıp yuvarlanmasını önleyen ideal basamak ölçüsünü belirler.",
+        "kritikUyari": "Rıht yüksekliği 17-18 cm'den yüksek yapılan dik merdivenler binalarda en sık yaşanan ölümcül düşme kazalarının ana sebebidir; iskan denetiminde ölçülür.",
+        "ilgiliTerimler": ["Yangın Merdiveni ve Kaçış Holü", "Engelli Erişimi"]
+    },
+    {
+        "terim": "Kaskad Isıtma Sistemi (Yoğuşmalı Çoklu Kazan)",
+        "slug": "kaskad-isitma-sistemi-kazan",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Tek bir devasa kazan yerine birbirine paralel bağlı 3-5 adet küçük duvar tipi yoğuşmalı kazanın dış hava sıcaklığına göre sırayla devreye girdiği akıllı ısıtmadır.",
+        "hukukiKarsilik": "5627 Sayılı Enerji Verimliliği Kanunu ve Binalarda Enerji Performansı Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Hava ılıkken tek bir küçük kazan çalışır, hava çok soğuduğunda diğer kazanlar otomatik devreye girer; doğalgaz faturasını %40 düşürür.",
+        "kritikUyari": "Kazanlardan biri arızalansa bile diğer kazanlar çalışmaya devam eder; bina sakinleri kışın ortasında asla buz gibi susuz ve ısıtmasız kalmaz.",
+        "ilgiliTerimler": ["Merkezi Isıtma Pay Ölçer", "Kazan Dairesi Havalandırması"]
+    },
+    {
+        "terim": "Boyler Lejyonella Koruma Programı",
+        "slug": "boyler-lejyonella-koruma-programi",
+        "harf": "B",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Merkezi sıcak su boylerindeki su sıcaklığının haftada bir kez gece otomatik olarak 65-70°C'ye yükseltilerek ölümcül lejyonella bakterisinin yok edilmesidir.",
+        "hukukiKarsilik": "Sağlık Bakanlığı Lejyoner Hastalığı Kontrol Usul ve Esasları Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Sıcak su borularında ve duş başlıklarında üreyen akciğer zatürresi bakterisini termal şokla öldürerek bina sakinlerinin sağlığını korur.",
+        "kritikUyari": "Lejyonella koruma döngüsü olmayan eski sistemlerde duş buharını soluyan yaşlılar ve çocuklar ölümcül akciğer enfeksiyonuna yakalanabilir.",
+        "ilgiliTerimler": ["Sıcak Su Sirkülasyon Ring Hattı", "Ortak Su Deposu Temizliği"]
+    },
+    {
+        "terim": "Yangın Merdiveni Acil Aydınlatma Kiti ve Yön Levhası",
+        "slug": "yangin-merdiveni-acil-aydinlatma-kiti",
+        "harf": "Y",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Şebeke elektriği kesildiğinde içindeki aküyle en az 120 dakika boyunca kaçış merdivenini ve yeşil 'EXIT / ÇIKIŞ' yön oklarını aydınlatan armatürlerdir.",
+        "hukukiKarsilik": "Binaların Yangından Korunması Hakkında Yönetmelik md. 72 ve TS EN 1838.",
+        "pratikteNeAnlamaGelir": "Zifiri karanlıkta insanların ezilmeden ve panik yapmadan sokağa çıkış kapısını bularak tahliye olmasını sağlar.",
+        "kritikUyari": "Akülerin ömrü 3-4 yıldır; periyodik test yapılmazsa elektrik kesintisinde ışıklar yanmaz ve kaçış holü karanlığa gömülür.",
+        "ilgiliTerimler": ["Yangın Merdiveni ve Kaçış Holü", "Yangın Kapısı Panik Bar"]
+    },
+    {
+        "terim": "Epoksi Zemin Bakımı ve Zemin Temizleme Otomatı",
+        "slug": "epoksi-zemin-bakimi-ve-otomat",
+        "harf": "E",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Kapalı otoparklardaki epoksi kaplamanın parlaklığını ve kaymazlığını korumak için nötr temizlik kimyasallarıyla fırçalayarak vakumlayan binicili temizlik aracıdır.",
+        "hukukiKarsilik": "İş Sağlığı ve Güvenliği Standartları ve KMK Ortak Gider Esasları.",
+        "pratikteNeAnlamaGelir": "Araçların lastiklerinden dökülen çamur ve yağ lekelerini anında temizler; lastiklerin otoparkta kaymasını ve kaza yapmasını engeller.",
+        "kritikUyari": "Asitli veya tuz ruhlu temizlik maddeleri kullanılırsa epoksi reçine tabakası erir ve matlaşarak soyulur.",
+        "ilgiliTerimler": ["Epoksi Zemin Kaplaması", "Otopark Yönetmeliği"]
+    },
+    {
+        "terim": "Site Peyzajında Otomatik Damla Sulama Sistemi",
+        "slug": "site-otomatik-damla-sulama-sistemi",
+        "harf": "S",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Bitki köklerine doğrudan su veren delikli hortumlar ve zaman ayarlı selenoid vanalarla gece buharlaşma olmadan bahçeyi sulayan tasarruflu sistemdir.",
+        "hukukiKarsilik": "Su Verimliliği Yönetmeliği ve Peyzaj Standartları.",
+        "pratikteNeAnlamaGelir": "Fıskiye ile havaya su saçıp güneş altında buharlaştırmak yerine suyu %60 tasarruf eder; fidanların ve ağaçların kurumasını engeller.",
+        "kritikUyari": "Gündüz öğlen sıcağında sulama yapılırsa su damlacıkları mercek görevi görerek bitki yapraklarını yakar; sulama mutlaka gece veya sabaha karşı yapılmalıdır.",
+        "ilgiliTerimler": ["Yağmur Suyu Hasadı", "Ortak Alanlar"]
+    },
+    {
+        "terim": "Bahçe Çim Alanlarında Otomatik Pop-up Yağmurlama",
+        "slug": "otomatik-pop-up-yagmurlama-sistemi",
+        "harf": "O",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Su basıncı geldiğinde toprağın altından 10 cm yukarı fırlayarak dönerek çimleri sulayan, su kesilince zemin seviyesine geri çekilen gömülü başlıklardır.",
+        "hukukiKarsilik": "Peyzaj Uygulama Standartları.",
+        "pratikteNeAnlamaGelir": "Çim biçme makinesine takılmaz, bahçede yürürken ayağa takılmaz; çimin her metrekaresine eşit miktarda su dağıtır.",
+        "kritikUyari": "Başlıkların püskürtme açısının bina dış cephesine veya pencerelere gelmemesi gerekir; kireçli su cephe camlarında leke yapar.",
+        "ilgiliTerimler": ["Ortak Alanlar", "Su Deposu"]
+    },
+    {
+        "terim": "Çim Taşı (Geçirgen Otopark Zemin Izgarası)",
+        "slug": "cim-tasi-gecirgen-otopark-zemin",
+        "harf": "Ç",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Açık otopark zeminlerine döşenen, boşluklarından çim çıkan, yağmur suyunun doğrudan toprağa sızmasını sağlayan beton veya plastik petek ızgaralardır.",
+        "hukukiKarsilik": "Planlı Alanlar İmar Yönetmeliği md. 5 ve Otopark Yönetmeliği.",
+        "pratikteNeAnlamaGelir": "Bahçeyi betona boğmadan araba park yeri üretir; yağmurda su birikintisi ve çamur oluşmasını engeller.",
+        "kritikUyari": "Geçirgen zeminler belediyelerin imar hesabında 'doğal zemin geçirgenlik katsayısı' şartını sağlamada büyük avantaj sunar.",
+        "ilgiliTerimler": ["Otopark Yönetmeliği", "Vaziyet Planı"]
+    },
+    {
+        "terim": "Kuru Peyzaj (Xeriscaping) ile Sıfır Su Tüketimli Bahçe",
+        "slug": "kuru-peyzaj-xeriscaping-su-tasarrufu",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Çok su isteyen çim yerine kuraklığa dayanıklı lavanta, kaktüs, zeytin ağaçları, dolomit taşları ve ağaç kabuklarıyla yapılan modern peyzaj tasarımıdır.",
+        "hukukiKarsilik": "Su Verimliliği Strateji Belgesi ve LEED Yeşil Bina Standartları.",
+        "pratikteNeAnlamaGelir": "Sitenin bahçe sulama su faturasını sıfıra indirir; kuraklıkta ve su kesintilerinde bahçenin sapsarı kuruyup çirkinleşmesini önler.",
+        "kritikUyari": "Toprağın üzerine jeotekstil malç örtüsü serilerek yabani otların çıkması engellenmeli ve üzerine renkli cüruf veya dere çakılı serilmelidir.",
+        "ilgiliTerimler": ["Yağmur Suyu Hasadı", "Ortak Alanlar"]
+    },
+    {
+        "terim": "Kat Mülkiyetinde Çamaşır İpi ve Tente Asma Kuralları",
+        "slug": "camasir-ipi-tente-asma-kurallari-kmk",
+        "harf": "C",
+        "kategori": "Kira & Tahliye",
+        "kisaTanim": "Bina dış cephesine veya balkon demirlerine sokaktan görünecek şekilde çamaşır asılmasının veya farklı renklerde tente çekilmesinin yönetim planıyla yasaklanmasıdır.",
+        "hukukiKarsilik": "634 Sayılı Kat Mülkiyeti Kanunu md. 18 ve md. 28.",
+        "pratikteNeAnlamaGelir": "Sitenin dış mimari estetiğini ve prestijini korur; ev alırken apartmanın gecekondu gibi görünmesini engeller.",
+        "kritikUyari": "Yönetim planında yasak varsa yönetici veya herhangi bir malik Sulh Hukuk Mahkemesi'nden tentenin söktürülmesini talep edebilir.",
+        "ilgiliTerimler": ["Yönetim Planı", "Ortak Alanlar"]
+    },
+    {
+        "terim": "Ortak Alanlarda Hareket Sensörlü Radar Aydınlatma",
+        "slug": "hareket-sensorlu-radar-aydinlatma",
+        "harf": "H",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Merdiven boşluğu ve kat koridorlarında insan hareketini mikrodalga radarla algılayıp sadece ihtiyaç anında yanan enerji tasarruflu LED tavan armatürüdür.",
+        "hukukiKarsilik": "Binalarda Enerji Performansı Yönetmeliği ve Elektrik İç Tesisleri Şartnamesi.",
+        "pratikteNeAnlamaGelir": "Işıkların 24 saat boşuna yanıp apartman ortak elektrik faturasını şişirmesini engeller; anahtar arama derdini bitirir.",
+        "kritikUyari": "Radar sensörlü armatürler kapı arkasındaki hareketi dahi algılayabilir; ayarı doğru yapılmazsa daire içindeki hareketle koridor ışığı gereksiz yanabilir.",
+        "ilgiliTerimler": ["Enerji Kimlik Belgesi (EKB)", "Ortak Gider Aidatı"]
+    },
+    {
+        "terim": "Güneş Enerjisi Sıcak Su Kollektörleri ve Basınçlı Boyler",
+        "slug": "gunes-enerjisi-sicak-su-kollektoru",
+        "harf": "G",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Çatıya yerleştirilen seçici yüzeyli panellerle güneş enerjisini emerek dairelerin kullanım sıcak suyunu bedelsiz ısıtan kapalı devre güneş sistemidir.",
+        "hukukiKarsilik": "Binalarda Enerji Performansı Yönetmeliği ve Yenilenebilir Enerji Mevzuatı.",
+        "pratikteNeAnlamaGelir": "Özellikle Ege ve Akdeniz bölgelerinde yılın 9 ayı boyunca doğalgaz veya elektrik harcamadan 24 saat kaynar su elde edilmesini sağlar.",
+        "kritikUyari": "Kışın donmayı önlemek için kapalı devrede antifrizli solar sıvı kullanılmalıdır; antifriz konulmazsa borular donup çatıya su basar.",
+        "ilgiliTerimler": ["Çatı Güneş Enerji Santrali (Çatı GES)", "Enerji Kimlik Belgesi"]
+    },
+    {
+        "terim": "Bireysel Kombi ile Merkezi Kaskad Isıtma Mukayesesi",
+        "slug": "kombi-vs-merkezi-kaskad-mukayesesi",
+        "harf": "K",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Her dairenin kendi faturasını ödediği bağımsız kombi sistemi ile büyük binalarda toplam gaz tüketimini %30 azaltan merkezi pay ölçerli sistemin farkıdır.",
+        "hukukiKarsilik": "5627 Sayılı Enerji Verimliliği Kanunu (2000 m² üzeri binalarda merkezi sistem zorunludur).",
+        "pratikteNeAnlamaGelir": "Toplam inşaat alanı 2000 m²'yi geçen yeni binalarda kanunen bireysel kombi yapılamaz; merkezi ısıtma sistemi kurulması mecburidir.",
+        "kritikUyari": "Merkezi sisteme sahip binalarda kombiye geçmek için Kat Malikleri Kurulu'nun oybirliği kararı şarttır; tek bir malik dahi itiraz etse ferdi kombiye dönülemez.",
+        "ilgiliTerimler": ["Merkezi Isıtma Pay Ölçer", "Kaskad Isıtma Sistemi"]
+    },
+    {
+        "terim": "Bina Aydınlık Boşluklarında Çöp ve Eşya Yasağı",
+        "slug": "bina-aydinlik-bosluklari-guvenlik",
+        "harf": "B",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "İç mekanlara ışık ve hava sağlayan mimari aydınlık kuyularına çöp, sigara izmariti veya eski eşya atılmasının yangın riski sebebiyle kesinlikle yasak olmasıdır.",
+        "hukukiKarsilik": "Binaların Yangından Korunması Hakkında Yönetmelik md. 38 ve KMK md. 18.",
+        "pratikteNeAnlamaGelir": "Aydınlık boşluğunda biriken çöpler bir sigara izmaritiyle tutuştuğunda baca gibi çekerek yangını saniyeler içinde tüm binaya yayar.",
+        "kritikUyari": "Aydınlık tabanının yılda en az bir kez apartman yönetimi tarafından temizletilmesi ve alt tabanın betonunun yıkanması zorunludur.",
+        "ilgiliTerimler": ["Havalandırma Şaftı ve Işıklık", "Yangın Merdiveni"]
+    },
+    {
+        "terim": "Asansör Kurtarma Tatbikatı ve Yıllık İtfaiye Eğitimi",
+        "slug": "asansor-kurtarma-tatbikati-egitimi",
+        "harf": "A",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Elektrik kesintisinde veya arızada asansör kabininde mahsur kalan yolcuların site güvenlik personeli veya kapıcı tarafından manuel frenle kata indirilmesi eğitimidir.",
+        "hukukiKarsilik": "Asansör İşletme ve Bakım Yönetmeliği md. 13.",
+        "pratikteNeAnlamaGelir": "Mahsur kalan kişilerin panikle kabin kapısını zorlayıp asansör boşluğuna düşüp ölmesini engeller; yetkili personel makine dairesinden kabini kata getirir.",
+        "kritikUyari": "Eğitim sertifikası olmayan şahısların asansöre müdahale etmesi yasaktır; ehliyetsiz müdahaleden doğan ölümlerde yönetici sorumlu tutulur.",
+        "ilgiliTerimler": ["Asansör Yeşil Bilgi Etiketi", "Makine Dairesiz Asansör"]
+    },
+    {
+        "terim": "Sığınaklarda Zorunlu Sıhhi Tesisat ve WC Kriterleri",
+        "slug": "siginak-wc-ve-sihhi-tesisat-sartlari",
+        "harf": "S",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Afet veya nükleer tehlike anında kullanılacak genel sığınaklarda her 50 kişi için en az 1 alaturka/alafranga tuvalet ve lavabo bulunması yasal zorunluluğudur.",
+        "hukukiKarsilik": "Sığınak Yönetmeliği md. 11.",
+        "pratikteNeAnlamaGelir": "Sığınak sadece kuru bir beton oda değildir; su deposu, lavabosu, acil çıkış kapağı ve atık su pompasıyla tam bağımsız bir yaşam alanıdır.",
+        "kritikUyari": "Tuvalet tesisatı yapılmamış veya su borusu çekilmemiş sığınaklara belediye imar müdürlüğü yapı kullanma izni (iskan) vermez.",
+        "ilgiliTerimler": ["Sığınak Yönetmeliği", "Yapı Kullanma İzin Belgesi"]
+    },
+    {
+        "terim": "Sığınak Kapısı ve Patlama Dalgası Dayanımı",
+        "slug": "siginak-kapisi-patlama-dayanimi",
+        "harf": "S",
+        "kategori": "İnşaat & Mimarlık",
+        "kisaTanim": "Sığınak girişlerine monte edilen, gaz sızdırmaz kauçuk contalı ve nükleer/konvansiyonel patlama basınç dalgasına (en az 1 bar basınca) dayanıklı zırhlı çelik kapıdır.",
+        "hukukiKarsilik": "Sığınak Yönetmeliği md. 13 ve TS 3456.",
+        "pratikteNeAnlamaGelir": "Şok dalgasının sığınak içindeki insanların kulak zarını ve ciğerlerini patlatmasını engeller; zehirli gazların içeri sızmasını önler.",
+        "kritikUyari": "Sığınak kapısı içeriden mandalla kilitlenmeli ancak dışarıdan anahtarsız kurtarma kolu bulunmalıdır; kapı contaları düzenli vazelinlenmelidir.",
+        "ilgiliTerimler": ["Sığınak Yönetmeliği", "Monoblok Çelik Kapı"]
+    }
+]
+
+print(f"data_ultra_7.py hazır: {len(ULTRA_TERIMLER_7)} terim.")
