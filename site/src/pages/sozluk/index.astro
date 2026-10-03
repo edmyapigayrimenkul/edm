@@ -177,99 +177,117 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
                       </div>
                     </button>
 
-                    <!-- 2. TIKLANDIĞINDA: BÜYÜYEN EDM POST / PAFTA TASARIMI -->
+                    <!-- 2. TIKLANDIĞINDA: BÜYÜYEN EDM POST / SÖZLÜK ŞABLONU (KİREÇ BEJ PAFTA) -->
                     <article
-                      class="terim-acik relative flex-col justify-between rounded-2xl bg-[#121316] text-[#f5f7fa] p-5 sm:p-7 shadow-2xl border border-[#24272d] overflow-hidden transition-all duration-200"
+                      class="terim-acik relative flex-col justify-between rounded-2xl bg-[#ebebe7] text-[#121316] p-5 sm:p-7 shadow-xl border border-[#d4d4ce] overflow-hidden transition-all duration-200"
                     >
-                      <!-- Mimari Arka Plan Filigranı (Harf Rölöve İmzası) -->
-                      <span class="absolute right-4 -bottom-6 font-serif text-9xl font-black text-white/[0.03] select-none pointer-events-none leading-none">
+                      <!-- Mimari Açık Kitap Filigranı (Instagram Sözlük Şablonu) -->
+                      <svg
+                        class="absolute right-4 top-14 w-48 sm:w-60 h-36 sm:h-44 text-[#121316]/[0.05] pointer-events-none select-none"
+                        viewBox="0 0 200 130"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                      >
+                        <!-- Sol ve Sağ Sayfalar -->
+                        <polygon points="96,20 10,12 10,105 96,115" stroke="currentColor" stroke-width="1.8" />
+                        <polygon points="104,20 190,12 190,105 104,115" stroke="currentColor" stroke-width="1.8" />
+                        <!-- Orta Cilt Çizgisi -->
+                        <line x1="100" y1="18" x2="100" y2="118" stroke="currentColor" stroke-width="2.5" />
+                        <!-- Sayfa İçi Kılavuz Çizgileri -->
+                        <line x1="25" y1="36" x2="82" y2="39" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
+                        <line x1="25" y1="52" x2="82" y2="55" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
+                        <line x1="25" y1="68" x2="82" y2="71" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
+                        <line x1="25" y1="84" x2="82" y2="87" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
+                        <line x1="118" y1="39" x2="175" y2="36" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
+                        <line x1="118" y1="55" x2="175" y2="52" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
+                        <line x1="118" y1="71" x2="175" y2="68" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
+                        <line x1="118" y1="87" x2="175" y2="84" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
+                        <!-- Kırmızı Kitap Ayracı Şeridi -->
+                        <polygon points="97,114 103,114 102,128 100,124 98,128" fill="#c4030f" stroke="#c4030f" stroke-width="1" />
+                      </svg>
+
+                      <!-- Arka Planda Silik Büyük Harf Rölövesi -->
+                      <span class="absolute right-4 -bottom-6 font-serif text-9xl font-black text-[#121316]/[0.03] select-none pointer-events-none leading-none">
                         {t.harf}
                       </span>
 
                       <div class="relative z-10">
-                        <!-- ÜST ŞERİT: KATEGORİ ROZETİ + HUKUKİ ETİKET + KÜÇÜLT BUTONU -->
-                        <div class="flex items-center justify-between gap-2 border-b border-[#24272d] pb-3.5">
-                          <div class="flex flex-wrap items-center gap-2">
-                            <!-- Kırmızı Oval Kategori Rozeti (EDM Post İmza Rozeti) -->
-                            <span class="px-2.5 py-0.5 rounded-full bg-[#f0000d] text-white text-[11px] font-mono font-bold uppercase tracking-wider shadow-sm">
-                              {t.kategori}
-                            </span>
-                            <!-- Teknik Mevzuat Kod Rozeti -->
-                            <span class="px-2 py-0.5 rounded bg-[#1a1c21] text-[#8a8b8f] border border-[#24272d] text-[10px] font-mono">
-                              {t.hukukiKarsilik.split(' ')[0]}
-                            </span>
+                        <!-- ÜST ŞERİT: SİYAH KAPSÜL ROZET + SAĞDA EDM LOGOSU & KÜÇÜLT -->
+                        <div class="flex items-center justify-between gap-2 border-b border-[#d4d4ce] pb-3">
+                          <!-- Siyah Dikdörtgen Hap Rozet -->
+                          <div class="inline-flex items-center px-2.5 py-1 rounded bg-[#121316] text-white text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider shadow-sm">
+                            EMLAK SÖZLÜĞÜ // {t.kategori.toUpperCase()}
                           </div>
 
-                          <!-- Küçült / Kapat Butonu -->
-                          <button
-                            type="button"
-                            class="terim-kapat-btn inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold text-[#8a8b8f] hover:text-white bg-[#1a1c21] hover:bg-[#f0000d] border border-[#24272d] hover:border-[#f0000d] px-2.5 py-1 rounded-lg transition-all cursor-pointer"
-                            title="Kartı küçült"
-                          >
-                            <span>✕</span>
-                            <span>Küçült</span>
-                          </button>
+                          <!-- Sağ Üst: Logo ve Küçült Butonu -->
+                          <div class="flex items-center gap-2">
+                            <img src="/marka/logo-yatay.png" alt="EDM Yapı & Gayrimenkul" class="h-5 sm:h-6 w-auto hidden sm:block opacity-90" />
+                            <button
+                              type="button"
+                              class="terim-kapat-btn inline-flex items-center gap-1 text-[11px] font-mono font-bold text-[#121316] bg-white/80 hover:bg-[#f0000d] hover:text-white border border-[#d4d4ce] px-2.5 py-0.5 rounded transition-all cursor-pointer shadow-2xs"
+                              title="Kartı küçült"
+                            >
+                              <span>✕</span>
+                              <span>Küçült</span>
+                            </button>
+                          </div>
                         </div>
 
-                        <!-- İRİ VE VURUCU TERİM MANŞETİ (EDM POST TİPOGRAFİSİ) -->
-                        <h3 class="font-serif text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight mt-4">
+                        <!-- İRİ VE DEV TERİM BAŞLIĞI (FRAUNCES SERİF BÜYÜK HARFLİ) -->
+                        <h3 class="font-serif text-2xl sm:text-3xl lg:text-4xl font-black text-[#121316] tracking-tight uppercase leading-[1.08] mt-4 sm:mt-5">
                           {t.terim}
                         </h3>
 
-                        <!-- HUKUKİ DAYANAK ŞERHİ -->
-                        <div class="flex items-center gap-2 mt-1.5 text-[11px] font-mono text-[#8a8b8f]">
-                          <span class="w-1.5 h-1.5 rounded-full bg-[#f0000d]"></span>
-                          <span>Hukuki Dayanak: {t.hukukiKarsilik}</span>
+                        <!-- İNCE AYRIM ÇİZGİSİ -->
+                        <div class="border-b border-[#d4d4ce] mt-3.5 mb-2.5"></div>
+
+                        <!-- TANIM & ANLAMI ETİKETİ -->
+                        <div class="text-[11px] font-mono font-bold text-[#8a8b8f] tracking-wider uppercase mb-1.5">
+                          TANIM & ANLAMI
                         </div>
 
-                        <!-- TANIM VE DETAY METNİ -->
-                        <div class="mt-4 space-y-3 font-sans">
-                          <p class="text-sm sm:text-base leading-relaxed text-[#f5f7fa]">
-                            {t.kisaTanim}
+                        <!-- TANIM VE SAHA GERÇEĞİ METNİ -->
+                        <div class="font-sans text-sm sm:text-base leading-relaxed text-[#121316] relative pl-4 sm:pl-5">
+                          <!-- Sol Baş Tırnak İşareti -->
+                          <span class="absolute left-0 -top-1 font-serif text-2xl sm:text-3xl text-[#8a8b8f]/70 select-none leading-none">“</span>
+                          <p>
+                            {t.kisaTanim} {t.pratikteNeAnlamaGelir}
                           </p>
-
-                          <!-- SAHA GERÇEĞİ VE PRATİK UYGULAMA PANELİ -->
-                          <div class="rounded-xl bg-[#1a1c21] border border-[#24272d] p-3.5 sm:p-4 text-xs sm:text-sm text-[#dadee6] leading-relaxed">
-                            <div class="flex items-center gap-1.5 text-[#8a8b8f] font-mono text-[10px] font-bold uppercase tracking-wider mb-1">
-                              <span class="w-1.5 h-1.5 rounded-full bg-[#8a8b8f]"></span>
-                              <span>SAHA GERÇEĞİ & PRATİK ANLAMI</span>
-                            </div>
-                            <p class="text-[#f5f7fa]">{t.pratikteNeAnlamaGelir}</p>
-                          </div>
                         </div>
 
-                        <!-- KRİTİK RİSK VE UYARI KUTUSU (EDM POST İMZA SOL KIRMIZI ŞERİT) -->
-                        <div class="mt-4 rounded-xl bg-[#16181f] border border-[#24272d] border-l-4 border-l-[#f0000d] p-3.5 sm:p-4 text-xs sm:text-sm leading-relaxed shadow-lg">
-                          <div class="flex items-center gap-1.5 text-[#ff3b30] font-mono text-[11px] font-bold uppercase tracking-wider mb-1">
-                            <svg class="w-4 h-4 shrink-0 text-[#f0000d]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
-                              <line x1="12" y1="9" x2="12" y2="13" />
-                              <line x1="12" y1="17" x2="12.01" y2="17" />
-                            </svg>
-                            <span>DİKKAT · KRİTİK RİSK & UYARI</span>
+                        <!-- SİYAH KUTU: YATIRIMCI İÇİN ÖNEMİ / KRİTİK UYARI -->
+                        <div class="mt-4 sm:mt-5 rounded-xl bg-[#121316] border border-[#2b2d35] border-l-4 border-l-[#EBAF37] p-3.5 sm:p-4.5 text-xs sm:text-sm text-white shadow-md">
+                          <div class="flex items-center gap-1.5 text-[#EBAF37] font-mono text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#EBAF37]"></span>
+                            <span>YATIRIMCI İÇİN ÖNEMİ:</span>
                           </div>
-                          <p class="text-[#f5f7fa]">{t.kritikUyari}</p>
+                          <p class="text-[#f5f7fa] font-sans leading-relaxed text-xs sm:text-[13px]">
+                            {t.kritikUyari}
+                          </p>
                         </div>
                       </div>
 
-                      <!-- KART ALTI: RESMİ MEVZUAT VE KURUMSAL MARKA DAMGASI -->
-                      <div class="relative z-10 mt-5 pt-3.5 border-t border-[#24272d] flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-[#8a8b8f]">
-                        <div class="flex flex-wrap items-center gap-2">
+                      <!-- KART ALTI (FOOTER): EDM YAPI // EMLAK SÖZLÜĞÜ + RESMİ MEVZUAT -->
+                      <div class="relative z-10 mt-5 pt-3 border-t border-[#d4d4ce] flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-[#8a8b8f]">
+                        <span class="tracking-wider uppercase text-[10px] sm:text-[11px]">
+                          EDM YAPI & GAYRİMENKUL // EMLAK SÖZLÜĞÜ
+                        </span>
+
+                        <div class="flex items-center gap-3">
                           {t.kaynaklar.map((kaynak) => (
                             <a
                               href={kaynak.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-white hover:text-[#f0000d] bg-[#1a1c21] hover:bg-[#24272d] border border-[#24272d] px-3 py-1.5 rounded-lg transition-colors"
+                              class="text-[#121316] hover:text-[#f0000d] font-bold underline underline-offset-4 decoration-[#d4d4ce] hover:decoration-[#f0000d] transition-colors"
                             >
-                              <span>{kaynak.baslik}</span>
-                              <span class="text-[#8a8b8f]">↗</span>
+                              <span>{kaynak.baslik} ↗</span>
                             </a>
                           ))}
-                        </div>
-                        <div class="flex items-center gap-2 text-[10px] font-mono text-[#8a8b8f] tracking-wider uppercase">
-                          <span class="w-1.5 h-1.5 rounded-full bg-[#f0000d]"></span>
-                          <span>EDM YAPI & GAYRİMENKUL // ARŞİV</span>
+                          <span class="text-[#121316] font-bold hidden sm:inline">
+                            SÖZLÜK // 01
+                          </span>
                         </div>
                       </div>
                     </article>
