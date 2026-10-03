@@ -18,13 +18,13 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
         <div>
           <div class="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold tracking-widest text-kirmizi uppercase mb-1">
             <span class="w-1.5 h-1.5 rounded-full bg-kirmizi animate-pulse"></span>
-            EDM AKADEMİ · İNSTAGRAM BİLGİ SERİSİ
+            EDM AKADEMİ · MEVZUAT VE SAHA SÖZLÜĞÜ
           </div>
           <h1 class="text-3xl sm:text-4xl lg:text-5xl font-serif font-black text-murekkep tracking-tight">
             Emlak Terimleri Sözlüğü
           </h1>
           <p class="mt-1.5 text-xs sm:text-sm text-metin-2 max-w-xl leading-relaxed">
-            Detayını ve saha gerçeğini öğrenmek istediğiniz <strong>kelimeye tıklayarak büyütebilirsiniz</strong>.
+            Detayını ve saha gerçeğini öğrenmek istediğiniz <strong>kelimeye tıklayarak bilgi kartını büyütebilirsiniz</strong>.
           </p>
         </div>
 
@@ -99,13 +99,13 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
         <!-- Canlı Durum -->
         <div class="pt-1 text-[11px] font-mono text-kursun flex items-center justify-between">
           <span id="arama-sayac">{SOZLUK_TERIMLERI.length} terim listeleniyor</span>
-          <span class="text-kursun/70 hidden sm:inline">Instagram @edmyapigayrimenkul</span>
+          <span class="text-kursun/70 hidden sm:inline">EDM Yapı & Gayrimenkul Hukuk & Saha Arşivi</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- TERİMLER ALANI: TIKLANDIĞINDA BÜYÜYEN INSTAGRAM POST KARTLARI -->
+  <!-- TERİMLER ALANI: TIKLANDIĞINDA BÜYÜYEN BİLGİ KARTLARI (EDM POST TASARIMI) -->
   <section class="pb-16 lg:pb-24">
     <div class="kab">
       <!-- Boş Durum -->
@@ -159,7 +159,7 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
                       type="button"
                       class="terim-kapali w-full text-left flex items-center justify-between gap-3 p-3 bg-white rounded-xl border border-murekkep/12 hover:border-kirmizi hover:shadow-sm transition-all duration-150 cursor-pointer"
                       aria-expanded="false"
-                      title="Detayları ve Instagram bilgi kartını görmek için tıklayın"
+                      title="Detaylı bilgi kartını açmak için tıklayın"
                     >
                       <div class="flex items-center gap-2.5 min-w-0">
                         <span class="w-2 h-2 rounded-full bg-kursun/40 group-hover:bg-kirmizi transition-colors shrink-0"></span>
@@ -177,85 +177,100 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
                       </div>
                     </button>
 
-                    <!-- 2. TIKLANDIĞINDA: BÜYÜYEN INSTAGRAM POST KARTI HALİ -->
+                    <!-- 2. TIKLANDIĞINDA: BÜYÜYEN EDM POST / PAFTA TASARIMI -->
                     <article
-                      class="terim-acik relative flex-col justify-between rounded-2xl bg-[#121316] text-[#f4f4f3] p-5 sm:p-6 shadow-2xl border border-white/12 overflow-hidden transition-all duration-200"
+                      class="terim-acik relative flex-col justify-between rounded-2xl bg-[#121316] text-[#f5f7fa] p-5 sm:p-7 shadow-2xl border border-[#24272d] overflow-hidden transition-all duration-200"
                     >
-                      <!-- Arka Plan Filigranı (Instagram Slide Damgası) -->
-                      <span class="absolute right-3 -bottom-4 font-serif text-8xl font-black text-white/[0.03] select-none pointer-events-none leading-none">
+                      <!-- Mimari Arka Plan Filigranı (Harf Rölöve İmzası) -->
+                      <span class="absolute right-4 -bottom-6 font-serif text-9xl font-black text-white/[0.03] select-none pointer-events-none leading-none">
                         {t.harf}
                       </span>
 
                       <div class="relative z-10">
-                        <!-- Instagram Üst Şerit: Hesap Monogramı + Kategori + Küçült Butonu -->
-                        <div class="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
-                          <div class="flex items-center gap-2">
-                            <!-- Instagram Story Çerçeveli EDM İkonu -->
-                            <div class="p-[1.5px] rounded-full bg-gradient-to-tr from-[#f0000d] via-[#f0000d] to-[#ff4d58] shrink-0">
-                              <div class="w-6 h-6 rounded-full bg-[#121316] flex items-center justify-center text-[9px] font-black text-white font-mono">
-                                EDM
-                              </div>
-                            </div>
-                            <div>
-                              <div class="text-[11px] font-mono font-bold text-white leading-tight">@edmyapigayrimenkul</div>
-                              <div class="text-[9px] font-mono text-white/50">{t.kategori}</div>
-                            </div>
-                          </div>
-
-                          <div class="flex items-center gap-2">
-                            <span class="text-[10px] font-mono text-white/45 bg-white/[0.05] px-2 py-0.5 rounded border border-white/8">
+                        <!-- ÜST ŞERİT: KATEGORİ ROZETİ + HUKUKİ ETİKET + KÜÇÜLT BUTONU -->
+                        <div class="flex items-center justify-between gap-2 border-b border-[#24272d] pb-3.5">
+                          <div class="flex flex-wrap items-center gap-2">
+                            <!-- Kırmızı Oval Kategori Rozeti (EDM Post İmza Rozeti) -->
+                            <span class="px-2.5 py-0.5 rounded-full bg-[#f0000d] text-white text-[11px] font-mono font-bold uppercase tracking-wider shadow-sm">
+                              {t.kategori}
+                            </span>
+                            <!-- Teknik Mevzuat Kod Rozeti -->
+                            <span class="px-2 py-0.5 rounded bg-[#1a1c21] text-[#8a8b8f] border border-[#24272d] text-[10px] font-mono">
                               {t.hukukiKarsilik.split(' ')[0]}
                             </span>
-                            <!-- Küçült Butonu -->
-                            <button
-                              type="button"
-                              class="terim-kapat-btn text-[10px] font-mono text-white/70 hover:text-white bg-white/[0.08] hover:bg-kirmizi px-2 py-1 rounded transition-colors cursor-pointer"
-                              title="Kartı küçült"
-                            >
-                              ✕ Küçült
-                            </button>
                           </div>
+
+                          <!-- Küçült / Kapat Butonu -->
+                          <button
+                            type="button"
+                            class="terim-kapat-btn inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold text-[#8a8b8f] hover:text-white bg-[#1a1c21] hover:bg-[#f0000d] border border-[#24272d] hover:border-[#f0000d] px-2.5 py-1 rounded-lg transition-all cursor-pointer"
+                            title="Kartı küçült"
+                          >
+                            <span>✕</span>
+                            <span>Küçült</span>
+                          </button>
                         </div>
 
-                        <!-- İRİ VE BÜYÜK TERİM BAŞLIĞI (INSTAGRAM SLIDE HERO) -->
-                        <h3 class="font-serif text-2xl sm:text-3xl font-black text-white tracking-tight leading-snug mt-4">
+                        <!-- İRİ VE VURUCU TERİM MANŞETİ (EDM POST TİPOGRAFİSİ) -->
+                        <h3 class="font-serif text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight mt-4">
                           {t.terim}
                         </h3>
 
-                        <!-- SADE VE AKICI METİN -->
-                        <p class="mt-3 text-xs sm:text-sm leading-relaxed text-white/85 font-sans">
-                          {t.kisaTanim} {t.pratikteNeAnlamaGelir}
-                        </p>
+                        <!-- HUKUKİ DAYANAK ŞERHİ -->
+                        <div class="flex items-center gap-2 mt-1.5 text-[11px] font-mono text-[#8a8b8f]">
+                          <span class="w-1.5 h-1.5 rounded-full bg-[#f0000d]"></span>
+                          <span>Hukuki Dayanak: {t.hukukiKarsilik}</span>
+                        </div>
 
-                        <!-- INSTAGRAM SLAYTI DİKKAT & KRİTİK RİSK VURGUSU -->
-                        <div class="mt-4 rounded-xl bg-white/[0.04] border-l-3 border-kirmizi p-3.5 text-xs leading-relaxed text-white">
-                          <div class="flex items-center gap-1.5 text-kirmizi font-mono text-[10px] font-bold uppercase tracking-wider mb-1">
-                            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <!-- TANIM VE DETAY METNİ -->
+                        <div class="mt-4 space-y-3 font-sans">
+                          <p class="text-sm sm:text-base leading-relaxed text-[#f5f7fa]">
+                            {t.kisaTanim}
+                          </p>
+
+                          <!-- SAHA GERÇEĞİ VE PRATİK UYGULAMA PANELİ -->
+                          <div class="rounded-xl bg-[#1a1c21] border border-[#24272d] p-3.5 sm:p-4 text-xs sm:text-sm text-[#dadee6] leading-relaxed">
+                            <div class="flex items-center gap-1.5 text-[#8a8b8f] font-mono text-[10px] font-bold uppercase tracking-wider mb-1">
+                              <span class="w-1.5 h-1.5 rounded-full bg-[#8a8b8f]"></span>
+                              <span>SAHA GERÇEĞİ & PRATİK ANLAMI</span>
+                            </div>
+                            <p class="text-[#f5f7fa]">{t.pratikteNeAnlamaGelir}</p>
+                          </div>
+                        </div>
+
+                        <!-- KRİTİK RİSK VE UYARI KUTUSU (EDM POST İMZA SOL KIRMIZI ŞERİT) -->
+                        <div class="mt-4 rounded-xl bg-[#16181f] border border-[#24272d] border-l-4 border-l-[#f0000d] p-3.5 sm:p-4 text-xs sm:text-sm leading-relaxed shadow-lg">
+                          <div class="flex items-center gap-1.5 text-[#ff3b30] font-mono text-[11px] font-bold uppercase tracking-wider mb-1">
+                            <svg class="w-4 h-4 shrink-0 text-[#f0000d]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                               <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
                               <line x1="12" y1="9" x2="12" y2="13" />
                               <line x1="12" y1="17" x2="12.01" y2="17" />
                             </svg>
-                            <span>DİKKAT · KRİTİK RİSK</span>
+                            <span>DİKKAT · KRİTİK RİSK & UYARI</span>
                           </div>
-                          <p class="text-white/90 text-[11px] sm:text-xs leading-relaxed">{t.kritikUyari}</p>
+                          <p class="text-[#f5f7fa]">{t.kritikUyari}</p>
                         </div>
                       </div>
 
-                      <!-- KART ALTI: RESMİ MEVZUAT VE MARKA İMZASI -->
-                      <div class="relative z-10 mt-5 pt-3.5 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-white/50">
-                        <div>
+                      <!-- KART ALTI: RESMİ MEVZUAT VE KURUMSAL MARKA DAMGASI -->
+                      <div class="relative z-10 mt-5 pt-3.5 border-t border-[#24272d] flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-[#8a8b8f]">
+                        <div class="flex flex-wrap items-center gap-2">
                           {t.kaynaklar.map((kaynak) => (
                             <a
                               href={kaynak.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              class="inline-flex items-center gap-1 text-white/70 hover:text-kirmizi transition-colors underline-offset-4 hover:underline"
+                              class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-white hover:text-[#f0000d] bg-[#1a1c21] hover:bg-[#24272d] border border-[#24272d] px-3 py-1.5 rounded-lg transition-colors"
                             >
-                              <span>Resmi Mevzuat ↗</span>
+                              <span>{kaynak.baslik}</span>
+                              <span class="text-[#8a8b8f]">↗</span>
                             </a>
                           ))}
                         </div>
-                        <span class="text-white/40 tracking-wider">edmyapigayrimenkul.com</span>
+                        <div class="flex items-center gap-2 text-[10px] font-mono text-[#8a8b8f] tracking-wider uppercase">
+                          <span class="w-1.5 h-1.5 rounded-full bg-[#f0000d]"></span>
+                          <span>EDM YAPI & GAYRİMENKUL // ARŞİV</span>
+                        </div>
                       </div>
                     </article>
                   </div>
@@ -285,10 +300,10 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
     display: flex !important;
   }
 
-  /* Açık durum (Büyümüş Instagram Gönderisi) */
+  /* Açık durum (Büyümüş EDM Post / Pafta Görünümü) */
   .terim-kapsayici[data-durum="acik"] .terim-acik {
     display: flex !important;
-    animation: slideGrow 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: slideGrow 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .terim-kapsayici[data-durum="acik"] .terim-kapali {
     display: none !important;
@@ -297,7 +312,7 @@ const kategoriler = ['Tümü', 'Tapu & Mülkiyet', 'İmar & Kadastro', 'Kira & T
   @keyframes slideGrow {
     from {
       opacity: 0;
-      transform: scale(0.96) translateY(-4px);
+      transform: scale(0.97) translateY(-6px);
     }
     to {
       opacity: 1;
