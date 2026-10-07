@@ -1,0 +1,316 @@
+{
+  "source": "Sahibinden Pro Ofis authenticated category selector, observed in Chrome DevTools",
+  "capturedAt": "2026-10-05",
+  "scope": "Observed Emlak category branches and leaf labels from authenticated selector screenshots and browser inspection; incomplete where source lists were clipped or not opened.",
+  "categories": [
+    {
+      "id": "3518",
+      "label": "Emlak"
+    },
+    {
+      "id": "3613",
+      "label": "Konut",
+      "parentId": "3518"
+    },
+    {
+      "id": "3620",
+      "label": "İş Yeri",
+      "parentId": "3518"
+    },
+    {
+      "id": "89789",
+      "label": "Arsa",
+      "parentId": "3518"
+    },
+    {
+      "id": "3618",
+      "label": "Bina",
+      "parentId": "3518"
+    },
+    {
+      "id": "3619",
+      "label": "Devre Mülk",
+      "parentId": "3518"
+    },
+    {
+      "id": "3617",
+      "label": "Turistik Tesis",
+      "parentId": "3518"
+    },
+    {
+      "id": "16623",
+      "label": "Satılık",
+      "parentId": "3613"
+    },
+    {
+      "id": "16622",
+      "label": "Kiralık",
+      "parentId": "3613"
+    },
+    {
+      "id": "229468",
+      "label": "Devren Satılık Konut",
+      "parentId": "3613"
+    }
+  ],
+  "quickCategories": [
+    {
+      "label": "Satılık Villa",
+      "path": [
+        "3518",
+        "3613",
+        "16623",
+        "16636"
+      ]
+    },
+    {
+      "label": "Kiralık Daire",
+      "path": [
+        "3518",
+        "3613",
+        "16622",
+        "16624"
+      ]
+    },
+    {
+      "label": "Kiralık Müstakil Ev",
+      "path": [
+        "3518",
+        "3613",
+        "16622",
+        "16626"
+      ]
+    },
+    {
+      "label": "Kiralık Villa",
+      "path": [
+        "3518",
+        "3613",
+        "16622",
+        "16627"
+      ]
+    },
+    {
+      "label": "Satılık Arsa",
+      "path": [
+        "3518",
+        "89789",
+        "3614"
+      ]
+    }
+  ],
+  "observedBranches": [
+    {
+      "parentPath": [
+        "Emlak",
+        "Konut",
+        "Satılık"
+      ],
+      "options": [
+        "Daire",
+        "Rezidans",
+        "Müstakil Ev",
+        "Villa",
+        "Çiftlik Evi",
+        "Köşk & Konak",
+        "Yalı",
+        "Yalı Dairesi",
+        "Yazlık",
+        "Kooperatif"
+      ]
+    },
+    {
+      "parentPath": [
+        "Emlak",
+        "Konut",
+        "Kiralık"
+      ],
+      "options": [
+        "Daire",
+        "Rezidans",
+        "Müstakil Ev",
+        "Villa",
+        "Çiftlik Evi",
+        "Köşk & Konak",
+        "Yalı",
+        "Yalı Dairesi"
+      ]
+    },
+    {
+      "parentPath": [
+        "Emlak",
+        "Konut",
+        "Devren Satılık Konut"
+      ],
+      "options": [
+        "Daire",
+        "Villa"
+      ]
+    },
+    {
+      "parentPath": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık"
+      ],
+      "options": [
+        "Akaryakıt İstasyonu",
+        "Apartman Dairesi",
+        "Atölye",
+        "Çiftlik",
+        "Depo & Antrepo",
+        "Dükkan & Mağaza",
+        "Fabrika & Üretim Tesisi",
+        "Garaj & Park Yeri",
+        "Hamam, Sauna & Spa",
+        "İmalathane",
+        "İş Hanı Katı & Ofisi",
+        "Komple Bina",
+        "Maden Ocağı",
+        "Ofis & Büro",
+        "Okul",
+        "Otopark",
+        "Pazar Yeri",
+        "Plaza",
+        "Plaza Katı & Ofisi",
+        "Rezidans Katı & Ofisi",
+        "Spor Tesisi",
+        "Toplantı & Etkinlik Salonu",
+        "Villa"
+      ]
+    },
+    {
+      "parentPath": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık"
+      ],
+      "options": [
+        "Akaryakıt İstasyonu",
+        "Apartman Dairesi",
+        "Atölye",
+        "Çiftlik",
+        "Depo & Antrepo",
+        "Dükkan & Mağaza",
+        "Fabrika & Üretim Tesisi",
+        "Garaj & Park Yeri",
+        "Hamam, Sauna & Spa",
+        "Hazır & Sanal Ofis",
+        "İmalathane",
+        "İş Hanı Katı & Ofisi",
+        "Komple Bina",
+        "Maden Ocağı",
+        "Ofis & Büro",
+        "Okul",
+        "Otopark",
+        "Pazar Yeri",
+        "Plaza",
+        "Plaza Katı & Ofisi",
+        "Rezidans Katı & Ofisi",
+        "Spor Tesisi",
+        "Toplantı & Etkinlik Salonu"
+      ]
+    },
+    {
+      "parentPath": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık"
+      ],
+      "options": [
+        "Acente",
+        "Akaryakıt İstasyonu",
+        "Aktar & Baharatçı",
+        "Anaokulu & Kreş",
+        "Araç Galerisi & Servis",
+        "Atölye",
+        "AVM Standı",
+        "Balıkçı",
+        "Bar",
+        "Bijuteri & Takıcı",
+        "Börekçi",
+        "Büfe",
+        "Cep Telefonu Dükkanı",
+        "Çamaşırhane",
+        "Çay Ocağı",
+        "Çiçekçi & Fidanlık",
+        "Çiftlik",
+        "Çiğ Köfteci",
+        "Düğün Salonu",
+        "Dükkan & Mağaza",
+        "Eczane",
+        "Elektrikçi & Hırdavatçı",
+        "Elektronik Mağazası",
+        "Enerji Santrali",
+        "Etkinlik Alanı",
+        "Fabrika & Üretim Tesisi",
+        "Fotoğraf Stüdyosu",
+        "Gece Kulübü & Disko",
+        "Giyim Mağazası",
+        "Gözlükçü",
+        "Güzellik Merkezi",
+        "Halı Yıkama",
+        "Hamam, Sauna & Spa",
+        "Huzur Evi",
+        "İmalathane",
+        "İnternet & Oyun Kafe",
+        "Kafe",
+        "Kantin",
+        "Kasap",
+        "Kıraathane",
+        "Kırtasiye",
+        "Kozmetik Mağazası",
+        "Kuaför & Berber",
+        "Kurs & Eğitim Merkezi",
+        "Kuru Temizleme",
+        "Kuruyemişçi",
+        "Kuyumcu",
+        "Lunapark",
+        "Maden Ocağı",
+        "Manav",
+        "Market",
+        "Matbaa",
+        "Medikal Market",
+        "Muayenehane",
+        "Nakliyat & Kargo",
+        "Nalbur",
+        "Ofis & Büro",
+        "Okul",
+        "Oto Servis & Bakım",
+        "Oto Yedek Parçacı",
+        "Oto Yıkama & Kuaför",
+        "Pastane, Fırın & Tatlıcı",
+        "Pazar Yeri",
+        "Pet Shop",
+        "Piknik Alanı & Kahvaltı Bahçesi",
+        "Prova & Kayıt Stüdyosu",
+        "Radyo İstasyonu & TV Kanalı",
+        "Restoran & Lokanta",
+        "Saat Mağazası",
+        "Sağlık Merkezi",
+        "Sebze & Meyve Hali",
+        "Soğuk Hava Deposu",
+        "Spor Tesisi",
+        "Su & Tüp Bayisi",
+        "Şans Oyunları Bayisi",
+        "Şarküteri",
+        "Taksi Durağı",
+        "Tamirhane",
+        "Tekel Bayisi",
+        "Teknik Servis",
+        "Terzi",
+        "Toplantı & Etkinlik Salonu",
+        "Tuhafiye",
+        "Tuvalet",
+        "Veteriner",
+        "Yurt",
+        "Züccaciye"
+      ]
+    }
+  ],
+  "dataQualityNotes": [
+    "Etiketler Sahibinden Pro Ofis kategori seçici ekran görüntülerinde görünen metinlerden derlendi; bazı uzun seçenekler ekran görüntüsünde kesilmiş olabilir.",
+    "Ekran görüntüsünde görünmeyen kategori kimlikleri tahmin edilmedi.",
+    "Konut kiralık daire için form şeması ayrı dosyada tam görünür alan ve seçenek dökümüdür; diğer yaprakların form alanları henüz kaydedilmedi."
+  ]
+}

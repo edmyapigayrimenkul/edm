@@ -1,7 +1,11 @@
 ---
 import Temel from '../../layouts/Temel.astro';
 import IlanKart from '../../components/IlanKart.astro';
+import BolgeRehberi from '../../components/BolgeRehberi.astro';
+import { bolgeRehberiBul } from '../../lib/bolge-rehberi';
 import { bolgeler, bolgeBul } from '../../lib/bolgeler';
+import { fiyatYaz } from '../../lib/ilanlar';
+import { ARAMA_SAYFALARI } from '../../lib/arama-sayfalari';
 import { KURUM } from '../../lib/site';
 
 const { slug } = Astro.params;
@@ -9,9 +13,15 @@ const bolge = slug ? await bolgeBul(slug) : undefined;
 if (!bolge) return Astro.rewrite('/404');
 
 const TUM_BOLGELER = await bolgeler();
+const yerelRehber = bolgeRehberiBul(bolge.il, bolge.ilce);
 
-const tl = (n: number | null) => (n === null ? '—' : `${n.toLocaleString('tr-TR')} ₺`);
-const donum = bolge.toplamAlan / 1000;
+const fiyatAraligi = (grup: (typeof bolge.fiyatGruplari)[number]) => {
+  const alt = fiyatYaz(grup.enDusuk, undefined, grup.paraBirimi);
+  const ust = fiyatYaz(grup.enYuksek, undefined, grup.paraBirimi);
+  return `${grup.enDusuk === grup.enYuksek ? alt : `${alt} — ${ust}`}${grup.donem ? ` ${grup.donem}` : ''}`;
+};
+const donum = bolge.arsaToplamAlan / 1000;
+const metaFiyatlar = bolge.fiyatGruplari.slice(0, 3).map((grup) => `${grup.etiket}: ${fiyatAraligi(grup)}`).join('; ');
 
 const olcuIsimleri = [
   { etiket: 'Aktif ilan', deger: String(bolge.adet) },
@@ -19,10 +29,10 @@ const olcuIsimleri = [
   ...(bolge.kiralik > 0 ? [{ etiket: 'Kiralık', deger: String(bolge.kiralik) }] : []),
   { etiket: 'Konut', deger: String(bolge.konut) },
   { etiket: 'Arsa & tarla', deger: String(bolge.arsa) },
-  {
-    etiket: 'Toplam alan',
-    deger: donum >= 1 ? `${donum.toLocaleString('tr-TR', { maximumFractionDigits: 1 })} dönüm` : `${bolge.toplamAlan} m²`,
-  },
+  ...(bolge.arsaToplamAlan > 0 ? [{
+    etiket: 'Arsa toplam alanı',
+    deger: donum >= 1 ? `${donum.toLocaleString('tr-TR', { maximumFractionDigits: 1 })} dönüm` : `${bolge.arsaToplamAlan} m²`,
+  }] : []),
 ];
 
 const jsonLd = {
@@ -36,7 +46,7 @@ const jsonLd = {
 
 <Temel
   baslik={`${bolge.ad} Emlak Rehberi`}
-  aciklama={`${bolge.ad}’de ${bolge.adet} aktif ilan. ${bolge.konut} konut, ${bolge.arsa} arsa ve tarla. Fiyat aralığı ${tl(bolge.enDusuk)} — ${tl(bolge.enYuksek)}. ${KURUM.ad} portföyünden güncel veriler.`}
+  aciklama={`${bolge.ad} bölgesinde ${bolge.adet} aktif ilan. ${bolge.konut} konut, ${bolge.arsa} arsa ve tarla.${metaFiyatlar ? ` ${metaFiyatlar}.` : ''} ${KURUM.ad} portföyünden güncel istek fiyatları.`}
   jsonLd={jsonLd}
 >
   <section class="pt-28 lg:pt-36">
@@ -60,6 +70,17 @@ const jsonLd = {
         )
       }
 
+      <nav aria-label="Rehber bölümleri" class="mt-8 flex flex-wrap gap-3">
+        <a href="#portfoy-fiyatlari" class="dugme dugme--hayalet">Portföy ve fiyatlar</a>
+        {yerelRehber && <a href="#bolgeyi-tani" class="dugme dugme--hayalet">Bölgeyi tanıyın</a>}
+        <a href="#bolge-ilanlari" class="dugme dugme--hayalet">İlanları inceleyin</a>
+      </nav>
+      <p class="mt-7 max-w-[70ch] text-sm leading-relaxed text-kursun">Aşağıdaki sayılar ve fiyatlar yalnız {KURUM.ad} portföyüne aittir; bölgenin tamamını temsil etmez.</p>
+
+      {bolge.slug === 'istanbul-silivri' && <nav aria-label="Silivri ilan aramaları" class="mt-5 flex flex-wrap gap-3">
+        {ARAMA_SAYFALARI.map((sayfa) => <a href={`/ilanlar/${sayfa.slug}`} class="dugme dugme--hayalet">{sayfa.baslik}</a>)}
+      </nav>}
+
       <!-- Ölçüler -->
       <dl class="olcu-serit mt-10">
         {
@@ -73,27 +94,31 @@ const jsonLd = {
       </dl>
 
       <!-- Fiyat okuması -->
-      <div class="mt-6 grid gap-5 lg:grid-cols-[1.15fr_1fr]">
+      <div id="portfoy-fiyatlari" class="rehber-hedef mt-6 grid gap-5 lg:grid-cols-[1.15fr_1fr]">
         <div class="fiyat-kutu">
-          <p class="etiket">Portföyümüzdeki fiyat aralığı</p>
-          <p class="fiyat-satir font-veri">
-            {bolge.enDusuk === bolge.enYuksek
-              ? tl(bolge.enDusuk)
-              : `${tl(bolge.enDusuk)} — ${tl(bolge.enYuksek)}`}
-          </p>
+          <p class="etiket">İşlem türüne göre istek fiyatları</p>
+          {bolge.fiyatGruplari.length === 0 && <p class="mt-4 text-sm text-metin-2">Geçerli fiyatı bulunan ilan olmadığı için fiyat aralığı gösterilmiyor.</p>}
+          <dl class="fiyat-gruplari">
+            {bolge.fiyatGruplari.map((grup) => <div>
+              <dt><span>{grup.etiket}</span><small>{grup.adet} ilan</small></dt>
+              <dd class="font-veri">{fiyatAraligi(grup)}</dd>
+            </div>)}
+          </dl>
           {
             bolge.ortancaBirimFiyat && (
               <p class="mt-4 border-t border-murekkep/10 pt-4 text-sm text-metin-2">
-                Arsa ve tarlada metrekare başına ortanca fiyat
+                TL ile satılık arsa ve tarlada metrekare başına ortanca istek fiyatı
                 <strong class="ml-1 font-veri text-murekkep">
                   {bolge.ortancaBirimFiyat.toLocaleString('tr-TR')} ₺
                 </strong>
+                <span class="mt-2 block text-xs leading-relaxed">{bolge.birimFiyatOrnekSayisi} farklı taşınmazın geçerli fiyat ve alanından hesaplandı. İmar ve kullanım farkları bu tek sayıyla açıklanmaz.</span>
               </p>
             )
           }
+          {bolge.ortancaBirimFiyat === null && <p class="mt-4 text-xs leading-relaxed text-kursun">Birim fiyat için {bolge.birimFiyatOrnekSayisi} geçerli TL satılık arazi örneği var. En az iki farklı taşınmaz olmadan ortanca gösterilmez.</p>}
           <p class="mt-3 text-[0.75rem] leading-relaxed text-kursun">
-            Bunlar istek fiyatlarıdır, gerçekleşmiş satış değil. Gerçek değer için
-            <a href="/degerleme" class="alt-cizgi text-metin-2">ücretsiz değerleme</a> isteyin.
+            Bunlar istek fiyatlarıdır, gerçekleşmiş satış fiyatı değildir. Taşınmaza özel
+            <a href="/degerleme" class="alt-cizgi text-metin-2">ücretsiz piyasa değerlendirmesi</a> isteyin.
           </p>
         </div>
 
@@ -127,15 +152,17 @@ const jsonLd = {
     </div>
   </section>
 
+  {yerelRehber && <BolgeRehberi rehber={yerelRehber} />}
+
   <!-- İlanlar -->
-  <section class="mt-16 border-t border-murekkep/10 py-14 lg:py-20">
+  <section id="bolge-ilanlari" class="rehber-hedef mt-16 border-t border-murekkep/10 py-14 lg:py-20">
     <div class="kab">
       <div class="flex flex-wrap items-end justify-between gap-6">
         <h2 class="baslik-orta">
-          {bolge.ad}’deki ilanlarımız
+          {bolge.ad} ilanlarımız
           <span class="ml-2 font-veri text-base text-kursun">{bolge.adet}</span>
         </h2>
-        <a href={`/ilanlar?ilce=${encodeURIComponent(bolge.ad.replace(/^.+ Merkez$/, 'Merkez'))}`} class="dugme dugme--hayalet">
+        <a href={`/ilanlar?il=${encodeURIComponent(bolge.il)}&ilce=${encodeURIComponent(bolge.ilce)}`} class="dugme dugme--hayalet">
           Filtreleyerek gör
         </a>
       </div>
@@ -165,6 +192,7 @@ const jsonLd = {
 </Temel>
 
 <style>
+  .rehber-hedef { scroll-margin-top: 7rem; }
   .olcu-serit {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(8.5rem, 45%), 1fr));
@@ -196,6 +224,8 @@ const jsonLd = {
     margin-top: 0.6rem;
     font-variant-numeric: tabular-nums;
   }
+  .fiyat-gruplari{display:grid;gap:.8rem;margin-top:1rem}.fiyat-gruplari>div{display:grid;grid-template-columns:minmax(8rem,.7fr) minmax(0,1.3fr);gap:1rem;align-items:center;padding:.75rem 0;border-top:1px solid color-mix(in oklab,var(--color-murekkep) 9%,transparent)}.fiyat-gruplari dt{display:grid;gap:.2rem;font-size:.82rem;font-weight:650}.fiyat-gruplari dt small{font:.62rem/1 var(--font-veri);font-weight:400;color:var(--color-kursun)}.fiyat-gruplari dd{text-align:right;font-size:clamp(.88rem,1.7vw,1.1rem);font-variant-numeric:tabular-nums}
+  @media(max-width:520px){.fiyat-gruplari>div{grid-template-columns:1fr}.fiyat-gruplari dd{text-align:left}}
 
   .not-satir {
     display: flex;

@@ -1,0 +1,16 @@
+{
+  "ortam": "gecici-yerel-D1-kopyasi",
+  "yol": "/rehber/istanbul-silivri",
+  "once": {
+    "durum": 200,
+    "onbellek": null,
+    "ilanVar": false
+  },
+  "gercekPanelPost": 200,
+  "sonra": {
+    "durum": 200,
+    "onbellek": null,
+    "ilanVar": true
+  },
+  "sonuc": "gecti"
+}

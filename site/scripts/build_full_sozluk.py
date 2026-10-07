@@ -45,6 +45,20 @@ from data.data_ultra_16 import ULTRA_TERIMLER_16
 from data.data_ultra_17 import ULTRA_TERIMLER_17
 from data.data_ultra_18 import ULTRA_TERIMLER_18
 from data.data_ultra_19 import ULTRA_TERIMLER_19
+from data.data_ultra_20 import ULTRA_TERIMLER_20
+from data.data_ultra_21 import ULTRA_TERIMLER_21
+from data.data_ultra_22 import ULTRA_TERIMLER_22
+from data.data_ultra_23 import ULTRA_TERIMLER_23
+from data.data_ultra_24 import ULTRA_TERIMLER_24
+from data.data_ultra_25 import ULTRA_TERIMLER_25
+from data.data_ultra_26 import ULTRA_TERIMLER_26
+from data.data_ultra_27 import ULTRA_TERIMLER_27
+from data.data_ultra_28 import ULTRA_TERIMLER_28
+from data.data_ultra_29 import ULTRA_TERIMLER_29
+from data.data_ultra_30 import ULTRA_TERIMLER_30
+from data.data_ultra_31 import ULTRA_TERIMLER_31
+from data.data_ultra_32 import ULTRA_TERIMLER_32
+from data.data_ultra_33 import ULTRA_TERIMLER_33
 
 def parse_existing_sozluk():
     pattern = re.compile(
@@ -112,7 +126,21 @@ def main():
         ULTRA_TERIMLER_16 +
         ULTRA_TERIMLER_17 +
         ULTRA_TERIMLER_18 +
-        ULTRA_TERIMLER_19
+        ULTRA_TERIMLER_19 +
+        ULTRA_TERIMLER_20 +
+        ULTRA_TERIMLER_21 +
+        ULTRA_TERIMLER_22 +
+        ULTRA_TERIMLER_23 +
+        ULTRA_TERIMLER_24 +
+        ULTRA_TERIMLER_25 +
+        ULTRA_TERIMLER_26 +
+        ULTRA_TERIMLER_27 +
+        ULTRA_TERIMLER_28 +
+        ULTRA_TERIMLER_29 +
+        ULTRA_TERIMLER_30 +
+        ULTRA_TERIMLER_31 +
+        ULTRA_TERIMLER_32 +
+        ULTRA_TERIMLER_33
     )
 
     # 1. Kaynak Python dosyalarındaki saf ve eksiksiz verileri öncelikli ekle
@@ -140,8 +168,10 @@ def main():
     }
 
     def kategori_tahmin(item):
-        if "kategori" in item and item["kategori"] in kategori_dosyalari:
-            return item["kategori"]
+        if "kategori" in item:
+            kat_norm = item["kategori"].replace(" ve ", " & ")
+            if kat_norm in kategori_dosyalari:
+                return kat_norm
         text = (
             item.get("terim", "") + " " +
             item.get("kisaTanim", "") + " " +

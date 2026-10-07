@@ -2,31 +2,42 @@
 import Temel from '../layouts/Temel.astro';
 import { KURUM, SOSYAL } from '../lib/site';
 import { icerik, whatsappBaglanti, haritaBaglanti } from '../lib/icerik';
+import { ilanBul } from '../lib/ilanlar';
 
 const { ekip, iletisim } = await icerik();
 const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.adresIlce} / ${iletisim.adresIl}`;
+const ilanParametresi = Astro.url.searchParams.get('ilan')?.trim().slice(0, 80) ?? '';
+const bagliIlan = ilanParametresi ? await ilanBul(ilanParametresi) : undefined;
+const formKaynagi = bagliIlan?.yol ?? '/iletisim';
+const hazirMesaj = bagliIlan
+  ? `“${bagliIlan.baslikTemiz}” ilanını yerinde görmek ve uygun randevu saatlerini öğrenmek istiyorum.`
+  : '';
 ---
 
 <Temel
   baslik="İletişim"
-  aciklama={`${KURUM.ad} ofisi Silivri'de. ${adresTam}. Telefon ${iletisim.telefon}. Randevu almadan da uğrayabilirsiniz.`}
+  aciklama={`${KURUM.ad} Silivri ofisi: ${adresTam}. Telefon ${iletisim.sabit}. ${iletisim.haftaCalismaGunleri} ${iletisim.haftaCalismaSaatleri}; pazar ${iletisim.pazarCalismaSaatleri.toLocaleLowerCase('tr-TR')}.`}
 >
   <section class="pt-28 pb-16 lg:pt-36 lg:pb-24">
     <div class="kab">
       <p class="etiket" data-belir>İletişim</p>
       <h1 class="baslik-buyuk mt-4 max-w-[15ch]" data-belir data-gecikme="0.05">
-        Kapımız açık, telefonumuz da
+        Görüşmenizi planlayalım
       </h1>
+      <p class="mt-5 max-w-[58ch] leading-relaxed text-metin-2" data-belir data-gecikme="0.1">
+        İlan, değerleme veya portföy yönetimi talebinizi iletin. Yerinde görüşmeler için
+        gelmeden önce randevu oluşturmanızı öneririz.
+      </p>
 
       <div class="mt-12 grid gap-10 lg:grid-cols-[1fr_1fr] lg:gap-16">
         <!-- Sol: kanallar -->
         <div>
           <ul class="kanal-liste" data-belir="sira">
             <li>
-              <a href={`tel:${iletisim.telefonHam}`} class="kanal">
-                <span class="etiket">Telefon</span>
-                <span class="kanal-deger font-veri">{iletisim.telefon}</span>
-                <span class="kanal-not">Hafta içi ve cumartesi 09:00 — 19:00</span>
+              <a href={`tel:${iletisim.sabitHam}`} class="kanal">
+                <span class="etiket">Ofis telefonu</span>
+                <span class="kanal-deger font-veri">{iletisim.sabit}</span>
+                <span class="kanal-not">{iletisim.haftaCalismaGunleri} · {iletisim.haftaCalismaSaatleri}</span>
               </a>
             </li>
             <li>
@@ -38,25 +49,14 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
               >
                 <span class="etiket">WhatsApp</span>
                 <span class="kanal-deger font-veri">{iletisim.telefon}</span>
-                <span class="kanal-not">En hızlı dönüş buradan olur</span>
+                <span class="kanal-not">{iletisim.yanitBeklentisi}</span>
               </a>
             </li>
-            {
-              iletisim.sabit && (
-                <li>
-                  <a href={`tel:${iletisim.sabitHam}`} class="kanal">
-                    <span class="etiket">Ofis sabit hattı</span>
-                    <span class="kanal-deger font-veri">{iletisim.sabit}</span>
-                    <span class="kanal-not">Ofiste kimse varsa buradan da ulaşabilirsiniz</span>
-                  </a>
-                </li>
-              )
-            }
             <li>
               <a href={`mailto:${iletisim.eposta}`} class="kanal">
                 <span class="etiket">E-posta</span>
                 <span class="kanal-deger font-veri text-[1.05rem]">{iletisim.eposta}</span>
-                <span class="kanal-not">Belge ve dosya göndermek için</span>
+                <span class="kanal-not">Belge ve ayrıntılı dosyalar için</span>
               </a>
             </li>
             <li>
@@ -72,7 +72,7 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
                   {iletisim.adresSatir2}<br />
                   {iletisim.adresIlce} / {iletisim.adresIl}
                 </span>
-                <span class="kanal-not">Haritada aç</span>
+                <span class="kanal-not">Pazar {iletisim.pazarCalismaSaatleri.toLocaleLowerCase('tr-TR')} · Haritada aç</span>
               </a>
             </li>
           </ul>
@@ -96,17 +96,34 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
         <!-- Sağ: form -->
         <div>
           <form class="form-kart" data-iletisim-form novalidate data-wa={iletisim.whatsapp}>
-            <h2 class="baslik-orta">Bize yazın</h2>
+            <h2 class="baslik-orta">{bagliIlan ? 'Yerinde görme talebi' : 'Bize yazın'}</h2>
             <p class="mt-2 text-sm text-metin-2">
-              Ne aradığınızı anlatın; portföyümüzde yoksa bulmaya çalışırız.
+              {bagliIlan
+                ? 'İlan bilgisi talebinize eklendi. Size uygun randevu saatini birlikte netleştirelim.'
+                : 'Talebinizi ve sizinle iletişim kurmamız için uygun saat aralığını yazın.'}
             </p>
+
+            {bagliIlan && (
+              <a href={bagliIlan.yol} class="ilan-baglami" aria-label={`${bagliIlan.baslikTemiz} ilanına dön`}>
+                {bagliIlan.kapak && <img src={bagliIlan.kapak} alt="" loading="lazy" decoding="async" />}
+                <span>
+                  <small>İLAN NO {bagliIlan.id}</small>
+                  <strong>{bagliIlan.baslikTemiz}</strong>
+                  <b>{bagliIlan.fiyatMetin}</b>
+                </span>
+              </a>
+            )}
+
+            <input type="hidden" name="kaynak" value={formKaynagi} />
+            <input type="hidden" name="ilan_id" value={bagliIlan?.id ?? ''} />
+            <input type="hidden" name="ilan_baslik" value={bagliIlan?.baslikTemiz ?? ''} />
 
             <div class="mt-6 grid gap-5">
               <div class="alan-ikili">
                 <label class="alan">
                   <span class="alan-etiket">Ad Soyad <span aria-hidden="true">*</span></span>
-                  <input type="text" name="ad" required autocomplete="name" placeholder="Adınız" />
-                  <span class="alan-hata" data-hata></span>
+                  <input id="iletisim-ad" type="text" name="ad" required autocomplete="name" placeholder="Adınız" aria-describedby="iletisim-ad-hata" />
+                  <span id="iletisim-ad-hata" class="alan-hata" data-hata></span>
                 </label>
                 <label class="alan">
                   <span class="alan-etiket">Telefon <span aria-hidden="true">*</span></span>
@@ -117,15 +134,17 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
                     autocomplete="tel"
                     inputmode="tel"
                     placeholder="05xx xxx xx xx"
+                    id="iletisim-telefon"
+                    aria-describedby="iletisim-telefon-hata"
                   />
-                  <span class="alan-hata" data-hata></span>
+                  <span id="iletisim-telefon-hata" class="alan-hata" data-hata></span>
                 </label>
               </div>
 
               <label class="alan">
                 <span class="alan-etiket">Konu</span>
                 <select name="konu">
-                  <option>Bir ilan hakkında</option>
+                  <option selected={Boolean(bagliIlan)}>Bir ilan hakkında</option>
                   <option>Mülkümü satmak / kiraya vermek istiyorum</option>
                   <option>Arsa – tarla yatırımı</option>
                   <option>Değerleme</option>
@@ -135,8 +154,16 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
 
               <label class="alan">
                 <span class="alan-etiket">Mesajınız <span aria-hidden="true">*</span></span>
-                <textarea name="mesaj" rows="5" required placeholder="Kısaca yazın…"></textarea>
-                <span class="alan-hata" data-hata></span>
+                <textarea
+                  name="mesaj"
+                  rows="5"
+                  required
+                  placeholder="Kısaca yazın…"
+                  set:text={hazirMesaj}
+                  id="iletisim-mesaj"
+                  aria-describedby="iletisim-mesaj-hata"
+                ></textarea>
+                <span id="iletisim-mesaj-hata" class="alan-hata" data-hata></span>
               </label>
 
               <div class="tuzak" aria-hidden="true">
@@ -165,10 +192,11 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
               <button type="submit" class="dugme dugme--kirmizi w-full !py-4" data-gonder>
                 Mesajı gönder
               </button>
+              <p class="sr-only" data-form-durum role="status" aria-live="polite"></p>
             </div>
           </form>
 
-          <div class="form-kart basari" data-basari hidden>
+          <div class="form-kart basari" data-basari role="status" tabindex="-1" hidden>
             <span class="basari-isaret" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M4 12.5l5 5L20 6.5"></path>
@@ -176,8 +204,7 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
             </span>
             <h2 class="baslik-orta mt-5">Mesajınız bize ulaştı</h2>
             <p class="mt-3 text-metin-2">
-              En kısa sürede döneceğiz. Acele ediyorsanız WhatsApp’tan yazmanız daha hızlı
-              olur.
+              Talebiniz kaydedildi. {iletisim.yanitBeklentisi}
             </p>
             <div class="mt-6 flex flex-col gap-2.5">
               <a
@@ -233,9 +260,11 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
     padding-left: 0.5rem;
   }
   .kanal-deger {
+    min-width: 0;
     font-size: 1.35rem;
     line-height: 1.25;
     font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
     transition: color 0.35s var(--ease-yumusak);
   }
   .kanal:hover .kanal-deger {
@@ -248,7 +277,7 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
   }
   .kanal-not {
     font-size: 0.8125rem;
-    color: var(--color-kursun);
+    color: var(--color-kursun-okunur);
   }
 
   /* Form stilleri değerleme sayfasıyla aynı dili konuşuyor */
@@ -258,6 +287,56 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
     border-radius: var(--radius-kart);
     padding: clamp(1.4rem, 3vw, 2.25rem);
     box-shadow: var(--shadow-kagit);
+  }
+  .ilan-baglami {
+    display: grid;
+    grid-template-columns: 5.25rem minmax(0, 1fr);
+    gap: 0.9rem;
+    align-items: stretch;
+    margin-top: 1.25rem;
+    padding: 0.65rem;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 11%, transparent);
+    border-radius: 8px;
+    background: var(--color-kagit);
+    transition: border-color 0.3s var(--ease-yumusak), transform 0.3s var(--ease-yumusak);
+  }
+  .ilan-baglami:hover {
+    border-color: color-mix(in oklab, var(--color-kirmizi) 55%, transparent);
+    transform: translateY(-1px);
+  }
+  .ilan-baglami img {
+    width: 5.25rem;
+    height: 100%;
+    min-height: 5rem;
+    border-radius: 5px;
+    object-fit: cover;
+  }
+  .ilan-baglami span {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
+  }
+  .ilan-baglami small {
+    font-family: var(--font-veri);
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    color: var(--color-kursun-okunur);
+  }
+  .ilan-baglami strong {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 0.875rem;
+    line-height: 1.35;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .ilan-baglami b {
+    font-size: 0.8125rem;
+    font-weight: 650;
+    color: var(--color-kirmizi-derin);
+    font-variant-numeric: tabular-nums;
   }
   .alan-ikili {
     display: grid;
@@ -279,7 +358,7 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
     font-weight: 600;
   }
   .alan-etiket span {
-    color: var(--color-kirmizi);
+    color: var(--color-kirmizi-derin);
   }
   .alan input,
   .alan select,
@@ -300,7 +379,6 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
   .alan input:focus,
   .alan select:focus,
   .alan textarea:focus {
-    outline: none;
     border-color: var(--color-murekkep);
     background: #fff;
   }
@@ -371,8 +449,9 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
     const hataKutusu = form.querySelector<HTMLElement>('[data-gonderim-hata]');
     const hataMetni = form.querySelector<HTMLElement>('[data-gonderim-hata-metni]');
     const waHata = form.querySelector<HTMLAnchorElement>('[data-wa-hata]');
+    const formDurum = form.querySelector<HTMLElement>('[data-form-durum]');
 
-    function alanDogrula(alan: HTMLInputElement | HTMLTextAreaElement): boolean {
+    function alanDogrula(alan: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement): boolean {
       const sarmal = alan.closest<HTMLElement>('.alan');
       const gecerli =
         alan.checkValidity() &&
@@ -380,9 +459,14 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
 
       if (sarmal) {
         const hataAlani = sarmal.querySelector<HTMLElement>('[data-hata]');
-        if (gecerli) sarmal.removeAttribute('data-gecersiz');
+        if (gecerli) {
+          sarmal.removeAttribute('data-gecersiz');
+          alan.removeAttribute('aria-invalid');
+          if (hataAlani) hataAlani.textContent = '';
+        }
         else {
           sarmal.setAttribute('data-gecersiz', 'evet');
+          alan.setAttribute('aria-invalid', 'true');
           if (hataAlani) {
             hataAlani.textContent =
               alan.name === 'telefon'
@@ -394,11 +478,18 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
       return gecerli;
     }
 
-    form.querySelectorAll<HTMLInputElement>('input, textarea').forEach((alan) => {
+    form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input, select, textarea').forEach((alan) => {
       alan.addEventListener('blur', () => {
         if (alan.name !== 'website') alanDogrula(alan);
       });
-      alan.addEventListener('input', () => alan.closest('.alan')?.removeAttribute('data-gecersiz'));
+      const hatayiTemizle = () => {
+        alan.closest('.alan')?.removeAttribute('data-gecersiz');
+        alan.removeAttribute('aria-invalid');
+        const hataAlani = alan.closest('.alan')?.querySelector<HTMLElement>('[data-hata]');
+        if (hataAlani) hataAlani.textContent = '';
+      };
+      alan.addEventListener('input', hatayiTemizle);
+      alan.addEventListener('change', hatayiTemizle);
     });
 
     form.addEventListener('submit', async (olay) => {
@@ -408,7 +499,8 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
         form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[required]')
       );
       if (!zorunlular.map(alanDogrula).every(Boolean)) {
-        form.querySelector<HTMLElement>('[data-gecersiz] input, [data-gecersiz] textarea')?.focus();
+        if (formDurum) formDurum.textContent = 'Formda düzeltilmesi gereken alanlar var.';
+        form.querySelector<HTMLElement>('[data-gecersiz] input, [data-gecersiz] select, [data-gecersiz] textarea')?.focus();
         return;
       }
 
@@ -419,15 +511,20 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
           `Ad: ${veri.ad}`,
           `Telefon: ${veri.telefon}`,
           `Konu: ${veri.konu}`,
+          veri.ilan_baslik ? `İlan: ${veri.ilan_baslik}` : '',
+          veri.ilan_id ? `İlan no: ${veri.ilan_id}` : '',
+          veri.ilan_id && veri.kaynak ? `Bağlantı: ${location.origin}${veri.kaynak}` : '',
           '',
           veri.mesaj,
-        ].join('\n');
+        ].filter((satir, sira, tumu) => satir || sira === tumu.length - 2).join('\n');
         const waAdresi = `https://wa.me/${waNumara}?text=${encodeURIComponent(metin)}`;
         waBaglanti.href = waAdresi;
         if (waHata) waHata.href = waAdresi;
       }
 
       if (hataKutusu) hataKutusu.hidden = true;
+      form.setAttribute('aria-busy', 'true');
+      if (formDurum) formDurum.textContent = 'Mesajınız gönderiliyor.';
       gonderDugme.disabled = true;
       gonderDugme.textContent = 'Gönderiliyor…';
 
@@ -438,19 +535,31 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
         const yanit = await fetch('/api/talep', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...veri, tur: 'iletisim', kaynak: location.pathname }),
+          body: JSON.stringify({ ...veri, tur: 'iletisim', kaynak: veri.kaynak || location.pathname }),
         });
 
         const sonuc = (await yanit.json().catch(() => null)) as
-          | { tamam?: boolean; hata?: string }
+          | { tamam?: boolean; hata?: string; alan?: string }
           | null;
 
         if (!yanit.ok || !sonuc?.tamam) {
           if (sonuc?.hata) kullaniciHatasi = sonuc.hata;
+          if (sonuc?.alan) {
+            const alan = form.elements.namedItem(sonuc.alan);
+            if (alan instanceof HTMLElement) {
+              const sarmal = alan.closest<HTMLElement>('.alan');
+              sarmal?.setAttribute('data-gecersiz', 'evet');
+              alan.setAttribute('aria-invalid', 'true');
+              const alanHatasi = sarmal?.querySelector<HTMLElement>('[data-hata]');
+              if (alanHatasi) alanHatasi.textContent = kullaniciHatasi;
+            }
+          }
           throw new Error('Talep kaydedilmedi.');
         }
       } catch {
         if (hataMetni) hataMetni.textContent = kullaniciHatasi;
+        form.removeAttribute('aria-busy');
+        if (formDurum) formDurum.textContent = 'Mesaj gönderilemedi. Hata açıklaması gösterildi.';
         if (hataKutusu) {
           hataKutusu.hidden = false;
           hataKutusu.focus({ preventScroll: true });
@@ -462,7 +571,9 @@ const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.ad
       }
 
       form.hidden = true;
+      form.removeAttribute('aria-busy');
       basari.hidden = false;
+      basari.focus({ preventScroll: true });
       basari.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   }

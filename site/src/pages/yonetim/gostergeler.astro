@@ -1,0 +1,96 @@
+---
+import Panel from '../../layouts/Panel.astro';
+import { paneleGiris } from '../../lib/panel/yetki';
+import { semayiKur } from '../../lib/senkron/depo';
+import { gostergeDonemi, isletmeGostergeleriniAl } from '../../lib/isletme-gostergeleri';
+import { env } from 'cloudflare:workers';
+import { isSonucuKaydiEtkin,isSonucuGostergeleriniAl } from '../../lib/talep-is-sonucu';
+
+const giris = await paneleGiris(Astro.request);
+if ('yanit' in giris) return giris.yanit;
+if (!['GET','HEAD'].includes(Astro.request.method)) return new Response('Bu ekran salt okunurdur.', {status:405,headers:{Allow:'GET, HEAD'}});
+let donem: ReturnType<typeof gostergeDonemi>;
+try { donem = gostergeDonemi(Astro.url.searchParams.get('hafta')); }
+catch { return new Response('Geçerli bir tarih seçin; ileri tarihler raporlanamaz.', {status:400}); }
+let rapor: Awaited<ReturnType<typeof isletmeGostergeleriniAl>> | null = null;
+let isRaporu: Awaited<ReturnType<typeof isSonucuGostergeleriniAl>> | null = null;
+const isSonuclariEtkin=isSonucuKaydiEtkin(env,Astro.url.href);
+try {
+  await semayiKur(env.VT);
+  rapor = await isletmeGostergeleriniAl(env.VT, donem);
+  if (isSonuclariEtkin) isRaporu=await isSonucuGostergeleriniAl(env.VT,donem.baslangicUTC,donem.bitisUTC);
+} catch {
+  rapor=null;
+  Astro.response.status = 503;
+  console.error('İşletme göstergeleri okunamadı.');
+}
+const tarih = (gun: string) => new Date(`${gun}T12:00:00Z`).toLocaleDateString('tr-TR', {day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});
+const gunAdi = (gun: string) => new Date(`${gun}T12:00:00Z`).toLocaleDateString('tr-TR', {weekday:'short',timeZone:'UTC'});
+const sayi = (n: number) => n.toLocaleString('tr-TR');
+const durumAdlari: Record<string,string> = {yeni:'Yeni',islemde:'İşlemde',kapandi:'Kapandı'};
+const enCokTalep = Math.max(1, ...(rapor?.gunler.map(g => g.talep ?? 0) ?? []));
+const kontrolZamani = new Date(donem.simdiUTC).toLocaleString('tr-TR', {timeZone:'Europe/Istanbul'});
+---
+<Panel baslik="İşletme göstergeleri" eposta={giris.kimlik.eposta} ozet="Mevcut kayıtların haftalık özeti ve güncel iş yükü">
+  <form class="donem" method="GET">
+    <div><label for="hafta">Hafta içinden bir tarih seç</label><input id="hafta" name="hafta" type="date" value={donem.secilen} min="2000-01-01" max={donem.bugunTR} required/></div>
+    <button class="pd" type="submit">Haftayı göster</button>
+    <nav aria-label="Rapor haftası">
+      {donem.onceki && <a href={`?hafta=${donem.onceki}`}>← Önceki hafta</a>}
+      {donem.sonraki && <a href={`?hafta=${donem.sonraki}`}>Sonraki hafta →</a>}
+      {donem.sonraki && <a href="/yonetim/gostergeler">Bu hafta</a>}
+    </nav>
+  </form>
+  {!rapor ? <div class="kutu hata" role="alert"><h2>Rapor şu anda alınamıyor</h2><p>Veri kaynağına erişilemedi. Sayılar sıfır olarak gösterilmedi; sayfayı yeniden açın.</p></div> : <>
+    <section aria-labelledby="haftalik-baslik">
+      <div class="bolum-bas"><div><h2 id="haftalik-baslik">{tarih(donem.hafta)} – {tarih(donem.sonGun)}</h2><p>Talepler Türkiye saatiyle, pazartesi 00.00’dan itibaren.</p></div><span class="etiket">{donem.devamEdiyor ? 'Hafta devam ediyor' : 'Geçmiş hafta'}</span></div>
+      <div class="kartlar">
+        <article class="kutu kart"><h3>Yeni oluşan talep</h3><strong>{sayi(rapor.toplamTalep)}</strong><p>Bu hafta oluşturulan kayıtlar</p></article>
+        {['yeni','islemde','kapandi'].map(durum => <article class="kutu kart"><h3>{durumAdlari[durum]}</h3><strong>{sayi(rapor!.durumlar.find(s => s.durum===durum)?.adet ?? 0)}</strong><p>Bu haftanın taleplerinin güncel durumu</p></article>)}
+      </div>
+      {rapor.durumlar.some(s => !durumAdlari[s.durum]) && <p class="not">Toplamda eski veya bilinmeyen durumdaki kayıtlar da bulunuyor; bu kayıtlar durum kartlarına eklenmedi.</p>}
+      <p class="not">“Kapandı”, talebin kapanışıdır; satış veya kiralama sayısı değildir. Geçmiş haftaların durumları sonraki işlemlerle değişebilir.</p>
+      <div class="ikili">
+        <article class="kutu detay"><h3>Günlük talep akışı <small>Türkiye saati</small></h3>
+          <div class="cubuklar" role="list" aria-label="Günlük talep sayıları">
+            {rapor.gunler.map(g => <div class="cubuk" role="listitem" aria-label={`${tarih(g.gun)}: ${g.talep===null ? 'Henüz başlamadı' : `${g.talep} talep`}`}><strong>{g.talep===null ? '—' : g.talep}</strong><div class="cubuk-iz"><span style={`height:${g.talep ? Math.max(4, g.talep/enCokTalep*100) : 0}%`}></span></div><span>{gunAdi(g.gun)}</span></div>)}
+          </div>
+          {rapor.toplamTalep===0 && <p class="not">Bu dönemde kayıtlı talep yok.</p>}
+        </article>
+        <article class="kutu detay"><h3>Talebin geldiği sayfa</h3><p class="not">Kayıtta belirtilen kaynak sayfa. Reklam, sosyal medya veya arama motoru atfı yapılmaz.</p>
+          {rapor.kaynaklar.length ? <ul class="satirlar">{rapor.kaynaklar.map(k => <li><span>{k.kaynak}</span><strong>{sayi(k.adet)}</strong></li>)}</ul> : <p class="bos">Bu hafta için kaynak kaydı yok.</p>}
+        </article>
+      </div>
+      <article class="kutu detay goruntulenme"><div><h3>İlan görüntülenme sayacı <small>UTC takvim haftası</small></h3><p class="not">{tarih(donem.hafta)} – {tarih(donem.sonGun)} · Her UTC günü Türkiye saatiyle 03.00’te başlar. Sayfa açılışları sayılır; tekil ziyaretçi değildir. Yenilemeler ve otomatik istekler dahil olabilir.</p></div><strong class="buyuk">{sayi(rapor.goruntulenme)}</strong>
+        <ul class="gun-sayilari">{rapor.gunler.map(g => <li><span>{gunAdi(g.gun)}</span><strong>{g.goruntulenme===null ? '—' : sayi(g.goruntulenme)}</strong></li>)}</ul>
+        <p class="not">Sayaç kayıtları gösterilir. Talep haftasıyla saat sınırları farklı olduğundan dönüşüm oranı hesaplanmaz.</p>
+      </article>
+    </section>
+    {isRaporu && <section aria-labelledby="is-sonucu-baslik"><div class="bolum-bas"><div><h2 id="is-sonucu-baslik">Gerçek iş sonuçları</h2><p>Seçili Türkiye haftasında oluşan aynı talep kümesi · {isRaporu.kayitli}/{isRaporu.toplam} talepte iş sonucu kaydı var</p></div></div>
+      <div class="kartlar">
+        {[[isRaporu.yanitli,'İlk yanıt kaydedilen'],[isRaporu.nitelikli,'Nitelikli talep'],[isRaporu.planlanan,'Planlı randevulu talep'],[isRaporu.randevulu,'Randevusu gerçekleşen talep'],[isRaporu.satis,'Satış teyidi olan talep'],[isRaporu.kiralama,'Kiralama teyidi olan talep']].map(([adet,ad])=><article class="kutu kart"><h3>{ad}</h3><strong>{sayi(Number(adet))}</strong><p>Yalnız teyitli kayıtlar</p></article>)}
+      </div>
+      <article class="kutu detay"><h3>İlk yanıt ve kayıt kapsamı</h3><p class="not">İlk yanıt ortalaması: {isRaporu.ortalama_yanit_dakika===null ? 'Veri oluşuyor' : `${sayi(Math.round(isRaporu.ortalama_yanit_dakika))} dakika (${isRaporu.yanitli} talep)`}. Kayıtlı ilk yanıt zamanlarından hesaplanır; yanıtsız ve bilinmeyen kayıtlar ortalamaya dahil değildir.</p>
+        <ul class="satirlar">{[[isRaporu.nitelik_orani,'Nitelikli talep oranı'],[isRaporu.randevu_orani,'Gerçek randevulu talep oranı'],[isRaporu.islem_orani,'Gerçek işlem teyidi olan talep oranı']].map(([oran,ad])=><li><span>{ad}</span><strong>{oran===null?'Eksik teyit / veri oluşuyor':`%${Number(oran).toLocaleString('tr-TR',{maximumFractionDigits:1})}`}</strong></li>)}</ul>
+        <p class="not">Payda aynı haftada oluşan {isRaporu.toplam} taleptir. İlgili alan bütün bu taleplerde teyit edilmeden oran verilmez. Eski taleplerin bu hafta gerçekleşen işlemleri bu haftanın yeni talep oranına eklenmez. İş sonucu düzeltmeleri geçmiş hafta raporunu değiştirebilir.</p>
+      </article>
+      <article class="kutu detay"><h3>Şu an yanıt bekleyen açık talepler · tüm haftalar</h3><p>{isRaporu.yanitsiz} talep: yanıt verilmediği teyitli. {isRaporu.yaniti_bilinmeyen} talep: yanıt durumu bilinmiyor.</p><p class="not">Bilinmeyen eski kayıtlar otomatik olarak yanıtsız kabul edilmez.</p></article>
+    </section>}
+    <section aria-labelledby="takip-baslik">
+      <div class="bolum-bas"><div><h2 id="takip-baslik">Şu an ilgilenilecek işler</h2><p>Tüm haftalardan açık talepler · {kontrolZamani} Türkiye saati</p></div><a href="/yonetim/talepler">Talepleri aç →</a></div>
+      <div class="kartlar takip-kartlar">
+        {[[rapor.takip.acik,'Açık talep'],[rapor.takip.sahipsiz,'Sorumlu atanmamış'],[rapor.takip.plansiz,'Takip tarihi yok'],[rapor.takip.geciken,'Takip tarihi geçmiş'],[rapor.takip.eski_yeni,'24 saati geçen yeni talep']].map(([adet,ad]) => <article class="kutu kart"><h3>{ad}</h3><strong>{sayi(Number(adet))}</strong></article>)}
+      </div><p class="not">Bir talep birden fazla uyarı grubunda bulunabilir. “Yeni”, yanıt verilmediği anlamına gelmez; {isRaporu ? 'yanıt durumu yalnız gerçek iş sonucu kaydıyla belirlenir.' : 'yanıt zamanı henüz kaydedilmiyor.'}</p>
+      <article class="kutu detay"><h3>Danışmanların açık işleri</h3>
+        {rapor.sorumlular.length ? <div class="tablo-kapsayici"><table><thead><tr><th scope="col">Sorumlu</th><th scope="col">Açık talep</th><th scope="col">Takibi geciken</th></tr></thead><tbody>{rapor.sorumlular.map(s => <tr><th scope="row">{s.ad ?? 'Sorumlu atanmamış'}</th><td>{sayi(s.adet)}</td><td>{sayi(s.geciken)}</td></tr>)}</tbody></table></div> : <p class="bos">Açık talep bulunmuyor.</p>}
+      </article>
+    </section>
+    <section class="kutu detay" aria-labelledby="olculmeyen-baslik"><h2 id="olculmeyen-baslik">Henüz ölçülmeyen sonuçlar</h2><p class="not">Bu alanlar için güvenilir olay kaydı bulunmuyor. Boşluklar sıfır başarı olarak değerlendirilmez.</p><ul class="eksikler">{(isRaporu ? ['Telefon ve WhatsApp tıklamaları'] : ['Telefon ve WhatsApp tıklamaları','Nitelikli talep','İlk yanıt süresi','Yanıtsız talep','Gerçek randevu ve görüşme','Doğrulanmış satış ve kiralama']).map(ad => <li><span>{ad}</span><small>Henüz ölçülmüyor</small></li>)}</ul></section>
+    <p class="not dipnot">Bu rapor mevcut kayıtlardan hazırlanır. Silinen kayıtlar rapordan düşer. Yeni ziyaretçi takibi, çerez veya müşteri profili oluşturmaz.</p>
+  </>}
+</Panel>
+<style>
+  h2{font-size:1.12rem;margin:0}h3{font-size:.92rem;margin:0}h3 small{display:block;font-size:.75rem;font-weight:400;color:#64717e;margin-top:.3rem}.donem{display:flex;gap:1rem;align-items:end;flex-wrap:wrap;margin-bottom:1.8rem}.donem label{display:block;font-size:.8rem;margin-bottom:.35rem}.donem input{border:1px solid #ccd5dd;border-radius:6px;padding:.6rem;background:white;max-width:100%;font:inherit}.donem nav{display:flex;gap:1rem;flex-wrap:wrap;align-self:center;font-size:.85rem}a{color:#925023}section{margin-bottom:2rem}.bolum-bas{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}.bolum-bas p,.not{font-size:.82rem;color:#64717e;line-height:1.6;margin:.45rem 0 .9rem}.etiket{background:#e8edf0;padding:.4rem .65rem;border-radius:20px;font-size:.75rem;white-space:nowrap}.kartlar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}.kart{padding:1rem;min-width:0}.kart h3{color:#52616d;font-weight:500}.kart strong,.buyuk{display:block;font-size:2rem;font-variant-numeric:tabular-nums;font-weight:600;margin:.6rem 0}.kart p{font-size:.73rem;color:#657381;line-height:1.5;margin:0}.ikili{display:grid;gap:1rem;margin-top:1rem}.detay{padding:1.25rem;margin-top:1rem}.cubuklar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.5rem;margin-top:1rem}.cubuk{text-align:center;font-size:.75rem;color:#536471}.cubuk strong{display:block;margin-bottom:.3rem;color:#243441}.cubuk-iz{height:100px;position:relative;background:#f2f5f7;border-radius:4px;margin-bottom:.5rem;overflow:hidden}.cubuk-iz span{position:absolute;inset:auto 0 0;background:#647c89;border-radius:4px}.satirlar{list-style:none;padding:0;margin:1rem 0 0}.satirlar li{display:flex;justify-content:space-between;gap:.6rem;padding:.7rem 0;border-bottom:1px solid #edf0f3;font-size:.9rem}.gun-sayilari{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));list-style:none;padding:0;gap:.5rem;grid-column:1/-1}.gun-sayilari li{background:#f3f5f7;border-radius:5px;padding:.6rem .2rem;text-align:center;font-size:.75rem}.gun-sayilari strong{display:block;margin-top:.3rem}.goruntulenme>.not{grid-column:1/-1}.bos{color:#657381;font-size:.9rem;margin:1rem 0}.tablo-kapsayici{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:.7rem}th,td{padding:.8rem .5rem;border-bottom:1px solid #e8edf0;text-align:left}thead th{color:#64717e;font-weight:500}tbody th{font-weight:500}.eksikler{display:grid;list-style:none;padding:0;margin:0;gap:.75rem}.eksikler li{display:flex;justify-content:space-between;gap:.5rem;flex-wrap:wrap;font-size:.85rem;padding:.75rem;background:#f5f7f8;border-radius:5px}.eksikler small{color:#64717e}.hata{padding:1.5rem}.dipnot{margin-bottom:0}
+  @media(min-width:700px){.kartlar{grid-template-columns:repeat(4,minmax(0,1fr))}.ikili{grid-template-columns:1.2fr 1fr}.ikili .detay{margin-top:0}.goruntulenme{display:grid;grid-template-columns:1fr auto;gap:.5rem 1.5rem}.eksikler{grid-template-columns:repeat(2,minmax(0,1fr))}.takip-kartlar{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media(min-width:1200px){.takip-kartlar{grid-template-columns:repeat(5,minmax(0,1fr))}}
+</style>

@@ -1,13 +1,19 @@
 ---
 import Panel from '../../layouts/Panel.astro';
-import { paneleGiris } from '../../lib/panel/yetki';
+import { adminProfiliniBul, paneleGiris } from '../../lib/panel/yetki';
 import { env } from 'cloudflare:workers';
 import { icerik, icerikOnbellegiTemizle } from '../../lib/icerik';
+import { semayiKur } from '../../lib/senkron/depo';
+import { islemKaydiKomutu } from '../../lib/panel/islem-gecmisi';
+import { rolYetkisiGerekli, rolYetkisiVar } from '../../lib/panel/roller';
 
 const giris = await paneleGiris(Astro.request);
 if ('yanit' in giris) return giris.yanit;
 
 const vt = env.VT as D1Database;
+await semayiKur(vt);
+const admin = adminProfiliniBul(giris.kimlik.eposta);
+const ayarYazabilir = rolYetkisiVar(admin?.rol ?? null, 'ayar-yonet');
 let bildirim: { tur: 'basari' | 'hata'; metin: string } | null = null;
 
 /** Panelden düzenlenebilen ayarlar — anahtar, etiket, açıklama. */
@@ -22,12 +28,24 @@ const ALANLAR = [
   { anahtar: 'adresSatir2', etiket: 'Adres — 2. satır', ipucu: '' },
   { anahtar: 'adresIlce', etiket: 'İlçe', ipucu: '' },
   { anahtar: 'adresIl', etiket: 'İl', ipucu: '' },
+  { anahtar: 'haftaCalismaGunleri', etiket: 'Çalışma günleri', ipucu: 'Örn. Pazartesi — Cumartesi' },
+  { anahtar: 'haftaCalismaSaatleri', etiket: 'Çalışma saatleri', ipucu: 'Örn. 09:00 — 19:00' },
+  { anahtar: 'pazarCalismaSaatleri', etiket: 'Pazar', ipucu: 'Örn. Randevuyla veya Kapalı' },
+  { anahtar: 'yanitBeklentisi', etiket: 'Mesaj yanıt notu', ipucu: 'İletişim ve değerleme formlarında görünür' },
 ] as const;
 
 if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
   try {
+    rolYetkisiGerekli(admin?.rol ?? null, 'ayar-yonet');
     const suAn = new Date().toISOString();
+    const oncekiSatirlar = await vt.prepare(`SELECT anahtar, deger FROM ayarlar`).all<{ anahtar: string; deger: string }>();
+    const oncekiHarita = new Map((oncekiSatirlar.results ?? []).map((satir) => [satir.anahtar, satir.deger]));
+    const degisenler = ALANLAR.map((alan) => ({
+      anahtar: alan.anahtar,
+      onceki: oncekiHarita.get(alan.anahtar) ?? '',
+      sonraki: String(form.get(alan.anahtar) ?? '').trim().slice(0, 300),
+    })).filter((alan) => alan.onceki !== alan.sonraki);
     const yazmalar = ALANLAR.map((a) =>
       vt
         .prepare(
@@ -36,7 +54,16 @@ if (Astro.request.method === 'POST') {
         )
         .bind(a.anahtar, String(form.get(a.anahtar) ?? '').trim().slice(0, 300), suAn)
     );
-    await vt.batch(yazmalar);
+    await vt.batch([
+      ...yazmalar,
+      islemKaydiKomutu(vt, giris.kimlik, {
+        eylem: 'ayarlar-guncellendi',
+        varlikTuru: 'ayarlar',
+        ozet: `${degisenler.length} genel ayar değiştirildi.`,
+        onceki: Object.fromEntries(degisenler.map((alan) => [alan.anahtar, alan.onceki])),
+        sonraki: Object.fromEntries(degisenler.map((alan) => [alan.anahtar, alan.sonraki])),
+      }),
+    ]);
     icerikOnbellegiTemizle();
     bildirim = { tur: 'basari', metin: 'Ayarlar kaydedildi. Site en geç bir dakikada güncellenir.' };
   } catch (hata) {
@@ -82,7 +109,8 @@ const guncelleme = await vt
     </div>
 
     <div class="ayar-alt">
-      <button type="submit" class="pd pd--kirmizi">Kaydet</button>
+      <button type="submit" class="pd pd--kirmizi" disabled={!ayarYazabilir}>Kaydet</button>
+      {!ayarYazabilir && <span class="veri-sayi">Değişiklik için ana admin yetkisi gerekir.</span>}
       {
         guncelleme?.son && (
           <span class="veri-sayi son-guncelleme">
@@ -111,7 +139,6 @@ const guncelleme = await vt
         <li><strong>Hizmet açıklamaları</strong> — ana sayfa ve hakkımızda bölümlerindeki altı hizmet</li>
         <li><strong>Bölge rehberi metinleri</strong> — her ilçenin tanıtım paragrafı ve notları</li>
         <li><strong>Kurum tanıtımı</strong> — hakkımızda sayfasındaki uzun metinler</li>
-        <li><strong>Çalışma saatleri</strong></li>
       </ul>
     </div>
   </section>

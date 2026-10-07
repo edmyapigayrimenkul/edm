@@ -1,0 +1,121 @@
+---
+import Panel from '../../../layouts/Panel.astro';
+import { paneleGiris } from '../../../lib/panel/yetki';
+import { env } from 'cloudflare:workers';
+import { icerik } from '../../../lib/icerik';
+import { baslikTemizle } from '../../../lib/ilanlar';
+import { kaynakOzellikleriniUygula, kaynakSunumDuzeltmesi } from '../../../lib/ilan-butunlugu';
+import { alanOzellikleriniBirlestir } from '../../../lib/ilan-alanlari';
+import { duzenlemeleriGetir, ilanSatiri, semayiKur, type SatirIlan } from '../../../lib/senkron/depo';
+import { portalAlanEslemeTablosu, ucPortalOnizlemesi, type PortalIlanGirdisi } from '../../../lib/portal-aktarim';
+
+const giris = await paneleGiris(Astro.request);
+if ('yanit' in giris) return giris.yanit;
+
+const vt = env.VT as D1Database;
+await semayiKur(vt);
+const id = Astro.params.id!;
+const satir = await ilanSatiri(vt, id);
+if (!satir) return Astro.rewrite('/404');
+
+const { ekip, iletisim } = await icerik();
+const duzenleme = (await duzenlemeleriGetir(vt)).get(id);
+const guvenliJson = <T,>(ham: string | null | undefined, varsayilan: T): T => {
+  try { return ham ? JSON.parse(ham) as T : varsayilan; } catch { return varsayilan; }
+};
+const temel = guvenliJson<Partial<SatirIlan>>(duzenleme?.temel, {});
+const kaynakDuzeltme = kaynakSunumDuzeltmesi(satir.id);
+const etkin: SatirIlan = {
+  ...satir,
+  ...temel,
+  baslik: duzenleme?.baslik ?? temel.baslik ?? kaynakDuzeltme?.baslik ?? satir.baslik,
+  aciklama: duzenleme?.aciklama ?? temel.aciklama ?? kaynakDuzeltme?.aciklama ?? satir.aciklama,
+  id: satir.id,
+  kaynak: satir.kaynak,
+  kaynak_url: satir.kaynak_url,
+};
+const hamOzellikler = guvenliJson<Record<string, string>>(etkin.ozellikler, {});
+const duzOzellikler = guvenliJson<Record<string, string>>(duzenleme?.ozellikler, {});
+const ozellikler = alanOzellikleriniBirlestir({
+  tipGrup: etkin.tip_grup,
+  m2: etkin.m2,
+  ozellikler: temel.ozellikler != null
+    ? guvenliJson<Record<string, string>>(temel.ozellikler, {})
+    : kaynakOzellikleriniUygula(hamOzellikler, kaynakDuzeltme),
+}, duzOzellikler, Boolean(duzenleme?.temel && duzenleme?.ozellikler));
+const donanim = duzenleme?.donanim == null
+  ? guvenliJson<string[]>(etkin.donanim, [])
+  : guvenliJson<string[]>(duzenleme.donanim, []);
+const yuklenen = await vt.prepare(`SELECT anahtar FROM ilan_foto WHERE ilan_id = ? ORDER BY sira ASC`).bind(id).all<{ anahtar: string }>();
+const portalGorselleri = etkin.hepsiemlak_gorseller
+  ? guvenliJson<string[]>(etkin.hepsiemlak_gorseller, [])
+  : guvenliJson<string[]>(etkin.gorseller, []);
+const gorseller = [
+  ...(yuklenen.results ?? []).map((foto) => `/g/${foto.anahtar}`),
+  ...portalGorselleri,
+];
+const danisman = ekip.find((kisi) => kisi.slug === etkin.danisman_slug || kisi.emlakjetSlug === etkin.danisman_slug) ?? null;
+const videoSatiri = await vt.prepare(`SELECT video_anahtar, poster_anahtar, mime, sure_saniye, boyut FROM ilan_video WHERE ilan_id = ?`).bind(id)
+  .first<{ video_anahtar: string; poster_anahtar: string; mime: string; sure_saniye: number; boyut: number }>().catch(() => null);
+const girdi: PortalIlanGirdisi = {
+  id: etkin.id,
+  baslik: baslikTemizle(etkin.baslik),
+  aciklama: etkin.aciklama,
+  fiyat: etkin.fiyat,
+  paraBirimi: etkin.para_birimi || 'TRY',
+  islem: etkin.islem,
+  tipGrup: etkin.tip_grup,
+  tip: etkin.tip,
+  oda: etkin.oda,
+  m2: etkin.m2,
+  il: etkin.il,
+  ilce: etkin.ilce,
+  mahalle: etkin.mahalle,
+  ozellikler,
+  donanim,
+  gorseller,
+  video: videoSatiri ? { url: `/g/${videoSatiri.video_anahtar}`, poster: `/g/${videoSatiri.poster_anahtar}`, mime: videoSatiri.mime, sure: videoSatiri.sure_saniye, boyut: videoSatiri.boyut } : null,
+  danisman: danisman ? { ad: danisman.ad, telefon: danisman.telefon ?? iletisim.telefon } : null,
+  ofisTelefonu: iletisim.telefon,
+};
+const onizlemeler = ucPortalOnizlemesi(girdi);
+const esleme = portalAlanEslemeTablosu(etkin.tip_grup, etkin.tip);
+const json = JSON.stringify({ sozlesmeSurumu: '2026-09-14', ilan: id, portallar: onizlemeler }, null, 2);
+---
+
+<Panel baslik="Portal Aktarım Önizlemesi" eposta={giris.kimlik.eposta} ozet={`No: ${id} · ${girdi.baslik}`}>
+  <div slot="eylem" class="flex flex-wrap items-center gap-2.5">
+    <a href={`/yonetim/ilan-duzenle/${encodeURIComponent(id)}`} class="pd pd--sade">← İlanı düzenle</a>
+    <a href={`/ilan/${encodeURIComponent(id)}`} target="_blank" rel="noopener" class="pd pd--sade">Sitede gör ↗</a>
+  </div>
+
+  <div class="sozlesme-notu"><strong>Ön kontrol sözleşmesi</strong><p>Bu ekran portalların alan adlarını, eksikleri ve açıklamaya taşınacak verileri kayıp olmadan gösterir. Portal hesabına otomatik gönderim yapmaz.</p></div>
+
+  <div class="portal-izgara">
+    {onizlemeler.map((onizleme) => <article class="portal-kart">
+      <header><div><span>{onizleme.portal.toUpperCase()}</span><h2>{onizleme.portalAdi}</h2></div><b class:list={[onizleme.eksikler.length ? 'hazir-degil' : 'hazir']}>{onizleme.eksikler.length ? `${onizleme.eksikler.length} eksik` : 'Aktarıma hazır'}</b></header>
+      <p class="kategori-yolu">{onizleme.kategoriYolu}</p>
+      <dl>
+        <div><dt>Alan</dt><dd>{onizleme.alanlar.length}</dd></div>
+        <div><dt>Nitelik</dt><dd>{onizleme.donanim.length}</dd></div>
+        <div><dt>Fotoğraf</dt><dd>{onizleme.gorseller.length}</dd></div>
+        <div><dt>Video</dt><dd>{onizleme.medya.video ? 'Var' : '—'}</dd></div>
+        <div><dt>Veri kaybı</dt><dd>{onizleme.veriKaybi.length}</dd></div>
+      </dl>
+      <div class="iletisim"><span>İletişim</span><strong>{[onizleme.iletisim.danisman, onizleme.iletisim.ofis].filter(Boolean).join(' · ') || 'Portal varsayılanı'}</strong></div>
+      <div class="koordinat"><span>Kesin konum</span><strong>{onizleme.kesinKonum ? 'İzinli · aktarılacak' : 'Aktarılmayacak'}</strong></div>
+      {onizleme.eksikler.length > 0 && <section><h3>Eksikler</h3><ul>{onizleme.eksikler.map((eksik) => <li>{eksik}</li>)}</ul></section>}
+      {onizleme.uyarilar.length > 0 && <section><h3>Kontrol notları</h3><ul>{onizleme.uyarilar.map((uyari) => <li>{uyari}</li>)}</ul></section>}
+      <details><summary>Aktarılacak alanları göster</summary><table><thead><tr><th>EDM</th><th>Portal alanı</th><th>Değer</th></tr></thead><tbody>{onizleme.alanlar.map((alan) => <tr><td>{alan.edm}</td><td>{alan.portal}</td><td>{alan.deger}</td></tr>)}</tbody></table></details>
+    </article>)}
+  </div>
+
+  <section class="esleme-karti"><header><span>ALAN SÖZLÜĞÜ</span><h2>{esleme.length} kategori alanının dönüşüm tablosu</h2></header><div class="tablo-kaydir"><table><thead><tr><th>EDM alanı</th><th>Sahibinden</th><th>Emlakjet</th><th>Hepsiemlak</th></tr></thead><tbody>{esleme.map((satir) => <tr><th>{satir.edm}</th><td>{satir.sahibinden}</td><td>{satir.emlakjet}</td><td>{satir.hepsiemlak}</td></tr>)}</tbody></table></div></section>
+
+  <details class="json-karti"><summary>Makine tarafından okunabilir JSON sözleşmesini göster</summary><pre>{json}</pre></details>
+</Panel>
+
+<style>
+  .sozlesme-notu{margin-bottom:1rem;padding:1rem 1.1rem;border-left:3px solid var(--color-kirmizi);background:#fff;font-size:.78rem}.sozlesme-notu p{margin-top:.25rem;color:var(--color-metin-2)}
+  .portal-izgara{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.portal-kart,.esleme-karti,.json-karti{border:1px solid color-mix(in oklab,var(--color-murekkep) 12%,transparent);border-radius:8px;background:#fff;padding:1rem}.portal-kart>header,.esleme-karti>header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}.portal-kart header span,.esleme-karti header span{font:600 .6rem/1 var(--font-veri);letter-spacing:.12em;color:var(--color-kirmizi)}.portal-kart h2,.esleme-karti h2{margin-top:.25rem;font-size:1rem}.portal-kart header b{border-radius:999px;padding:.35rem .55rem;font-size:.62rem}.hazir{background:#e9f7ed;color:#205d35}.hazir-degil{background:#fff1df;color:#875000}.kategori-yolu{margin:.8rem 0;padding:.6rem;background:var(--color-kagit);font-size:.68rem;color:var(--color-metin-2)}.portal-kart dl{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#ddd}.portal-kart dl div{display:grid;gap:.2rem;background:#fff;padding:.6rem}.portal-kart dt{font-size:.58rem;color:var(--color-kursun)}.portal-kart dd{font:600 .85rem/1 var(--font-veri)}.iletisim,.koordinat{display:grid;gap:.2rem;margin-top:.7rem}.iletisim span,.koordinat span{font-size:.6rem;color:var(--color-kursun)}.iletisim strong,.koordinat strong{font-size:.7rem}.portal-kart section{margin-top:.8rem}.portal-kart h3{font-size:.7rem}.portal-kart ul{margin:.35rem 0 0 1rem;list-style:disc;font-size:.67rem;color:var(--color-metin-2)}details{margin-top:.85rem}summary{font-size:.7rem;font-weight:700;cursor:pointer}.portal-kart table,.esleme-karti table{width:100%;margin-top:.7rem;border-collapse:collapse;font-size:.64rem}.portal-kart th,.portal-kart td,.esleme-karti th,.esleme-karti td{border-bottom:1px solid #eee;padding:.45rem;text-align:left;vertical-align:top}.portal-kart td:last-child{max-width:12rem;overflow-wrap:anywhere}.esleme-karti{margin-top:1rem}.tablo-kaydir{overflow-x:auto}.esleme-karti table{min-width:46rem}.json-karti{margin-top:1rem}.json-karti pre{overflow:auto;max-height:36rem;margin-top:.8rem;padding:1rem;background:#151619;color:#f6f6f4;font:400 .66rem/1.5 var(--font-veri)}@media(max-width:1100px){.portal-izgara{grid-template-columns:1fr}}@media(max-width:600px){.portal-kart dl{grid-template-columns:repeat(2,1fr)}}
+</style>

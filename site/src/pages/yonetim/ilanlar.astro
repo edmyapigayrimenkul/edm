@@ -1,15 +1,35 @@
 ---
 import Panel from '../../layouts/Panel.astro';
-import { paneleGiris } from '../../lib/panel/yetki';
+import { adminProfiliniBul, paneleGiris } from '../../lib/panel/yetki';
 import { env } from 'cloudflare:workers';
-import { tumIlanSatirlari } from '../../lib/senkron/depo';
-import { onbellegiTemizle, baslikTemizle, slugla, fiyatKisa } from '../../lib/ilanlar';
+import { semayiKur, tumIlanSatirlari } from '../../lib/senkron/depo';
+import { onbellegiTemizle, baslikTemizle, slugla, fiyatKisa, portfoy } from '../../lib/ilanlar';
+import { mukerrerKanonikId } from '../../lib/ilan-butunlugu';
+import { icerik } from '../../lib/icerik';
+import { ilanKalitesiniDenetle, kaliteOzeti } from '../../lib/ilan-kalite';
+import { teyitKayitlariniGetir, teyitOzeti } from '../../lib/ilan-teyit';
+import {
+  hatirlatmalariGetir,
+  elleIlaniKaliciSil,
+  ilanYayinDurumuDegistir,
+  paylasimKuyrugunaEkle,
+  paylasimlariGetir,
+  platformlariOku,
+} from '../../lib/ilan-isletim';
+import { islemKaydet } from '../../lib/panel/islem-gecmisi';
+import { rolYetkisiGerekli } from '../../lib/panel/roller';
 
 const giris = await paneleGiris(Astro.request);
 if ('yanit' in giris) return giris.yanit;
 
 const vt = env.VT as D1Database;
+await semayiKur(vt);
+const admin = adminProfiliniBul(giris.kimlik.eposta);
+const kaydedilenElleIlanId = Astro.url.searchParams.get('eklendi')?.match(/^elle-[a-z0-9-]{6,34}$/i)?.[0] ?? '';
 let bildirim: { tur: 'basari' | 'hata'; metin: string } | null = null;
+if (Astro.url.searchParams.get('eklendi')) bildirim = { tur: 'basari', metin: 'Yeni ilan kaydedildi ve yayına alındı.' };
+if (Astro.url.searchParams.get('paylasim')) bildirim = { tur: 'basari', metin: 'Yeni ilan kaydedildi; sosyal medya paylaşımı kuyruğa eklendi.' };
+if (Astro.url.searchParams.get('silindi')) bildirim = { tur: 'basari', metin: 'Elle eklenen ilan kalıcı olarak silindi.' };
 
 const suAn = () => new Date().toISOString();
 
@@ -30,102 +50,65 @@ if (Astro.request.method === 'POST') {
   const id = String(form.get('id') ?? '');
 
   try {
+    rolYetkisiGerekli(admin?.rol ?? null, eylem === 'elle-sil' ? 'kalici-sil' : 'ilan-yonet');
     if (eylem === 'one-cikar' && id) {
-      await duzenlemeYaz(id, 'one_cikan', Number(form.get('deger')) ? 1 : 0);
+      const onceki = await vt.prepare(`SELECT one_cikan FROM ilan_duzenleme WHERE ilan_id = ?`).bind(id).first<{ one_cikan: number | null }>();
+      const sonraki = Number(form.get('deger')) ? 1 : 0;
+      await duzenlemeYaz(id, 'one_cikan', sonraki);
+      await islemKaydet(vt, giris.kimlik, { eylem: 'ilan-one-cikarma', varlikTuru: 'ilan', varlikId: id, ozet: sonraki ? 'İlan öne çıkarıldı.' : 'İlanın öne çıkarması kaldırıldı.', onceki: { one_cikan: onceki?.one_cikan ?? 0 }, sonraki: { one_cikan: sonraki } });
       bildirim = { tur: 'basari', metin: 'Öne çıkarma güncellendi.' };
-    } else if (eylem === 'gizle' && id) {
-      await duzenlemeYaz(id, 'gizli', Number(form.get('deger')) ? 1 : 0);
-      bildirim = { tur: 'basari', metin: 'Görünürlük güncellendi.' };
-    } else if (eylem === 'metin' && id) {
-      const baslik = String(form.get('baslik') ?? '').trim();
-      const aciklama = String(form.get('aciklama') ?? '').trim();
-      await vt
-        .prepare(
-          `INSERT INTO ilan_duzenleme (ilan_id, baslik, aciklama, guncelleme) VALUES (?,?,?,?)
-           ON CONFLICT(ilan_id) DO UPDATE SET
-             baslik = excluded.baslik, aciklama = excluded.aciklama, guncelleme = excluded.guncelleme`
-        )
-        .bind(id, baslik || null, aciklama || null, suAn())
-        .run();
-      bildirim = { tur: 'basari', metin: 'Metin güncellendi. Portaldan gelen hâli bozulmadı.' };
-    } else if (eylem === 'sifirla' && id) {
-      await vt.prepare(`DELETE FROM ilan_duzenleme WHERE ilan_id = ?`).bind(id).run();
-      bildirim = { tur: 'basari', metin: 'Düzenlemeler kaldırıldı, portaldaki hâline döndü.' };
-    } else if (eylem === 'elle-ekle') {
-      const baslik = String(form.get('baslik') ?? '').trim();
-      const fiyat = Number(form.get('fiyat')) || null;
-      if (!baslik) throw new Error('Başlık gerekli.');
-
-      const yeniId = `elle-${Date.now().toString(36)}`;
-      const gorseller = String(form.get('gorseller') ?? '')
-        .split(/[\n,]+/)
-        .map((g) => g.trim())
-        .filter((g) => /^https?:\/\//.test(g));
-
-      await vt
-        .prepare(
-          `INSERT INTO ilanlar
-             (id, kaynak, kaynak_url, baslik, aciklama, fiyat, para_birimi, islem, kategori,
-              tip, tip_grup, oda, m2, il, ilce, mahalle, ozellikler, gorseller,
-              danisman_slug, guncellenme, ilk_gorulme, son_gorulme, durum, pasif_tarihi)
-           VALUES (?,'elle','',?,?,?,'TRY',?,?,?,?,?,?,?,?,?,'{}',?,NULL,?,?,?,'aktif',NULL)`
-        )
-        .bind(
-          yeniId,
-          baslik,
-          String(form.get('aciklama') ?? '').trim(),
-          fiyat,
-          String(form.get('islem') ?? 'satilik'),
-          String(form.get('kategori') ?? '').trim(),
-          String(form.get('tip') ?? 'diger').trim().toLocaleLowerCase('tr'),
-          String(form.get('tip_grup') ?? 'diger'),
-          String(form.get('oda') ?? '').trim() || null,
-          Number(form.get('m2')) || null,
-          String(form.get('il') ?? '').trim() || null,
-          String(form.get('ilce') ?? '').trim() || null,
-          String(form.get('mahalle') ?? '').trim() || null,
-          JSON.stringify(gorseller),
-          suAn(),
-          suAn(),
-          suAn()
-        )
-        .run();
-      bildirim = {
-        tur: 'basari',
-        metin: 'İlan eklendi. Elle eklenen ilanlar senkronda silinmez.',
-      };
+    } else if (eylem === 'durum' && id) {
+      const yayinlansin = String(form.get('deger')) === 'aktif';
+      const onceki = await vt.prepare(`SELECT i.durum, COALESCE(d.gizli, 0) AS gizli FROM ilanlar i LEFT JOIN ilan_duzenleme d ON d.ilan_id = i.id WHERE i.id = ?`).bind(id).first<{ durum: string; gizli: number }>();
+      await ilanYayinDurumuDegistir(vt, id, yayinlansin);
+      await islemKaydet(vt, giris.kimlik, { eylem: 'ilan-yayin-durumu', varlikTuru: 'ilan', varlikId: id, ozet: yayinlansin ? 'İlan yayına alındı.' : 'İlan pasife alındı.', onceki, sonraki: { yayin_durumu: yayinlansin ? 'aktif' : 'pasif' } });
+      bildirim = { tur: 'basari', metin: yayinlansin ? 'İlan yayına alındı.' : 'İlan pasife alındı.' };
+    } else if (eylem === 'paylas' && id) {
+      const sonuc = await paylasimKuyrugunaEkle(vt, id, platformlariOku(form.getAll('sosyal_platform')), 'panel-listesi');
+      await islemKaydet(vt, giris.kimlik, { eylem: 'ilan-paylasim-kuyrugu', varlikTuru: 'ilan', varlikId: id, ozet: `Sosyal medya paylaşımı #${sonuc.id} kuyruğa alındı.`, sonraki: { paylasim_id: sonuc.id, yeni: sonuc.yeni, platformlar: platformlariOku(form.getAll('sosyal_platform')) } });
+      bildirim = { tur: 'basari', metin: sonuc.yeni ? `Paylaşım #${sonuc.id} kuyruğa eklendi.` : `Bu ilan için bekleyen paylaşım #${sonuc.id} zaten var.` };
     } else if (eylem === 'toplu') {
       const secilenler = form.getAll('secili').map(String).filter(Boolean);
       const islem = String(form.get('toplu-islem') ?? '');
       if (!secilenler.length) throw new Error('Hiç ilan seçilmedi.');
 
-      const alan = islem.startsWith('one') ? 'one_cikan' : 'gizli';
-      const deger = islem.endsWith('-ac') ? 1 : 0;
-
-      await vt.batch(
-        secilenler.map((sid) =>
-          vt
-            .prepare(
-              `INSERT INTO ilan_duzenleme (ilan_id, ${alan}, guncelleme) VALUES (?,?,?)
-               ON CONFLICT(ilan_id) DO UPDATE SET ${alan} = excluded.${alan}, guncelleme = excluded.guncelleme`
-            )
-            .bind(sid, deger, suAn())
-        )
-      );
+      if (islem.startsWith('durum-')) {
+        const yayinlansin = islem === 'durum-aktif';
+        if (yayinlansin) {
+          const yerler = secilenler.map(() => '?').join(',');
+          const kapaliPortal = await vt
+            .prepare(`SELECT COUNT(*) AS adet FROM ilanlar WHERE id IN (${yerler}) AND kaynak <> 'elle' AND durum <> 'aktif'`)
+            .bind(...secilenler)
+            .first<{ adet: number }>();
+          if ((kapaliPortal?.adet ?? 0) > 0) throw new Error('Seçimde kaynakta pasif portal ilanı var; bu ilan portal geri gelmeden açılamaz.');
+        }
+        for (const sid of secilenler) await ilanYayinDurumuDegistir(vt, sid, yayinlansin);
+      } else {
+        const deger = islem.endsWith('-ac') ? 1 : 0;
+        await vt.batch(secilenler.map((sid) => vt
+          .prepare(
+            `INSERT INTO ilan_duzenleme (ilan_id, one_cikan, guncelleme) VALUES (?,?,?)
+             ON CONFLICT(ilan_id) DO UPDATE SET one_cikan = excluded.one_cikan, guncelleme = excluded.guncelleme`
+          )
+          .bind(sid, deger, suAn())));
+      }
 
       const adlar: Record<string, string> = {
         'one-ac': 'öne çıkarıldı',
         'one-kapat': 'öne çıkarma kaldırıldı',
-        'gizli-ac': 'gizlendi',
-        'gizli-kapat': 'tekrar gösteriliyor',
+        'durum-pasif': 'pasife alındı',
+        'durum-aktif': 'yayına alındı',
       };
       bildirim = {
         tur: 'basari',
         metin: `${secilenler.length} ilan ${adlar[islem] ?? 'güncellendi'}.`,
       };
+      await islemKaydet(vt, giris.kimlik, { eylem: 'ilan-toplu-islem', varlikTuru: 'ilan', varlikId: secilenler.join(','), ozet: bildirim.metin, sonraki: { islem, ilanlar: secilenler } });
     } else if (eylem === 'elle-sil' && id.startsWith('elle-')) {
-      await vt.prepare(`DELETE FROM ilanlar WHERE id = ? AND kaynak = 'elle'`).bind(id).run();
-      await vt.prepare(`DELETE FROM ilan_duzenleme WHERE ilan_id = ?`).bind(id).run();
+      const onceki = await vt.prepare(`SELECT id, baslik, durum, kaynak FROM ilanlar WHERE id = ?`).bind(id).first<Record<string, unknown>>();
+      const kova = (env as Record<string, unknown>).GORSELLER as R2Bucket | undefined;
+      await elleIlaniKaliciSil(vt, kova, id);
+      await islemKaydet(vt, giris.kimlik, { eylem: 'ilan-kalici-silindi', varlikTuru: 'ilan', varlikId: id, ozet: `${String(onceki?.baslik ?? id)} kalıcı olarak silindi.`, onceki });
       bildirim = { tur: 'basari', metin: 'Elle eklenen ilan silindi.' };
     }
     onbellegiTemizle();
@@ -135,6 +118,40 @@ if (Astro.request.method === 'POST') {
 }
 
 const ilanlar = await tumIlanSatirlari(vt);
+const [{ ilanlar: yayinIlanlari }, { ekip }] = await Promise.all([portfoy(), icerik()]);
+const bilinenDanismanlar = new Set(ekip.flatMap((danisman) => [danisman.slug, danisman.emlakjetSlug]).filter(Boolean));
+const kaliteKayitlari = yayinIlanlari.map((ilan) => ilanKalitesiniDenetle(ilan, bilinenDanismanlar));
+const kaliteHarita = new Map(kaliteKayitlari.map((kayit) => [kayit.ilanId, kayit]));
+const kaliteSayilari = kaliteOzeti(kaliteKayitlari);
+const kaliteSorunlu = kaliteKayitlari.filter((kayit) => kayit.durum !== 'uygun');
+const teyitSayilari = teyitOzeti(await teyitKayitlariniGetir(vt));
+const yayinIlanHarita = new Map(yayinIlanlari.map((ilan) => [ilan.id, ilan]));
+const hatirlatmalar = await hatirlatmalariGetir(vt);
+const sonPaylasimlar = new Map<string, Awaited<ReturnType<typeof paylasimlariGetir>>[number]>();
+const paylasimlar = await paylasimlariGetir(vt);
+for (const kayit of paylasimlar) if (!sonPaylasimlar.has(kayit.ilan_id)) sonPaylasimlar.set(kayit.ilan_id, kayit);
+const bekleyenBildirim = await vt.prepare(`SELECT COUNT(*) AS adet FROM ilan_bildirim WHERE durum = 'bekliyor'`).first<{ adet: number }>().catch(() => ({ adet: 0 }));
+const paylasimDurumu: Record<string, string> = {
+  bekliyor: 'Sırada',
+  isleniyor: 'Yayınlanıyor',
+  yayinlandi: 'Yayınlandı',
+  hata: 'Hata',
+  iptal: 'İptal edildi',
+  kuru: 'Kuru çalışma',
+};
+const platformEtiketi: Record<string, string> = {
+  ig: 'Instagram', facebook: 'Facebook', threads: 'Threads', reels: 'Reels',
+  youtube: 'YouTube Shorts', tiktok: 'TikTok',
+};
+const platformMetni = (ham: string) => {
+  try { return (JSON.parse(ham) as string[]).map((x) => platformEtiketi[x] ?? x).join(', '); }
+  catch { return 'Platform bilgisi okunamadı'; }
+};
+const tarihSaat = (ham: string) => new Date(ham).toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' });
+const ortam = env as unknown as Record<string, unknown>;
+const whatsAppHazir = ['WHATSAPP_TELEFON_NO_KIMLIGI', 'WHATSAPP_ERISIM_JETONU', 'WHATSAPP_BILDIRIM_ALICI', 'WHATSAPP_PASIF_SABLONU']
+  .every((anahtar) => Boolean(ortam[anahtar]));
+const postedmHazir = Boolean(ortam.POSTEDM_API_ANAHTARI);
 
 // Son 30 günün görüntülenmeleri — hangi ilan ilgi görüyor, hangisi durgun.
 const goruntulenmeler = await vt
@@ -149,11 +166,13 @@ const bakisHarita = new Map(
 );
 const enCokBakis = Math.max(1, ...bakisHarita.values());
 const duzenlemeler = await vt
-  .prepare(`SELECT ilan_id, baslik, aciklama FROM ilan_duzenleme`)
-  .all<{ ilan_id: string; baslik: string | null; aciklama: string | null }>();
+  .prepare(`SELECT ilan_id, baslik, aciklama, temel FROM ilan_duzenleme`)
+  .all<{ ilan_id: string; baslik: string | null; aciklama: string | null; temel: string | null }>();
 const duzHarita = new Map((duzenlemeler.results ?? []).map((d) => [d.ilan_id, d]));
-
-const acik = Astro.url.searchParams.get('duzenle');
+const guvenliTemel = (ham: string | null | undefined) => {
+  try { return ham ? JSON.parse(ham) as Partial<(typeof ilanlar)[number]> : {}; }
+  catch { return {}; }
+};
 
 const PORTAL_OFIS = 'https://www.hepsiemlak.com/emlak-ofisi/edm-yapi-gayrimenkul-122060';
 
@@ -176,17 +195,49 @@ const c=await fetch('https://edmyapigayrimenkul.com/api/gorsel-aktar',{method:'P
 <Panel
   baslik="İlanlar"
   eposta={giris.kimlik.eposta}
-  ozet={`${ilanlar.filter((i) => i.durum === 'aktif').length} aktif · ${ilanlar.filter((i) => i.durum === 'pasif').length} pasif`}
+  ozet={`${ilanlar.filter((i) => i.durum === 'aktif' && i.gizli !== 1 && !mukerrerKanonikId(i.id)).length} yayında · ${ilanlar.filter((i) => i.durum !== 'aktif' || i.gizli === 1).length} pasif · ${ilanlar.filter((i) => Boolean(mukerrerKanonikId(i.id))).length} mükerrer · ${bekleyenBildirim?.adet ?? 0} WhatsApp bildirimi bekliyor`}
 >
   <a href="/yonetim/ilan-ekle" class="pd pd--kirmizi font-semibold" slot="eylem">+ Yeni İlan Ekle</a>
 
   {bildirim && <div class={`bildirim bildirim--${bildirim.tur}`}>{bildirim.metin}</div>}
+  {kaydedilenElleIlanId && <span hidden data-kaydedilen-elle-ilan={kaydedilenElleIlanId} />}
 
   <p class="aciklama-kutu">
-    Buradaki düzenlemeler <strong>portaldan gelen veriyi bozmaz</strong>. Bir başlığı
-    düzelttiğinizde senkron çalışsa bile düzeltmeniz kalır; “Portaldakine döndür” dediğinizde
-    orijinaline geri döner.
+    <strong>Portal ilanları silinmez:</strong> kaynakta kaybolursa otomatik pasife düşer, geri
+    gelirse yeniden aktifleşir. “Yayından al” kararı ve içerik düzenlemeleri senkronun üstünde
+    korunur. <strong>Elle eklenen ilanlara senkron dokunmaz;</strong> aktif/pasif ve silme kararı
+    tamamen yönetim panelindedir.
   </p>
+
+  <div class="isletim-durumlari" aria-label="Otomasyon durumu">
+    <div><span class:list={['durum-noktasi', whatsAppHazir && 'durum-noktasi--hazir']} aria-hidden="true"></span><p><strong>Pasif ilan WhatsApp’ı</strong><small>{whatsAppHazir ? 'Yapılandırıldı; portal senkronundan sonra otomatik gönderilir.' : 'Ayar bekliyor; olaylar kaybolmadan bildirim kuyruğunda tutulur.'}</small></p></div>
+    <div><span class="durum-noktasi durum-noktasi--hazir" aria-hidden="true"></span><p><strong>İlan hatırlatmaları</strong><small>Seçilen tarihte sabah günlük özet e-postasına eklenir.</small></p></div>
+    <div><span class:list={['durum-noktasi', postedmHazir && 'durum-noktasi--hazir']} aria-hidden="true"></span><p><strong>Sosyal yayın bağlantısı</strong><small>{postedmHazir ? 'Site API anahtarı hazır; GitHub secret’ı aynı değerde olmalıdır.' : 'Site API anahtarı tanımlanınca kuyruk otomasyona açılır.'}</small></p></div>
+  </div>
+
+  <details class="kalite-kutusu" open={kaliteSayilari.kritik > 0}>
+    <summary>
+      <span><strong>İçerik kalite kontrolü</strong><small>{kaliteSayilari.toplam} yayındaki ilan için otomatik kural taraması</small></span>
+      <span class="kalite-sayilar">
+        <b class="kalite-sayi kalite-sayi--uygun">{kaliteSayilari.uygun} uyarı yok</b>
+        <b class="kalite-sayi kalite-sayi--incele">{kaliteSayilari.incele} incelenecek</b>
+        <b class="kalite-sayi kalite-sayi--kritik">{kaliteSayilari.kritik} kritik</b>
+      </span>
+    </summary>
+    <p class="kalite-aciklama">Bu tarama eksik ve çelişkili bilgileri işaretler. Fiyat, tapu ve müsaitliğin güncelliği danışman teyidi gerektirir. <a href="/yonetim/teyitler"><strong>{teyitSayilari.bekliyor + teyitSayilari.yanitlandi} açık teyidi yönet →</strong></a></p>
+    {kaliteSorunlu.length ? <div class="tablo-sar"><table class="veri kalite-tablosu">
+      <thead><tr><th>İlan</th><th>Durum</th><th>Kontrol notları</th><th></th></tr></thead>
+      <tbody>{kaliteSorunlu.map((kayit) => {
+        const ilan = yayinIlanHarita.get(kayit.ilanId)!;
+        return <tr>
+          <td><strong>{ilan.baslikTemiz}</strong><small class="kalite-id">No: {ilan.id}</small></td>
+          <td><span class:list={['cip', kayit.durum === 'kritik' ? 'cip--pasif' : 'cip--islemde']}>{kayit.durum === 'kritik' ? 'Bilgi çelişkisi' : 'Teyit gerekli'}</span></td>
+          <td><ul>{kayit.sorunlar.map((sorun) => <li><b>{sorun.seviye === 'hata' ? 'Hata' : 'Uyarı'}:</b> {sorun.mesaj}</li>)}</ul></td>
+          <td><a href={`/yonetim/ilan-duzenle/${ilan.id}`} class="pd pd--sade">Düzelt</a></td>
+        </tr>;
+      })}</tbody>
+    </table></div> : <p class="kalite-temiz">Yayındaki bütün ilanlar tanımlı kalite kontrollerinden geçti.</p>}
+  </details>
 
   <form method="POST" id="toplu-form" class="toplu-cubuk" data-toplu hidden>
     <input type="hidden" name="eylem" value="toplu" />
@@ -194,8 +245,8 @@ const c=await fetch('https://edmyapigayrimenkul.com/api/gorsel-aktar',{method:'P
     <div class="toplu-dugmeler">
       <button type="submit" name="toplu-islem" value="one-ac" class="pd pd--birincil">Öne çıkar</button>
       <button type="submit" name="toplu-islem" value="one-kapat" class="pd pd--sade">Öne çıkarmayı kaldır</button>
-      <button type="submit" name="toplu-islem" value="gizli-ac" class="pd pd--tehlike">Gizle</button>
-      <button type="submit" name="toplu-islem" value="gizli-kapat" class="pd pd--sade">Göster</button>
+      <button type="submit" name="toplu-islem" value="durum-pasif" class="pd pd--tehlike">Pasife al</button>
+      <button type="submit" name="toplu-islem" value="durum-aktif" class="pd pd--sade">Yayına al</button>
     </div>
   </form>
 
@@ -217,8 +268,15 @@ const c=await fetch('https://edmyapigayrimenkul.com/api/gorsel-aktar',{method:'P
           {
             ilanlar.map((i) => {
               const duz = duzHarita.get(i.id);
-              const gosterilenBaslik = duz?.baslik ?? baslikTemizle(i.baslik);
-              const yol = `/ilan/${slugla(baslikTemizle(duz?.baslik ?? i.baslik))}-${i.id}`;
+              const etkin = { ...i, ...guvenliTemel(duz?.temel), id: i.id, kaynak: i.kaynak, kaynak_url: i.kaynak_url };
+              const gosterilenBaslik = yayinIlanHarita.get(i.id)?.baslikTemiz ?? baslikTemizle(duz?.baslik ?? etkin.baslik);
+              const kanonikAdayi = mukerrerKanonikId(i.id);
+              const kanonikId = kanonikAdayi && yayinIlanHarita.has(kanonikAdayi) ? kanonikAdayi : null;
+              const yol = kanonikId ? `/ilan/ilan-${kanonikId}` : `/ilan/${slugla(gosterilenBaslik)}-${i.id}`;
+              const yayinda = i.durum === 'aktif' && i.gizli !== 1 && !kanonikId;
+              const hatirlatma = hatirlatmalar.get(i.id);
+              const paylasim = sonPaylasimlar.get(i.id);
+              const kalite = kaliteHarita.get(i.id);
               return (
                 <>
                   <tr>
@@ -231,12 +289,16 @@ const c=await fetch('https://edmyapigayrimenkul.com/api/gorsel-aktar',{method:'P
                       </a>
                       <div class="satir-etiket">
                         <span class="veri-sayi">{i.id}</span>
-                        {i.kaynak === 'elle' && <span class="cip cip--pasif">Elle eklendi</span>}
+                        <span class:list={['cip', i.kaynak === 'elle' ? 'cip--pasif' : 'cip--islemde']}>{i.kaynak === 'elle' ? 'Elle girildi' : 'Otomatik aktarıldı'}</span>
                         {i.duzenlendi === 1 && <span class="cip cip--islemde">Düzenlendi</span>}
+                        {kanonikId && <span class="cip cip--pasif">Mükerrer · ana kayıt {kanonikId}</span>}
+                        {hatirlatma && <span class="cip cip--islemde">Takip: {new Date(`${hatirlatma.planlanan}T12:00:00`).toLocaleDateString('tr-TR')}</span>}
+                        {paylasim && <span class="cip cip--one">Sosyal: {paylasimDurumu[paylasim.durum] ?? paylasim.durum}</span>}
+                        {kalite && <span class:list={['cip', kalite.durum === 'uygun' ? 'cip--kapandi' : kalite.durum === 'kritik' ? 'cip--pasif' : 'cip--islemde']} title={kalite.sorunlar.map((sorun) => sorun.mesaj).join('\n')}>{kalite.durum === 'uygun' ? 'Kural uyarısı yok' : kalite.durum === 'kritik' ? 'Bilgi çelişkisi' : 'Teyit gerekli'}</span>}
                       </div>
                     </td>
-                    <td>{[i.ilce, i.il].filter(Boolean).join(' / ') || '—'}</td>
-                    <td class="sayi">{fiyatKisa(i.fiyat)}</td>
+                    <td>{[etkin.ilce, etkin.il].filter(Boolean).join(' / ') || '—'}</td>
+                    <td class="sayi">{fiyatKisa(etkin.fiyat, etkin.para_birimi)}</td>
                     <td class="sayi">
                       {(() => {
                         const bakis = bakisHarita.get(i.id) ?? 0;
@@ -254,10 +316,12 @@ const c=await fetch('https://edmyapigayrimenkul.com/api/gorsel-aktar',{method:'P
                     </td>
                     <td>
                       <div class="durum-yigin">
-                        {i.durum === 'pasif' ? (
-                          <span class="cip cip--pasif">Pasif</span>
+                        {kanonikId ? (
+                          <span class="cip cip--gizli">Ana kayda yönleniyor</span>
+                        ) : i.durum === 'pasif' ? (
+                          <span class="cip cip--pasif">Kaynakta pasif</span>
                         ) : i.gizli === 1 ? (
-                          <span class="cip cip--gizli">Gizli</span>
+                          <span class="cip cip--gizli">Yönetici pasif yaptı</span>
                         ) : (
                           <span class="cip cip--kapandi">Yayında</span>
                         )}
@@ -276,63 +340,28 @@ const c=await fetch('https://edmyapigayrimenkul.com/api/gorsel-aktar',{method:'P
                         </form>
                         <form method="POST">
                           <input type="hidden" name="id" value={i.id} />
-                          <input type="hidden" name="eylem" value="gizle" />
-                          <input type="hidden" name="deger" value={i.gizli === 1 ? '0' : '1'} />
-                          <button type="submit" class="pd pd--sade">
-                            {i.gizli === 1 ? 'Göster' : 'Gizle'}
+                          <input type="hidden" name="eylem" value="durum" />
+                          <input type="hidden" name="deger" value={yayinda ? 'pasif' : 'aktif'} />
+                          <button type="submit" class:list={['pd', yayinda ? 'pd--tehlike' : 'pd--sade']} disabled={!yayinda && i.kaynak !== 'elle' && i.durum !== 'aktif'} title={!yayinda && i.kaynak !== 'elle' && i.durum !== 'aktif' ? 'Portal tekrar aktif göstermeden yayına alınamaz' : undefined}>
+                            {yayinda ? 'Yayından al' : 'Yayına al'}
                           </button>
                         </form>
+                        <details class="paylas-menu">
+                          <summary class="pd pd--sade">Sosyal paylaş</summary>
+                          <form method="POST">
+                            <input type="hidden" name="id" value={i.id} />
+                            <input type="hidden" name="eylem" value="paylas" />
+                            <strong>Hesapları seçin</strong>
+                            <div>{[['ig','Instagram'],['facebook','Facebook'],['threads','Threads'],['reels','Reels'],['youtube','Shorts'],['tiktok','TikTok']].map(([deger, etiket]) => <label><input type="checkbox" name="sosyal_platform" value={deger} checked /><span>{etiket}</span></label>)}</div>
+                            <button type="submit" class="pd pd--birincil" disabled={!yayinda}>Kuyruğa ekle</button>
+                            {!yayinda && <small>{kanonikId ? `Mükerrer kayıt paylaşılamaz; ${kanonikId} numaralı ana kaydı kullanın.` : 'Önce ilanı yayına alın.'}</small>}
+                          </form>
+                        </details>
                         <a href={`/yonetim/ilan-duzenle/${i.id}`} class="pd pd--birincil">Detaylı Düzenle</a>
                         <a href={`/yonetim/gorsel/${i.id}`} class="pd pd--sade">Fotoğraflar</a>
-                        <a href={`?duzenle=${i.id}#d${i.id}`} class="pd pd--sade">Hızlı Başlık</a>
                       </div>
                     </td>
                   </tr>
-
-                  {acik === i.id && (
-                    <tr id={`d${i.id}`}>
-                      <td colspan="7" class="duzenle-hucre">
-                        <form method="POST" class="duzenle-form">
-                          <input type="hidden" name="id" value={i.id} />
-                          <input type="hidden" name="eylem" value="metin" />
-                          <label class="p-alan">
-                            <span>Başlık</span>
-                            <input
-                              type="text"
-                              name="baslik"
-                              value={duz?.baslik ?? baslikTemizle(i.baslik)}
-                              maxlength="200"
-                            />
-                          </label>
-                          <label class="p-alan">
-                            <span>Açıklama</span>
-                            <textarea name="aciklama" rows="6" set:text={duz?.aciklama ?? i.aciklama} />
-                          </label>
-                          <div class="duzenle-eylem">
-                            <button type="submit" class="pd pd--birincil">Kaydet</button>
-                            <a href="/yonetim/ilanlar" class="pd pd--sade">Vazgeç</a>
-                          </div>
-                        </form>
-
-                        <div class="duzenle-yan">
-                          <p class="ozet-etiket">Portaldaki hâli</p>
-                          <p class="orijinal-baslik">{i.baslik}</p>
-                          <form method="POST">
-                            <input type="hidden" name="id" value={i.id} />
-                            <input type="hidden" name="eylem" value="sifirla" />
-                            <button type="submit" class="pd pd--tehlike">Portaldakine döndür</button>
-                          </form>
-                          {i.kaynak === 'elle' && (
-                            <form method="POST" style="margin-top:0.5rem">
-                              <input type="hidden" name="id" value={i.id} />
-                              <input type="hidden" name="eylem" value="elle-sil" />
-                              <button type="submit" class="pd pd--tehlike">İlanı sil</button>
-                            </form>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  )}
                 </>
               );
             })
@@ -341,6 +370,35 @@ const c=await fetch('https://edmyapigayrimenkul.com/api/gorsel-aktar',{method:'P
       </table>
     </div>
   </div>
+
+  <section class="kutu kuyruk-kutusu">
+    <div class="kutu-bas">
+      <div>
+        <h2>Sosyal yayın kuyruğu</h2>
+        <p>Son işler, seçilen hesaplar ve otomasyonun geri bildirdiği sonuç.</p>
+      </div>
+      <span class="cip cip--islemde">{paylasimlar.filter((x) => ['bekliyor', 'isleniyor'].includes(x.durum)).length} işlem açık</span>
+    </div>
+    {paylasimlar.length ? (
+      <div class="tablo-sar">
+        <table class="veri kuyruk-tablosu">
+          <thead><tr><th>İş</th><th>İlan</th><th>Hesaplar</th><th>Durum</th><th>Son işlem</th><th>Sonuç</th></tr></thead>
+          <tbody>{paylasimlar.slice(0, 20).map((is) => {
+            const ilgili = ilanlar.find((ilan) => ilan.id === is.ilan_id);
+            const ayrinti = is.hata || is.sonuc;
+            return <tr>
+              <td class="sayi">#{is.id}</td>
+              <td>{ilgili ? <a href={`/yonetim/ilan-duzenle/${is.ilan_id}`}>{baslikTemizle(ilgili.baslik)}</a> : <span>{is.ilan_id}</span>}</td>
+              <td>{platformMetni(is.platformlar)}</td>
+              <td><span class:list={['cip', is.durum === 'hata' ? 'cip--pasif' : ['yayinlandi', 'kuru'].includes(is.durum) ? 'cip--kapandi' : 'cip--islemde']}>{paylasimDurumu[is.durum] ?? is.durum}</span></td>
+              <td class="sayi">{tarihSaat(is.guncelleme)}</td>
+              <td>{ayrinti ? <details class="sonuc-ayrinti"><summary>Ayrıntıyı gör</summary><pre>{ayrinti}</pre></details> : '—'}</td>
+            </tr>;
+          })}</tbody>
+        </table>
+      </div>
+    ) : <p class="bos-kuyruk">Henüz sosyal paylaşım işi oluşturulmadı.</p>}
+  </section>
 
   <!-- Hepsiemlak görsel tazeleme -->
   <section class="kutu" style="margin-top:1.5rem">
@@ -377,85 +435,18 @@ const c=await fetch('https://edmyapigayrimenkul.com/api/gorsel-aktar',{method:'P
     </div>
   </section>
 
-  <!-- Elle ilan ekleme -->
-  <section class="kutu" id="elle-ekle" style="margin-top:1.5rem">
+  <section class="kutu yeni-ilan-kutusu" style="margin-top:1.5rem">
     <div class="kutu-bas">
       <h2>Portalda olmayan ilan ekle</h2>
       <span style="font-size:0.75rem;color:var(--color-kursun)">Senkron bunlara dokunmaz</span>
     </div>
-    <form method="POST" class="ekle-form">
-      <input type="hidden" name="eylem" value="elle-ekle" />
-
-      <div class="p-izgara">
-        <label class="p-alan" style="grid-column:1/-1">
-          <span>Başlık *</span>
-          <input type="text" name="baslik" required maxlength="200" placeholder="Silivri Merkez'de 3+1 Daire" />
-        </label>
-
-        <label class="p-alan">
-          <span>İşlem</span>
-          <select name="islem">
-            <option value="satilik">Satılık</option>
-            <option value="kiralik">Kiralık</option>
-          </select>
-        </label>
-        <label class="p-alan">
-          <span>Kategori (görünen)</span>
-          <input type="text" name="kategori" placeholder="Satılık Daire" />
-        </label>
-        <label class="p-alan">
-          <span>Tip</span>
-          <input type="text" name="tip" placeholder="daire" />
-        </label>
-        <label class="p-alan">
-          <span>Tip grubu</span>
-          <select name="tip_grup">
-            <option value="konut">Konut</option>
-            <option value="arsa">Arsa & Tarla</option>
-            <option value="isyeri">İş Yeri</option>
-            <option value="diger">Diğer</option>
-          </select>
-        </label>
-
-        <label class="p-alan">
-          <span>Fiyat (₺)</span>
-          <input type="number" name="fiyat" min="0" inputmode="numeric" />
-        </label>
-        <label class="p-alan">
-          <span>Metrekare</span>
-          <input type="number" name="m2" min="0" inputmode="numeric" />
-        </label>
-        <label class="p-alan">
-          <span>Oda</span>
-          <input type="text" name="oda" placeholder="3+1" />
-        </label>
-
-        <label class="p-alan">
-          <span>İl</span>
-          <input type="text" name="il" placeholder="İstanbul" />
-        </label>
-        <label class="p-alan">
-          <span>İlçe</span>
-          <input type="text" name="ilce" placeholder="Silivri" />
-        </label>
-        <label class="p-alan">
-          <span>Mahalle</span>
-          <input type="text" name="mahalle" placeholder="Alibey Mahallesi" />
-        </label>
+    <div class="yeni-ilan-icerik">
+      <div>
+        <strong>Eksiksiz ilan sihirbazını kullanın</strong>
+        <p>Kategoriye göre zorunlu alanlar, yetki durumu, medya ve yayın kontrolü tek akışta doğrulanır.</p>
       </div>
-
-      <label class="p-alan" style="margin-top:1rem">
-        <span>Açıklama</span>
-        <textarea name="aciklama" rows="5" />
-      </label>
-
-      <label class="p-alan" style="margin-top:1rem">
-        <span>Fotoğraf adresleri — her satıra bir tane</span>
-        <textarea name="gorseller" rows="3" placeholder="https://…" />
-      </label>
-
-      <button type="submit" class="pd pd--kirmizi" style="margin-top:1rem">İlanı ekle</button>
-    </form>
+      <a href="/yonetim/ilan-ekle" class="pd pd--kirmizi font-semibold">Yeni ilan oluştur</a>
+    </div>
   </section>
 </Panel>
 
@@ -472,6 +463,9 @@ const c=await fetch('https://edmyapigayrimenkul.com/api/gorsel-aktar',{method:'P
     margin-bottom: 1.25rem;
     max-width: 72ch;
   }
+  .isletim-durumlari{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.65rem;margin:0 0 1.25rem}.isletim-durumlari>div{display:flex;align-items:flex-start;gap:.6rem;padding:.75rem;border:1px solid color-mix(in oklab,var(--color-murekkep) 10%,transparent);border-radius:6px;background:#fff}.isletim-durumlari p{display:grid;gap:.15rem;margin:0}.isletim-durumlari strong{font-size:.72rem}.isletim-durumlari small{color:var(--color-kursun);font-size:.64rem;line-height:1.45}.durum-noktasi{flex:none;width:.55rem;height:.55rem;margin-top:.2rem;border-radius:50%;background:#c6931b;box-shadow:0 0 0 3px rgb(198 147 27/.12)}.durum-noktasi--hazir{background:#23804a;box-shadow:0 0 0 3px rgb(35 128 74/.12)}
+  .kalite-aciklama{margin:0;padding:0 1.15rem 1rem;color:var(--color-kursun);font-size:.72rem;line-height:1.5}
+  .kalite-kutusu{margin:0 0 1.25rem;border:1px solid color-mix(in oklab,var(--color-murekkep) 11%,transparent);border-radius:8px;background:#fff;overflow:hidden}.kalite-kutusu>summary{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.15rem;cursor:pointer;list-style:none}.kalite-kutusu>summary::-webkit-details-marker{display:none}.kalite-kutusu>summary>span:first-child{display:grid;gap:.15rem}.kalite-kutusu>summary strong{font-size:.88rem}.kalite-kutusu>summary small{font-size:.68rem;color:var(--color-kursun)}.kalite-sayilar{display:flex;flex-wrap:wrap;gap:.4rem}.kalite-sayi{padding:.3rem .5rem;border-radius:999px;font:650 .62rem/1 var(--font-veri)}.kalite-sayi--uygun{color:#17633a;background:#e8f5ed}.kalite-sayi--incele{color:#835e0b;background:#fff5d8}.kalite-sayi--kritik{color:#9b2424;background:#fdeaea}.kalite-tablosu{min-width:58rem;border-top:1px solid color-mix(in oklab,var(--color-murekkep) 8%,transparent)}.kalite-tablosu td>strong{display:block;max-width:28rem;font-size:.74rem}.kalite-id{display:block;margin-top:.25rem;color:var(--color-kursun);font:500 .62rem/1 var(--font-veri)}.kalite-tablosu ul{display:grid;gap:.2rem;max-width:40rem;margin:0;padding-left:1rem;font-size:.68rem;line-height:1.45}.kalite-tablosu li::marker{color:var(--color-kirmizi)}.kalite-temiz{margin:0;padding:1rem 1.15rem;border-top:1px solid color-mix(in oklab,var(--color-murekkep) 8%,transparent);color:#17633a;font-size:.76rem}
 
   .satir-etiket {
     display: flex;
@@ -491,47 +485,28 @@ const c=await fetch('https://edmyapigayrimenkul.com/api/gorsel-aktar',{method:'P
   .islem-yigin {
     justify-content: flex-end;
   }
+  .paylas-menu{position:relative}.paylas-menu summary{list-style:none;cursor:pointer}.paylas-menu summary::-webkit-details-marker{display:none}.paylas-menu[open]>summary{background:var(--color-murekkep);color:#fff}.paylas-menu>form{position:relative;width:18rem;max-width:100%;margin:.35rem 0 0 auto;padding:.85rem;border:1px solid color-mix(in oklab,var(--color-murekkep) 15%,transparent);border-radius:7px;background:#fff;box-shadow:var(--shadow-kalkik);text-align:left}.paylas-menu>form>strong{display:block;margin-bottom:.55rem;font-size:.72rem}.paylas-menu>form>div{display:grid;grid-template-columns:1fr 1fr;gap:.35rem;margin-bottom:.65rem}.paylas-menu label{display:flex;align-items:center;gap:.35rem;font-size:.68rem}.paylas-menu small{display:block;margin-top:.35rem;color:var(--color-kursun);font-size:.62rem}
 
-  .duzenle-hucre {
-    background: var(--color-kagit);
-    display: grid;
-    gap: 1.25rem;
-  }
-  @media (min-width: 900px) {
-    .duzenle-hucre {
-      grid-template-columns: 1fr 15rem;
-    }
-  }
-  .duzenle-form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-  }
-  .duzenle-eylem {
-    display: flex;
-    gap: 0.4rem;
-  }
-  .duzenle-yan {
-    border-left: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
-    padding-left: 1.25rem;
-  }
-  @media (max-width: 899px) {
-    .duzenle-yan {
-      border-left: 0;
-      padding-left: 0;
-      border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
-      padding-top: 1rem;
-    }
-  }
-  .orijinal-baslik {
-    font-size: 0.875rem;
-    line-height: 1.5;
-    margin: 0.35rem 0 0.85rem;
-    color: var(--color-metin-2);
-  }
+  .kuyruk-kutusu{margin-top:1.5rem}.kuyruk-kutusu .kutu-bas>div p{margin:.2rem 0 0;color:var(--color-kursun);font-size:.75rem}.kuyruk-tablosu{min-width:66rem}.kuyruk-tablosu a{font-weight:650}.bos-kuyruk{margin:0;padding:1.25rem;color:var(--color-kursun);font-size:.82rem}.sonuc-ayrinti summary{cursor:pointer;color:var(--color-murekkep);font-size:.72rem;font-weight:650}.sonuc-ayrinti pre{max-width:28rem;max-height:12rem;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:.5rem 0 0;padding:.65rem;border-radius:5px;background:var(--color-kirec);font-family:var(--font-veri);font-size:.62rem;line-height:1.5}
 
-  .ekle-form {
+  .yeni-ilan-icerik {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
     padding: 1.25rem;
+  }
+  .yeni-ilan-icerik p {
+    margin: 0.25rem 0 0;
+    color: var(--color-metin-2);
+    font-size: 0.875rem;
+  }
+  @media (max-width: 640px) {
+    .isletim-durumlari{grid-template-columns:1fr}
+    .yeni-ilan-icerik {
+      align-items: stretch;
+      flex-direction: column;
+    }
   }
 
   /* --- Toplu işlem --- */
@@ -637,6 +612,13 @@ const c=await fetch('https://edmyapigayrimenkul.com/api/gorsel-aktar',{method:'P
 </style>
 
 <script>
+  // Başarılı yeni ilan yönlendirmesi taslağın sahibidir; kayıttan sonra
+  // yerel kopyayı bırakmak düzenleme ekranında sahte bir taslak uyarısı çıkarır.
+  const kaydedilenElleIlanId = document.querySelector<HTMLElement>('[data-kaydedilen-elle-ilan]')?.dataset.kaydedilenElleIlan;
+  if (kaydedilenElleIlanId) {
+    try { localStorage.removeItem(`edm-ilan-formu:${kaydedilenElleIlanId}`); } catch { /* depolama kapalı olabilir */ }
+  }
+
   // Seçim kutuları: toplu işlem çubuğunu yönetir
   const cubuk = document.querySelector<HTMLElement>('[data-toplu]');
   const sayac = document.querySelector<HTMLElement>('[data-toplu-sayi]');

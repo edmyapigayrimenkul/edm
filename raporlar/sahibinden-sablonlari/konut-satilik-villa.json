@@ -1,0 +1,586 @@
+{
+  "source": "Sahibinden Pro Ofis authenticated listing form, visible Villa page and accessibility tree",
+  "template": "konut-satilik-villa",
+  "categoryPath": [
+    "Emlak",
+    "Konut",
+    "Satılık",
+    "Villa"
+  ],
+  "coverage": {
+    "status": "live-dom-captured",
+    "visibleCategoryFields": 20,
+    "dropdownOptionListsCaptured": 12,
+    "detailGroupsCaptured": 9,
+    "sharedComponentsReferenced": 9
+  },
+  "fields": [
+    {
+      "key": "Gross m²",
+      "label": "m² (Brüt)",
+      "controlType": "number",
+      "required": true,
+      "options": [],
+      "optionsStatus": "not-applicable"
+    },
+    {
+      "key": "Net m²",
+      "label": "m² (Net)",
+      "controlType": "number",
+      "required": true,
+      "options": [],
+      "optionsStatus": "not-applicable"
+    },
+    {
+      "key": "Open area m²",
+      "label": "Açık Alan m²",
+      "controlType": "number",
+      "required": false,
+      "options": [],
+      "optionsStatus": "not-applicable"
+    },
+    {
+      "key": "Room count",
+      "label": "Oda Sayısı",
+      "controlType": "select",
+      "required": true,
+      "options": [
+        "Seçiniz",
+        "Stüdyo (1+0)",
+        "1+1",
+        "1.5+1",
+        "2+0",
+        "2+1",
+        "2.5+1",
+        "2+2",
+        "3+0",
+        "3+1",
+        "3.5+1",
+        "3+2",
+        "3+3",
+        "4+0",
+        "4+1",
+        "4.5+1",
+        "4.5+2",
+        "4+2",
+        "4+3",
+        "4+4",
+        "5+1",
+        "5.5+1",
+        "5+2",
+        "5+3",
+        "5+4",
+        "6+1",
+        "6+2",
+        "6.5+1",
+        "6+3",
+        "6+4",
+        "7+1",
+        "7+2",
+        "7+3",
+        "8+1",
+        "8+2",
+        "8+3",
+        "8+4",
+        "9+1",
+        "9+2",
+        "9+3",
+        "9+4",
+        "9+5",
+        "9+6",
+        "10+1",
+        "10+2",
+        "10 Üzeri"
+      ],
+      "optionsStatus": "captured-from-live-dom",
+      "sourceControlName": "a20",
+      "optionsCount": 46
+    },
+    {
+      "key": "Building age",
+      "label": "Bina Yaşı",
+      "controlType": "select",
+      "required": true,
+      "options": [
+        "Seçiniz",
+        "0 (Oturuma Hazır)",
+        "0 (Yapım Aşamasında)",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6-10 arası",
+        "11-15 arası",
+        "16-20 arası",
+        "21-25 arası",
+        "26-30 arası",
+        "31 ve üzeri"
+      ],
+      "optionsStatus": "captured-from-live-dom",
+      "sourceControlName": "a812",
+      "optionsCount": 14
+    },
+    {
+      "key": "Floor count",
+      "label": "Kat Sayısı",
+      "controlType": "select",
+      "required": true,
+      "options": [
+        "Seçiniz",
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "optionsStatus": "captured-from-live-dom",
+      "sourceControlName": "a810",
+      "optionsCount": 5
+    },
+    {
+      "key": "Heating",
+      "label": "Isıtma",
+      "controlType": "select",
+      "required": true,
+      "options": [
+        "Seçiniz",
+        "Yok",
+        "Soba",
+        "Doğalgaz Sobası",
+        "Kat Kaloriferi",
+        "Merkezi",
+        "Merkezi (Pay Ölçer)",
+        "Kombi (Doğalgaz)",
+        "Kombi (Elektrik)",
+        "Yerden Isıtma",
+        "Klima",
+        "Fancoil Ünitesi",
+        "Güneş Enerjisi",
+        "Elektrikli Radyatör",
+        "Jeotermal",
+        "Şömine",
+        "VRV",
+        "Isı Pompası"
+      ],
+      "optionsStatus": "captured-from-live-dom",
+      "sourceControlName": "a23",
+      "optionsCount": 18
+    },
+    {
+      "key": "Bathroom count",
+      "label": "Banyo Sayısı",
+      "controlType": "select",
+      "required": true,
+      "options": [
+        "Seçiniz",
+        "Yok",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "6 Üzeri"
+      ],
+      "optionsStatus": "captured-from-live-dom",
+      "sourceControlName": "a22",
+      "optionsCount": 9
+    },
+    {
+      "key": "Kitchen",
+      "label": "Mutfak",
+      "controlType": "select",
+      "required": true,
+      "options": [
+        "Seçiniz",
+        "Açık (Amerikan)",
+        "Kapalı"
+      ],
+      "optionsStatus": "captured-from-live-dom",
+      "sourceControlName": "a118798",
+      "optionsCount": 3
+    },
+    {
+      "key": "Parking",
+      "label": "Otopark",
+      "controlType": "select",
+      "required": true,
+      "options": [
+        "Seçiniz",
+        "Açık Otopark",
+        "Kapalı Otopark",
+        "Açık & Kapalı Otopark",
+        "Yok"
+      ],
+      "optionsStatus": "captured-from-live-dom",
+      "sourceControlName": "a116769",
+      "optionsCount": 5
+    },
+    {
+      "key": "Furnished",
+      "label": "Eşyalı",
+      "controlType": "checkbox",
+      "required": false,
+      "options": [],
+      "optionsStatus": "not-applicable"
+    },
+    {
+      "key": "Occupancy status",
+      "label": "Kullanım Durumu",
+      "controlType": "select",
+      "required": true,
+      "options": [
+        "Seçiniz",
+        "Boş",
+        "Kiracılı",
+        "Mülk Sahibi"
+      ],
+      "optionsStatus": "captured-from-live-dom",
+      "sourceControlName": "a98426",
+      "optionsCount": 4
+    },
+    {
+      "key": "Dues",
+      "label": "Aidat (TL)",
+      "controlType": "number",
+      "required": false,
+      "options": [],
+      "optionsStatus": "not-applicable"
+    },
+    {
+      "key": "Credit eligible",
+      "label": "Krediye Uygun",
+      "controlType": "checkbox",
+      "required": false,
+      "options": [],
+      "optionsStatus": "not-applicable"
+    },
+    {
+      "key": "Energy certificate",
+      "label": "Enerji Kimlik Belgesi",
+      "controlType": "select",
+      "required": false,
+      "options": [
+        "Seçiniz",
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G"
+      ],
+      "optionsStatus": "captured-from-live-dom",
+      "sourceControlName": "a121236",
+      "optionsCount": 8
+    },
+    {
+      "key": "Property owner",
+      "label": "Gayrimenkul Sahibi",
+      "controlType": "select",
+      "required": true,
+      "options": [
+        "Seçiniz",
+        "T.C. vatandaşı",
+        "T.C. vatandaşı değil",
+        "Banka / Vakıf / Dernek / Sendika",
+        "Kamu Kurumu"
+      ],
+      "optionsStatus": "captured-from-live-dom",
+      "sourceControlName": "a118494",
+      "optionsCount": 5
+    },
+    {
+      "key": "Title deed status",
+      "label": "Tapu Durumu",
+      "controlType": "select",
+      "required": true,
+      "options": [
+        "Seçiniz",
+        "Kat Mülkiyetli",
+        "Kat İrtifaklı",
+        "Hisseli Tapu",
+        "Müstakil Tapulu",
+        "Arsa Tapulu",
+        "Kooperatif Hisseli Tapu",
+        "İntifa Hakkı Tesisli",
+        "Yurt Dışı Tapulu",
+        "Tapu Kaydı Yok"
+      ],
+      "optionsStatus": "captured-from-live-dom",
+      "sourceControlName": "a115950",
+      "optionsCount": 10
+    },
+    {
+      "key": "Property number",
+      "label": "Taşınmaz Numarası",
+      "controlType": "text",
+      "required": false,
+      "options": [],
+      "optionsStatus": "not-applicable"
+    },
+    {
+      "key": "Listed by",
+      "label": "Kimden",
+      "controlType": "fixed",
+      "required": false,
+      "options": [],
+      "optionsStatus": "not-applicable"
+    },
+    {
+      "key": "Barter",
+      "label": "Takaslı",
+      "controlType": "select",
+      "required": true,
+      "options": [
+        "Seçiniz",
+        "Evet",
+        "Hayır"
+      ],
+      "optionsStatus": "captured-from-live-dom",
+      "sourceControlName": "exchange",
+      "optionsCount": 3
+    }
+  ],
+  "detailGroups": [
+    {
+      "label": "Genel özellikler",
+      "options": [
+        "Eşyalı"
+      ],
+      "optionCount": 1
+    },
+    {
+      "label": "Cephe",
+      "options": [
+        "Batı",
+        "Doğu",
+        "Güney",
+        "Kuzey",
+        "Cephe seçimi yapmak istemiyorum"
+      ],
+      "optionCount": 5
+    },
+    {
+      "label": "İç Özellikler",
+      "options": [
+        "ADSL",
+        "Ahşap Doğrama",
+        "Akıllı Ev",
+        "Alarm (Hırsız)",
+        "Alarm (Yangın)",
+        "Alaturka Tuvalet",
+        "Alüminyum Doğrama",
+        "Amerikan Kapı",
+        "Ankastre Fırın",
+        "Barbekü",
+        "Beyaz Eşya",
+        "Boyalı",
+        "Bulaşık Makinesi",
+        "Buzdolabı",
+        "Çamaşır Kurutma Makinesi",
+        "Çamaşır Makinesi",
+        "Çamaşır Odası",
+        "Çelik Kapı",
+        "Duşakabin",
+        "Duvar Kağıdı",
+        "Ebeveyn Banyosu",
+        "Fırın",
+        "Fiber İnternet",
+        "Giyinme Odası",
+        "Gömme Dolap",
+        "Görüntülü Diyafon",
+        "Hilton Banyo",
+        "Intercom Sistemi",
+        "Isıcam",
+        "Jakuzi",
+        "Kapalı / Cam Balkon",
+        "Kartonpiyer",
+        "Kiler",
+        "Klima",
+        "Küvet",
+        "Laminat Zemin",
+        "Marley",
+        "Mobilya",
+        "Mutfak (Ankastre)",
+        "Mutfak (Laminat)",
+        "Mutfak Doğalgazı",
+        "Panjur/Jaluzi",
+        "Parke Zemin",
+        "PVC Doğrama",
+        "Seramik Zemin",
+        "Set Üstü Ocak",
+        "Spot Aydınlatma",
+        "Şofben",
+        "Şömine",
+        "Teras",
+        "Termosifon",
+        "Vestiyer",
+        "Yüz Tanıma & Parmak İzi",
+        "İç Özellikler seçimi yapmak istemiyorum"
+      ],
+      "optionCount": 54
+    },
+    {
+      "label": "Dış Özellikler",
+      "options": [
+        "Araç Şarj İstasyonu",
+        "24 Saat Güvenlik",
+        "Apartman Görevlisi",
+        "Buhar Odası",
+        "Çocuk Oyun Parkı",
+        "Hamam",
+        "Hidrofor",
+        "Isı Yalıtımı",
+        "Jeneratör",
+        "Kablo TV",
+        "Kamera Sistemi",
+        "Köpek Parkı",
+        "Kreş",
+        "Müstakil Havuzlu",
+        "Sauna",
+        "Ses Yalıtımı",
+        "Siding",
+        "Spor Alanı",
+        "Su Deposu",
+        "Tenis Kortu",
+        "Uydu",
+        "Yangın Merdiveni",
+        "Yüzme Havuzu (Açık)",
+        "Yüzme Havuzu (Kapalı)",
+        "Dış Özellikler seçimi yapmak istemiyorum"
+      ],
+      "optionCount": 25
+    },
+    {
+      "label": "Muhit",
+      "options": [
+        "Alışveriş Merkezi",
+        "Belediye",
+        "Cami",
+        "Cemevi",
+        "Denize Sıfır",
+        "Eczane",
+        "Eğlence Merkezi",
+        "Fuar",
+        "Göle Sıfır",
+        "Hastane",
+        "Havra",
+        "İlkokul-Ortaokul",
+        "İtfaiye",
+        "Kilise",
+        "Lise",
+        "Market",
+        "Park",
+        "Plaj",
+        "Polis Merkezi",
+        "Sağlık Ocağı",
+        "Semt Pazarı",
+        "Spor Salonu",
+        "Şehir Merkezi",
+        "Üniversite",
+        "Muhit seçimi yapmak istemiyorum"
+      ],
+      "optionCount": 25
+    },
+    {
+      "label": "Ulaşım",
+      "options": [
+        "Anayol",
+        "Avrasya Tüneli",
+        "Boğaz Köprüleri",
+        "Cadde",
+        "Deniz Otobüsü",
+        "Dolmuş",
+        "E-5",
+        "Havaalanı",
+        "İskele",
+        "Marmaray",
+        "Metro",
+        "Metrobüs",
+        "Minibüs",
+        "Otobüs Durağı",
+        "Sahil",
+        "TEM",
+        "Tramvay",
+        "Tren İstasyonu",
+        "Ulaşım seçimi yapmak istemiyorum"
+      ],
+      "optionCount": 19
+    },
+    {
+      "label": "Manzara",
+      "options": [
+        "Boğaz",
+        "Deniz",
+        "Doğa",
+        "Göl",
+        "Havuz",
+        "Nehir",
+        "Park & Yeşil Alan",
+        "Şehir",
+        "Manzara seçimi yapmak istemiyorum"
+      ],
+      "optionCount": 9
+    },
+    {
+      "label": "Konut Tipi",
+      "options": [
+        "Ara Kat Dubleks",
+        "Dubleks",
+        "En Üst Kat",
+        "Bahçe Dubleksi",
+        "Çatı Dubleksi",
+        "Forleks",
+        "Ters Dubleks",
+        "Tripleks",
+        "Konut Tipi seçimi yapmak istemiyorum"
+      ],
+      "optionCount": 9
+    },
+    {
+      "label": "Engelliye ve Yaşlıya Uygun",
+      "options": [
+        "Araç Park Yeri",
+        "Engelliye Uygun Asansör",
+        "Engelliye Uygun Banyo",
+        "Engelliye Uygun Mutfak",
+        "Engelliye Uygun Park",
+        "Geniş Koridor",
+        "Giriş / Rampa",
+        "Merdiven",
+        "Oda Kapısı",
+        "Priz / Elektrik Anahtarı",
+        "Tutamak / Korkuluk",
+        "Tuvalet",
+        "Yüzme Havuzu",
+        "Engelliye ve Yaşlıya Uygun seçimi yapmak istemiyorum"
+      ],
+      "optionCount": 14
+    }
+  ],
+  "sharedComponents": [
+    "ilan-basligi",
+    "aciklama",
+    "fiyat",
+    "adres",
+    "fotograf-video",
+    "sanal-tur",
+    "ilan-notu",
+    "iletisim",
+    "ilan-kurallari"
+  ],
+  "notes": [
+    "Alan etiketleri ve zorunluluk bilgisi açık formun görünür alanlarından kaydedildi; formdaki hiçbir değer/işaretli durum alınmadı.",
+    "Adres, başlık, açıklama ve ilan medya/iletişim alanları ortak bileşenlerden gelir.",
+    "Tüm kategori seçicilerinin canlı form DOM option etiketleri DevTools üzerinden alındı; geçici option value değerleri ve seçili durumlar kaydedilmedi.",
+    "Adres, başlık, açıklama, fiyat, medya, sanal tur, ilan notu, iletişim ve ilan kuralları ortak-alanlar.json üzerinden kullanılır."
+  ],
+  "capture": {
+    "capturedAt": "2026-10-05",
+    "captureMethod": "Authenticated Chrome DevTools Console DOM extraction",
+    "dropdownOptionListsCaptured": 12,
+    "dropdownOptionsCaptured": 130,
+    "dropdownOptionsCoverage": "complete for category-specific select controls in the current Villa form"
+  }
+}

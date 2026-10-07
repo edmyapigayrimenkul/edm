@@ -16,16 +16,33 @@
 
   "observability": { "enabled": true },
 
+  // Herkese açık talep/değerleme ucunda kötüye kullanım koruması.
+  // IP sınırı bilerek gevşek: mobil ağlarda bir IP'yi birden çok kişi paylaşabilir.
+  "ratelimits": [
+    {
+      "name": "TALEP_IP_SINIRI",
+      "namespace_id": "63001",
+      "simple": { "limit": 6, "period": 60 }
+    },
+    {
+      "name": "TALEP_GENEL_SINIR",
+      "namespace_id": "63002",
+      "simple": { "limit": 30, "period": 60 }
+    }
+  ],
+
   // İlan ve talep veritabanı
   "d1_databases": [
     {
       "binding": "VT",
       "database_name": "edm-talepler",
-      "database_id": "30d4df58-b49f-43c8-95c5-5a538ce44f68"
+      "database_id": "30d4df58-b49f-43c8-95c5-5a538ce44f68",
+      "migrations_dir": "migrations",
+      "migrations_table": "d1_migrations"
     }
   ],
 
-  // Portföy senkronu: her gün 06:00, 12:00, 18:00 ve 00:00 (UTC)
+  // Portföy senkronu: her gün 06:00, 12:00, 18:00 ve 00:00 (Türkiye saati)
   "triggers": {
     "crons": ["0 3,9,15,21 * * *"]
   },
@@ -38,8 +55,49 @@
   "send_email": [{ "name": "EPOSTA" }],
 
   "vars": {
+    // Yeni CRM sonucu kaydı, veri akışı kararları tamamlanana kadar kapalıdır.
+    "TALEP_IS_SONUCLARI_ETKIN": "0",
     "ACCESS_EKIP_ALANI": "ozbornstudio.cloudflareaccess.com",
     "ACCESS_AUD": "55604eaba7e4d8d8dfc3eff4db7902bb308f158ea9630d8bbd99c49251f55b0b",
+    "PANEL_ADMIN_EPOSTALARI": "edmyapigayrimenkul@gmail.com,ozdogandogukan@gmail.com",
+    "POSTEDM_DEPO": "edmyapigayrimenkul/postedm",
     "BILDIRIM_ADRESI": "ozdogandogukan@gmail.com"
+  },
+
+  // Üretimden bağımsız uzak test ortamı. --env staging olmadan dağıtılmaz.
+  "env": {
+    "staging": {
+      "workers_dev": true,
+      "preview_urls": false,
+      "d1_databases": [
+        {
+          "binding": "VT",
+          "database_name": "edm-talepler-staging",
+          "database_id": "17ca546e-1a76-46ab-9b73-95a944a97603",
+          "migrations_dir": "migrations",
+          "migrations_table": "d1_migrations"
+        }
+      ],
+      "r2_buckets": [{ "binding": "GORSELLER", "bucket_name": "edm-gorseller-staging" }],
+      "ratelimits": [
+        {
+          "name": "TALEP_IP_SINIRI",
+          "namespace_id": "63003",
+          "simple": { "limit": 6, "period": 60 }
+        },
+        {
+          "name": "TALEP_GENEL_SINIR",
+          "namespace_id": "63004",
+          "simple": { "limit": 30, "period": 60 }
+        }
+      ],
+      "triggers": { "crons": [] },
+      "vars": {
+        "STAGING_ORTAMI": "1",
+        "ACCESS_EKIP_ALANI": "ozbornstudio.cloudflareaccess.com",
+        "ACCESS_AUD": "9abf6f7f5ee1204d8c2c14c3f8e497e6fed310dbb077e3767baff2d139dcd27d",
+        "PANEL_ADMIN_EPOSTALARI": "edmyapigayrimenkul@gmail.com,ozdogandogukan@gmail.com"
+      }
+    }
   }
 }

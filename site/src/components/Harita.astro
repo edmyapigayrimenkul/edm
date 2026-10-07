@@ -32,7 +32,7 @@ const { enlem, boylam, etiket, yaricap = 700 } = Astro.props;
 >
   <div class="harita-tuval" data-harita-tuval></div>
   <p class="harita-not">
-    Harita mahalle sınırını gösterir, mülkün kesin konumunu değil.
+    Harita mahallenin yaklaşık konumunu gösterir; mülkün kesin konumunu göstermez.
   </p>
   <noscript>
     <p class="harita-not">Haritayı görmek için tarayıcınızda JavaScript gerekiyor.</p>
@@ -53,7 +53,7 @@ const { enlem, boylam, etiket, yaricap = 700 } = Astro.props;
   .harita-not {
     margin-top: 0.6rem;
     font-size: 0.75rem;
-    color: var(--color-kursun);
+    color: var(--color-kursun-okunur);
   }
 
   /* Leaflet'in kendi kontrollerini siteye yaklaştır */

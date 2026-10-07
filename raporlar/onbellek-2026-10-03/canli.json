@@ -1,0 +1,180 @@
+{
+  "surum": "efc93bf7-f9f7-4ef6-8e86-3f1a31a3c491",
+  "adimlar": [
+    {
+      "ad": "liste-MISS",
+      "yol": "/ilanlar?edm047=1791027014357",
+      "durum": 200,
+      "onbellek": "MISS",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "cfCache": null,
+      "merkez": "MXP",
+      "bayt": 283794,
+      "sha256": "4b640a8198ab0e16df7910db308a360c3eedff959fe583ff935cdc1afd847b99",
+      "zaman": "2026-10-03T11:30:15.328Z"
+    },
+    {
+      "ad": "liste-HIT",
+      "yol": "/ilanlar?edm047=1791027014357",
+      "durum": 200,
+      "onbellek": "HIT",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "cfCache": "HIT",
+      "merkez": "MXP",
+      "bayt": 283794,
+      "sha256": "4b640a8198ab0e16df7910db308a360c3eedff959fe583ff935cdc1afd847b99",
+      "zaman": "2026-10-03T11:30:15.415Z"
+    },
+    {
+      "ad": "genel-GET",
+      "yol": "/",
+      "durum": 200,
+      "onbellek": "MISS",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "cfCache": null,
+      "merkez": "MXP",
+      "bayt": 105882,
+      "sha256": "b0e617b92ce158cae5b5e08b975a23e712a00e7e25cbb874581badb896e699c6",
+      "zaman": "2026-10-03T11:30:15.888Z"
+    },
+    {
+      "ad": "genel-GET",
+      "yol": "/favorilerim",
+      "durum": 200,
+      "onbellek": "MISS",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "cfCache": null,
+      "merkez": "MXP",
+      "bayt": 272445,
+      "sha256": "4ff824c9958e1a07e0cb7c49c34411069c7d849fc964941b0a04e1bd0a66166d",
+      "zaman": "2026-10-03T11:30:16.438Z"
+    },
+    {
+      "ad": "genel-GET",
+      "yol": "/rehber/istanbul-silivri",
+      "durum": 200,
+      "onbellek": "MISS",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "cfCache": null,
+      "merkez": "MXP",
+      "bayt": 215309,
+      "sha256": "3e8009f80d6e3aa372605f5177cfc8c79fe4de9bf0fe50fbf7468ad4d60b5cd9",
+      "zaman": "2026-10-03T11:30:16.745Z"
+    },
+    {
+      "ad": "genel-GET",
+      "yol": "/ilan/selimpasa-araptepede-kiralik-deniz-manzarali-7-2-villa-19797428",
+      "durum": 200,
+      "onbellek": "MISS",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "cfCache": null,
+      "merkez": "MXP",
+      "bayt": 71798,
+      "sha256": "5ddc0981ed32483554e591c30f24229a1648653b145454c0f43a4d6d237f93ac",
+      "zaman": "2026-10-03T11:30:17.132Z"
+    },
+    {
+      "ad": "genel-bypass",
+      "yol": "/ilanlar?edm047=1791027014357",
+      "durum": 200,
+      "onbellek": null,
+      "kontrol": "private, no-store",
+      "cfCache": null,
+      "merkez": "MXP",
+      "bayt": 283794,
+      "sha256": "4b640a8198ab0e16df7910db308a360c3eedff959fe583ff935cdc1afd847b99",
+      "zaman": "2026-10-03T11:30:17.521Z"
+    },
+    {
+      "ad": "genel-bypass",
+      "yol": "/ilanlar?edm047=1791027014357",
+      "durum": 200,
+      "onbellek": null,
+      "kontrol": "private, no-store",
+      "cfCache": null,
+      "merkez": "MXP",
+      "bayt": 283794,
+      "sha256": "4b640a8198ab0e16df7910db308a360c3eedff959fe583ff935cdc1afd847b99",
+      "zaman": "2026-10-03T11:30:17.963Z"
+    },
+    {
+      "ad": "genel-bypass",
+      "yol": "/ilanlar?edm047=1791027014357",
+      "durum": 200,
+      "onbellek": null,
+      "kontrol": "private, no-store",
+      "cfCache": null,
+      "merkez": "MXP",
+      "bayt": 283794,
+      "sha256": "4b640a8198ab0e16df7910db308a360c3eedff959fe583ff935cdc1afd847b99",
+      "zaman": "2026-10-03T11:30:18.379Z"
+    },
+    {
+      "ad": "panel-yetkisiz",
+      "yol": "/yonetim/ilan-ekle",
+      "durum": 302,
+      "onbellek": null,
+      "kontrol": "private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "cfCache": null,
+      "merkez": "MXP",
+      "bayt": 143,
+      "sha256": "12755429beb15d5eb57eafa45b8dba326343dd099bf0552038694c3856e8860e",
+      "zaman": "2026-10-03T11:30:18.443Z"
+    },
+    {
+      "ad": "senkron-durumu",
+      "yol": "/api/senkron",
+      "durum": 200,
+      "onbellek": null,
+      "kontrol": "no-store",
+      "cfCache": null,
+      "merkez": "MXP",
+      "bayt": 1150,
+      "sha256": "a700bed17c75393e529fdd0469f3bce64d892897bd0dd71040adcaa502bd95d0",
+      "zaman": "2026-10-03T11:30:18.568Z"
+    },
+    {
+      "ad": "sitemap",
+      "yol": "/sitemap.xml",
+      "durum": 200,
+      "onbellek": null,
+      "kontrol": "public, max-age=0, must-revalidate",
+      "cfCache": null,
+      "merkez": "MXP",
+      "bayt": 15857,
+      "sha256": "4e92294110c01b11ee5647f7c2fc4ac789886a63b7efa4a2c49694b7843ab2bb",
+      "zaman": "2026-10-03T11:30:19.009Z"
+    },
+    {
+      "ad": "sure-sonrasi-MISS",
+      "yol": "/ilanlar?edm047=1791027014357",
+      "durum": 200,
+      "onbellek": "MISS",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "cfCache": null,
+      "merkez": "IST",
+      "bayt": 283794,
+      "sha256": "4b640a8198ab0e16df7910db308a360c3eedff959fe583ff935cdc1afd847b99",
+      "zaman": "2026-10-03T11:31:18.294Z"
+    },
+    {
+      "ad": "sure-sonrasi-HIT",
+      "yol": "/ilanlar?edm047=1791027014357",
+      "durum": 200,
+      "onbellek": "HIT",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "cfCache": "HIT",
+      "merkez": "IST",
+      "bayt": 283794,
+      "sha256": "4b640a8198ab0e16df7910db308a360c3eedff959fe583ff935cdc1afd847b99",
+      "zaman": "2026-10-03T11:31:18.388Z"
+    }
+  ],
+  "sonuc": {
+    "gecti": true,
+    "olcumSaniye": 63.051,
+    "uretimVerisiDegistirilmedi": true,
+    "sureDolumuKaniti": false,
+    "sureNotu": "İlk ölçümde MXP → IST merkez değişimi oldu; TTL için ayrı aynı bağlantı deneyi kullanılır."
+  }
+}

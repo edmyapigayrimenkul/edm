@@ -1,0 +1,18 @@
+[
+  {
+    "durum": 200,
+    "cache": "MISS",
+    "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+    "colo": "IST",
+    "boyutKaynaklari": true,
+    "yedekBetigi": true
+  },
+  {
+    "durum": 200,
+    "cache": "HIT",
+    "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+    "colo": "IST",
+    "boyutKaynaklari": true,
+    "yedekBetigi": true
+  }
+]

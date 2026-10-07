@@ -34,7 +34,13 @@ npm install
 
 npm run dev        # yerel geliştirme
 node scripts/dagit.mjs   # derle + Cloudflare'e yükle
+node --experimental-strip-types scripts/sahibinden-form-kapsami.mjs --check # kaynak form kapsamını doğrula
 ```
+
+Sahibinden tam form kaynağı `raporlar/sahibinden-sablonlari/tam-form-sablonlari.json` dosyasında;
+kategoriye göre zorunlu alanların üretilmiş eşlemesi `site/src/lib/sahibinden-zorunlu-alanlar.generated.ts`
+dosyasındadır. Kaynak eşlemesini yeniden üretmek için `site/` klasöründe
+`node --experimental-strip-types scripts/sahibinden-form-kapsami.mjs` çalıştırılır.
 
 Elle senkron (yeni ilan yayınlandığında beklemeden güncellemek için):
 

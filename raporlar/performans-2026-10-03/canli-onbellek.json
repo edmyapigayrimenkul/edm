@@ -1,0 +1,29 @@
+{
+  "zaman": "2026-10-03T10:54:33.914Z",
+  "sonuc": [
+    {
+      "sira": 0,
+      "durum": 200,
+      "edmCache": "MISS",
+      "onbellek": "public, max-age=60, s-maxage=60",
+      "yeniGorsel": true,
+      "tarih": "Sat, 03 Oct 2026 10:54:33 GMT"
+    },
+    {
+      "sira": 1,
+      "durum": 200,
+      "edmCache": "HIT",
+      "onbellek": "public, max-age=60, s-maxage=60",
+      "yeniGorsel": true,
+      "tarih": "Sat, 03 Oct 2026 10:54:33 GMT"
+    },
+    {
+      "sira": 2,
+      "durum": 200,
+      "edmCache": "HIT",
+      "onbellek": "public, max-age=60, s-maxage=60",
+      "yeniGorsel": true,
+      "tarih": "Sat, 03 Oct 2026 10:54:34 GMT"
+    }
+  ]
+}

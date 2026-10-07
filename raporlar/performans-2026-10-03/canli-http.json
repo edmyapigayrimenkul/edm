@@ -1,0 +1,83 @@
+{
+  "zaman": "2026-10-03T10:51:14.053Z",
+  "surum": "32f939a0-b23b-4e07-864e-47bc8b2a9018",
+  "sonuc": [
+    {
+      "yol": "/",
+      "durum": 200,
+      "onbellek": "public, max-age=60, s-maxage=60",
+      "edmCache": null,
+      "gorsel": 37,
+      "secenekli": 24,
+      "gizliSecenekli": 0,
+      "kapaliGaleriKaynakli": null,
+      "htmlBayt": 105882
+    },
+    {
+      "yol": "/ilanlar",
+      "durum": 200,
+      "onbellek": "public, max-age=60, s-maxage=60",
+      "edmCache": null,
+      "gorsel": 51,
+      "secenekli": 29,
+      "gizliSecenekli": 0,
+      "kapaliGaleriKaynakli": null,
+      "htmlBayt": 283794
+    },
+    {
+      "yol": "/ilan/silivri-cumhuriyet-mah-satilik-2-1-deniz-manzarali-daire-18693270",
+      "durum": 200,
+      "onbellek": "public, max-age=60, s-maxage=60",
+      "edmCache": null,
+      "gorsel": 12,
+      "secenekli": 7,
+      "gizliSecenekli": 0,
+      "kapaliGaleriKaynakli": false,
+      "htmlBayt": 74354
+    },
+    {
+      "yol": "/favorilerim",
+      "durum": 200,
+      "onbellek": "public, max-age=60, s-maxage=60",
+      "edmCache": null,
+      "gorsel": 51,
+      "secenekli": 0,
+      "gizliSecenekli": 29,
+      "kapaliGaleriKaynakli": null,
+      "htmlBayt": 272445
+    },
+    {
+      "yol": "/degerleme",
+      "durum": 200,
+      "onbellek": "public, max-age=60, s-maxage=60",
+      "edmCache": null,
+      "gorsel": 3,
+      "secenekli": 0,
+      "gizliSecenekli": 0,
+      "kapaliGaleriKaynakli": null,
+      "htmlBayt": 39408
+    },
+    {
+      "yol": "/api/senkron",
+      "durum": 200,
+      "onbellek": "no-store",
+      "edmCache": null,
+      "gorsel": 0,
+      "secenekli": 0,
+      "gizliSecenekli": 0,
+      "kapaliGaleriKaynakli": null,
+      "htmlBayt": 1150
+    },
+    {
+      "yol": "/yonetim",
+      "durum": 302,
+      "onbellek": "private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "edmCache": null,
+      "gorsel": 0,
+      "secenekli": 0,
+      "gizliSecenekli": 0,
+      "kapaliGaleriKaynakli": null,
+      "htmlBayt": 143
+    }
+  ]
+}

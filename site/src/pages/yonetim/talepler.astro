@@ -1,56 +1,114 @@
 ---
 import Panel from '../../layouts/Panel.astro';
 import { paneleGiris } from '../../lib/panel/yetki';
+import { semayiKur } from '../../lib/senkron/depo';
 import { env } from 'cloudflare:workers';
+import { belirsizBildirimleriAyir, talepBildiriminiYenidenDene, talepBildirimMetni } from '../../lib/talep-bildirim';
+
+import { TALEP_SONUCLARI, TAKIP_KOSULLARI, TalepTakipHatasi, talepTakibiniKaydet, takipFormTarihi, takipSayimlariniAl } from '../../lib/talep-takip';
+import { talepUyarilariniKaydet } from '../../lib/isletim-uyari';
+import { isSonucuKaydiEtkin,talepIsSonucunuKaydet } from '../../lib/talep-is-sonucu';
+import TalepIsSonucu from '../../components/panel/TalepIsSonucu.astro';
 
 const giris = await paneleGiris(Astro.request);
 if ('yanit' in giris) return giris.yanit;
 
 const vt = env.VT as D1Database;
+const isSonuclariEtkin = isSonucuKaydiEtkin(env,Astro.url.href);
+await semayiKur(vt);
+await belirsizBildirimleriAyir(vt);
 let bildirim: { tur: 'basari' | 'hata'; metin: string } | null = null;
 
 if (Astro.request.method === 'POST') {
+  if (Astro.request.headers.get('Origin') !== Astro.url.origin) {
+    return new Response('İstek kaynağı doğrulanamadı.', { status: 403 });
+  }
   const form = await Astro.request.formData();
   const id = Number(form.get('id'));
   const eylem = String(form.get('eylem') ?? '');
 
-  if (id && eylem === 'durum') {
-    const yeniDurum = String(form.get('durum') ?? 'yeni');
-    await vt
-      .prepare(
-        `UPDATE talepler
-         SET durum = ?, ilgilenen = ?, kapanma = CASE WHEN ? = 'kapandi' THEN datetime('now') ELSE NULL END
-         WHERE id = ?`
-      )
-      .bind(yeniDurum, giris.kimlik.eposta, yeniDurum, id)
-      .run();
-    bildirim = { tur: 'basari', metin: 'Talep durumu güncellendi.' };
+  if (eylem === 'is-sonucu' && !isSonuclariEtkin) return new Response('İş sonucu kaydı henüz kullanıma açılmadı.',{status:403});
+  if (['takip', 'not', 'is-sonucu'].includes(eylem)) {
+    try {
+      if (eylem==='is-sonucu') await talepIsSonucunuKaydet(vt,giris.kimlik.eposta,form);
+      else await talepTakibiniKaydet(vt, giris.kimlik.eposta, form);
+      bildirim = { tur: 'basari', metin: eylem === 'not' ? 'İç not kaydedildi.' : eylem === 'is-sonucu' ? 'Gerçek iş sonucu kaydedildi; talep durumu ve takip planı ayrıca korunuyor.' : 'Sorumlu, takip planı ve sonuç kaydedildi.' };
+      try { await talepUyarilariniKaydet(vt); } catch {
+        // Talep kaydı başarılıdır; uyarı özeti cron'da yeniden hesaplanır.
+        console.error('[talep-takip] Uyarı özeti güncellenemedi.');
+      }
+    } catch (hata) {
+      bildirim = { tur: 'hata', metin: hata instanceof TalepTakipHatasi ? hata.message : 'Talep kaydedilemedi. Güncel bilgileri kontrol edip tekrar deneyin.' };
+    }
+  } else if (eylem !== 'bildirim') {
+    bildirim = { tur: 'hata', metin: 'Geçerli bir talep işlemi seçin.' };
   }
 
-  if (id && eylem === 'not') {
-    await vt
-      .prepare(`UPDATE talepler SET ic_not = ? WHERE id = ?`)
-      .bind(String(form.get('ic_not') ?? '').slice(0, 2000) || null, id)
-      .run();
-    bildirim = { tur: 'basari', metin: 'Not kaydedildi.' };
+  if (Number.isSafeInteger(id) && id > 0 && eylem === 'bildirim') {
+    try {
+      const sonuc = await talepBildiriminiYenidenDene(vt, env, id);
+      bildirim = sonuc === 'gonderildi'
+        ? { tur: 'basari', metin: 'E-posta gönderimine kabul edildi. Gelen kutusuna teslim ayrıca kontrol edilebilir.' }
+        : sonuc === 'belirsiz'
+          ? { tur: 'hata', metin: 'Gönderim sonucu doğrulanamadı. Tekrar denemeden önce Gmail’i kontrol edin.' }
+        : sonuc === 'atlanmis'
+          ? { tur: 'hata', metin: 'Bu bildirim zaten gönderilmiş, işleniyor veya eski kayıt için durum bilinmiyor.' }
+          : { tur: 'hata', metin: 'E-posta gönderilemedi. Talep korunuyor; bildirim durumu aşağıda gösteriliyor.' };
+    } catch {
+      bildirim = { tur: 'hata', metin: 'Bildirim işlemi tamamlanamadı. Gönderim durumunu kontrol edin.' };
+    }
   }
+
 }
 
-const suzgec = Astro.url.searchParams.get('durum') ?? 'hepsi';
-const kosul =
-  suzgec === 'hepsi' ? '' : suzgec === 'acik' ? `WHERE durum <> 'kapandi'` : `WHERE durum = ?`;
+const hamSuzgec = Astro.url.searchParams.get('durum') ?? 'hepsi';
+const suzgec = ['hepsi','acik','yeni','islemde','kapandi'].includes(hamSuzgec) ? hamSuzgec : 'hepsi';
+const takipSuzgeci = Astro.url.searchParams.get('takip') ?? '';
+const takipKosulu = Object.hasOwn(TAKIP_KOSULLARI, takipSuzgeci)
+  ? TAKIP_KOSULLARI[takipSuzgeci as keyof typeof TAKIP_KOSULLARI] : null;
+let kosul =
+  suzgec === 'hepsi' ? '' : suzgec === 'acik' ? `WHERE t.durum <> 'kapandi'` : `WHERE t.durum = ?`;
+const bildirimUyarilari = Astro.url.searchParams.get('bildirim') === 'uyari';
+if (bildirimUyarilari) kosul += `${kosul ? ' AND' : 'WHERE'} b.durum IN ('basarisiz', 'belirsiz')`;
+if (takipKosulu) kosul += `${kosul ? ' AND ' : 'WHERE '}${takipKosulu}`;
 const baglar = suzgec === 'hepsi' || suzgec === 'acik' ? [] : [suzgec];
 
+const filtreSayimi = await vt.prepare(`SELECT COUNT(*) AS adet FROM talepler t
+  LEFT JOIN talep_bildirim b ON b.talep_id=t.id LEFT JOIN ekip e ON e.slug=t.sorumlu_slug ${kosul}`)
+  .bind(...baglar).first<{adet:number}>();
+const sayfaSayisi = Math.max(1,Math.ceil(Number(filtreSayimi?.adet || 0)/200));
+const hamSayfa = Number(Astro.url.searchParams.get('sayfa') || 1);
+const sayfa = Number.isSafeInteger(hamSayfa) ? Math.min(sayfaSayisi,Math.max(1,hamSayfa)) : 1;
+const sayfaYolu = (n:number) => {
+  const q = new URLSearchParams({durum:suzgec,sayfa:String(n)});
+  if (takipKosulu) q.set('takip',takipSuzgeci);
+  if (bildirimUyarilari) q.set('bildirim','uyari');
+  return `/yonetim/talepler?${q}`;
+};
+
 const talepler = await vt
-  .prepare(`SELECT * FROM talepler ${kosul} ORDER BY id DESC LIMIT 200`)
-  .bind(...baglar)
+  .prepare(`SELECT t.*, ${isSonuclariEtkin ? 's.talep_id AS is_sonucu_kayitli,s.yanit_durumu,s.ilk_yanit,s.nitelik,s.randevu_durumu,s.randevu_tarihi,s.islem_turu,s.islem_tarihi,' : ''} b.durum AS bildirim_durumu, b.deneme AS bildirim_deneme,
+    b.son_deneme AS bildirim_son_deneme, b.kabul AS bildirim_kabul, e.ad AS sorumlu_ad,
+    CASE WHEN t.durum<>'kapandi' AND datetime(t.takip_tarihi)<=datetime('now') THEN 1 ELSE 0 END AS takip_gecikti
+    FROM talepler t LEFT JOIN talep_bildirim b ON b.talep_id = t.id
+    LEFT JOIN ekip e ON e.slug=t.sorumlu_slug
+    ${isSonuclariEtkin ? 'LEFT JOIN talep_is_sonucu s ON s.talep_id=t.id' : ''}
+    ${kosul} ORDER BY takip_gecikti DESC,
+      CASE WHEN t.durum<>'kapandi' AND e.slug IS NULL THEN 1 ELSE 0 END DESC,
+      CASE WHEN t.durum<>'kapandi' AND t.takip_tarihi IS NULL THEN 1 ELSE 0 END DESC, CASE WHEN t.durum<>'kapandi' THEN datetime(t.takip_tarihi) END ASC, t.id DESC LIMIT 200 OFFSET ?`)
+  .bind(...baglar, (sayfa-1)*200)
   .all<Record<string, unknown>>();
 
+// Yayında olmayan danışman da iç takip sorumlusu olabilir; bu seçim panel erişimi vermez.
+const ekip = await vt.prepare('SELECT slug,ad FROM ekip ORDER BY sira,ad').all<{slug:string;ad:string}>();
+const takipSayimlari = await takipSayimlariniAl(vt);
 const sayimlar = await vt
   .prepare(`SELECT durum, COUNT(*) AS adet FROM talepler GROUP BY durum`)
   .all<{ durum: string; adet: number }>();
 const say = Object.fromEntries((sayimlar.results ?? []).map((s) => [s.durum, s.adet]));
 const toplam = Object.values(say).reduce((t: number, n) => t + Number(n), 0);
+const bildirimUyariSayisi = await vt.prepare(`SELECT COUNT(*) AS adet FROM talep_bildirim
+  WHERE durum IN ('basarisiz', 'belirsiz')`).first<{ adet: number }>();
 
 const suzgecler = [
   { deger: 'hepsi', ad: 'Hepsi', adet: toplam },
@@ -62,7 +120,8 @@ const suzgecler = [
 
 const tarih = (d: unknown) =>
   d
-    ? new Date(String(d).replace(' ', 'T') + 'Z').toLocaleString('tr-TR', {
+    ? new Date(String(d).includes('T') ? String(d) : String(d).replace(' ', 'T') + 'Z').toLocaleString('tr-TR', {
+        timeZone: 'Europe/Istanbul',
         day: 'numeric',
         month: 'long',
         hour: '2-digit',
@@ -82,12 +141,30 @@ const cipAd = (durum: unknown) =>
   ozet="Siteden gelen değerleme ve iletişim formları"
 >
   {bildirim && <div class={`bildirim bildirim--${bildirim.tur}`}>{bildirim.metin}</div>}
+  {Number(bildirimUyariSayisi?.adet) > 0 && (
+    <div class="bildirim bildirim--hata" role="status">
+      {bildirimUyariSayisi?.adet} talebin e-posta bildirimi kontrol bekliyor.
+      <a href="/yonetim/talepler?bildirim=uyari">Bildirim uyarılarını göster</a>
+    </div>
+  )}
 
+  <nav class="takip-ozet" aria-label="Takip öncelikleri">
+    {[
+      {deger:'sahipsiz',ad:'Sorumlu bekleyen',adet:takipSayimlari?.sahipsiz},
+      {deger:'geciken',ad:'Takibi geciken',adet:takipSayimlari?.geciken},
+      {deger:'plansiz',ad:'Takip tarihi bekleyen',adet:takipSayimlari?.plansiz},
+    ].map((s)=>(
+      <a href={`/yonetim/talepler?durum=acik&takip=${s.deger}`} aria-current={takipSuzgeci===s.deger?'true':undefined}>
+        <strong class="veri-sayi">{Number(s.adet) || 0}</strong><span>{s.ad}</span>
+      </a>
+    ))}
+  </nav>
+  <p class="takip-aciklama">Geciken ve sahipsiz talepler önce gösterilir. Bir talep birden fazla öncelikte sayılabilir. Saatler Türkiye saatidir.</p>
   <div class="suzgec-satir">
     {
       suzgecler.map((s) => (
         <a
-          href={s.deger === 'hepsi' ? '/yonetim/talepler' : `/yonetim/talepler?durum=${s.deger}`}
+          href={`/yonetim/talepler?durum=${s.deger}${bildirimUyarilari ? '&bildirim=uyari' : ''}${takipKosulu ? `&takip=${takipSuzgeci}` : ''}`}
           class="suzgec"
           aria-current={suzgec === s.deger ? 'true' : undefined}
         >
@@ -97,26 +174,26 @@ const cipAd = (durum: unknown) =>
       ))
     }
   </div>
+  {(bildirimUyarilari || takipKosulu) && <p><a href="/yonetim/talepler">Tüm taleplere dön</a></p>}
 
   {
     (talepler.results ?? []).length === 0 ? (
       <div class="kutu">
         <p class="bos">
-          Bu filtrede talep yok. Formlar çalışıyor — biri değerleme veya iletişim formunu
-          doldurduğunda buraya düşecek ve Gmail'inize de bildirim gidecek.
+          Bu filtrede gösterilecek talep yok. Yeni değerleme ve iletişim talepleri burada listelenir. E-posta gönderiminin durumunu talebin yanında görebilirsiniz.
         </p>
       </div>
     ) : (
       <div class="talep-liste">
         {(talepler.results ?? []).map((t) => (
-          <article class="talep" id={`t${t.id}`}>
+          <article class={`talep ${t.takip_gecikti || (t.durum!=='kapandi' && !t.sorumlu_ad) ? 'talep--oncelikli' : ''}`} id={`t${t.id}`}>
             <div class="talep-bas">
               <div>
                 <div class="talep-kimlik">
                   <h2>{String(t.ad)}</h2>
                   <span class={`cip ${cipSinif(t.durum)}`}>{cipAd(t.durum)}</span>
                   <span class="cip cip--pasif">
-                    {t.tur === 'degerleme' ? 'Değerleme' : 'İletişim'}
+                    {t.tur === 'degerleme' ? 'Değerleme' : t.ilan_id ? 'İlan talebi' : 'İletişim'}
                   </span>
                 </div>
                 <p class="talep-zaman veri-sayi">{tarih(t.olusturma)}</p>
@@ -127,7 +204,7 @@ const cipAd = (durum: unknown) =>
                   {String(t.telefon)}
                 </a>
                 <a
-                  href={`https://wa.me/9${String(t.telefon).replace(/\D/g, '')}`}
+                  href={`https://wa.me/${String(t.telefon).replace(/\D/g, '')}`}
                   target="_blank"
                   rel="noopener"
                   class="pd pd--sade"
@@ -141,6 +218,45 @@ const cipAd = (durum: unknown) =>
                 )}
               </div>
             </div>
+
+            <dl class="takip-bilgi">
+              <div><dt>Sorumlu</dt><dd>{String(t.sorumlu_ad ?? (t.durum==='kapandi' ? 'Eski kayıtta belirtilmemiş' : 'Atanmadı'))}</dd></div>
+              <div><dt>Sonraki takip</dt><dd>{t.durum==='kapandi' ? 'Kapalı talep' : t.takip_tarihi ? tarih(t.takip_tarihi) : 'Planlanmadı'}
+                {Number(t.takip_gecikti)===1 && <span class="cip cip--yeni">Takip gecikti</span>}
+              </dd></div>
+              <div><dt>Kapanış sonucu</dt><dd>{t.sonuc ? TALEP_SONUCLARI[t.sonuc as keyof typeof TALEP_SONUCLARI] : t.durum==='kapandi' ? 'Eski kayıtta belirtilmemiş' : 'Henüz kapanmadı'}</dd></div>
+            </dl>
+
+            <div class="talep-bildirim" role={['basarisiz', 'belirsiz'].includes(String(t.bildirim_durumu)) ? 'status' : undefined}>
+              <p><strong>{talepBildirimMetni(t.bildirim_durumu, t.bildirim_deneme)}</strong></p>
+              {t.bildirim_son_deneme && <p>Son deneme: {tarih(t.bildirim_son_deneme)} · {Number(t.bildirim_deneme)} deneme</p>}
+              {t.bildirim_durumu === 'basarisiz' && <p>Talep kaydı korunuyor. Otomatik denemeler mevcut 6 saatlik çalışma takviminde yapılır.</p>}
+              {t.bildirim_durumu === 'belirsiz' && <p>Önce Gmail’i kontrol edin; tekrar gönderim ikinci bir e-posta oluşturabilir.</p>}
+              {['bekliyor', 'basarisiz', 'belirsiz'].includes(String(t.bildirim_durumu)) && (
+                <form method="POST">
+                  <input type="hidden" name="id" value={String(t.id)} />
+                  <input type="hidden" name="eylem" value="bildirim" />
+                  <button type="submit" class="pd pd--sade">E-postayı tekrar dene</button>
+                </form>
+              )}
+            </div>
+
+            {t.ilan_id && (
+              <div class="talep-ilan">
+                <div>
+                  <span>İLGİLİ İLAN · NO {String(t.ilan_id)}</span>
+                  <strong>{String(t.ilan_baslik ?? `İlan ${t.ilan_id}`)}</strong>
+                </div>
+                <nav aria-label="İlgili ilan bağlantıları">
+                  {String(t.kaynak ?? '').startsWith('/ilan/') && (
+                    <a href={String(t.kaynak)} class="pd pd--sade" target="_blank" rel="noopener">İlanı aç</a>
+                  )}
+                  <a href={`/yonetim/ilan-duzenle/${encodeURIComponent(String(t.ilan_id))}`} class="pd pd--birincil">
+                    Düzenle
+                  </a>
+                </nav>
+              </div>
+            )}
 
             <dl class="talep-veri">
               {t.mulk_tipi && (
@@ -173,7 +289,7 @@ const cipAd = (durum: unknown) =>
                   <dd class="veri-sayi">{String(t.eposta)}</dd>
                 </div>
               )}
-              {t.kaynak && (
+              {t.kaynak && !t.ilan_id && (
                 <div>
                   <dt>Geldiği sayfa</dt>
                   <dd class="veri-sayi">{String(t.kaynak)}</dd>
@@ -183,34 +299,48 @@ const cipAd = (durum: unknown) =>
 
             {t.mesaj && <p class="talep-mesaj">{String(t.mesaj)}</p>}
 
+            {isSonuclariEtkin && <TalepIsSonucu talep={t}/>}
+
             <div class="talep-eylem">
-              <form method="POST" class="talep-durum">
+              <form method="POST" class="talep-plan">
                 <input type="hidden" name="id" value={String(t.id)} />
-                <input type="hidden" name="eylem" value="durum" />
-                {t.durum !== 'islemde' && (
-                  <button type="submit" name="durum" value="islemde" class="pd pd--sade">
-                    İşleme al
-                  </button>
-                )}
-                {t.durum !== 'kapandi' && (
-                  <button type="submit" name="durum" value="kapandi" class="pd pd--sade">
-                    Kapat
-                  </button>
-                )}
-                {t.durum !== 'yeni' && (
-                  <button type="submit" name="durum" value="yeni" class="pd pd--sade">
-                    Yeniye al
-                  </button>
-                )}
+                <input type="hidden" name="eylem" value="takip" />
+                <input type="hidden" name="takip_surumu" value={String(t.takip_surumu)} />
+                <div class="takip-alanlar">
+                  <label class="p-alan"><span>Sorumlu danışman</span>
+                    <select name="sorumlu_slug"><option value="">Sorumlu seçin</option>
+                      {(ekip.results ?? []).map((e)=><option value={e.slug} selected={t.sorumlu_slug===e.slug}>{e.ad}</option>)}
+                    </select>
+                  </label>
+                  <label class="p-alan"><span>Sonraki takip · Türkiye saati</span>
+                    <input type="datetime-local" name="takip_tarihi" value={takipFormTarihi(t.takip_tarihi)} />
+                  </label>
+                  <label class="p-alan"><span>Durum</span>
+                    <select name="durum">
+                      <option value="yeni" selected={t.durum==='yeni'}>Yeni</option>
+                      <option value="islemde" selected={t.durum==='islemde'}>İşlemde</option>
+                      <option value="kapandi" selected={t.durum==='kapandi'}>Kapandı</option>
+                    </select>
+                  </label>
+                  <label class="p-alan"><span>Kapatırken sonuç</span>
+                    <select name="sonuc"><option value="">Sonuç seçin</option>
+                      {Object.entries(TALEP_SONUCLARI).map(([deger,ad])=><option value={deger} selected={t.sonuc===deger}>{ad}</option>)}
+                    </select>
+                  </label>
+                </div>
+                <p class="takip-aciklama">İşlemde: sorumlu ve ilerideki takip tarihi gerekir. Kapandı: sorumlu ve gerçekleşen sonuç gerekir; takip tarihi kaldırılır. Yeniden açınca kapanış sonucu temizlenir. “Talep karşılandı” satış gerçekleştiği anlamına gelmez.</p>
+                <button type="submit" class="pd pd--birincil">Takip planını kaydet</button>
               </form>
 
               <form method="POST" class="talep-not">
                 <input type="hidden" name="id" value={String(t.id)} />
                 <input type="hidden" name="eylem" value="not" />
+                <input type="hidden" name="takip_surumu" value={String(t.takip_surumu)} />
                 <label class="p-alan">
                   <span>İç not</span>
                   <textarea
                     name="ic_not"
+                    maxlength="2000"
                     rows="2"
                     placeholder="Görüşme notu, sonraki adım…"
                     set:text={String(t.ic_not ?? '')}
@@ -221,16 +351,53 @@ const cipAd = (durum: unknown) =>
             </div>
 
             {t.ilgilenen && (
-              <p class="talep-ilgilenen">Son işlem: {String(t.ilgilenen)}</p>
+              <p class="talep-ilgilenen">Son düzenleyen: {String(t.ilgilenen)}</p>
             )}
           </article>
         ))}
       </div>
     )
   }
+  {sayfaSayisi > 1 && <nav class="suzgec-satir sayfalama" aria-label="Talep sayfaları">
+    {sayfa>1 && <a class="pd pd--sade" href={sayfaYolu(sayfa-1)}>Önceki</a>}
+    <span>Sayfa {sayfa} / {sayfaSayisi} · Bu filtrede {Number(filtreSayimi?.adet)} talep</span>
+    {sayfa<sayfaSayisi && <a class="pd pd--sade" href={sayfaYolu(sayfa+1)}>Sonraki</a>}
+  </nav>}
 </Panel>
 
 <style>
+  .sayfalama { align-items:center; margin-top:1rem; font-size:.8rem; }
+  .takip-ozet { display:grid; grid-template-columns:repeat(3,1fr); gap:.7rem; }
+  .takip-ozet a { display:grid; gap:.3rem; background:#fff; border:1px solid #ddd; border-radius:8px; padding:1rem; color:var(--color-murekkep); }
+  .takip-ozet a[aria-current] { border-color:var(--color-kirmizi); }
+  .takip-ozet strong { font-size:1.7rem; }
+  .takip-ozet span { font-size:.8rem; }
+  .takip-aciklama { color:var(--color-kursun); font-size:.8rem; line-height:1.6; margin:.7rem 0 1rem; }
+  .takip-bilgi { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; padding:1rem; margin-top:1rem; background:var(--color-kagit); border-radius:6px; }
+  .takip-bilgi dt { font-size:.75rem; color:var(--color-kursun); margin-bottom:.25rem; }
+  .takip-bilgi dd { font-size:.85rem; }
+  .takip-bilgi .cip { display:inline-flex; margin:.25rem; }
+  .talep--oncelikli { border-left:3px solid var(--color-kirmizi); }
+  .takip-alanlar { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.8rem; }
+  .takip-alanlar input, .takip-alanlar select { min-width:0; width:100%; }
+  @media(max-width:640px) {
+    .takip-ozet { grid-template-columns:1fr; }
+    .takip-ozet a { grid-template-columns:2.5rem 1fr; align-items:center; }
+    .takip-bilgi,.takip-alanlar { grid-template-columns:1fr; }
+    .talep-not { flex-direction:column; align-items:stretch !important; }
+    .talep-not .p-alan { width:100%; }
+  }
+
+  .talep-bildirim {
+    margin-top: 1rem;
+    padding: 0.8rem 1rem;
+    background: var(--color-kagit);
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+  .talep-bildirim form { margin-top: 0.5rem; }
+
   .suzgec-satir {
     display: flex;
     flex-wrap: wrap;
@@ -263,6 +430,47 @@ const cipAd = (durum: unknown) =>
     display: flex;
     flex-direction: column;
     gap: 0.85rem;
+  }
+  .talep-ilan {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid color-mix(in oklab, var(--color-kirmizi) 18%, transparent);
+    border-radius: 7px;
+    background: color-mix(in oklab, var(--color-kirmizi) 4%, #fff);
+  }
+  .talep-ilan > div {
+    display: grid;
+    min-width: 0;
+    gap: 0.25rem;
+  }
+  .talep-ilan span {
+    font-family: var(--font-veri);
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    color: var(--color-kirmizi-derin);
+  }
+  .talep-ilan strong {
+    font-size: 0.875rem;
+    line-height: 1.35;
+  }
+  .talep-ilan nav {
+    display: flex;
+    flex: none;
+    gap: 0.4rem;
+  }
+  @media (max-width: 640px) {
+    .talep-ilan {
+      align-items: stretch;
+      flex-direction: column;
+    }
+    .talep-ilan nav a {
+      flex: 1;
+      justify-content: center;
+    }
   }
   .talep {
     background: #fff;
@@ -342,17 +550,6 @@ const cipAd = (durum: unknown) =>
     margin-top: 1.1rem;
     padding-top: 1rem;
     border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 8%, transparent);
-  }
-  @media (min-width: 780px) {
-    .talep-eylem {
-      grid-template-columns: auto 1fr;
-      align-items: end;
-    }
-  }
-  .talep-durum {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
   }
   .talep-not {
     display: flex;

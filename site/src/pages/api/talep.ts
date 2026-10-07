@@ -8,39 +8,37 @@
 
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
-import { epostaGonder } from '../../lib/eposta';
-
-interface Talep {
-  tur?: string;
-  ad?: string;
-  telefon?: string;
-  eposta?: string;
-  konu?: string;
-  tip?: string;
-  ilce?: string;
-  mahalle?: string;
-  m2?: string;
-  not?: string;
-  mesaj?: string;
-  kaynak?: string;
-  website?: string; // bot tuzağı
-}
+import { talebiKaydet, talepBildiriminiGonder } from '../../lib/talep-bildirim';
+import { talebiDogrula } from '../../lib/talep-dogrulama';
+import { semayiKur } from '../../lib/senkron/depo';
 
 const JSON_BASLIK = { 'Content-Type': 'application/json; charset=utf-8' };
-const yanit = (govde: unknown, durum = 200) =>
-  new Response(JSON.stringify(govde), { status: durum, headers: JSON_BASLIK });
+const yanit = (govde: unknown, durum = 200, ekBasliklar: Record<string, string> = {}) =>
+  new Response(JSON.stringify(govde), { status: durum, headers: { ...JSON_BASLIK, ...ekBasliklar } });
 
-/** Girdiyi kırpar ve aşırı uzun değerleri keser. */
-function temizle(deger: unknown, enFazla = 500): string | null {
-  if (typeof deger !== 'string') return null;
-  const kirpik = deger.trim();
-  return kirpik ? kirpik.slice(0, enFazla) : null;
+interface HizSiniri {
+  limit(ayar: { key: string }): Promise<{ success: boolean }>;
+}
+
+async function hizSiniriAsildiMi(request: Request): Promise<boolean> {
+  const ortam = env as unknown as Record<string, unknown>;
+  const genel = ortam.TALEP_GENEL_SINIR as HizSiniri | undefined;
+  const ipSiniri = ortam.TALEP_IP_SINIRI as HizSiniri | undefined;
+  const ip = request.headers.get('CF-Connecting-IP')?.trim();
+  const kontroller = [
+    genel?.limit({ key: 'talep-formlari' }),
+    ip && ipSiniri ? ipSiniri.limit({ key: `ip:${ip}` }) : null,
+  ].filter((islem): islem is Promise<{ success: boolean }> => Boolean(islem));
+  if (!kontroller.length) return false;
+  const sonuclar = await Promise.all(kontroller);
+  return sonuclar.some((sonuc) => !sonuc.success);
 }
 
 export const POST: APIRoute = async ({ request }) => {
   const vt = env.VT as D1Database;
+  await semayiKur(vt);
 
-  let veri: Talep;
+  let veri: Record<string, unknown>;
   try {
     veri = await request.json();
   } catch {
@@ -50,15 +48,18 @@ export const POST: APIRoute = async ({ request }) => {
   // Bot tuzağı doluysa sessizce başarı dön — bota ipucu vermiyoruz.
   if (veri.website) return yanit({ tamam: true });
 
-  const ad = temizle(veri.ad, 120);
-  const telefon = temizle(veri.telefon, 40);
-
-  if (!ad || !telefon) return yanit({ hata: 'Ad ve telefon gerekli.' }, 400);
-  if (telefon.replace(/\D/g, '').length < 10) {
-    return yanit({ hata: 'Telefon numarası geçerli görünmüyor.' }, 400);
+  if (await hizSiniriAsildiMi(request)) {
+    return yanit(
+      { hata: 'Çok kısa sürede fazla istek gönderildi. Bir dakika sonra yeniden deneyin.' },
+      429,
+      { 'Retry-After': '60' }
+    );
   }
 
-  const ip = request.headers.get('CF-Connecting-IP') ?? '';
+  const dogrulama = talebiDogrula(veri);
+  if (!dogrulama.tamam) return yanit({ hata: dogrulama.hata, alan: dogrulama.alan }, 400);
+  const kayit = dogrulama.talep;
+
   const ulke = request.headers.get('CF-IPCountry');
 
   // Basit hız sınırı: aynı numaradan 2 dakika içinde ikinci talep alınmaz.
@@ -66,85 +67,27 @@ export const POST: APIRoute = async ({ request }) => {
     const son = await vt
       .prepare(
         `SELECT COUNT(*) AS adet FROM talepler
-         WHERE telefon = ? AND olusturma > datetime('now', '-2 minutes')`
+         WHERE telefon = ? AND COALESCE(ilan_id, '') = COALESCE(?, '')
+           AND olusturma > datetime('now', '-2 minutes')`
       )
-      .bind(telefon)
+      .bind(kayit.telefon, kayit.ilan_id)
       .first<{ adet: number }>();
     if ((son?.adet ?? 0) > 0) return yanit({ tamam: true, not: 'zaten alındı' });
   } catch {
     // Sorgu başarısızsa talebi yine de kaydetmeyi deniyoruz.
   }
 
-  const kayit = {
-    tur: temizle(veri.tur, 30) ?? 'iletisim',
-    ad,
-    telefon,
-    eposta: temizle(veri.eposta, 160),
-    konu: temizle(veri.konu, 160),
-    mulk_tipi: temizle(veri.tip, 80),
-    ilce: temizle(veri.ilce, 80),
-    mahalle: temizle(veri.mahalle, 120),
-    m2: Number.parseInt(String(veri.m2 ?? ''), 10) || null,
-    mesaj: temizle(veri.not ?? veri.mesaj, 4000),
-    kaynak: temizle(veri.kaynak, 200),
-    ip_ulke: ulke,
-  };
-
+  let id: number;
   try {
-    await vt
-      .prepare(
-        `INSERT INTO talepler
-           (tur, ad, telefon, eposta, konu, mulk_tipi, ilce, mahalle, m2, mesaj, kaynak, ip_ulke)
-         VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`
-      )
-      .bind(
-        kayit.tur,
-        kayit.ad,
-        kayit.telefon,
-        kayit.eposta,
-        kayit.konu,
-        kayit.mulk_tipi,
-        kayit.ilce,
-        kayit.mahalle,
-        kayit.m2,
-        kayit.mesaj,
-        kayit.kaynak,
-        kayit.ip_ulke
-      )
-      .run();
-  } catch (hata) {
-    console.error('Talep kaydedilemedi:', hata);
+    id = await talebiKaydet(vt, kayit, ulke);
+  } catch {
+    console.error('Talep ve bildirim kuyruğu kaydedilemedi.');
     return yanit({ hata: 'Talep kaydedilemedi.' }, 500);
   }
 
-  await bildirimGonder(kayit, ip).catch((h) => console.error('Bildirim gönderilemedi:', h));
+  await talepBildiriminiGonder(vt, env, id).catch(() =>
+    console.error('Talep bildirimi tamamlanamadı; kalıcı kuyruk kaydı korunuyor.')
+  );
 
   return yanit({ tamam: true });
 };
-
-/** Talep bildirimi — ortak e-posta modülü üzerinden. */
-async function bildirimGonder(kayit: Record<string, unknown>, ip: string): Promise<void> {
-  const konu =
-    kayit.tur === 'degerleme'
-      ? `Değerleme talebi — ${kayit.ad}`
-      : `İletişim formu — ${kayit.ad}`;
-
-  const govde = [
-    ['Ad Soyad', kayit.ad],
-    ['Telefon', kayit.telefon],
-    ['E-posta', kayit.eposta],
-    ['Konu', kayit.konu],
-    ['Mülk tipi', kayit.mulk_tipi],
-    ['İlçe', kayit.ilce],
-    ['Mahalle', kayit.mahalle],
-    ['Büyüklük', kayit.m2 ? `${kayit.m2} m²` : null],
-    ['Mesaj', kayit.mesaj],
-    ['Geldiği sayfa', kayit.kaynak],
-    ['IP', ip],
-  ]
-    .filter(([, deger]) => Boolean(deger))
-    .map(([etiket, deger]) => `${etiket}: ${deger}`)
-    .join('\n');
-
-  await epostaGonder(env as never, konu, `${govde}\n\nPanel: https://edmyapigayrimenkul.com/yonetim/talepler`);
-}

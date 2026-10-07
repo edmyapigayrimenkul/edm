@@ -1,12 +1,11 @@
 ---
-import { KURUM, SOSYAL, MENU, PORTALLAR, ILETISIM } from '../lib/site';
+import { KURUM, SOSYAL, MENU, PORTALLAR } from '../lib/site';
 import { portfoy } from '../lib/ilanlar';
 import { icerik, haritaBaglanti } from '../lib/icerik';
+import LogoAcik from './LogoAcik.astro';
 
 const { sayimlar: SAYIMLAR, sonGuncelleme } = await portfoy();
 const { iletisim } = await icerik();
-// Çalışma saatleri henüz panelden yönetilmiyor; koddaki değer geçerli.
-const CALISMA_SAATLERI = ILETISIM.calismaSaatleri;
 
 const yil = new Date().getFullYear();
 const guncelleme = new Date(sonGuncelleme).toLocaleDateString('tr-TR', {
@@ -26,14 +25,14 @@ const guncelleme = new Date(sonGuncelleme).toLocaleDateString('tr-TR', {
           Mülkünüzün bugünkü değerini birlikte çıkaralım.
         </h2>
         <p class="mt-5 max-w-[52ch] text-kagit/62">
-          Bölgede gerçekleşmiş satışlara bakarak ücretsiz bir değerleme hazırlıyoruz.
-          Satmaya karar vermeniz gerekmiyor — rakamı bilmek her zaman işinize yarar.
+          Benzer ilanları, konumu ve taşınmazın özelliklerini inceleyerek ücretsiz bir
+          piyasa değerlendirmesi hazırlıyoruz. Satmaya karar vermeniz gerekmiyor.
         </p>
       </div>
       <div class="flex flex-wrap gap-3 lg:justify-end">
         <a href="/degerleme" class="dugme dugme--kirmizi">Ücretsiz değerleme</a>
-        <a href={`tel:${iletisim.telefonHam}`} class="dugme dugme--hayalet-acik">
-          {iletisim.telefon}
+        <a href={`tel:${iletisim.sabitHam}`} class="dugme dugme--hayalet-acik">
+          {iletisim.sabit}
         </a>
       </div>
     </div>
@@ -41,13 +40,7 @@ const guncelleme = new Date(sonGuncelleme).toLocaleDateString('tr-TR', {
     <!-- Orta: bilgi sütunları -->
     <div class="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-12">
       <div>
-        <img
-          src="/marka/logo-yatay-acik.png"
-          alt={KURUM.ad}
-          width="1000"
-          height="274"
-          class="h-9 w-auto"
-        />
+        <LogoAcik alt={KURUM.ad} imgClass="h-10 w-auto" sizes="180px" />
         <p class="mt-5 max-w-[36ch] text-sm leading-relaxed text-kagit/58">
           {KURUM.tanim}
         </p>
@@ -107,29 +100,22 @@ const guncelleme = new Date(sonGuncelleme).toLocaleDateString('tr-TR', {
             {iletisim.adresSatir2}<br />
             {iletisim.adresIlce} / {iletisim.adresIl}
           </a>
-          <a href={`tel:${iletisim.telefonHam}`} class="ayak-bag font-veri">
-            {iletisim.telefon}
+          <a href={`tel:${iletisim.sabitHam}`} class="ayak-bag font-veri">
+            {iletisim.sabit}
           </a>
-          {
-            iletisim.sabit && (
-              <a href={`tel:${iletisim.sabitHam}`} class="ayak-bag font-veri">
-                {iletisim.sabit}
-              </a>
-            )
-          }
           <a href={`mailto:${iletisim.eposta}`} class="ayak-bag font-veri text-[0.8125rem]">
             {iletisim.eposta}
           </a>
         </address>
         <dl class="mt-6 flex flex-col gap-1.5 border-t border-kagit/12 pt-5 text-[0.8125rem] text-kagit/58">
-          {
-            CALISMA_SAATLERI.map((s) => (
-              <div class="flex justify-between gap-4">
-                <dt>{s.gun}</dt>
-                <dd class="font-veri">{s.saat}</dd>
-              </div>
-            ))
-          }
+          <div class="flex justify-between gap-4">
+            <dt>{iletisim.haftaCalismaGunleri}</dt>
+            <dd class="font-veri">{iletisim.haftaCalismaSaatleri}</dd>
+          </div>
+          <div class="flex justify-between gap-4">
+            <dt>Pazar</dt>
+            <dd class="font-veri">{iletisim.pazarCalismaSaatleri}</dd>
+          </div>
         </dl>
       </div>
     </div>

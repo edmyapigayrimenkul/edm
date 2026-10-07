@@ -9,6 +9,7 @@ import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { senkronla } from '../../worker';
 import { googleYorumlariniCek } from '../../lib/senkron/yorumlar';
+import { senkronIstegiYetkili } from '../../lib/senkron/yetki';
 import { onbellegiTemizle } from '../../lib/ilanlar';
 
 const yanit = (govde: unknown, durum = 200) =>
@@ -18,15 +19,14 @@ const yanit = (govde: unknown, durum = 200) =>
   });
 
 export const POST: APIRoute = async ({ request }) => {
+  if ((env as Record<string, unknown>).STAGING_ORTAMI === '1') {
+    return yanit({ hata: 'Staging ortamında portal senkronu kapalı.' }, 503);
+  }
   const beklenen = (env as Record<string, unknown>).SENKRON_ANAHTARI as string | undefined;
 
   if (!beklenen) return yanit({ hata: 'Senkron anahtarı tanımlı değil.' }, 503);
 
-  const gelen =
-    request.headers.get('X-Senkron-Anahtari') ??
-    new URL(request.url).searchParams.get('anahtar');
-
-  if (gelen !== beklenen) return yanit({ hata: 'Yetkisiz.' }, 401);
+  if (!senkronIstegiYetkili(request, beklenen)) return yanit({ hata: 'Yetkisiz.' }, 401);
 
   const sonuc = await senkronla(env as never);
 

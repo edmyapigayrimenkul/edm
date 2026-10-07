@@ -1,0 +1,26 @@
+---
+interface Props {
+  alt: string;
+  imgClass?: string;
+  pictureClass?: string;
+  /** Beklenen CSS genişliği; yüksek DPI'da doğru WebP kaynağını seçtirir. */
+  sizes?: string;
+}
+
+const { alt, imgClass = 'block', pictureClass, sizes = '220px' } = Astro.props;
+---
+
+<picture class:list={['block w-fit', pictureClass]}>
+  <source
+    type="image/webp"
+    srcset="/marka/logo-yatay-acik-500.webp 500w, /marka/logo-yatay-acik-1000.webp 1000w"
+    sizes={sizes}
+  />
+  <img
+    src="/marka/logo-yatay-acik.png"
+    alt={alt}
+    width="1000"
+    height="274"
+    class={imgClass}
+  />
+</picture>

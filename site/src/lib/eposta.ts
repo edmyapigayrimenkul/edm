@@ -32,7 +32,8 @@ function govdeyiKodla(metin: string): string {
 export async function epostaGonder(
   ortam: EpostaOrtam,
   konu: string,
-  govde: string
+  govde: string,
+  hatayiYukselt = false
 ): Promise<boolean> {
   const gonderici = ortam.EPOSTA;
   if (!gonderici) return false;
@@ -57,7 +58,8 @@ export async function epostaGonder(
     await gonderici.send(new EmailMessage(GONDEREN, alici, ham));
     return true;
   } catch (hata) {
-    console.error('E-posta gönderilemedi:', hata);
+    console.error('E-posta gönderilemedi.');
+    if (hatayiYukselt) throw hata;
     return false;
   }
 }
@@ -68,7 +70,7 @@ export async function epostaGonder(
  * bu onun yerine geçmiyor, günü toparlıyor.
  */
 export async function gunlukOzet(vt: D1Database, ortam: EpostaOrtam): Promise<boolean> {
-  const [talepler, bekleyen, bakislar, ilanlar, sonSenkron] = await Promise.all([
+  const [talepler, bakislar, ilanlar, hatirlatmalar] = await Promise.all([
     vt
       .prepare(
         `SELECT tur, ad, telefon, ilce, mulk_tipi FROM talepler
@@ -76,10 +78,6 @@ export async function gunlukOzet(vt: D1Database, ortam: EpostaOrtam): Promise<bo
       )
       .all<Record<string, string>>()
       .catch(() => ({ results: [] })),
-    vt
-      .prepare(`SELECT COUNT(*) AS adet FROM talepler WHERE durum = 'yeni'`)
-      .first<{ adet: number }>()
-      .catch(() => ({ adet: 0 })),
     vt
       .prepare(
         `SELECT SUM(adet) AS toplam FROM goruntulenme WHERE gun = date('now', '-1 day')`
@@ -89,27 +87,32 @@ export async function gunlukOzet(vt: D1Database, ortam: EpostaOrtam): Promise<bo
     vt
       .prepare(
         `SELECT
-           SUM(CASE WHEN durum = 'aktif' THEN 1 ELSE 0 END) AS aktif,
-           SUM(CASE WHEN pasif_tarihi >= datetime('now','-1 day') THEN 1 ELSE 0 END) AS yeniPasif,
-           SUM(CASE WHEN ilk_gorulme >= datetime('now','-1 day') THEN 1 ELSE 0 END) AS yeniIlan
-         FROM ilanlar`
+           SUM(CASE WHEN i.durum = 'aktif' AND COALESCE(d.gizli, 0) = 0 THEN 1 ELSE 0 END) AS aktif,
+           SUM(CASE WHEN i.pasif_tarihi >= datetime('now','-1 day') THEN 1 ELSE 0 END) AS yeniPasif,
+           SUM(CASE WHEN i.ilk_gorulme >= datetime('now','-1 day') THEN 1 ELSE 0 END) AS yeniIlan
+         FROM ilanlar i
+         LEFT JOIN ilan_duzenleme d ON d.ilan_id = i.id`
       )
       .first<{ aktif: number; yeniPasif: number; yeniIlan: number }>()
       .catch(() => null),
     vt
       .prepare(
-        `SELECT bitis, hata FROM senkron_gunlugu ORDER BY id DESC LIMIT 1`
+        `SELECT h.ilan_id, h.planlanan, h.notu, i.baslik
+         FROM ilan_hatirlatma h JOIN ilanlar i ON i.id = h.ilan_id
+         WHERE h.durum = 'bekliyor' AND date(h.planlanan) <= date('now', '+3 hours')
+         ORDER BY h.planlanan LIMIT 30`
       )
-      .first<{ bitis: string; hata: string | null }>()
-      .catch(() => null),
+      .all<{ ilan_id: string; planlanan: string; notu: string; baslik: string }>()
+      .catch(() => ({ results: [] })),
   ]);
 
   const yeniTalepler = talepler.results ?? [];
 
   // Kayda değer bir şey yoksa e-posta göndermiyoruz — her sabah boş bir
   // "hiçbir şey olmadı" maili en hızlı görmezden gelinen şeydir.
-  const bekleyenAdet = bekleyen?.adet ?? 0;
-  if (yeniTalepler.length === 0 && bekleyenAdet === 0 && !sonSenkron?.hata) return false;
+  const gelenHatirlatmalar = hatirlatmalar.results ?? [];
+  // Kalıcı bekleyen talep/senkron sorunları işletim uyarısında bir kez bildirilir.
+  if (yeniTalepler.length === 0 && gelenHatirlatmalar.length === 0) return false;
 
   const satirlar: string[] = ['EDM — günlük özet', ''];
 
@@ -127,10 +130,6 @@ export async function gunlukOzet(vt: D1Database, ortam: EpostaOrtam): Promise<bo
     satirlar.push('Dün yeni talep gelmedi.', '');
   }
 
-  if (bekleyenAdet > 0) {
-    satirlar.push(`İlgilenilmeyi bekleyen ${bekleyenAdet} talep var.`, '');
-  }
-
   satirlar.push(
     `İlan durumu: ${ilanlar?.aktif ?? 0} aktif` +
       (ilanlar?.yeniIlan ? `, ${ilanlar.yeniIlan} yeni` : '') +
@@ -138,11 +137,21 @@ export async function gunlukOzet(vt: D1Database, ortam: EpostaOrtam): Promise<bo
   );
   satirlar.push(`Dün toplam ${bakislar?.toplam ?? 0} ilan görüntülenmesi.`);
 
-  if (sonSenkron?.hata) {
-    satirlar.push('', `⚠ Son senkron hata verdi: ${sonSenkron.hata}`);
+  if (gelenHatirlatmalar.length) {
+    satirlar.push('', `Bugün kontrol edilecek ilanlar (${gelenHatirlatmalar.length}):`);
+    for (const h of gelenHatirlatmalar) {
+      satirlar.push(`  • ${h.baslik} (No: ${h.ilan_id})${h.notu ? ` — ${h.notu}` : ''}`);
+    }
   }
 
   satirlar.push('', 'Panel: https://edmyapigayrimenkul.com/yonetim/talepler');
 
-  return await epostaGonder(ortam, 'EDM — günlük özet', satirlar.join('\n'));
+  const gonderildi = await epostaGonder(ortam, 'EDM — günlük özet', satirlar.join('\n'));
+  if (gonderildi && gelenHatirlatmalar.length) {
+    const zaman = new Date().toISOString();
+    await vt.batch(gelenHatirlatmalar.map((h) => vt
+      .prepare(`UPDATE ilan_hatirlatma SET durum = 'bildirildi', bildirim = ?, guncelleme = ? WHERE ilan_id = ? AND durum = 'bekliyor'`)
+      .bind(zaman, zaman, h.ilan_id)));
+  }
+  return gonderildi;
 }

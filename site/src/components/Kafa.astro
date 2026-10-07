@@ -1,6 +1,7 @@
 ---
 import { KURUM, MENU } from '../lib/site';
 import { icerik } from '../lib/icerik';
+import LogoAcik from './LogoAcik.astro';
 
 interface Props {
   /** Sayfa koyu bir kahramanla açılıyorsa çubuk şeffaf başlar. */
@@ -21,24 +22,18 @@ const aktifMi = (yol: string) => suAn === yol || suAn.startsWith(`${yol}/`);
 >
   <div class="kab">
     <div class="flex h-[4.5rem] items-center justify-between gap-6 lg:h-20">
-      <a href="/" class="shrink-0" aria-label={`${KURUM.ad} — ana sayfa`}>
+      <a href="/" class="flex shrink-0 items-center gap-2.5" aria-label={`${KURUM.ad} — ana sayfa`}>
         <img
-          class="logo-koyu h-8 w-auto lg:h-9"
+          class="logo-koyu h-12 w-auto lg:h-14"
           src="/marka/logo-yatay.png"
-          alt={KURUM.ad}
+          alt="EDM"
           width="1000"
           height="274"
         />
-        <img
-          class="logo-acik h-8 w-auto lg:h-9"
-          src="/marka/logo-yatay-acik.png"
-          alt={KURUM.ad}
-          width="1000"
-          height="274"
-        />
+        <LogoAcik alt="EDM" pictureClass="logo-acik" imgClass="h-12 w-auto lg:h-14" sizes="210px" />
       </a>
 
-      <nav class="hidden items-center gap-8 lg:flex" aria-label="Ana menü">
+      <nav class="hidden items-center gap-6 lg:flex" aria-label="Ana menü">
         {
           MENU.map((oge) => (
             <a
@@ -76,8 +71,8 @@ const aktifMi = (yol: string) => suAn === yol || suAn.startsWith(`${yol}/`);
         </a>
 
         <a
-          href={`tel:${iletisim.telefonHam}`}
-          class="menu-bag hidden items-center gap-2 font-veri text-sm tracking-tight sm:inline-flex"
+          href={`tel:${iletisim.sabitHam}`}
+          class="menu-bag hidden items-center gap-2 whitespace-nowrap font-veri text-sm tracking-tight sm:inline-flex"
         >
           <svg
             class="h-3.5 w-3.5"
@@ -91,7 +86,7 @@ const aktifMi = (yol: string) => suAn === yol || suAn.startsWith(`${yol}/`);
               d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"
             ></path>
           </svg>
-          {iletisim.telefon}
+          {iletisim.sabit}
         </a>
 
         <a href="/degerleme" class="dugme dugme--kirmizi hidden !px-5 !py-2.5 text-[0.8125rem] md:inline-flex">
@@ -123,6 +118,9 @@ const aktifMi = (yol: string) => suAn === yol || suAn.startsWith(`${yol}/`);
   id="mobil-menu"
   data-menu-panel
   data-acik="hayir"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Mobil menü"
   class="fixed inset-0 z-40 bg-murekkep text-kagit lg:hidden"
 >
   <div class="kab flex h-full flex-col pt-24 pb-10">
@@ -142,13 +140,34 @@ const aktifMi = (yol: string) => suAn === yol || suAn.startsWith(`${yol}/`);
 
     <div class="mt-auto flex flex-col gap-4 pt-10">
       <a href="/degerleme" class="dugme dugme--kirmizi w-full">Ücretsiz değerleme al</a>
-      <a href={`tel:${iletisim.telefonHam}`} class="dugme dugme--hayalet-acik w-full">
-        {iletisim.telefon}
+      <a href={`tel:${iletisim.sabitHam}`} class="dugme dugme--hayalet-acik w-full">
+        {iletisim.sabit}
       </a>
       <p class="etiket etiket--acik pt-2">{adresTam}</p>
     </div>
   </div>
 </div>
+
+<!-- Betik çalışmadığında hamburger işlevsiz kalmasın; mobil gezinme normal
+     belge akışında açık görünür ve tüm bağlantılar klavyeyle kullanılabilir. -->
+<noscript>
+  <style is:inline>
+    [data-menu-dugme] {
+      display: none !important;
+    }
+    [data-menu-panel] {
+      position: static !important;
+      inset: auto !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: none !important;
+    }
+    [data-menu-panel] .menu-satir {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  </style>
+</noscript>
 
 <style>
   /* --- Çubuk zemini ------------------------------------------------ */
@@ -173,13 +192,13 @@ const aktifMi = (yol: string) => suAn === yol || suAn.startsWith(`${yol}/`);
   }
 
   /* --- Logo varyantı ---------------------------------------------- */
-  .logo-acik {
+  :global(.logo-acik) {
     display: none;
   }
   [data-kafa][data-koyu='evet'][data-katmanli='hayir'] .logo-koyu {
     display: none;
   }
-  [data-kafa][data-koyu='evet'][data-katmanli='hayir'] .logo-acik {
+  [data-kafa][data-koyu='evet'][data-katmanli='hayir'] :global(.logo-acik) {
     display: block;
   }
 
@@ -191,6 +210,9 @@ const aktifMi = (yol: string) => suAn === yol || suAn.startsWith(`${yol}/`);
     color: var(--color-kagit);
   }
   .menu-bag[aria-current='page'] {
+    color: var(--color-kirmizi-derin);
+  }
+  [data-kafa][data-koyu='evet'][data-katmanli='hayir'] .menu-bag[aria-current='page'] {
     color: var(--color-kirmizi);
   }
 

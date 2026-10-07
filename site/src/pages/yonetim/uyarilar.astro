@@ -1,0 +1,67 @@
+---
+import Panel from '../../layouts/Panel.astro';
+import { paneleGiris } from '../../lib/panel/yetki';
+import { semayiKur } from '../../lib/senkron/depo';
+import { env } from 'cloudflare:workers';
+import { belirsizUyarilariAyir, uyariyiYenidenDene, UYARI_BASLIKLARI, TALEP_GECIKME_SAATI } from '../../lib/isletim-uyari';
+import type { UyariAnahtari } from '../../lib/isletim-uyari';
+import { talepBildirimMetni } from '../../lib/talep-bildirim';
+
+const giris = await paneleGiris(Astro.request);
+if ('yanit' in giris) return giris.yanit;
+const vt = env.VT as D1Database;
+await semayiKur(vt);
+await belirsizUyarilariAyir(vt);
+let bildirim = '';
+if (Astro.request.method === 'POST') {
+  if (Astro.request.headers.get('Origin') !== Astro.url.origin) return new Response('İstek kaynağı doğrulanamadı.', {status:403});
+  const form = await Astro.request.formData();
+  const anahtar = String(form.get('anahtar') ?? '') as UyariAnahtari;
+  const olay = String(form.get('olay') ?? '');
+  if (Object.hasOwn(UYARI_BASLIKLARI, anahtar) && /^[0-9a-f-]{36}$/.test(olay)) {
+    try {
+      const sonuc = await uyariyiYenidenDene(vt, env, anahtar, olay);
+      bildirim = sonuc === 'gonderildi' ? 'E-posta gönderimine kabul edildi. Gelen kutusuna teslim ayrıca kontrol edilebilir.'
+        : sonuc === 'belirsiz' ? 'Sonuç belirsiz. Tekrar denemeden önce gelen kutusunu kontrol edin.'
+        : sonuc === 'atlanmis' ? 'Uyarı kapandı, zaten gönderildi veya başka bir işlem gönderiyor.' : 'E-posta gönderilemedi; uyarı kaydı korunuyor.';
+    } catch { bildirim = 'Gönderim işlemi tamamlanamadı. Güncel durumu kontrol edin.'; }
+  } else { return new Response('Uyarı bilgisi geçersiz.', {status:400}); }
+}
+const uyarilar = await vt.prepare('SELECT * FROM isletim_uyari WHERE acilis IS NOT NULL ORDER BY aktif DESC,acilis DESC')
+  .all<{anahtar:UyariAnahtari;aktif:number;olay:string;metin:string;acilis:string;kapanis:string|null;son_kontrol:string;durum:string;deneme:number;kabul:string|null}>();
+const tarih = (d:string|null) => d ? new Date(d.includes('T') ? d : d.replace(' ','T')+'Z').toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'}) : '—';
+const yol = (anahtar:UyariAnahtari) => anahtar === 'talep-bildirim' ? '/yonetim/talepler?bildirim=uyari'
+  : anahtar === 'talep-gecikti' ? '/yonetim/talepler?durum=yeni' : '/yonetim';
+const aktifAdet = uyarilar.results.filter((u) => u.aktif).length;
+---
+<Panel baslik="Uyarılar" eposta={giris.kimlik.eposta} ozet={`${aktifAdet} açık işletim uyarısı`}>
+  {bildirim && <p class="bilgi" role="status">{bildirim}</p>}
+  <p class="aciklama">Kontroller her ilan senkronunda yapılır; otomatik program 6 saatte birdir. Yeni talepler {TALEP_GECIKME_SAATI} saat sonra gecikmiş sayılır. Aynı sorun devam ederken yeni e-posta gönderilmez; sorun düzelip yeniden oluşursa yeni uyarı açılır.</p>
+  {!uyarilar.results.length && <p class="bos">Henüz işletim uyarısı yok. Kontrol gerektiren durumlar burada görünecek.</p>}
+  <div class="uyarilar">
+    {uyarilar.results.map((u) => <article class:list={['uyari', {acik: !!u.aktif}]}>
+      <header><h2>{UYARI_BASLIKLARI[u.anahtar]}</h2><span class="etiket">{u.aktif ? 'Kontrol gerekli' : 'Düzeldi'}</span></header>
+      <p>{u.metin}</p>
+      <dl><div><dt>Açılış</dt><dd>{tarih(u.acilis)}</dd></div><div><dt>Son kontrol</dt><dd>{tarih(u.son_kontrol)}</dd></div>
+        {!u.aktif && <div><dt>Düzelme</dt><dd>{tarih(u.kapanis)}</dd></div>}
+        <div><dt>E-posta</dt><dd>{!u.aktif && ['bekliyor','basarisiz'].includes(u.durum) ? 'Sorun düzeldi; gönderim durduruldu' : talepBildirimMetni(u.durum,u.deneme)} · {u.deneme} deneme</dd></div>
+        {u.kabul && <div><dt>Sağlayıcı kabulü</dt><dd>{tarih(u.kabul)}</dd></div>}
+      </dl>
+      <footer><a href={yol(u.anahtar)}>İlgili ekranı aç →</a>
+        {!!u.aktif && ['basarisiz','belirsiz'].includes(u.durum) && <form method="POST">
+          <input type="hidden" name="anahtar" value={u.anahtar}/><input type="hidden" name="olay" value={u.olay}/>
+          {u.durum === 'belirsiz' && <label><input type="checkbox" required/> Gelen kutusunu kontrol ettim; yeniden gönderimin mükerrer olabileceğini biliyorum.</label>}
+          <button class="pd pd--sade" type="submit">E-postayı yeniden dene</button>
+        </form>}
+      </footer>
+    </article>)}
+  </div>
+  <p class="aciklama">Bu ekran her türün son uyarısını gösterir. E-posta kabulü, gelen kutusuna teslim edildiği anlamına gelmez. Düzelmiş uyarılar yeniden gönderilmez.</p>
+</Panel>
+<style>
+  .aciklama{color:var(--panel-soluk,#657381);font-size:.9rem;line-height:1.6;max-width:85ch;margin:0 0 1.5rem}
+  .bilgi,.bos{padding:1rem;background:#f2f5f8;border-radius:8px;margin-bottom:1.5rem}
+  .uyarilar{display:grid;gap:1rem;margin-bottom:1.5rem}.uyari{background:#fff;border:1px solid #dce3e9;border-radius:10px;padding:1.25rem}.uyari.acik{border-left:4px solid #b57017}
+  header{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}h2{font-size:1rem;margin:0}.etiket{font-size:.8rem;padding:.25rem .5rem;background:#f1f4f7;border-radius:5px}
+  .uyari p{line-height:1.6;margin:.75rem 0}dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.75rem;margin:1rem 0}dt{font-size:.75rem;color:#687786}dd{margin:.25rem 0 0;font-size:.85rem}footer{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}a{color:#215e9a;font-size:.875rem}form{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}label{font-size:.8rem;max-width:48ch}
+</style>

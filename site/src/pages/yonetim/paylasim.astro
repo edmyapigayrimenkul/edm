@@ -13,9 +13,10 @@
  */
 import Panel from '../../layouts/Panel.astro';
 import { paneleGiris } from '../../lib/panel/yetki';
-import { portfoy } from '../../lib/ilanlar';
+import { portfoy, m2Yaz } from '../../lib/ilanlar';
 import { icerik } from '../../lib/icerik';
 import { KURUM } from '../../lib/site';
+import { islemEtiketi } from '../../lib/ilan-bilgileri';
 
 const giris = await paneleGiris(Astro.request);
 if ('yanit' in giris) return giris.yanit;
@@ -27,16 +28,18 @@ const { iletisim } = await icerik();
 const veri = ilanlar.map((i) => ({
   id: i.id,
   baslik: i.baslikTemiz,
-  islem: i.islem === 'satilik' ? 'SATILIK' : 'KİRALIK',
+  islem: islemEtiketi(i.islem).toLocaleUpperCase('tr-TR'),
   kategori: i.kategori,
   konum: i.konum,
   mahalle: i.mahalle ?? '',
   ilce: i.ilce ?? '',
   il: i.il ?? '',
   fiyat: i.fiyatMetin,
-  birim: i.birimFiyat ?? '',
+  birim: i.birimFiyat ? [i.birimFiyat, i.birimFiyatTemeli].filter(Boolean).join(' · ') : '',
   oda: i.oda ?? '',
-  m2: i.m2Metin ?? '',
+  m2: i.alanlar.karsilastirmaM2 && i.alanlar.karsilastirmaKisaEtiketi
+    ? `${i.alanlar.karsilastirmaKisaEtiketi} ${m2Yaz(i.alanlar.karsilastirmaM2)}`
+    : '',
   yol: i.yol,
   kapak: i.kapak ?? '',
   gorseller: i.gorseller.slice(0, 8),

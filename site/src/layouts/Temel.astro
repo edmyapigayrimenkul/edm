@@ -5,7 +5,7 @@ import Kafa from '../components/Kafa.astro';
 import Ayak from '../components/Ayak.astro';
 import WhatsappDugme from '../components/WhatsappDugme.astro';
 import FavoriBetik from '../components/FavoriBetik.astro';
-import { KURUM, SOSYAL } from '../lib/site';
+import { BELGELER, KURUM, SOSYAL } from '../lib/site';
 import { icerik } from '../lib/icerik';
 
 interface Props {
@@ -31,6 +31,7 @@ const {
 } = Astro.props;
 
 const { iletisim } = await icerik();
+const saatAraligi = iletisim.haftaCalismaSaatleri.match(/(\d{2}:\d{2})\s*[—–-]\s*(\d{2}:\d{2})/);
 
 const kanonik = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
 const gorselTam = new URL(gorsel, Astro.site).href;
@@ -44,10 +45,11 @@ const kurumLd = {
   name: KURUM.ad,
   description: KURUM.tanim,
   url: KURUM.site,
-  telephone: [iletisim.telefonHam, iletisim.sabitHam].filter(Boolean),
+  telephone: [iletisim.sabitHam, iletisim.telefonHam].filter(Boolean),
   email: iletisim.eposta,
   logo: new URL('/marka/logo-yatay.png', Astro.site).href,
-  image: gorselTam,
+  // İlanın fotoğrafı kurum kimliğinin görseli olarak değişmemeli.
+  image: new URL('/marka/og-varsayilan.png', Astro.site).href,
   address: {
     '@type': 'PostalAddress',
     streetAddress: `${iletisim.adresSatir1} ${iletisim.adresSatir2}`,
@@ -62,21 +64,30 @@ const kurumLd = {
     { '@type': 'City', name: 'Tekirdağ' },
   ],
   sameAs: SOSYAL.map((s) => s.url),
-  openingHoursSpecification: [
-    {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: [
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-      ],
-      opens: '09:00',
-      closes: '19:00',
-    },
-  ],
+  identifier: BELGELER.map((belge) => ({
+    '@type': 'PropertyValue',
+    name: 'sahip' in belge ? `${belge.tur} — ${belge.sahip}` : belge.tur,
+    value: belge.no,
+  })),
+  ...(saatAraligi
+    ? {
+        openingHoursSpecification: [
+          {
+            '@type': 'OpeningHoursSpecification',
+            dayOfWeek: [
+              'Monday',
+              'Tuesday',
+              'Wednesday',
+              'Thursday',
+              'Friday',
+              'Saturday',
+            ],
+            opens: saatAraligi[1],
+            closes: saatAraligi[2],
+          },
+        ],
+      }
+    : {}),
 };
 
 const semalar = [kurumLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])];
@@ -124,7 +135,7 @@ const semalar = [kurumLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd
     <meta property="og:image:alt" content={aciklama} />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(semalar)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(semalar).replace(/</g, '\\u003c')} />
   </head>
 
   <body>

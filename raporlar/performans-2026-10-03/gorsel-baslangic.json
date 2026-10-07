@@ -1,0 +1,828 @@
+{
+  "zaman": "2026-10-03T10:36:29.591Z",
+  "yontem": "Her benzersiz Hepsiemlak görselinin 1280/960 ve 640/480 kutusundaki HTTP gövdesi. Sayfa yükü veya LCP değildir; DPR 2 özgün boyutu seçebilir.",
+  "sayfalar": [
+    {
+      "yol": "/",
+      "durum": 200,
+      "htmlBayt": 100314,
+      "fotograflar": [
+        "/marka/logo-yatay.png",
+        "/marka/logo-yatay-acik.png",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/8/1/9/7/4/0/7/4/ae6e183f-057d-42a1-8742-8feb2eb4a557.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/64606ec9-72d2-41e6-a0fe-b85b8e8c2cf4.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/5/2/0/6/0/7/6/4/fc374c5b-a046-43ec-a0f8-4c02e168f125.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/2/0/0/6/0/7/6/4/3bca0ed0-fb03-46f2-9643-95975132a712.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/9/9/5/0/7/6/4/2aedb3da-0316-4e99-b90a-b644dccf6dcd.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/1/3/0/6/0/7/6/4/eb3a721a-bae1-4784-b4db-3a38656d683d.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/1/0/0/6/0/7/6/4/39d7a4e2-cdd4-43f0-8206-ca9f35fa65fa.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/4/1/8/4/8/6/4/c2446c1e-4dba-4bf6-9fb8-c50573ba2ecf.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/4/2/0/6/0/7/6/4/5f05fdaf-baf0-48a3-83ea-e7846353bd81.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/3/2/0/6/0/7/6/4/ab55ce87-526f-4d2b-87c1-488a9c1e32d6.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/8/1/9/7/4/0/7/4/ae6e183f-057d-42a1-8742-8feb2eb4a557.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/64606ec9-72d2-41e6-a0fe-b85b8e8c2cf4.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/5/2/0/6/0/7/6/4/fc374c5b-a046-43ec-a0f8-4c02e168f125.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/2/0/0/6/0/7/6/4/3bca0ed0-fb03-46f2-9643-95975132a712.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/9/9/5/0/7/6/4/2aedb3da-0316-4e99-b90a-b644dccf6dcd.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/1/3/0/6/0/7/6/4/eb3a721a-bae1-4784-b4db-3a38656d683d.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/1/0/0/6/0/7/6/4/39d7a4e2-cdd4-43f0-8206-ca9f35fa65fa.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/4/1/8/4/8/6/4/c2446c1e-4dba-4bf6-9fb8-c50573ba2ecf.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/4/2/0/6/0/7/6/4/5f05fdaf-baf0-48a3-83ea-e7846353bd81.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/3/2/0/6/0/7/6/4/ab55ce87-526f-4d2b-87c1-488a9c1e32d6.jpg",
+        "https://imaj.emlakjet.com/listing/19877910/EB4A20E1DC7EA245A02D3DF1CD5B1FC119877910.jpg",
+        "https://imaj.emlakjet.com/listing/19856250/30B6450CC9D230B86DD049DB5A9D2EAD19856250.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/5/4/7/2/9/6/4/fae7cb98-0f9c-4e11-a7f0-0b90f672a3ed.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/64606ec9-72d2-41e6-a0fe-b85b8e8c2cf4.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/5/9/5/9/0/7/6/4/9c681757-ec59-4ce5-a0eb-798950bb5563.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/8/5/2/7/2/9/6/4/006cab0e-61bb-4816-ab1b-9e9b980e87af.jpg",
+        "https://imaj.emlakjet.com/listing/18522916/0541DC368F693B825A8D39F5DF50F2D018522916.jpg",
+        "/ekip/dogukan-ozdogan.webp",
+        "/ekip/metin-ozdogan.webp",
+        "https://lh3.googleusercontent.com/a-/ALV-UjXHL4UtUj4YwQ6EMF-ComMy-0CfqQXZiMFp-M4JWCrwxMR5lXI=s128-c0x00000000-cc-rp-mo",
+        "https://lh3.googleusercontent.com/a/ACg8ocKcvrHyHxQrPlHW3cCq-lvILJYf_iBU6fhpcTpXlJR4TjCv=s128-c0x00000000-cc-rp-mo",
+        "https://lh3.googleusercontent.com/a/ACg8ocKbOSZuRk7mhUJUMghJS3rd84n1Y7hV6tI2XEFbuT_1ywxcMw=s128-c0x00000000-cc-rp-mo",
+        "https://lh3.googleusercontent.com/a/ACg8ocLxN0xjp634GH0-kYZRwIBdCQbTQ99XpXvOLhni3arg3IJadA=s128-c0x00000000-cc-rp-mo",
+        "https://lh3.googleusercontent.com/a-/ALV-UjUIRx_w0CwIqjabhu8eyNwN18GcmntrruBXnvo07JGEJJMgWv4z=s128-c0x00000000-cc-rp-mo",
+        "/marka/logo-yatay-acik.png"
+      ]
+    },
+    {
+      "yol": "/ilanlar",
+      "durum": 200,
+      "htmlBayt": 277086,
+      "fotograflar": [
+        "/marka/logo-yatay.png",
+        "/marka/logo-yatay-acik.png",
+        "https://imaj.emlakjet.com/listing/19797428/9511BAE0897B5DB439864F39BB07A31919797428.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/5/0/8/9/8/6/4/b15f3245-99c8-435d-be55-6ac4abaf4656.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/8/1/9/7/4/0/7/4/ae6e183f-057d-42a1-8742-8feb2eb4a557.jpg",
+        "https://imaj.emlakjet.com/listing/19749125/AAC9F85838625BBF8BFF33C8B3A8F52D19749125.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/64606ec9-72d2-41e6-a0fe-b85b8e8c2cf4.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/1/6/9/9/1/0/7/4/beb11a8e-d298-4101-a7d4-34e72c4cc9c8.jpg",
+        "https://imaj.emlakjet.com/listing/17092884/23CBD87A5BC68C8E9E743C4965283DC617092884.jpg",
+        "https://imaj.emlakjet.com/listing/17048566/172B249369E2726BD27A03A8511C5CE317048566.jpg",
+        "https://imaj.emlakjet.com/listing/17887555/D5D4A761BB57F951BA65DAAF5ED10AF717887555.jpg",
+        "https://imaj.emlakjet.com/listing/16648928/5C26E9490924BA2B92A45B08E204928116648928.jpg",
+        "https://imaj.emlakjet.com/listing/19764800/9139FD278888EB0CB69FE1216CFF7E8019764800.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/5/2/0/6/0/7/6/4/fc374c5b-a046-43ec-a0f8-4c02e168f125.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/4/4/4/6/0/0/7/4/3ffc7483-cabd-45b7-b4d8-69ae96656cf6.jpg",
+        "https://imaj.emlakjet.com/listing/19889243/7005C4BBB205D3729D6C1B512F27E99219889243.jpg",
+        "https://imaj.emlakjet.com/listing/19647478/685A757B1580872BA1CDADC5639F026119647478.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/1/0/0/6/0/7/6/4/39d7a4e2-cdd4-43f0-8206-ca9f35fa65fa.jpg",
+        "https://imaj.emlakjet.com/listing/18883340/71BA80E139F338E6CCF9531B4A1EB88918883340.jpg",
+        "https://imaj.emlakjet.com/listing/17325803/493E2069A76B17E8901D27546FD7406317325803.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/2/5/7/0/4/1/7/4/1305e833-6778-47ef-8ce7-461a7973b666.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/7/7/1/6/7/9/6/4/bf5547fa-3875-4008-9de8-fe196ad35c7e.jpg",
+        "https://imaj.emlakjet.com/listing/19881114/D349DB1E476D2DF38F2DE375605C400B19881114.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/4/1/5/5/7/9/6/4/249bcd32-0d28-4d96-be5a-8bf62751988b.jpg",
+        "https://imaj.emlakjet.com/listing/16648927/04BDA2A4417CE02264EABADF1E580D0616648927.jpg",
+        "https://imaj.emlakjet.com/listing/19877910/EB4A20E1DC7EA245A02D3DF1CD5B1FC119877910.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/5/4/7/2/9/6/4/fae7cb98-0f9c-4e11-a7f0-0b90f672a3ed.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/6/4/3/7/2/9/6/4/7bea2de7-cc00-47f4-a747-e19485755e23.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/2/0/6/0/7/6/4/d2e90d9f-1e37-4f02-9613-81fe598720b6.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/8/5/2/7/2/9/6/4/006cab0e-61bb-4816-ab1b-9e9b980e87af.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/4/0/0/6/0/7/6/4/45e6961c-41e4-4094-bc88-de1f4e9b93f7.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/2/0/0/6/0/7/6/4/3bca0ed0-fb03-46f2-9643-95975132a712.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/9/9/5/0/7/6/4/2aedb3da-0316-4e99-b90a-b644dccf6dcd.jpg",
+        "https://imaj.emlakjet.com/listing/19751424/9D93999292859D8EA9E0F95327F6D49219751424.jpg",
+        "https://imaj.emlakjet.com/listing/19856250/30B6450CC9D230B86DD049DB5A9D2EAD19856250.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/8/5/3/2/3/2/7/4/29a20e13-8044-4035-a05b-cfa83828522d.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/5/9/5/9/0/7/6/4/9c681757-ec59-4ce5-a0eb-798950bb5563.jpg",
+        "https://imaj.emlakjet.com/listing/18717288/ADC1CAE5E0BE82B78E61FD4FC0B849B218717288.jpg",
+        "https://imaj.emlakjet.com/listing/18522916/0541DC368F693B825A8D39F5DF50F2D018522916.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/1/3/0/6/0/7/6/4/eb3a721a-bae1-4784-b4db-3a38656d683d.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/4/1/8/4/8/6/4/c2446c1e-4dba-4bf6-9fb8-c50573ba2ecf.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/0/0/6/0/7/6/4/47882dad-06cc-4b4c-bdff-a6fbe3256a2c.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/6/0/0/6/0/7/6/4/d12c2b1d-8bb5-4024-a253-17114f7bf5b7.jpg",
+        "https://imaj.emlakjet.com/listing/19647778/02635C729392BDDA43E58AFD34FF32B119647778.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/6/5/3/5/1/7/4/88e34490-ddb5-452e-bbf3-6932a9efe6e8.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/0/0/6/0/7/6/4/f7ea276f-497e-481d-8db0-c021c5d5fd1b.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/4/2/0/6/0/7/6/4/5f05fdaf-baf0-48a3-83ea-e7846353bd81.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/6/1/0/6/0/7/6/4/376a6cd7-d467-4c2c-adde-8a5e2428f944.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/3/2/0/6/0/7/6/4/ab55ce87-526f-4d2b-87c1-488a9c1e32d6.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/1/2/0/6/0/7/6/4/20c546c4-b627-46e2-bfcd-85bf750803fc.jpg",
+        "/marka/logo-yatay-acik.png"
+      ]
+    },
+    {
+      "yol": "/ilan/silivri-cumhuriyet-mah-satilik-2-1-deniz-manzarali-daire-18693270",
+      "durum": 200,
+      "htmlBayt": 71086,
+      "fotograflar": [
+        "/marka/logo-yatay.png",
+        "/marka/logo-yatay-acik.png",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/64606ec9-72d2-41e6-a0fe-b85b8e8c2cf4.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/47d3a69a-f669-492f-854d-e8bb6eaee7d3.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/984a290c-0992-4cf4-bd82-ec469afd1419.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/9b2c5577-54aa-4144-bd4d-257646683b1c.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/0a51ca3d-fbd1-4ae4-82cd-30d8a154bc76.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/64606ec9-72d2-41e6-a0fe-b85b8e8c2cf4.jpg",
+        "https://imaj.emlakjet.com/listing/18522916/0541DC368F693B825A8D39F5DF50F2D018522916.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/0/0/6/0/7/6/4/47882dad-06cc-4b4c-bdff-a6fbe3256a2c.jpg",
+        "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/7/7/1/6/7/9/6/4/bf5547fa-3875-4008-9de8-fe196ad35c7e.jpg",
+        "/marka/logo-yatay-acik.png"
+      ]
+    }
+  ],
+  "olcumler": [
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/8/1/9/7/4/0/7/4/ae6e183f-057d-42a1-8742-8feb2eb4a557.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/8/1/9/7/4/0/7/4/ae6e183f-057d-42a1-8742-8feb2eb4a557.jpg",
+          "durum": 200,
+          "bayt": 139576,
+          "genislik": 361,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/8/1/9/7/4/0/7/4/ae6e183f-057d-42a1-8742-8feb2eb4a557.jpg",
+          "durum": 200,
+          "bayt": 493516,
+          "genislik": 723,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/64606ec9-72d2-41e6-a0fe-b85b8e8c2cf4.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/64606ec9-72d2-41e6-a0fe-b85b8e8c2cf4.jpg",
+          "durum": 200,
+          "bayt": 206079,
+          "genislik": 640,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/64606ec9-72d2-41e6-a0fe-b85b8e8c2cf4.jpg",
+          "durum": 200,
+          "bayt": 710318,
+          "genislik": 1280,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/5/2/0/6/0/7/6/4/fc374c5b-a046-43ec-a0f8-4c02e168f125.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/5/2/0/6/0/7/6/4/fc374c5b-a046-43ec-a0f8-4c02e168f125.jpg",
+          "durum": 200,
+          "bayt": 176791,
+          "genislik": 360,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/5/2/0/6/0/7/6/4/fc374c5b-a046-43ec-a0f8-4c02e168f125.jpg",
+          "durum": 200,
+          "bayt": 600182,
+          "genislik": 720,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/2/0/0/6/0/7/6/4/3bca0ed0-fb03-46f2-9643-95975132a712.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/2/0/0/6/0/7/6/4/3bca0ed0-fb03-46f2-9643-95975132a712.jpg",
+          "durum": 200,
+          "bayt": 325044,
+          "genislik": 640,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/2/0/0/6/0/7/6/4/3bca0ed0-fb03-46f2-9643-95975132a712.jpg",
+          "durum": 200,
+          "bayt": 1041337,
+          "genislik": 1280,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/9/9/5/0/7/6/4/2aedb3da-0316-4e99-b90a-b644dccf6dcd.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/9/9/9/5/0/7/6/4/2aedb3da-0316-4e99-b90a-b644dccf6dcd.jpg",
+          "durum": 200,
+          "bayt": 275538,
+          "genislik": 640,
+          "yukseklik": 389,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/9/9/5/0/7/6/4/2aedb3da-0316-4e99-b90a-b644dccf6dcd.jpg",
+          "durum": 200,
+          "bayt": 908559,
+          "genislik": 1280,
+          "yukseklik": 778,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/1/3/0/6/0/7/6/4/eb3a721a-bae1-4784-b4db-3a38656d683d.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/1/3/0/6/0/7/6/4/eb3a721a-bae1-4784-b4db-3a38656d683d.jpg",
+          "durum": 200,
+          "bayt": 206200,
+          "genislik": 640,
+          "yukseklik": 316,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/1/3/0/6/0/7/6/4/eb3a721a-bae1-4784-b4db-3a38656d683d.jpg",
+          "durum": 200,
+          "bayt": 720409,
+          "genislik": 1280,
+          "yukseklik": 633,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/1/0/0/6/0/7/6/4/39d7a4e2-cdd4-43f0-8206-ca9f35fa65fa.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/1/0/0/6/0/7/6/4/39d7a4e2-cdd4-43f0-8206-ca9f35fa65fa.jpg",
+          "durum": 200,
+          "bayt": 312404,
+          "genislik": 640,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/1/0/0/6/0/7/6/4/39d7a4e2-cdd4-43f0-8206-ca9f35fa65fa.jpg",
+          "durum": 200,
+          "bayt": 1069441,
+          "genislik": 1280,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/4/1/8/4/8/6/4/c2446c1e-4dba-4bf6-9fb8-c50573ba2ecf.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/9/4/1/8/4/8/6/4/c2446c1e-4dba-4bf6-9fb8-c50573ba2ecf.jpg",
+          "durum": 200,
+          "bayt": 306324,
+          "genislik": 640,
+          "yukseklik": 440,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/4/1/8/4/8/6/4/c2446c1e-4dba-4bf6-9fb8-c50573ba2ecf.jpg",
+          "durum": 200,
+          "bayt": 1030992,
+          "genislik": 1280,
+          "yukseklik": 880,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/4/2/0/6/0/7/6/4/5f05fdaf-baf0-48a3-83ea-e7846353bd81.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/4/2/0/6/0/7/6/4/5f05fdaf-baf0-48a3-83ea-e7846353bd81.jpg",
+          "durum": 200,
+          "bayt": 262830,
+          "genislik": 640,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/4/2/0/6/0/7/6/4/5f05fdaf-baf0-48a3-83ea-e7846353bd81.jpg",
+          "durum": 200,
+          "bayt": 1223033,
+          "genislik": 1280,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/3/2/0/6/0/7/6/4/ab55ce87-526f-4d2b-87c1-488a9c1e32d6.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/3/2/0/6/0/7/6/4/ab55ce87-526f-4d2b-87c1-488a9c1e32d6.jpg",
+          "durum": 200,
+          "bayt": 239308,
+          "genislik": 640,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/3/2/0/6/0/7/6/4/ab55ce87-526f-4d2b-87c1-488a9c1e32d6.jpg",
+          "durum": 200,
+          "bayt": 896631,
+          "genislik": 1280,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/5/4/7/2/9/6/4/fae7cb98-0f9c-4e11-a7f0-0b90f672a3ed.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/9/5/4/7/2/9/6/4/fae7cb98-0f9c-4e11-a7f0-0b90f672a3ed.jpg",
+          "durum": 200,
+          "bayt": 222392,
+          "genislik": 640,
+          "yukseklik": 355,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/5/4/7/2/9/6/4/fae7cb98-0f9c-4e11-a7f0-0b90f672a3ed.jpg",
+          "durum": 200,
+          "bayt": 732757,
+          "genislik": 1280,
+          "yukseklik": 710,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/5/9/5/9/0/7/6/4/9c681757-ec59-4ce5-a0eb-798950bb5563.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/5/9/5/9/0/7/6/4/9c681757-ec59-4ce5-a0eb-798950bb5563.jpg",
+          "durum": 200,
+          "bayt": 245526,
+          "genislik": 640,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/5/9/5/9/0/7/6/4/9c681757-ec59-4ce5-a0eb-798950bb5563.jpg",
+          "durum": 200,
+          "bayt": 897050,
+          "genislik": 1280,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/8/5/2/7/2/9/6/4/006cab0e-61bb-4816-ab1b-9e9b980e87af.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/8/5/2/7/2/9/6/4/006cab0e-61bb-4816-ab1b-9e9b980e87af.jpg",
+          "durum": 200,
+          "bayt": 265412,
+          "genislik": 640,
+          "yukseklik": 407,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/8/5/2/7/2/9/6/4/006cab0e-61bb-4816-ab1b-9e9b980e87af.jpg",
+          "durum": 200,
+          "bayt": 866497,
+          "genislik": 1280,
+          "yukseklik": 814,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/5/0/8/9/8/6/4/b15f3245-99c8-435d-be55-6ac4abaf4656.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/5/0/8/9/8/6/4/b15f3245-99c8-435d-be55-6ac4abaf4656.jpg",
+          "durum": 200,
+          "bayt": 99645,
+          "genislik": 361,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/5/0/8/9/8/6/4/b15f3245-99c8-435d-be55-6ac4abaf4656.jpg",
+          "durum": 200,
+          "bayt": 308704,
+          "genislik": 723,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/1/6/9/9/1/0/7/4/beb11a8e-d298-4101-a7d4-34e72c4cc9c8.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/1/6/9/9/1/0/7/4/beb11a8e-d298-4101-a7d4-34e72c4cc9c8.jpg",
+          "durum": 200,
+          "bayt": 198104,
+          "genislik": 640,
+          "yukseklik": 358,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/1/6/9/9/1/0/7/4/beb11a8e-d298-4101-a7d4-34e72c4cc9c8.jpg",
+          "durum": 200,
+          "bayt": 702660,
+          "genislik": 1280,
+          "yukseklik": 716,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/4/4/4/6/0/0/7/4/3ffc7483-cabd-45b7-b4d8-69ae96656cf6.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/4/4/4/6/0/0/7/4/3ffc7483-cabd-45b7-b4d8-69ae96656cf6.jpg",
+          "durum": 200,
+          "bayt": 193657,
+          "genislik": 640,
+          "yukseklik": 334,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/4/4/4/6/0/0/7/4/3ffc7483-cabd-45b7-b4d8-69ae96656cf6.jpg",
+          "durum": 200,
+          "bayt": 653682,
+          "genislik": 1280,
+          "yukseklik": 669,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/2/5/7/0/4/1/7/4/1305e833-6778-47ef-8ce7-461a7973b666.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/2/5/7/0/4/1/7/4/1305e833-6778-47ef-8ce7-461a7973b666.jpg",
+          "durum": 200,
+          "bayt": 136269,
+          "genislik": 360,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/2/5/7/0/4/1/7/4/1305e833-6778-47ef-8ce7-461a7973b666.jpg",
+          "durum": 200,
+          "bayt": 486997,
+          "genislik": 721,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/7/7/1/6/7/9/6/4/bf5547fa-3875-4008-9de8-fe196ad35c7e.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/7/7/1/6/7/9/6/4/bf5547fa-3875-4008-9de8-fe196ad35c7e.jpg",
+          "durum": 200,
+          "bayt": 164158,
+          "genislik": 360,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/7/7/1/6/7/9/6/4/bf5547fa-3875-4008-9de8-fe196ad35c7e.jpg",
+          "durum": 200,
+          "bayt": 579215,
+          "genislik": 721,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/4/1/5/5/7/9/6/4/249bcd32-0d28-4d96-be5a-8bf62751988b.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/4/1/5/5/7/9/6/4/249bcd32-0d28-4d96-be5a-8bf62751988b.jpg",
+          "durum": 200,
+          "bayt": 173317,
+          "genislik": 640,
+          "yukseklik": 293,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/4/1/5/5/7/9/6/4/249bcd32-0d28-4d96-be5a-8bf62751988b.jpg",
+          "durum": 200,
+          "bayt": 654530,
+          "genislik": 1280,
+          "yukseklik": 586,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/6/4/3/7/2/9/6/4/7bea2de7-cc00-47f4-a747-e19485755e23.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/6/4/3/7/2/9/6/4/7bea2de7-cc00-47f4-a747-e19485755e23.jpg",
+          "durum": 200,
+          "bayt": 306249,
+          "genislik": 640,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/6/4/3/7/2/9/6/4/7bea2de7-cc00-47f4-a747-e19485755e23.jpg",
+          "durum": 200,
+          "bayt": 1016282,
+          "genislik": 1280,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/2/0/6/0/7/6/4/d2e90d9f-1e37-4f02-9613-81fe598720b6.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/9/2/0/6/0/7/6/4/d2e90d9f-1e37-4f02-9613-81fe598720b6.jpg",
+          "durum": 200,
+          "bayt": 206615,
+          "genislik": 640,
+          "yukseklik": 359,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/2/0/6/0/7/6/4/d2e90d9f-1e37-4f02-9613-81fe598720b6.jpg",
+          "durum": 200,
+          "bayt": 621476,
+          "genislik": 1280,
+          "yukseklik": 718,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/4/0/0/6/0/7/6/4/45e6961c-41e4-4094-bc88-de1f4e9b93f7.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/4/0/0/6/0/7/6/4/45e6961c-41e4-4094-bc88-de1f4e9b93f7.jpg",
+          "durum": 200,
+          "bayt": 240241,
+          "genislik": 640,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/4/0/0/6/0/7/6/4/45e6961c-41e4-4094-bc88-de1f4e9b93f7.jpg",
+          "durum": 200,
+          "bayt": 864439,
+          "genislik": 1280,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/8/5/3/2/3/2/7/4/29a20e13-8044-4035-a05b-cfa83828522d.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/8/5/3/2/3/2/7/4/29a20e13-8044-4035-a05b-cfa83828522d.jpg",
+          "durum": 200,
+          "bayt": 269474,
+          "genislik": 640,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/8/5/3/2/3/2/7/4/29a20e13-8044-4035-a05b-cfa83828522d.jpg",
+          "durum": 200,
+          "bayt": 953111,
+          "genislik": 1280,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/0/0/6/0/7/6/4/47882dad-06cc-4b4c-bdff-a6fbe3256a2c.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/9/0/0/6/0/7/6/4/47882dad-06cc-4b4c-bdff-a6fbe3256a2c.jpg",
+          "durum": 200,
+          "bayt": 132336,
+          "genislik": 360,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/9/0/0/6/0/7/6/4/47882dad-06cc-4b4c-bdff-a6fbe3256a2c.jpg",
+          "durum": 200,
+          "bayt": 472698,
+          "genislik": 721,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/6/0/0/6/0/7/6/4/d12c2b1d-8bb5-4024-a253-17114f7bf5b7.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/6/0/0/6/0/7/6/4/d12c2b1d-8bb5-4024-a253-17114f7bf5b7.jpg",
+          "durum": 200,
+          "bayt": 280391,
+          "genislik": 640,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/6/0/0/6/0/7/6/4/d12c2b1d-8bb5-4024-a253-17114f7bf5b7.jpg",
+          "durum": 200,
+          "bayt": 971227,
+          "genislik": 1280,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/6/5/3/5/1/7/4/88e34490-ddb5-452e-bbf3-6932a9efe6e8.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/6/5/3/5/1/7/4/88e34490-ddb5-452e-bbf3-6932a9efe6e8.jpg",
+          "durum": 200,
+          "bayt": 169151,
+          "genislik": 361,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/6/5/3/5/1/7/4/88e34490-ddb5-452e-bbf3-6932a9efe6e8.jpg",
+          "durum": 200,
+          "bayt": 622717,
+          "genislik": 723,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/0/0/6/0/7/6/4/f7ea276f-497e-481d-8db0-c021c5d5fd1b.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/0/0/6/0/7/6/4/f7ea276f-497e-481d-8db0-c021c5d5fd1b.jpg",
+          "durum": 200,
+          "bayt": 210322,
+          "genislik": 469,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/0/0/6/0/7/6/4/f7ea276f-497e-481d-8db0-c021c5d5fd1b.jpg",
+          "durum": 200,
+          "bayt": 629310,
+          "genislik": 939,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/6/1/0/6/0/7/6/4/376a6cd7-d467-4c2c-adde-8a5e2428f944.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/6/1/0/6/0/7/6/4/376a6cd7-d467-4c2c-adde-8a5e2428f944.jpg",
+          "durum": 200,
+          "bayt": 153720,
+          "genislik": 360,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/6/1/0/6/0/7/6/4/376a6cd7-d467-4c2c-adde-8a5e2428f944.jpg",
+          "durum": 200,
+          "bayt": 561612,
+          "genislik": 720,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/1/2/0/6/0/7/6/4/20c546c4-b627-46e2-bfcd-85bf750803fc.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/1/2/0/6/0/7/6/4/20c546c4-b627-46e2-bfcd-85bf750803fc.jpg",
+          "durum": 200,
+          "bayt": 230251,
+          "genislik": 640,
+          "yukseklik": 390,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/1/2/0/6/0/7/6/4/20c546c4-b627-46e2-bfcd-85bf750803fc.jpg",
+          "durum": 200,
+          "bayt": 730733,
+          "genislik": 1280,
+          "yukseklik": 780,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/47d3a69a-f669-492f-854d-e8bb6eaee7d3.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/47d3a69a-f669-492f-854d-e8bb6eaee7d3.jpg",
+          "durum": 200,
+          "bayt": 108290,
+          "genislik": 270,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/47d3a69a-f669-492f-854d-e8bb6eaee7d3.jpg",
+          "durum": 200,
+          "bayt": 377356,
+          "genislik": 540,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/984a290c-0992-4cf4-bd82-ec469afd1419.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/984a290c-0992-4cf4-bd82-ec469afd1419.jpg",
+          "durum": 200,
+          "bayt": 108736,
+          "genislik": 270,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/984a290c-0992-4cf4-bd82-ec469afd1419.jpg",
+          "durum": 200,
+          "bayt": 369399,
+          "genislik": 540,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/9b2c5577-54aa-4144-bd4d-257646683b1c.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/9b2c5577-54aa-4144-bd4d-257646683b1c.jpg",
+          "durum": 200,
+          "bayt": 106272,
+          "genislik": 270,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/9b2c5577-54aa-4144-bd4d-257646683b1c.jpg",
+          "durum": 200,
+          "bayt": 368712,
+          "genislik": 540,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    },
+    {
+      "adres": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/0a51ca3d-fbd1-4ae4-82cd-30d8a154bc76.jpg",
+      "varyantlar": [
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/0a51ca3d-fbd1-4ae4-82cd-30d8a154bc76.jpg",
+          "durum": 200,
+          "bayt": 114432,
+          "genislik": 360,
+          "yukseklik": 480,
+          "format": "jpeg"
+        },
+        {
+          "url": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/0a51ca3d-fbd1-4ae4-82cd-30d8a154bc76.jpg",
+          "durum": 200,
+          "bayt": 367562,
+          "genislik": 720,
+          "yukseklik": 960,
+          "format": "jpeg"
+        }
+      ]
+    }
+  ],
+  "ozet": {
+    "gorselSayisi": 33,
+    "onceBayt": 23503144,
+    "sonraBayt": 6785054,
+    "azalmaYuzde": 71.1
+  }
+}

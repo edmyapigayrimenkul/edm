@@ -7,15 +7,21 @@
  * yani yanlışlıkla silmek siteyi boş bırakmıyor.
  */
 import Panel from '../../layouts/Panel.astro';
-import { paneleGiris } from '../../lib/panel/yetki';
+import { adminProfiliniBul, paneleGiris } from '../../lib/panel/yetki';
 import { env } from 'cloudflare:workers';
 import { icerik, icerikOnbellegiTemizle } from '../../lib/icerik';
-import { bolgeler, TANIMLAR } from '../../lib/bolgeler';
+import { bolgeler, bolgeOnbellegiTemizle } from '../../lib/bolgeler';
+import { semayiKur } from '../../lib/senkron/depo';
+import { islemKaydet, type IslemKaydiGirdisi } from '../../lib/panel/islem-gecmisi';
+import { rolYetkisiGerekli, rolYetkisiVar } from '../../lib/panel/roller';
 
 const giris = await paneleGiris(Astro.request);
 if ('yanit' in giris) return giris.yanit;
 
 const vt = env.VT as D1Database;
+await semayiKur(vt);
+const admin = adminProfiliniBul(giris.kimlik.eposta);
+const metinSilebilir = rolYetkisiVar(admin?.rol ?? null, 'kalici-sil');
 let bildirim: { tur: 'basari' | 'hata'; metin: string } | null = null;
 
 if (Astro.request.method === 'POST') {
@@ -25,7 +31,16 @@ if (Astro.request.method === 'POST') {
   const suAn = new Date().toISOString();
 
   try {
+    rolYetkisiGerekli(admin?.rol ?? null, tur === 'hizmet-sil' ? 'kalici-sil' : 'icerik-yonet');
+    let islemKaydi: IslemKaydiGirdisi | null = null;
     if (tur === 'hizmet' && anahtar) {
+      const onceki = await vt.prepare(`SELECT baslik, govde, sira, yayinda FROM metinler WHERE tur = 'hizmet' AND anahtar = ?`).bind(anahtar).first<Record<string, unknown>>();
+      const sonraki = {
+        baslik: String(form.get('baslik') ?? '').trim().slice(0, 120),
+        govde: String(form.get('govde') ?? '').trim().slice(0, 800),
+        sira: Number(form.get('sira')) || 0,
+        yayinda: form.get('yayinda') ? 1 : 0,
+      };
       await vt
         .prepare(
           `INSERT INTO metinler (tur, anahtar, baslik, govde, sira, yayinda, guncelleme)
@@ -44,8 +59,10 @@ if (Astro.request.method === 'POST') {
           suAn
         )
         .run();
+      islemKaydi = { eylem: 'metin-guncellendi', varlikTuru: 'metin', varlikId: `hizmet:${anahtar}`, ozet: `${sonraki.baslik || anahtar} hizmet metni güncellendi.`, onceki, sonraki };
       bildirim = { tur: 'basari', metin: 'Hizmet metni kaydedildi.' };
     } else if (tur === 'bolge' && anahtar) {
+      const onceki = await vt.prepare(`SELECT govde, ek, yayinda FROM metinler WHERE tur = 'bolge' AND anahtar = ?`).bind(anahtar).first<Record<string, unknown>>();
       const notlar = String(form.get('notlar') ?? '')
         .split('\n')
         .map((n) => n.trim())
@@ -64,6 +81,7 @@ if (Astro.request.method === 'POST') {
           suAn
         )
         .run();
+      islemKaydi = { eylem: 'metin-guncellendi', varlikTuru: 'metin', varlikId: `bolge:${anahtar}`, ozet: `${anahtar} bölge tanıtımı güncellendi.`, onceki, sonraki: { giris: String(form.get('giris') ?? '').trim().slice(0, 2000), notlar } };
       bildirim = { tur: 'basari', metin: `${anahtar} tanıtımı kaydedildi.` };
     } else if (tur === 'hizmet-ekle') {
       const yeniAnahtar = `h${Date.now().toString(36)}`;
@@ -74,26 +92,30 @@ if (Astro.request.method === 'POST') {
         )
         .bind(yeniAnahtar, 'Yeni hizmet', '', suAn)
         .run();
+      islemKaydi = { eylem: 'metin-eklendi', varlikTuru: 'metin', varlikId: `hizmet:${yeniAnahtar}`, ozet: 'Yeni hizmet metni eklendi.', sonraki: { baslik: 'Yeni hizmet', yayinda: 1 } };
       bildirim = { tur: 'basari', metin: 'Yeni hizmet eklendi, aşağıdan düzenleyin.' };
     } else if (tur === 'hizmet-sil' && anahtar) {
+      const onceki = await vt.prepare(`SELECT baslik, govde, sira, yayinda FROM metinler WHERE tur = 'hizmet' AND anahtar = ?`).bind(anahtar).first<Record<string, unknown>>();
       await vt
         .prepare(`DELETE FROM metinler WHERE tur = 'hizmet' AND anahtar = ?`)
         .bind(anahtar)
         .run();
+      islemKaydi = { eylem: 'metin-silindi', varlikTuru: 'metin', varlikId: `hizmet:${anahtar}`, ozet: `${String(onceki?.baslik ?? anahtar)} hizmet metni silindi.`, onceki };
       bildirim = { tur: 'basari', metin: 'Hizmet silindi.' };
     }
+    if (islemKaydi) await islemKaydet(vt, giris.kimlik, islemKaydi);
     icerikOnbellegiTemizle();
+    if (tur === 'bolge') bolgeOnbellegiTemizle();
   } catch (hata) {
     bildirim = { tur: 'hata', metin: (hata as Error).message };
   }
 }
 
-const { hizmetler, bolgeMetinleri } = await icerik();
+const { hizmetler } = await icerik();
 const bolgeListesi = await bolgeler();
 
-/** Bölge adı D1'de ilçe adıyla saklanıyor ("Merkez" dahil). */
-const bolgeAnahtari = (b: (typeof bolgeListesi)[number]) =>
-  b.ad.replace(/^.+\s(Merkez)$/, '$1');
+/** İlçe adı birden fazla ilde bulunabilir; yeni kayıtlar bölge slug'ıyla ayrılır. */
+const bolgeAnahtari = (b: (typeof bolgeListesi)[number]) => b.slug;
 ---
 
 <Panel
@@ -147,7 +169,7 @@ const bolgeAnahtari = (b: (typeof bolgeListesi)[number]) =>
                 <span>Yayında</span>
               </label>
               <button type="submit" class="pd pd--birincil">Kaydet</button>
-              <button
+              {metinSilebilir && <button
                 type="submit"
                 name="tur"
                 value="hizmet-sil"
@@ -156,7 +178,7 @@ const bolgeAnahtari = (b: (typeof bolgeListesi)[number]) =>
                 onclick="return confirm('Bu hizmet kalıcı olarak silinecek. Emin misiniz?')"
               >
                 Sil
-              </button>
+              </button>}
             </div>
           </form>
         ))
@@ -177,10 +199,8 @@ const bolgeAnahtari = (b: (typeof bolgeListesi)[number]) =>
       {
         bolgeListesi.map((b) => {
           const anahtar = bolgeAnahtari(b);
-          const panelMetni = bolgeMetinleri.get(anahtar);
-          const varsayilan = TANIMLAR[anahtar];
-          const giris = panelMetni?.giris ?? varsayilan?.giris ?? '';
-          const notlar = (panelMetni?.notlar?.length ? panelMetni.notlar : varsayilan?.notlar) ?? [];
+          const giris = b.giris ?? '';
+          const notlar = b.notlar;
 
           return (
             <form method="POST" class="metin-satir">

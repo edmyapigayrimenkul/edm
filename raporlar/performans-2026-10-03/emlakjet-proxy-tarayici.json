@@ -1,0 +1,65 @@
+{
+  "tarih": "2026-10-03T12:36:59.330Z",
+  "uretimSurumu": "099708ec-bcb3-4350-a9da-65c0fac30cfb",
+  "stagingSurumu": "143e27a5-55cf-4a9d-b7ac-1eb7d37731ad",
+  "yerel": {
+    "mobilKapak": [
+      640,
+      480
+    ],
+    "masaustuKapak": [
+      960,
+      720
+    ],
+    "ozgunBuyutecGenislik": 1600,
+    "sonrakiSayac": "2 / 10"
+  },
+  "canli": {
+    "mobil": {
+      "ekran": [
+        390,
+        844
+      ],
+      "kapak": [
+        640,
+        480
+      ],
+      "ozguneDonus": false,
+      "yatayTasma": false,
+      "kapaliGaleriSrc": null
+    },
+    "masaustu": {
+      "ekran": [
+        1280,
+        800
+      ],
+      "kapak": [
+        960,
+        720
+      ],
+      "kucukFotoGenislik": 640,
+      "yatayTasma": false
+    },
+    "buyutec": {
+      "ozgunGenislik": 1600,
+      "sonrakiSayac": "2 / 10",
+      "acmaVeKapatma": true
+    },
+    "favoriler": {
+      "seciliFotoGenislik": 640,
+      "gizliKart": 47,
+      "gizliEtkinImg": 0,
+      "gizliEtkinSource": 0,
+      "denemeKaldirildiktanSonra": {
+        "gizliKart": 48,
+        "etkinImg": 0,
+        "etkinSource": 0
+      }
+    },
+    "kaydedilenKonsolHatasi": 0
+  },
+  "sinirlar": [
+    "Fiziksel yüksek yoğunluklu veya düşük güçlü cihaz ölçümü yapılmadı.",
+    "Dosya bayt azalması toplam sayfa veya LCP kazanımı değildir."
+  ]
+}

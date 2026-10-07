@@ -1,0 +1,114 @@
+{
+  "ortam": "gecici-yerel-D1-kopyasi",
+  "adimlar": [
+    {
+      "ad": "liste-baslangic",
+      "yol": "/ilanlar?edm047=form",
+      "durum": 200,
+      "onbellek": "MISS",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "zaman": "2026-10-03T11:23:21.666Z"
+    },
+    {
+      "ad": "detay-MISS",
+      "yol": "/ilan/silivri-mimar-sinanda-kiralik-deniz-manzarali-2-1-daire-19802542?edm047=form",
+      "durum": 200,
+      "onbellek": "MISS",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "zaman": "2026-10-03T11:23:21.715Z"
+    },
+    {
+      "ad": "detay-HIT",
+      "yol": "/ilan/silivri-mimar-sinanda-kiralik-deniz-manzarali-2-1-daire-19802542?edm047=form",
+      "durum": 200,
+      "onbellek": "HIT",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "zaman": "2026-10-03T11:23:21.721Z"
+    },
+    {
+      "ad": "gercek-duzenleme-POST",
+      "yol": "/yonetim/ilan-duzenle/19802542",
+      "durum": 200,
+      "onbellek": null,
+      "kontrol": "no-store",
+      "zaman": "2026-10-03T11:23:21.762Z"
+    },
+    {
+      "ad": "duzenleme-sonrasi-bypass",
+      "yol": "/ilan/silivri-mimar-sinanda-kiralik-deniz-manzarali-2-1-daire-19802542?edm047=form",
+      "durum": 200,
+      "onbellek": null,
+      "kontrol": "private, no-store",
+      "zaman": "2026-10-03T11:23:21.785Z"
+    },
+    {
+      "ad": "duzenleme-sonrasi-yeni-MISS",
+      "yol": "/ilan/silivri-mimar-sinanda-kiralik-deniz-manzarali-2-1-daire-19802542?edm047=guncel",
+      "durum": 200,
+      "onbellek": "MISS",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "zaman": "2026-10-03T11:23:21.808Z"
+    },
+    {
+      "ad": "gercek-pasifleme-POST",
+      "yol": "/yonetim/ilanlar",
+      "durum": 200,
+      "onbellek": null,
+      "kontrol": "no-store",
+      "zaman": "2026-10-03T11:23:21.851Z"
+    },
+    {
+      "ad": "pasif-sonrasi-bypass",
+      "yol": "/ilan/silivri-mimar-sinanda-kiralik-deniz-manzarali-2-1-daire-19802542?edm047=form",
+      "durum": 404,
+      "onbellek": null,
+      "kontrol": null,
+      "zaman": "2026-10-03T11:23:21.887Z"
+    },
+    {
+      "ad": "pasif-sonrasi-sitemap",
+      "yol": "/sitemap.xml",
+      "durum": 200,
+      "onbellek": null,
+      "kontrol": "public, max-age=0, must-revalidate",
+      "zaman": "2026-10-03T11:23:21.909Z"
+    },
+    {
+      "ad": "pasif-sonrasi-eski-HIT",
+      "yol": "/ilan/silivri-mimar-sinanda-kiralik-deniz-manzarali-2-1-daire-19802542?edm047=form",
+      "durum": 200,
+      "onbellek": "HIT",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "zaman": "2026-10-03T11:23:21.914Z"
+    },
+    {
+      "ad": "sure-sonrasi-detay",
+      "yol": "/ilan/silivri-mimar-sinanda-kiralik-deniz-manzarali-2-1-daire-19802542?edm047=form",
+      "durum": 404,
+      "onbellek": null,
+      "kontrol": null,
+      "zaman": "2026-10-03T11:24:23.123Z"
+    },
+    {
+      "ad": "sure-sonrasi-guncel-detay",
+      "yol": "/ilan/silivri-mimar-sinanda-kiralik-deniz-manzarali-2-1-daire-19802542?edm047=guncel",
+      "durum": 404,
+      "onbellek": null,
+      "kontrol": null,
+      "zaman": "2026-10-03T11:24:23.164Z"
+    },
+    {
+      "ad": "sure-sonrasi-liste",
+      "yol": "/ilanlar?edm047=form",
+      "durum": 200,
+      "onbellek": "MISS",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "zaman": "2026-10-03T11:24:23.202Z"
+    }
+  ],
+  "sonuc": {
+    "gecti": true,
+    "pasiflemeSonrasiOlcumSaniye": 61.351,
+    "uretimDegisikligi": false
+  }
+}

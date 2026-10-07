@@ -8,21 +8,30 @@
  */
 
 import { defineMiddleware } from 'astro:middleware';
+import { env } from 'cloudflare:workers';
+import { istekKapsaminda } from './lib/istek-onbellegi';
+import { GENEL_HTML_KONTROLU, genelHtmlOnbellekAnahtari } from './lib/edge-cache';
 
 const KOK_ALAN = 'edmyapigayrimenkul.com';
 
 /** Önbelleklenmeyecek yollar: form uçları ve yönetim paneli. */
 const ONBELLEKSIZ = [/^\/api\//, /^\/yonetim/];
 
-export const onRequest = defineMiddleware(async (baglam, sonraki) => {
+export const onRequest = defineMiddleware((baglam, sonraki) => istekKapsaminda(async () => {
   const adres = baglam.url;
+  const yerelAdres = ['localhost', '127.0.0.1', '[::1]'].includes(adres.hostname);
 
-  if (adres.hostname === `www.${KOK_ALAN}`) {
+  if ((adres.protocol === 'http:' && !yerelAdres) || adres.hostname === `www.${KOK_ALAN}`) {
+    adres.protocol = 'https:';
     adres.hostname = KOK_ALAN;
     return baglam.redirect(adres.toString(), 301);
   }
 
   const yanit = await sonraki();
+
+  if ((env as Record<string, unknown>).STAGING_ORTAMI === '1') {
+    yanit.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+  }
 
   if (ONBELLEKSIZ.some((d) => d.test(adres.pathname))) {
     yanit.headers.set('Cache-Control', 'no-store');
@@ -32,12 +41,11 @@ export const onRequest = defineMiddleware(async (baglam, sonraki) => {
   // Yalnızca başarılı HTML yanıtları önbelleklenir.
   const tur = yanit.headers.get('Content-Type') ?? '';
   if (yanit.status === 200 && tur.includes('text/html')) {
-    // Tarayıcı kısa süre, Cloudflare kenarı 1 saat tutar; kenar önbelleği
-    // bayatlarsa arka planda tazelenirken eski sürüm sunulur.
-    yanit.headers.set(
-      'Cache-Control',
-      'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400'
-    );
+    // İletişim ve portföy ayarları panelden değiştiğinde site en geç bir dakika
+    // içinde aynı içeriği göstermeli. Sürümlü statik dosyalar public/_headers ile
+    // uzun süre tutulurken HTML kısa süreli önbelleklenir.
+    yanit.headers.set('Cache-Control', genelHtmlOnbellekAnahtari(baglam.request)
+      ? GENEL_HTML_KONTROLU : 'private, no-store');
   }
 
   yanit.headers.set('X-Content-Type-Options', 'nosniff');
@@ -46,4 +54,4 @@ export const onRequest = defineMiddleware(async (baglam, sonraki) => {
   yanit.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
 
   return yanit;
-});
+}));

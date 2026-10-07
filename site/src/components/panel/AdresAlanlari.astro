@@ -1,0 +1,74 @@
+---
+import { KONUM_YONETIM_ALANLARI } from '../../lib/ilan-bilgileri';
+
+interface Props {
+  il: string;
+  ilce: string;
+  mahalle: string;
+  hatalar?: string[];
+  degerler?: Record<string, string>;
+}
+
+const { il, ilce, mahalle, hatalar = [], degerler = {} } = Astro.props;
+---
+
+<div class="adres-alanlari">
+  <div class="alan-grid alan-grid--uc">
+    <label class="alan" id="alan-il"><span>İl <em>*</em></span><input name="il" value={il} required aria-invalid={hatalar.includes('il') ? 'true' : undefined} /></label>
+    <label class="alan" id="alan-ilce"><span>İlçe <em>*</em></span><input name="ilce" value={ilce} required aria-invalid={hatalar.includes('ilce') ? 'true' : undefined} /></label>
+    <label class="alan" id="alan-mahalle"><span>Mahalle <em>*</em></span><input name="mahalle" value={mahalle} required aria-invalid={hatalar.includes('mahalle') ? 'true' : undefined} /></label>
+  </div>
+
+  <div class="alt-kart konum-pini">
+    <div class="alt-kart-bas"><strong>İlana özel harita pini</strong><span>Kesin koordinat halka açık sayfaya gönderilmez.</span></div>
+    <div class="alan-grid alan-grid--iki">
+      {KONUM_YONETIM_ALANLARI.map((alan) => {
+        const varsayilan = alan.ad === 'kamu_konum_duzeyi' ? 'mahalle' : alan.ad === 'portal_konum_aktarimi' ? 'kapali' : '';
+        const deger = degerler[alan.ad] ?? varsayilan;
+        return <label class="alan" id={`alan-${alan.ad}`}><span>{alan.etiket}</span>
+          {alan.tur === 'secim'
+            ? <select name={alan.ad} aria-invalid={hatalar.includes(alan.ad) ? 'true' : undefined}><option value="">Seçin</option>{alan.secenekler?.map((secenek) => <option value={secenek.deger} selected={deger === secenek.deger}>{secenek.etiket}</option>)}</select>
+            : <input type="number" name={alan.ad} value={deger} min={alan.enAz} max={alan.enFazla} step={alan.adim} inputmode="decimal" aria-invalid={hatalar.includes(alan.ad) ? 'true' : undefined} />}
+          {alan.yardim && <small>{alan.yardim}</small>}
+        </label>;
+      })}
+    </div>
+    <div class="konum-pini-eylem"><button type="button" class="konum-pini-dugme" data-konum-harita-ac>Haritada işaretle</button><button type="button" class="konum-pini-dugme" data-konum-gps>Mevcut konumumu kullan</button><button type="button" class="konum-pini-dugme" data-konum-temizle>Kesin pini temizle</button></div>
+    <div class="konum-pini-harita" data-konum-pini-harita hidden></div>
+    <p class="konum-pini-durum" data-konum-pini-durum aria-live="polite">Varsayılan olarak eski mahalle merkezi gösterimi korunur.</p>
+  </div>
+</div>
+
+<style>
+  .adres-alanlari { display: grid; gap: 1rem; min-width: 0; }
+  .alan-grid { display: grid; gap: 1rem; min-width: 0; }
+  .alan-grid--iki { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .alan-grid--uc { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .alan { display: grid; gap: .35rem; min-width: 0; }
+  .alan > span { font-size: .72rem; font-weight: 650; color: var(--color-murekkep); }
+  .alan input, .alan select {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    border: 1px solid var(--cizgi);
+    border-radius: 5px;
+    background: #fff;
+    color: var(--color-murekkep);
+    font: 400 .84rem/1.35 var(--font-govde);
+    padding: .72rem .8rem;
+  }
+  .alan input:focus, .alan select:focus { border-color: var(--color-murekkep); outline: 0; box-shadow: 0 0 0 3px rgb(18 19 22 / 7%); }
+  .alan [aria-invalid="true"] { border-color: #c4030f; background: #fff8f8; }
+  .alan > small { display: block; margin-top: .35rem; color: var(--color-kursun); font-size: .65rem; line-height: 1.4; }
+  .alt-kart { min-width: 0; margin-top: 1.25rem; padding: 1rem; border-radius: 6px; background: var(--color-kagit); }
+  .alt-kart-bas { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; font-size: .75rem; }
+  .alt-kart-bas span { color: var(--color-kursun); }
+  .konum-pini-eylem { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+  .konum-pini-dugme { border: 1px solid var(--cizgi); border-radius: 5px; background: #fff; padding: .65rem .8rem; font-size: .72rem; font-weight: 650; }
+  .konum-pini-harita { height: 20rem; margin-top: 1rem; overflow: hidden; border: 1px solid var(--cizgi); border-radius: 6px; }
+  .konum-pini-durum { margin-top: .65rem; color: var(--color-kursun); font-size: .68rem; }
+  @media (max-width: 700px) {
+    .alan-grid--iki, .alan-grid--uc { grid-template-columns: minmax(0, 1fr); }
+    .alt-kart-bas { align-items: flex-start; flex-direction: column; }
+  }
+</style>

@@ -1,6 +1,6 @@
 ---
 import Temel from '../layouts/Temel.astro';
-import { KURUM } from '../lib/site';
+import { BELGELER, KURUM } from '../lib/site';
 import { icerik } from '../lib/icerik';
 import { portfoy } from '../lib/ilanlar';
 
@@ -9,7 +9,7 @@ const { ekip, iletisim, hizmetler: HIZMETLER } = await icerik();
 const adresTam = `${iletisim.adresSatir1} ${iletisim.adresSatir2}, ${iletisim.adresIlce} / ${iletisim.adresIl}`;
 
 const yil = new Date().getFullYear() - KURUM.kurulus;
-const donum = Math.round(SAYIMLAR.toplamAlan / 1000);
+const donum = Math.round(SAYIMLAR.arsaToplamAlan / 1000);
 
 const ilkeler = [
   {
@@ -198,8 +198,37 @@ const iller = FILTRELER.il;
 
       <div class="mt-14 flex flex-wrap items-center gap-3 border-t border-murekkep/10 pt-10">
         <a href="/iletisim" class="dugme dugme--kirmizi">Ofise gelin</a>
-        <a href={`tel:${iletisim.telefonHam}`} class="dugme dugme--hayalet">{iletisim.telefon}</a>
+        <a href={`tel:${iletisim.sabitHam}`} class="dugme dugme--hayalet">{iletisim.sabit}</a>
         <p class="ml-auto max-w-[30ch] text-sm text-kursun">{adresTam}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Yasal kayıtlar ve mesleki yeterlilik -->
+  <section class="belge-blok pb-20 lg:pb-28">
+    <div class="kab">
+      <div class="grid gap-10 border-t border-murekkep/12 pt-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+        <div>
+          <p class="etiket">Kayıt ve yetkinlik</p>
+          <h2 class="baslik-buyuk mt-4 max-w-[12ch]">İşletme bilgileri açık</h2>
+          <p class="mt-5 max-w-[42ch] text-sm leading-relaxed text-metin-2">
+            Aşağıdaki kayıt ve belge numaraları işletmenin beyan ettiği güncel bilgilerdir.
+            Bir taşınmaz işlemi öncesinde yetki belgesini ilgili resmî kayıt üzerinden ayrıca
+            doğrulamanızı öneririz.
+          </p>
+        </div>
+
+        <dl class="belge-liste">
+          {BELGELER.map((belge) => (
+            <div class="belge-satir">
+              <dt>
+                <span>{belge.tur}</span>
+                {'sahip' in belge && <small>{belge.sahip}</small>}
+              </dt>
+              <dd class="font-veri">{belge.no}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
     </div>
   </section>
@@ -307,5 +336,46 @@ const iller = FILTRELER.il;
     font-size: 1.15rem;
     font-weight: 600;
     color: var(--color-metin-2);
+  }
+  .belge-liste {
+    margin: 0;
+    border-top: 1px solid color-mix(in oklab, var(--color-murekkep) 12%, transparent);
+  }
+  .belge-satir {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.5rem;
+    align-items: baseline;
+    padding-block: 1.1rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+  }
+  .belge-satir dt {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+    align-items: baseline;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .belge-satir dt small {
+    color: var(--color-kursun);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  .belge-satir dd {
+    margin: 0;
+    color: var(--color-metin-2);
+    font-size: clamp(0.72rem, 2vw, 0.86rem);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 36rem) {
+    .belge-satir {
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+    }
+    .belge-satir dd {
+      text-align: left;
+    }
   }
 </style>

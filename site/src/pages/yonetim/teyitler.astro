@@ -1,0 +1,204 @@
+---
+import Panel from '../../layouts/Panel.astro';
+import { paneleGiris } from '../../lib/panel/yetki';
+import { env } from 'cloudflare:workers';
+import { semayiKur, tumIlanSatirlari } from '../../lib/senkron/depo';
+import { baslikTemizle } from '../../lib/ilanlar';
+import {
+  ILAN_TEYIT_LISTESI,
+  TEYIT_DURUMLARI,
+  teyitAnahtari,
+  teyitKaydet,
+  teyitKayitlariniGetir,
+  teyitOzeti,
+  type TeyitDurumu,
+} from '../../lib/ilan-teyit';
+
+const giris = await paneleGiris(Astro.request);
+if ('yanit' in giris) return giris.yanit;
+
+const vt = env.VT as D1Database;
+await semayiKur(vt);
+let bildirim: { tur: 'basari' | 'hata'; metin: string } | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  try {
+    await teyitKaydet(vt, {
+      ilanId: String(form.get('ilan_id') ?? ''),
+      sorunKodu: String(form.get('sorun_kodu') ?? ''),
+      durum: String(form.get('durum') ?? ''),
+      yanit: String(form.get('yanit') ?? ''),
+      kaynak: String(form.get('kaynak') ?? ''),
+      notu: String(form.get('notu') ?? ''),
+    }, giris.kimlik.eposta);
+    bildirim = { tur: 'basari', metin: 'Teyit kaydı güncellendi.' };
+  } catch (hata) {
+    bildirim = { tur: 'hata', metin: (hata as Error).message };
+  }
+}
+
+const [kayitlar, ilanSatirlari] = await Promise.all([
+  teyitKayitlariniGetir(vt),
+  tumIlanSatirlari(vt),
+]);
+const ozet = teyitOzeti(kayitlar);
+const ilanBasliklari = new Map(ilanSatirlari.map((ilan) => [ilan.id, baslikTemizle(ilan.baslik)]));
+const filtre = Astro.url.searchParams.get('durum') ?? 'acik';
+const maddeDurumu = (ilanId: string, kod: string): TeyitDurumu =>
+  kayitlar.get(teyitAnahtari(ilanId, kod))?.durum ?? 'bekliyor';
+const gorunurMaddeler = ILAN_TEYIT_LISTESI.filter((madde) => {
+  const durum = maddeDurumu(madde.ilanId, madde.kod);
+  if (filtre === 'tumu') return true;
+  if (filtre === 'acik') return durum !== 'tamamlandi';
+  return durum === filtre;
+});
+const ilanGruplari = [...new Set(gorunurMaddeler.map((madde) => madde.ilanId))].map((ilanId) => ({
+  ilanId,
+  baslik: ilanBasliklari.get(ilanId) ?? `İlan ${ilanId}`,
+  maddeler: gorunurMaddeler.filter((madde) => madde.ilanId === ilanId),
+}));
+const durumEtiketi = new Map(TEYIT_DURUMLARI.map((durum) => [durum.deger, durum.etiket]));
+const tarihSaat = (ham: string) => new Date(ham).toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' });
+---
+
+<Panel
+  baslik="Teyit Merkezi"
+  eposta={giris.kimlik.eposta}
+  ozet={`${ozet.bekliyor} bekliyor · ${ozet.yanitlandi} yanıtlandı · ${ozet.tamamlandi} kapandı`}
+>
+  <a href="/yonetim/ilanlar" class="pd pd--sade" slot="eylem">İlanlara dön</a>
+
+  {bildirim && <div class={`bildirim bildirim--${bildirim.tur}`}>{bildirim.metin}</div>}
+
+  <div class="teyit-bilgi">
+    <div>
+      <strong>İşletme bilgisi ile otomatik kalite kontrolünü birbirine bağlar.</strong>
+      <p>Tapu, kadastro, fiyat kapsamı ve bağımsız bölüm gibi bilgiler tahmin edilmez. Yanıtı ve dayanağını kaydedin; gerekiyorsa ilanı düzeltin, ardından konuyu kapatın.</p>
+    </div>
+    <ol>
+      <li>Danışman veya belge yanıtını alın.</li>
+      <li>Yanıt ve kaynağı bu ekrana kaydedin.</li>
+      <li>İlan alanlarını düzeltip konuyu kapatın.</li>
+    </ol>
+  </div>
+
+  <div class="teyit-ozet" aria-label="Teyit durumu özeti">
+    <a href="?durum=bekliyor" class:list={['teyit-sayi', filtre === 'bekliyor' && 'teyit-sayi--secili']}><span>Bekliyor</span><strong>{ozet.bekliyor}</strong></a>
+    <a href="?durum=yanitlandi" class:list={['teyit-sayi', filtre === 'yanitlandi' && 'teyit-sayi--secili']}><span>Bilgi alındı</span><strong>{ozet.yanitlandi}</strong></a>
+    <a href="?durum=tamamlandi" class:list={['teyit-sayi', filtre === 'tamamlandi' && 'teyit-sayi--secili']}><span>Konu kapandı</span><strong>{ozet.tamamlandi}</strong></a>
+    <a href="?durum=acik" class:list={['teyit-sayi', filtre === 'acik' && 'teyit-sayi--secili']}><span>Açık toplam</span><strong>{ozet.bekliyor + ozet.yanitlandi}</strong></a>
+  </div>
+
+  <nav class="teyit-filtre" aria-label="Teyit filtresi">
+    <a href="?durum=acik" aria-current={filtre === 'acik' ? 'page' : undefined}>Açık işler</a>
+    <a href="?durum=tumu" aria-current={filtre === 'tumu' ? 'page' : undefined}>Tümü</a>
+    <a href="?durum=tamamlandi" aria-current={filtre === 'tamamlandi' ? 'page' : undefined}>Kapananlar</a>
+  </nav>
+
+  {ilanGruplari.length ? <div class="teyit-listesi">
+    {ilanGruplari.map((grup) => <section class="teyit-ilan">
+      <header class="teyit-ilan-bas">
+        <div><span class="veri-sayi">İLAN {grup.ilanId}</span><h2>{grup.baslik}</h2></div>
+        <div class="teyit-ilan-eylem">
+          <a href={`/ilan/ilan-${grup.ilanId}`} target="_blank" rel="noopener" class="pd pd--sade">İlanı aç ↗</a>
+          <a href={`/yonetim/ilan-duzenle/${grup.ilanId}`} class="pd pd--birincil">İlanı düzenle</a>
+        </div>
+      </header>
+
+      <div class="teyit-maddeleri">
+        {grup.maddeler.map((madde) => {
+          const kayit = kayitlar.get(teyitAnahtari(madde.ilanId, madde.kod));
+          const durum = kayit?.durum ?? 'bekliyor';
+          return <details class:list={['teyit-madde', `teyit-madde--${durum}`]} open={durum !== 'tamamlandi'}>
+            <summary>
+              <span class="teyit-kategori">{madde.kategori}</span>
+              <strong>{madde.baslik}</strong>
+              <span class:list={['cip', durum === 'tamamlandi' ? 'cip--kapandi' : durum === 'yanitlandi' ? 'cip--islemde' : 'cip--pasif']}>{durumEtiketi.get(durum)}</span>
+            </summary>
+            <div class="teyit-madde-govde">
+              <div class="teyit-soru">
+                <p>{madde.soru}</p>
+                <small><strong>Beklenen kayıt:</strong> {madde.beklenen}</small>
+                {madde.etkilenenIlanIdleri.length > 1 && <div class="etkilenenler">Etkilenen ilanlar: {madde.etkilenenIlanIdleri.map((id) => <a href={`/yonetim/ilan-duzenle/${id}`}>{id}</a>)}</div>}
+              </div>
+              <form method="POST" class="teyit-form">
+                <input type="hidden" name="ilan_id" value={madde.ilanId} />
+                <input type="hidden" name="sorun_kodu" value={madde.kod} />
+                <label><span>Durum</span><select name="durum">
+                  {TEYIT_DURUMLARI.map((secenek) => <option value={secenek.deger} selected={durum === secenek.deger}>{secenek.etiket}</option>)}
+                </select><small>{TEYIT_DURUMLARI.find((secenek) => secenek.deger === durum)?.aciklama}</small></label>
+                <label class="tam"><span>Doğrulanan yanıt</span><textarea name="yanit" rows="3" maxlength="2000" placeholder="Örn. Tapu belgesinde Kat İrtifakı yazıyor; 138 m² brüt yapı alanıdır.">{kayit?.yanit ?? ''}</textarea></label>
+                <label><span>Belge / teyit kaynağı</span><input name="kaynak" maxlength="500" value={kayit?.kaynak ?? ''} placeholder="Örn. Tapu belgesi · 14.09.2026" /><small>Kişisel belge veya telefon numarası yazmayın; belge türü ve kontrol tarihi yeterli.</small></label>
+                <label><span>İç not</span><textarea name="notu" rows="2" maxlength="2000" placeholder="Takip veya düzeltme notu">{kayit?.notu ?? ''}</textarea></label>
+                <div class="teyit-kaydet tam">
+                  <div>{kayit ? <>Son güncelleme: {tarihSaat(kayit.guncelleme)} · {kayit.teyit_eden}</> : 'Henüz kayıt girilmedi.'}</div>
+                  <div>
+                    <a href={`/yonetim/ilan-duzenle/${madde.etkilenenIlanIdleri[0]}#${madde.duzenlemeBolumu ?? 'teknik'}`} class="pd pd--sade">İlgili alana git</a>
+                    <button type="submit" class="pd pd--kirmizi">Teyidi kaydet</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </details>;
+        })}
+      </div>
+    </section>)}
+  </div> : <div class="teyit-bos"><strong>Bu filtrede kayıt yok.</strong><a href="?durum=acik">Açık teyitleri göster</a></div>}
+</Panel>
+
+<style>
+  .teyit-bilgi { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(16rem,.8fr); gap:1.5rem; padding:1.25rem 1.4rem; margin-bottom:1rem; border:1px solid color-mix(in oklab,var(--color-murekkep) 12%,transparent); border-left:4px solid var(--color-kirmizi); border-radius:8px; background:#fff; }
+  .teyit-bilgi strong { font-family:var(--font-baslik); font-size:1.05rem; }
+  .teyit-bilgi p { margin:.35rem 0 0; color:var(--color-kursun); line-height:1.55; }
+  .teyit-bilgi ol { margin:0; padding-left:1.25rem; color:var(--color-kursun); line-height:1.75; }
+  .teyit-ozet { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.75rem; margin-bottom:1rem; }
+  .teyit-sayi { display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:.8rem 1rem; border:1px solid color-mix(in oklab,var(--color-murekkep) 10%,transparent); border-radius:7px; background:#fff; color:var(--color-kursun); }
+  .teyit-sayi strong { font-family:var(--font-veri); font-size:1.45rem; color:var(--color-murekkep); }
+  .teyit-sayi--secili { border-color:var(--color-kirmizi); box-shadow:inset 3px 0 0 var(--color-kirmizi); }
+  .teyit-filtre { display:flex; gap:.35rem; margin:0 0 1rem; }
+  .teyit-filtre a { padding:.45rem .8rem; border-radius:99px; color:var(--color-kursun); font-size:.8rem; font-weight:600; }
+  .teyit-filtre a[aria-current='page'] { background:var(--color-murekkep); color:#fff; }
+  .teyit-listesi { display:grid; gap:1rem; }
+  .teyit-ilan { overflow:hidden; border:1px solid color-mix(in oklab,var(--color-murekkep) 12%,transparent); border-radius:8px; background:#fff; }
+  .teyit-ilan-bas { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 1.2rem; border-bottom:1px solid color-mix(in oklab,var(--color-murekkep) 10%,transparent); background:color-mix(in oklab,var(--color-kagit-2) 65%,#fff); }
+  .teyit-ilan-bas h2 { margin:.15rem 0 0; font-size:1rem; }
+  .teyit-ilan-eylem { display:flex; gap:.5rem; flex:none; }
+  .teyit-maddeleri { display:grid; }
+  .teyit-madde + .teyit-madde { border-top:1px solid color-mix(in oklab,var(--color-murekkep) 9%,transparent); }
+  .teyit-madde summary { display:grid; grid-template-columns:9rem minmax(0,1fr) auto 1rem; align-items:center; gap:1rem; padding:.85rem 1.2rem; cursor:pointer; list-style:none; }
+  .teyit-madde summary::-webkit-details-marker { display:none; }
+  .teyit-madde summary::before { content:'+'; grid-column:4; grid-row:1; font-family:var(--font-veri); color:var(--color-kursun); }
+  .teyit-madde[open] summary::before { content:'−'; }
+  .teyit-kategori { font-size:.72rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--color-kursun); }
+  .teyit-madde-govde { padding:0 1.2rem 1.2rem; }
+  .teyit-soru { padding:.9rem 1rem; border-radius:6px; background:var(--color-kagit-2); }
+  .teyit-soru p { margin:0 0 .35rem; font-weight:600; }
+  .teyit-soru small { color:var(--color-kursun); }
+  .etkilenenler { margin-top:.5rem; font-size:.8rem; color:var(--color-kursun); }
+  .etkilenenler a { margin-left:.45rem; text-decoration:underline; }
+  .teyit-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.8rem 1rem; margin-top:1rem; }
+  .teyit-form label { display:flex; flex-direction:column; gap:.3rem; }
+  .teyit-form label > span { font-size:.78rem; font-weight:700; }
+  .teyit-form input,.teyit-form select,.teyit-form textarea { width:100%; padding:.65rem .72rem; border:1px solid color-mix(in oklab,var(--color-murekkep) 18%,transparent); border-radius:5px; background:#fff; color:var(--color-murekkep); font:inherit; }
+  .teyit-form textarea { resize:vertical; }
+  .teyit-form small { color:var(--color-kursun); font-size:.7rem; line-height:1.4; }
+  .tam { grid-column:1/-1; }
+  .teyit-kaydet { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding-top:.25rem; color:var(--color-kursun); font-size:.72rem; }
+  .teyit-kaydet > div:last-child { display:flex; gap:.5rem; }
+  .teyit-bos { display:flex; justify-content:space-between; padding:1.5rem; border:1px dashed color-mix(in oklab,var(--color-murekkep) 22%,transparent); border-radius:8px; background:#fff; }
+  @media (max-width:760px) {
+    .teyit-bilgi { grid-template-columns:1fr; }
+    .teyit-ozet { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .teyit-ilan-bas { align-items:flex-start; flex-direction:column; }
+    .teyit-madde summary { grid-template-columns:1fr auto; gap:.35rem .75rem; }
+    .teyit-kategori { grid-column:1; }
+    .teyit-madde summary strong { grid-column:1; }
+    .teyit-madde summary .cip { grid-column:2; grid-row:1/3; }
+    .teyit-madde summary::before { display:none; }
+    .teyit-form { grid-template-columns:1fr; }
+    .tam { grid-column:auto; }
+    .teyit-kaydet { align-items:flex-start; flex-direction:column; }
+    .teyit-kaydet > div:last-child { width:100%; flex-wrap:wrap; }
+  }
+</style>

@@ -1,0 +1,84 @@
+{
+  "tarih": "2026-10-03T12:34:23.731Z",
+  "uretimSurumu": "099708ec-bcb3-4350-a9da-65c0fac30cfb",
+  "sonuclar": [
+    {
+      "yol": "/",
+      "durum": 200,
+      "cacheControl": "private, no-store",
+      "htmlOnbellek": null,
+      "proxyImg": 3,
+      "proxySource": 2,
+      "gizliProxyImg": 0,
+      "gizliProxySource": 0,
+      "galeriBaslangic": null
+    },
+    {
+      "yol": "/ilanlar",
+      "durum": 200,
+      "cacheControl": "private, no-store",
+      "htmlOnbellek": null,
+      "proxyImg": 19,
+      "proxySource": 19,
+      "gizliProxyImg": 0,
+      "gizliProxySource": 0,
+      "galeriBaslangic": null
+    },
+    {
+      "yol": "/favorilerim",
+      "durum": 200,
+      "cacheControl": "private, no-store",
+      "htmlOnbellek": null,
+      "proxyImg": 0,
+      "proxySource": 0,
+      "gizliProxyImg": 19,
+      "gizliProxySource": 19,
+      "galeriBaslangic": null
+    },
+    {
+      "yol": "/ilan/selimpasa-araptepede-kiralik-deniz-manzarali-7-2-villa-19797428",
+      "durum": 200,
+      "cacheControl": "private, no-store",
+      "htmlOnbellek": null,
+      "proxyImg": 6,
+      "proxySource": 11,
+      "gizliProxyImg": 0,
+      "gizliProxySource": 0,
+      "galeriBaslangic": "<img data-buyutec-gorsel alt=\"Selimpaşa Araptepe’de Kiralık Deniz Manzaralı 7+2 Villa\" decoding=\"async\" data-astro-cid-qcbthbs3>"
+    },
+    {
+      "yol": "/api/senkron",
+      "durum": 200,
+      "cacheControl": "no-store",
+      "htmlOnbellek": null,
+      "proxyImg": 0,
+      "proxySource": 0,
+      "gizliProxyImg": 0,
+      "gizliProxySource": 0,
+      "galeriBaslangic": null
+    },
+    {
+      "yol": "/yonetim",
+      "durum": 302,
+      "cacheControl": "private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "htmlOnbellek": null,
+      "proxyImg": 0,
+      "proxySource": 0,
+      "gizliProxyImg": 0,
+      "gizliProxySource": 0,
+      "galeriBaslangic": null
+    }
+  ],
+  "onbellek": [
+    {
+      "durum": 200,
+      "htmlOnbellek": "MISS",
+      "proxyVar": true
+    },
+    {
+      "durum": 200,
+      "htmlOnbellek": "MISS",
+      "proxyVar": true
+    }
+  ]
+}

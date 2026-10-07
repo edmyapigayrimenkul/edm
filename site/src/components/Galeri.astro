@@ -1,4 +1,5 @@
 ---
+import { gorselSunumu, GORSEL_YEDEK_BETIGI } from '../lib/gorsel-sunum';
 interface Props {
   gorseller: string[];
   baslik: string;
@@ -7,6 +8,8 @@ interface Props {
 }
 const { gorseller, baslik, gecisAdi } = Astro.props;
 const kapak = gorseller[0];
+const kapakSunumu = kapak ? gorselSunumu(kapak, 'kapak') : undefined;
+const mobilKapakSunumu = kapak ? gorselSunumu(kapak, 'kart') : undefined;
 const yan = gorseller.slice(1, 5);
 const kalan = Math.max(0, gorseller.length - 5);
 ---
@@ -14,21 +17,34 @@ const kalan = Math.max(0, gorseller.length - 5);
 {
   kapak && (
     <div class="galeri" data-galeri>
-      <div class="galeri-serit">
+      <div
+        class="galeri-serit"
+        role="region"
+        aria-label={`${baslik} fotoğrafları. Diğer fotoğraflar için yatay kaydırın.`}
+      >
       <button
         type="button"
         class="galeri-ana goruntu-kutu grup-kart"
         data-ac="0"
-        aria-label={`${baslik} — fotoğrafları büyüt`}
+        aria-label={`Fotoğraf 1 / ${gorseller.length}: ${baslik}. Büyüt.`}
       >
+        <picture>
+        {kapakSunumu?.yogunKaynak && <source media="(min-width: 900px) and (min-resolution: 1.5dppx)" srcset={kapakSunumu.yogunKaynak} />}
+        {mobilKapakSunumu?.yogunKaynak && <source media="(max-width: 899px) and (min-resolution: 1.5dppx)" srcset={mobilKapakSunumu.yogunKaynak} />}
+        {mobilKapakSunumu?.secenekler && <source media="(max-width: 899px)" srcset={mobilKapakSunumu.secenekler} />}
         <img
-          src={kapak}
+          src={kapakSunumu?.kaynak}
+          srcset={kapakSunumu?.secenekler}
+          data-gorsel-yedek={kapakSunumu?.yogunKaynak ? kapak : undefined}
+          data-gorsel-alternatif={kapakSunumu?.alternatifKaynak}
+          onerror={kapakSunumu?.yogunKaynak ? GORSEL_YEDEK_BETIGI : undefined}
           alt={baslik}
           fetchpriority="high"
           decoding="async"
           data-gecis-adi={gecisAdi ? '' : undefined}
           style={gecisAdi ? `view-transition-name:${gecisAdi}` : undefined}
         />
+        </picture>
       </button>
 
       {yan.length > 0 && (
@@ -38,9 +54,14 @@ const kalan = Math.max(0, gorseller.length - 5);
               type="button"
               class="goruntu-kutu grup-kart galeri-kucuk"
               data-ac={String(i + 1)}
-              aria-label={`Fotoğraf ${i + 2}`}
+              aria-label={`Fotoğraf ${i + 2} / ${gorseller.length}: ${baslik}. Büyüt.`}
             >
-              <img src={g} alt="" loading="lazy" decoding="async" />
+              <picture>
+                {gorselSunumu(g, 'kart').mobilYogunKaynak && <source media="(min-resolution: 1.5dppx) and (max-width: 899px)" srcset={gorselSunumu(g, 'kart').mobilYogunKaynak} />}
+                {gorselSunumu(g, 'kart').yogunKaynak && <source media="(min-resolution: 1.5dppx)" srcset={gorselSunumu(g, 'kart').yogunKaynak} />}
+                {gorselSunumu(g, 'kucuk').secenekler && <source media="(min-width: 900px)" srcset={gorselSunumu(g, 'kucuk').secenekler} />}
+                <img src={gorselSunumu(g, 'kart').kaynak} srcset={gorselSunumu(g, 'kart').secenekler} data-gorsel-alternatif={gorselSunumu(g, 'kart').alternatifKaynak} data-gorsel-yedek={gorselSunumu(g, 'kart').yogunKaynak ? g : undefined} onerror={gorselSunumu(g, 'kart').yogunKaynak ? GORSEL_YEDEK_BETIGI : undefined} alt="" loading="lazy" decoding="async" />
+              </picture>
               {i === yan.length - 1 && kalan > 0 && (
                 <span class="galeri-kalan font-veri">+{kalan}</span>
               )}
@@ -50,7 +71,12 @@ const kalan = Math.max(0, gorseller.length - 5);
       )}
       </div>
 
-      <button type="button" class="galeri-tumu" data-ac="0">
+      <button
+        type="button"
+        class="galeri-tumu"
+        data-ac="0"
+        aria-label={`${gorseller.length} fotoğrafın tümünü aç`}
+      >
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
           <rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1" />
           <rect x="9" y="1.5" width="5.5" height="5.5" rx="1" />
@@ -61,7 +87,12 @@ const kalan = Math.max(0, gorseller.length - 5);
       </button>
 
       {/* Büyütme katmanı */}
-      <dialog class="buyutec" data-buyutec aria-label="Fotoğraf galerisi">
+      <dialog
+        class="buyutec"
+        data-buyutec
+        data-baslik={baslik}
+        aria-label={`${baslik} fotoğraf galerisi`}
+      >
         <button type="button" class="buyutec-kapat" data-kapat aria-label="Kapat">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
             <path d="M5 5l10 10M15 5L5 15" />
@@ -75,7 +106,7 @@ const kalan = Math.max(0, gorseller.length - 5);
         </button>
 
         <figure class="buyutec-sahne">
-          <img data-buyutec-gorsel src={kapak} alt={baslik} />
+          <img data-buyutec-gorsel alt={baslik} onerror={GORSEL_YEDEK_BETIGI} decoding="async" />
           <figcaption class="buyutec-alt">
             <span class="font-veri" data-buyutec-sayac>
               1 / {gorseller.length}
@@ -90,7 +121,7 @@ const kalan = Math.max(0, gorseller.length - 5);
           </svg>
         </button>
 
-        <script type="application/json" data-gorsel-listesi set:html={JSON.stringify(gorseller)} />
+        <script type="application/json" data-gorsel-listesi set:html={JSON.stringify(gorseller).replace(/</g, '\\u003c')} />
       </dialog>
     </div>
   )
@@ -103,9 +134,17 @@ const kalan = Math.max(0, gorseller.length - 5);
     gap: 0.5rem;
     grid-template-columns: 1fr;
   }
+  .galeri picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
   @media (min-width: 900px) {
     .galeri {
       grid-template-columns: 1.62fr 1fr;
+      grid-template-rows: minmax(0, 1fr);
+      aspect-ratio: 2 / 1;
+      align-items: stretch;
     }
     /* Şerit yalnızca mobilde bir kap; geniş ekranda ortadan çekiliyor ki
        büyük kare ile küçükler doğrudan ızgaranın iki sütununa otursun.
@@ -129,6 +168,8 @@ const kalan = Math.max(0, gorseller.length - 5);
       gap: 0.5rem;
       overflow-x: auto;
       scroll-snap-type: x mandatory;
+      overscroll-behavior-inline: contain;
+      -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
       /* Kenarlardan taşır ki kaydırma tam ekran hissi versin */
       margin-inline: calc(-1 * var(--kab-pay, 1.25rem));
@@ -138,21 +179,17 @@ const kalan = Math.max(0, gorseller.length - 5);
     .galeri-serit::-webkit-scrollbar {
       display: none;
     }
-    .galeri-serit > button {
-      flex: 0 0 88%;
-      scroll-snap-align: center;
+    .galeri-ana,
+    .galeri-kucuk {
+      flex: 0 0 min(84vw, 34rem);
+      min-width: 0;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
       aspect-ratio: 4 / 3;
       height: auto;
     }
-    .galeri-yan {
-      display: contents;
-    }
     .galeri-ana {
       aspect-ratio: 4 / 3;
-    }
-    .galeri-tumu {
-      right: 1rem;
-      bottom: 1rem;
     }
   }
 
@@ -170,14 +207,13 @@ const kalan = Math.max(0, gorseller.length - 5);
   }
   @media (min-width: 900px) {
     .galeri-ana {
-      aspect-ratio: 3 / 2.35;
+      aspect-ratio: auto;
+      height: 100%;
     }
   }
 
   .galeri-yan {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
+    display: contents;
   }
   .galeri-kucuk {
     aspect-ratio: 4 / 3;
@@ -188,7 +224,11 @@ const kalan = Math.max(0, gorseller.length - 5);
       height: 100%;
     }
     .galeri-yan {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
+      gap: 0.5rem;
+      min-height: 0;
     }
   }
 
@@ -230,6 +270,17 @@ const kalan = Math.max(0, gorseller.length - 5);
   .galeri-tumu svg {
     width: 0.9rem;
     height: 0.9rem;
+  }
+  @media (max-width: 899px) {
+    .galeri .galeri-tumu {
+      position: static;
+      justify-self: end;
+      min-height: 2.75rem;
+      margin-top: 0.75rem;
+      border: 1px solid color-mix(in oklab, var(--color-murekkep) 14%, transparent);
+      background: var(--color-kagit);
+      box-shadow: none;
+    }
   }
 
   /* --- Büyüteç --- */
@@ -356,12 +407,15 @@ const kalan = Math.max(0, gorseller.length - 5);
 
 <script>
   import { herSayfada } from '../scripts/sayfa';
+  import { galeriIndeksi, kaydirmaYonunuBul } from '../lib/galeri-etkilesimi';
+  import { gorselSunumu } from '../lib/gorsel-sunum';
 
   /* Gövde her görünüm geçişinden sonra yeniden kuruluyor: modül betikleri
      bir kez çalışıp bittiği için gezinince kendiliğinden tekrarlanmaz. */
   function sayfayiKur() {
   const kok = document.querySelector<HTMLElement>('[data-galeri]');
-  if (kok) {
+  if (kok && kok.dataset.hazir !== 'evet') {
+    kok.dataset.hazir = 'evet';
     const buyutec = kok.querySelector<HTMLDialogElement>('[data-buyutec]');
     const gorsel = kok.querySelector<HTMLImageElement>('[data-buyutec-gorsel]');
     const sayac = kok.querySelector<HTMLElement>('[data-buyutec-sayac]');
@@ -371,13 +425,33 @@ const kalan = Math.max(0, gorseller.length - 5);
       const liste: string[] = JSON.parse(listeEtiket.textContent || '[]');
       let sira = 0;
 
+      // Emlakjet'in özgün CDN adresi kartta çalışan Workers proxy'sini
+      // atlıyordu. Galeri fotoğraflarını da aynı doğrulanmış proxy'den iste.
+      const buyukGorselAdresi = (adres: string) => {
+        const sunum = gorselSunumu(adres, 'kapak');
+        return sunum.kaynak.startsWith('/foto/emlakjet/') ? sunum.kaynak : adres;
+      };
+
       const goster = (yeni: number) => {
-        sira = (yeni + liste.length) % liste.length;
-        gorsel.src = liste[sira];
+        const indeks = galeriIndeksi(yeni, liste.length);
+        if (indeks === null) return;
+        sira = indeks;
+        const adres = liste[sira];
+        const sunum = gorselSunumu(adres, 'kapak');
+        const emlakjetProxy = sunum.kaynak.startsWith('/foto/emlakjet/');
+        if (emlakjetProxy && sunum.alternatifKaynak) {
+          gorsel.dataset.gorselAlternatif = sunum.alternatifKaynak;
+          gorsel.dataset.gorselYedek = adres;
+        } else {
+          delete gorsel.dataset.gorselAlternatif;
+          delete gorsel.dataset.gorselYedek;
+        }
+        gorsel.src = buyukGorselAdresi(adres);
+        gorsel.alt = `${buyutec.dataset.baslik ?? 'İlan'} — ${sira + 1}. fotoğraf`;
         if (sayac) sayac.textContent = `${sira + 1} / ${liste.length}`;
         // Bir sonrakini önden yükle — ok tuşuyla gezerken bekleme olmasın
         const sonraki = new Image();
-        sonraki.src = liste[(sira + 1) % liste.length];
+        sonraki.src = buyukGorselAdresi(liste[(sira + 1) % liste.length]);
       };
 
       kok.querySelectorAll<HTMLElement>('[data-ac]').forEach((d) =>
@@ -403,18 +477,22 @@ const kalan = Math.max(0, gorseller.length - 5);
 
       // Dokunmatikte kaydırarak gezinme
       let baslangicX = 0;
+      let baslangicY = 0;
       buyutec.addEventListener(
         'touchstart',
         (o) => {
           baslangicX = o.changedTouches[0].clientX;
+          baslangicY = o.changedTouches[0].clientY;
         },
         { passive: true }
       );
       buyutec.addEventListener(
         'touchend',
         (o) => {
-          const fark = o.changedTouches[0].clientX - baslangicX;
-          if (Math.abs(fark) > 55) goster(fark > 0 ? sira - 1 : sira + 1);
+          const farkX = o.changedTouches[0].clientX - baslangicX;
+          const farkY = o.changedTouches[0].clientY - baslangicY;
+          const yon = kaydirmaYonunuBul(farkX, farkY);
+          if (yon !== null) goster(sira + yon);
         },
         { passive: true }
       );

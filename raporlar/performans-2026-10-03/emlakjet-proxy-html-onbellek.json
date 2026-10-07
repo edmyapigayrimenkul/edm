@@ -1,0 +1,20 @@
+[
+  {
+    "durum": 200,
+    "html": "MISS",
+    "ray": "a44bfd510d88ed4f-MXP",
+    "proxy": true
+  },
+  {
+    "durum": 200,
+    "html": "HIT",
+    "ray": "a44bfd555f37ed4f-MXP",
+    "proxy": true
+  },
+  {
+    "durum": 200,
+    "html": "HIT",
+    "ray": "a44bfd57acdfed4f-MXP",
+    "proxy": true
+  }
+]

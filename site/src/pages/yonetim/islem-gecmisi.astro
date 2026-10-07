@@ -1,0 +1,86 @@
+---
+import Panel from '../../layouts/Panel.astro';
+import { adminProfiliniBul, paneleGiris } from '../../lib/panel/yetki';
+import { rolYetkisiGerekli } from '../../lib/panel/roller';
+import { semayiKur } from '../../lib/senkron/depo';
+import { env } from 'cloudflare:workers';
+
+const giris = await paneleGiris(Astro.request);
+if ('yanit' in giris) return giris.yanit;
+
+const admin = adminProfiliniBul(giris.kimlik.eposta);
+try {
+  rolYetkisiGerekli(admin?.rol ?? null, 'islem-gecmisi-gor');
+} catch (hata) {
+  return new Response((hata as Error).message, { status: 403 });
+}
+
+const vt = env.VT as D1Database;
+await semayiKur(vt);
+
+interface IslemSatiri {
+  id: number;
+  zaman: string;
+  eposta: string;
+  ad: string;
+  rol: string;
+  eylem: string;
+  varlik_turu: string;
+  varlik_id: string;
+  ozet: string;
+  onceki: string | null;
+  sonraki: string | null;
+}
+
+const tumKayitlar = await vt
+  .prepare(`SELECT * FROM panel_islem_gecmisi ORDER BY zaman DESC LIMIT 300`)
+  .all<IslemSatiri>();
+
+const kullanici = Astro.url.searchParams.get('kullanici')?.trim().toLowerCase() ?? '';
+const varlik = Astro.url.searchParams.get('varlik')?.trim().toLowerCase() ?? '';
+const arama = Astro.url.searchParams.get('arama')?.trim().toLocaleLowerCase('tr-TR') ?? '';
+const satirlar = (tumKayitlar.results ?? []).filter((kayit) => {
+  if (kullanici && kayit.eposta.toLowerCase() !== kullanici) return false;
+  if (varlik && kayit.varlik_turu.toLowerCase() !== varlik) return false;
+  if (arama && !`${kayit.ozet} ${kayit.varlik_id} ${kayit.eylem}`.toLocaleLowerCase('tr-TR').includes(arama)) return false;
+  return true;
+});
+const kullanicilar = [...new Map((tumKayitlar.results ?? []).map((kayit) => [kayit.eposta, kayit.ad])).entries()];
+const varliklar = [...new Set((tumKayitlar.results ?? []).map((kayit) => kayit.varlik_turu))].sort();
+
+const tarihSaat = (deger: string) => new Date(deger).toLocaleString('tr-TR', {
+  day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit',
+});
+const jsonuDuzenle = (deger: string | null) => {
+  if (!deger) return '';
+  try { return JSON.stringify(JSON.parse(deger), null, 2); } catch { return deger; }
+};
+---
+
+<Panel baslik="İşlem Geçmişi" eposta={giris.kimlik.eposta} ozet="Yönetim panelinde kim, neyi, ne zaman değiştirdi">
+  <form class="gecmis-filtre" method="GET">
+    <label><span>Yönetici</span><select name="kullanici"><option value="">Tümü</option>{kullanicilar.map(([eposta, ad]) => <option value={eposta} selected={kullanici === eposta}>{ad}</option>)}</select></label>
+    <label><span>Kayıt türü</span><select name="varlik"><option value="">Tümü</option>{varliklar.map((tur) => <option value={tur} selected={varlik === tur}>{tur}</option>)}</select></label>
+    <label class="gecmis-arama"><span>Ara</span><input type="search" name="arama" value={arama} placeholder="İlan no, işlem veya açıklama" /></label>
+    <button class="pd pd--birincil" type="submit">Filtrele</button>
+    <a class="pd pd--sade" href="/yonetim/islem-gecmisi">Temizle</a>
+  </form>
+
+  <div class="gecmis-ozet"><strong>{satirlar.length}</strong> kayıt gösteriliyor · En fazla son 300 işlem</div>
+
+  {satirlar.length ? <ol class="gecmis-liste">
+    {satirlar.map((kayit) => <li class="gecmis-kart">
+      <div class="gecmis-zaman"><time datetime={kayit.zaman}>{tarihSaat(kayit.zaman)}</time><span>#{kayit.id}</span></div>
+      <div class="gecmis-icerik">
+        <div class="gecmis-bas"><strong>{kayit.ad || kayit.eposta}</strong><span class="rol">{kayit.rol === 'ana-admin' ? 'Ana admin' : 'Admin'}</span><span class="tur">{kayit.varlik_turu}</span></div>
+        <p>{kayit.ozet}</p>
+        <div class="gecmis-alt"><code>{kayit.eylem}</code>{kayit.varlik_id && <span>Kimlik: {kayit.varlik_id}</span>}</div>
+        {(kayit.onceki || kayit.sonraki) && <details><summary>Değişiklik ayrıntısı</summary><div class="degisim-izgara">{kayit.onceki && <section><h3>Önceki</h3><pre>{jsonuDuzenle(kayit.onceki)}</pre></section>}{kayit.sonraki && <section><h3>Sonraki</h3><pre>{jsonuDuzenle(kayit.sonraki)}</pre></section>}</div></details>}
+      </div>
+    </li>)}
+  </ol> : <div class="kutu bos">Bu filtrelerle eşleşen işlem kaydı yok.</div>}
+</Panel>
+
+<style>
+  .gecmis-filtre{display:flex;align-items:end;gap:.7rem;flex-wrap:wrap;padding:1rem;border:1px solid color-mix(in oklab,var(--color-murekkep) 12%,transparent);border-radius:8px;background:#fff}.gecmis-filtre label{display:grid;gap:.35rem}.gecmis-filtre label span{font-size:.68rem;font-weight:700;color:var(--color-metin-2)}.gecmis-filtre select,.gecmis-filtre input{min-height:2.6rem;border:1px solid color-mix(in oklab,var(--color-murekkep) 18%,transparent);border-radius:6px;background:#fff;padding:.55rem .7rem;font-size:.78rem}.gecmis-arama{flex:1;min-width:14rem}.gecmis-ozet{margin:1rem 0;color:var(--color-metin-2);font-size:.75rem}.gecmis-liste{display:grid;gap:.7rem}.gecmis-kart{display:grid;grid-template-columns:10rem minmax(0,1fr);gap:1rem;padding:1rem;border:1px solid color-mix(in oklab,var(--color-murekkep) 11%,transparent);border-radius:8px;background:#fff}.gecmis-zaman{display:grid;align-content:start;gap:.25rem;font:500 .67rem/1.4 var(--font-veri);color:var(--color-metin-2)}.gecmis-zaman span{color:var(--color-kursun-okunur)}.gecmis-bas{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap}.gecmis-bas strong{font-size:.83rem}.rol,.tur{border-radius:999px;padding:.25rem .45rem;background:var(--color-kagit-2);font:600 .58rem/1 var(--font-veri)}.tur{color:var(--color-kirmizi)}.gecmis-icerik>p{margin-top:.4rem;font-size:.78rem}.gecmis-alt{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:.55rem;color:var(--color-metin-2);font:400 .63rem/1.4 var(--font-veri)}.gecmis-alt code{color:var(--color-kirmizi)}details{margin-top:.75rem}summary{cursor:pointer;font-size:.68rem;font-weight:700}.degisim-izgara{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem;margin-top:.55rem}.degisim-izgara section{min-width:0}.degisim-izgara h3{margin-bottom:.25rem;font-size:.62rem}.degisim-izgara pre{max-height:20rem;overflow:auto;border-radius:5px;background:#17181b;color:#f3f3f1;padding:.7rem;font:400 .61rem/1.45 var(--font-veri);white-space:pre-wrap;overflow-wrap:anywhere}.bos{text-align:center;color:var(--color-metin-2)}@media(max-width:700px){.gecmis-kart{grid-template-columns:1fr}.gecmis-zaman{display:flex;justify-content:space-between}.degisim-izgara{grid-template-columns:1fr}}
+</style>

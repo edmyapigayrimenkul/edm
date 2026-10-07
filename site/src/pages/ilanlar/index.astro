@@ -1,6 +1,7 @@
 ---
 import Temel from '../../layouts/Temel.astro';
 import IlanKart from '../../components/IlanKart.astro';
+import { ARAMA_SAYFALARI } from '../../lib/arama-sayfalari';
 import { KURUM } from '../../lib/site';
 import { portfoy } from '../../lib/ilanlar';
 
@@ -12,6 +13,23 @@ const tipEtiket: Record<string, string> = {
   isyeri: 'İş Yeri',
   diger: 'Diğer',
 };
+
+const ilSecenekleri = [...new Set(ILANLAR.map((ilan) => ilan.il).filter((il): il is string => Boolean(il)))].sort((a, b) => a.localeCompare(b, 'tr'));
+
+const mahalleSecenekleri = FILTRELER.mahalle.map((secenek) => ({
+  ...secenek,
+  ilceler: [...new Set(
+    ILANLAR.filter((ilan) => ilan.mahalle === secenek.deger)
+      .map((ilan) => ilan.ilce)
+      .filter((ilce): ilce is string => Boolean(ilce))
+  )],
+}));
+const altTurSecenekleri = FILTRELER.tip.map((secenek) => ({
+  ...secenek,
+  gruplar: [...new Set(
+    ILANLAR.filter((ilan) => ilan.tip === secenek.deger).map((ilan) => ilan.tipGrup)
+  )],
+}));
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -40,6 +58,10 @@ const jsonLd = {
       </div>
     </div>
   </section>
+
+  <nav aria-label="Silivri ilan aramaları" class="kab mb-6 flex flex-wrap gap-3">
+    {ARAMA_SAYFALARI.map((sayfa) => <a href={`/ilanlar/${sayfa.slug}`} class="dugme dugme--hayalet">{sayfa.baslik}</a>)}
+  </nav>
 
   <!-- Filtre çubuğu -->
   <section class="filtre-cubugu" data-filtre-alan>
@@ -71,16 +93,54 @@ const jsonLd = {
             </select>
           </label>
 
+          <button
+            type="button"
+            class="filtre-ac-dugme"
+            data-filtre-ac
+            aria-controls="portfoy-filtreleri"
+            aria-expanded="false"
+          >
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <path d="M3 5h14M6 10h8M8.5 15h3"></path>
+            </svg>
+            Filtreler
+            <span data-filtre-adet hidden>0</span>
+          </button>
+
           <button type="button" data-temizle class="temizle-dugme" hidden>
             Filtreleri temizle
           </button>
 
-          <p class="ml-auto etiket" data-sonuc-sayisi>{SAYIMLAR.toplam} ilan</p>
+          <p
+            id="portfoy-sonuc-sayisi"
+            class="ml-auto etiket"
+            data-sonuc-sayisi
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            aria-label={`${SAYIMLAR.toplam} ilan gösteriliyor`}
+          >
+            {SAYIMLAR.toplam} ilan
+          </p>
+        </div>
+
+        <div class="secili-ozet" data-secili-ozet hidden aria-label="Seçili filtreler">
+          <div data-secili-liste></div>
+          <button type="button" data-temizle>Tümünü temizle</button>
         </div>
 
         <!-- İkinci sıra: pil filtreleri -->
-        <div class="pil-satir" data-lenis-prevent>
+        <div class="pil-satir" id="portfoy-filtreleri" data-filtre-panel data-lenis-prevent>
+          <div class="mobil-panel-baslik">
+            <div>
+              <span class="etiket">Portföyü daralt</span>
+              <strong>Filtreler</strong>
+            </div>
+            <button type="button" data-filtre-kapat aria-label="Filtreleri kapat">Kapat</button>
+          </div>
+
           <div class="pil-grup" role="group" aria-label="İşlem türü">
+            <span class="mobil-grup-baslik">İşlem türü</span>
             <button type="button" class="pil" data-filtre="islem" data-deger="" aria-pressed="true">
               Tümü
             </button>
@@ -103,6 +163,7 @@ const jsonLd = {
           <span class="pil-ayirac" aria-hidden="true"></span>
 
           <div class="pil-grup" role="group" aria-label="Mülk türü">
+            <span class="mobil-grup-baslik">Mülk türü</span>
             <button type="button" class="pil" data-filtre="tip" data-deger="" aria-pressed="true">
               Tüm türler
             </button>
@@ -125,6 +186,7 @@ const jsonLd = {
           <span class="pil-ayirac" aria-hidden="true"></span>
 
           <div class="pil-grup" role="group" aria-label="İlçe">
+            <span class="mobil-grup-baslik">Bölge</span>
             <button type="button" class="pil" data-filtre="ilce" data-deger="" aria-pressed="true">
               Tüm bölgeler
             </button>
@@ -143,6 +205,65 @@ const jsonLd = {
               ))
             }
           </div>
+
+          <div class="gelismis-filtreler" aria-label="Ayrıntılı filtreler">
+            <label>
+              <span>İl</span>
+              <select data-gelismis="il" aria-label="İl">
+                <option value="">Tüm iller</option>
+                {ilSecenekleri.map((il) => <option value={il}>{il}</option>)}
+              </select>
+            </label>
+            <label>
+              <span>Mahalle</span>
+              <select data-gelismis="mahalle" aria-label="Mahalle">
+                <option value="">Tüm mahalleler</option>
+                {mahalleSecenekleri.map((f) => (
+                  <option value={f.deger} data-ilceler={f.ilceler.join('|')}>
+                    {f.etiket} ({f.adet})
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              <span>Alt tür</span>
+              <select data-gelismis="altTip" aria-label="Mülk alt türü">
+                <option value="">Tüm alt türler</option>
+                {altTurSecenekleri.map((f) => (
+                  <option value={f.deger} data-gruplar={f.gruplar.join('|')}>
+                    {f.etiket} ({f.adet})
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              <span>Oda düzeni</span>
+              <select data-gelismis="oda" aria-label="Oda düzeni">
+                <option value="">Tüm oda düzenleri</option>
+                {FILTRELER.oda.map((f) => <option value={f.deger}>{f.etiket} ({f.adet})</option>)}
+              </select>
+            </label>
+
+            <label>
+              <span>Bütçe</span>
+              <select data-gelismis="butce" aria-label="Türk lirası bütçe aralığı" disabled>
+                <option value="">Önce işlem türü seçin</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Alan</span>
+              <select data-gelismis="alan" aria-label="Metrekare aralığı">
+                <option value="">Tüm alanlar</option>
+              </select>
+            </label>
+          </div>
+
+          <button type="button" class="mobil-sonuclari-goster" data-filtre-kapat>
+            <span data-panel-sonuc>{SAYIMLAR.toplam} ilanı göster</span>
+          </button>
         </div>
       </div>
     </div>
@@ -151,8 +272,13 @@ const jsonLd = {
   <!-- Sonuçlar -->
   <section class="pt-8 pb-20 lg:pb-28">
     <div class="kab">
-      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" data-izgara>
-        {ILANLAR.map((ilan, i) => <IlanKart ilan={ilan} oncelikli={i < 4} />)}
+      <div
+        id="ilan-sonuclari"
+        class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        data-izgara
+        aria-describedby="portfoy-sonuc-sayisi"
+      >
+        {ILANLAR.map((ilan) => <IlanKart ilan={ilan} />)}
       </div>
 
       <div data-bos hidden class="bos-durum">
@@ -203,10 +329,15 @@ const jsonLd = {
   .arama-kutu:focus-within {
     border-color: var(--color-murekkep);
   }
+  .arama-kutu:has(input:focus-visible) {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--color-kirmizi-derin);
+  }
   .arama-kutu svg {
     width: 1rem;
     height: 1rem;
-    color: var(--color-kursun);
+    color: var(--color-kursun-okunur);
     flex: none;
   }
   .arama-kutu input {
@@ -255,6 +386,58 @@ const jsonLd = {
   }
   .temizle-dugme:hover {
     background: color-mix(in oklab, var(--color-kirmizi) 18%, transparent);
+  }
+
+  .filtre-ac-dugme,
+  .mobil-panel-baslik,
+  .mobil-grup-baslik,
+  .mobil-sonuclari-goster {
+    display: none;
+  }
+
+  .secili-ozet {
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  .secili-ozet > div {
+    display: flex;
+    min-width: 0;
+    gap: 0.4rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .secili-ozet > div::-webkit-scrollbar {
+    display: none;
+  }
+  .secili-ozet button {
+    flex: none;
+    border: 0;
+    background: transparent;
+    color: var(--color-kirmizi-derin);
+    font: 650 0.75rem/1.2 var(--font-govde);
+    cursor: pointer;
+  }
+  .secili-ozet :global([data-ozet-filtre]) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2rem;
+    padding-inline: 0.7rem;
+    white-space: nowrap;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 12%, transparent);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--color-metin-2);
+    font: 500 0.75rem/1.2 var(--font-govde);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .secili-ozet :global([data-ozet-filtre])::after {
+    content: '×';
+    color: var(--color-kirmizi-derin);
+    font-size: 1rem;
+    line-height: 1;
   }
 
   /* --- Pil satırı --- */
@@ -317,6 +500,206 @@ const jsonLd = {
     opacity: 0.55;
   }
 
+  .gelismis-filtreler {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    flex: 1 0 100%;
+    gap: 0.55rem;
+    width: 100%;
+    padding-top: 0.35rem;
+  }
+  .gelismis-filtreler label {
+    display: grid;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+  .gelismis-filtreler label > span {
+    font-size: 0.6875rem;
+    font-weight: 650;
+    color: var(--color-kursun-okunur);
+  }
+  .gelismis-filtreler select {
+    width: 100%;
+    min-width: 0;
+    height: 2.35rem;
+    padding-inline: 0.65rem 1.7rem;
+    overflow: hidden;
+    border: 1px solid color-mix(in oklab, var(--color-murekkep) 12%, transparent);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--color-metin-2);
+    font: 500 0.75rem/1 var(--font-govde);
+    text-overflow: ellipsis;
+  }
+  .gelismis-filtreler select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 699px) {
+    .filtre-cubugu {
+      top: 4.25rem;
+    }
+    .filtre-cubugu .kab > div {
+      padding-block: 0.75rem;
+    }
+    .arama-kutu {
+      flex-basis: 100%;
+      max-width: none;
+      height: 2.75rem;
+    }
+    .secim {
+      flex: 1 1 auto;
+    }
+    .secim select {
+      width: 100%;
+      height: 2.75rem;
+    }
+    .filtre-ac-dugme {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      height: 2.75rem;
+      padding-inline: 0.9rem;
+      border: 1px solid color-mix(in oklab, var(--color-murekkep) 14%, transparent);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--color-murekkep);
+      font: 650 0.8125rem/1 var(--font-govde);
+      cursor: pointer;
+    }
+    .filtre-ac-dugme svg {
+      width: 1rem;
+      height: 1rem;
+    }
+    .filtre-ac-dugme [data-filtre-adet] {
+      display: grid;
+      place-items: center;
+      min-width: 1.2rem;
+      height: 1.2rem;
+      padding-inline: 0.25rem;
+      border-radius: 999px;
+      background: var(--color-kirmizi);
+      color: #fff;
+      font: 650 0.625rem/1 var(--font-veri);
+    }
+    .filtre-ac-dugme [data-filtre-adet][hidden] {
+      display: none;
+    }
+    [data-sonuc-sayisi] {
+      order: 4;
+      width: 100%;
+      margin-left: 0;
+    }
+    .temizle-dugme {
+      display: none;
+    }
+    .secili-ozet:not([hidden]) {
+      display: flex;
+    }
+    .secili-ozet > button {
+      min-height: 2.75rem;
+      padding-inline: 0.55rem;
+      white-space: nowrap;
+    }
+    .secili-ozet :global([data-ozet-filtre]) {
+      min-height: 2.75rem;
+    }
+    .pil-satir {
+      display: none;
+      max-height: calc(100dvh - 14.5rem);
+      margin: 0;
+      padding: 1rem;
+      overflow-x: hidden;
+      overflow-y: auto;
+      border: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: var(--shadow-kagit);
+    }
+    .pil-satir[data-acik] {
+      display: flex;
+      align-items: stretch;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+    .gelismis-filtreler {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.8rem;
+      padding-top: 0;
+    }
+    .gelismis-filtreler select {
+      height: 2.75rem;
+    }
+    .mobil-panel-baslik {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: 0.9rem;
+      border-bottom: 1px solid color-mix(in oklab, var(--color-murekkep) 10%, transparent);
+    }
+    .mobil-panel-baslik > div {
+      display: grid;
+      gap: 0.25rem;
+    }
+    .mobil-panel-baslik strong {
+      font-size: 1.15rem;
+    }
+    .mobil-panel-baslik button {
+      min-height: 2.75rem;
+      padding-inline: 0.8rem;
+      border: 1px solid color-mix(in oklab, var(--color-murekkep) 12%, transparent);
+      border-radius: 999px;
+      background: var(--color-kagit);
+      font: 650 0.75rem/1 var(--font-govde);
+      cursor: pointer;
+    }
+    .pil-grup {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+    .mobil-grup-baslik {
+      display: block;
+      flex-basis: 100%;
+      margin-bottom: 0.15rem;
+      font-size: 0.75rem;
+      font-weight: 650;
+      color: var(--color-metin-2);
+    }
+    .pil {
+      min-height: 2.75rem;
+      height: auto;
+      padding-block: 0.6rem;
+    }
+    .pil-ayirac {
+      display: none;
+    }
+    .mobil-sonuclari-goster {
+      position: sticky;
+      bottom: -1rem;
+      display: flex;
+      justify-content: center;
+      width: calc(100% + 2rem);
+      min-height: 3.25rem;
+      margin: 0 -1rem -1rem;
+      padding: 1rem;
+      border: 0;
+      background: var(--color-kirmizi);
+      color: #fff;
+      font: 650 0.875rem/1 var(--font-govde);
+      cursor: pointer;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .gelismis-filtreler {
+      grid-template-columns: 1fr;
+    }
+  }
+
   /* --- Kart gizleme --- */
   [data-ilan][hidden] {
     display: none;
@@ -338,17 +721,54 @@ const jsonLd = {
 
   const alan = document.querySelector<HTMLElement>('[data-filtre-alan]');
   const izgara = document.querySelector<HTMLElement>('[data-izgara]');
-  if (alan && izgara) {
+  if (alan && izgara && alan.dataset.kuruldu !== 'evet') {
+    alan.dataset.kuruldu = 'evet';
     const kartlar = Array.from(izgara.querySelectorAll<HTMLElement>('[data-ilan]'));
     const sonucSayisi = document.querySelector<HTMLElement>('[data-sonuc-sayisi]');
     const bosDurum = document.querySelector<HTMLElement>('[data-bos]');
     const araGirdi = document.querySelector<HTMLInputElement>('[data-ara-girdi]');
     const siralaSecim = document.querySelector<HTMLSelectElement>('[data-sirala]');
     const temizleDugmeleri = document.querySelectorAll<HTMLButtonElement>('[data-temizle]');
+    const filtrePaneli = alan.querySelector<HTMLElement>('[data-filtre-panel]');
+    const filtreAc = alan.querySelector<HTMLButtonElement>('[data-filtre-ac]');
+    const filtreKapat = alan.querySelectorAll<HTMLButtonElement>('[data-filtre-kapat]');
+    const filtreAdet = alan.querySelector<HTMLElement>('[data-filtre-adet]');
+    const seciliOzet = alan.querySelector<HTMLElement>('[data-secili-ozet]');
+    const seciliListe = alan.querySelector<HTMLElement>('[data-secili-liste]');
+    const panelSonuc = alan.querySelector<HTMLElement>('[data-panel-sonuc]');
 
-    const durum: Record<string, string> = { islem: '', tip: '', ilce: '' };
+    const durum: Record<string, string> = {
+      islem: '', tip: '', il: '', ilce: '', mahalle: '', altTip: '', oda: '', butce: '', alan: '',
+    };
     let arama = '';
     let sira: Sirala = 'yeni';
+    const gelismisSecimler = Array.from(
+      alan.querySelectorAll<HTMLSelectElement>('[data-gelismis]')
+    );
+    const ilSecimi = alan.querySelector<HTMLSelectElement>('[data-gelismis="il"]');
+    const mahalleSecimi = alan.querySelector<HTMLSelectElement>('[data-gelismis="mahalle"]');
+    const altTipSecimi = alan.querySelector<HTMLSelectElement>('[data-gelismis="altTip"]');
+    const odaSecimi = alan.querySelector<HTMLSelectElement>('[data-gelismis="oda"]');
+    const butceSecimi = alan.querySelector<HTMLSelectElement>('[data-gelismis="butce"]');
+    const alanSecimi = alan.querySelector<HTMLSelectElement>('[data-gelismis="alan"]');
+    const mahalleHavuzu = mahalleSecimi ? Array.from(mahalleSecimi.options).slice(1) : [];
+    const altTipHavuzu = altTipSecimi ? Array.from(altTipSecimi.options).slice(1) : [];
+    const odaHavuzu = odaSecimi ? Array.from(odaSecimi.options).slice(1) : [];
+
+    const butceAraliklari: Record<string, Array<[string, string]>> = {
+      satilik: [['0:5000000', '5 milyon ₺ altı'], ['5000000:10000000', '5–10 milyon ₺'], ['10000000:20000000', '10–20 milyon ₺'], ['20000000:', '20 milyon ₺ ve üzeri']],
+      kiralik: [['0:25000', '25 bin ₺ altı / ay'], ['25000:50000', '25–50 bin ₺ / ay'], ['50000:100000', '50–100 bin ₺ / ay'], ['100000:', '100 bin ₺ ve üzeri / ay']],
+      'gunluk-kiralik': [['0:5000', '5 bin ₺ altı / gün'], ['5000:10000', '5–10 bin ₺ / gün'], ['10000:', '10 bin ₺ ve üzeri / gün']],
+      'sezonluk-kiralik': [['0:100000', '100 bin ₺ altı / sezon'], ['100000:250000', '100–250 bin ₺ / sezon'], ['250000:500000', '250–500 bin ₺ / sezon'], ['500000:', '500 bin ₺ ve üzeri / sezon']],
+      'devren-satilik': [['0:5000000', '5 milyon ₺ altı'], ['5000000:10000000', '5–10 milyon ₺'], ['10000000:20000000', '10–20 milyon ₺'], ['20000000:', '20 milyon ₺ ve üzeri']],
+      'devren-kiralik': [['0:5000000', '5 milyon ₺ altı'], ['5000000:10000000', '5–10 milyon ₺'], ['10000000:', '10 milyon ₺ ve üzeri']],
+    };
+    const alanAraliklari: Record<string, Array<[string, string]>> = {
+      konut: [['0:100', '100 m² altı'], ['100:200', '100–200 m²'], ['200:400', '200–400 m²'], ['400:', '400 m² ve üzeri']],
+      isyeri: [['0:100', '100 m² altı'], ['100:250', '100–250 m²'], ['250:500', '250–500 m²'], ['500:', '500 m² ve üzeri']],
+      arsa: [['0:1000', '1.000 m² altı'], ['1000:5000', '1.000–5.000 m²'], ['5000:20000', '5.000–20.000 m²'], ['20000:', '20.000 m² ve üzeri']],
+      varsayilan: [['0:250', '250 m² altı'], ['250:1000', '250–1.000 m²'], ['1000:5000', '1.000–5.000 m²'], ['5000:', '5.000 m² ve üzeri']],
+    };
 
     /** Türkçe küçük harfe indirger — "İSTANBUL" ile "istanbul" eşleşsin diye. */
     const kucult = (s: string) => s.toLocaleLowerCase('tr');
@@ -371,9 +791,107 @@ const jsonLd = {
       });
     }
 
+    function secimiKur(
+      secim: HTMLSelectElement | null,
+      varsayilan: string,
+      secenekler: Array<{ deger: string; etiket: string }>,
+      secili: string
+    ) {
+      if (!secim) return;
+      secim.replaceChildren(
+        new Option(varsayilan, ''),
+        ...secenekler.map(({ deger, etiket }) => new Option(etiket, deger))
+      );
+      secim.value = secili;
+    }
+
+    function gelismisSecimleriGuncelle() {
+      if (ilSecimi) ilSecimi.value = durum.il;
+      const mahalleler = mahalleHavuzu
+        .filter((o) => !durum.ilce || (o.dataset.ilceler ?? '').split('|').includes(durum.ilce))
+        .map((o) => ({ deger: o.value, etiket: o.textContent ?? o.value }));
+      if (durum.mahalle && !mahalleler.some((o) => o.deger === durum.mahalle)) durum.mahalle = '';
+      secimiKur(mahalleSecimi, durum.ilce ? 'İlçedeki tüm mahalleler' : 'Tüm mahalleler', mahalleler, durum.mahalle);
+
+      const altTurler = altTipHavuzu
+        .filter((o) => !durum.tip || (o.dataset.gruplar ?? '').split('|').includes(durum.tip))
+        .map((o) => ({ deger: o.value, etiket: o.textContent ?? o.value }));
+      if (durum.altTip && !altTurler.some((o) => o.deger === durum.altTip)) durum.altTip = '';
+      secimiKur(altTipSecimi, durum.tip ? 'Gruptaki tüm alt türler' : 'Tüm alt türler', altTurler, durum.altTip);
+
+      const odaEtkin = durum.tip === 'konut';
+      if (!odaEtkin) durum.oda = '';
+      secimiKur(
+        odaSecimi,
+        odaEtkin ? 'Tüm oda düzenleri' : 'Konut filtresini seçin',
+        odaEtkin ? odaHavuzu.map((o) => ({ deger: o.value, etiket: o.textContent ?? o.value })) : [],
+        durum.oda
+      );
+      if (odaSecimi) odaSecimi.disabled = !odaEtkin;
+
+      const butceler = butceAraliklari[durum.islem] ?? [];
+      if (durum.butce && !butceler.some(([deger]) => deger === durum.butce)) durum.butce = '';
+      secimiKur(
+        butceSecimi,
+        durum.islem ? 'Tüm bütçeler (₺)' : 'Önce işlem türü seçin',
+        butceler.map(([deger, etiket]) => ({ deger, etiket })),
+        durum.butce
+      );
+      if (butceSecimi) butceSecimi.disabled = butceler.length === 0;
+
+      const alanlar = alanAraliklari[durum.tip] ?? alanAraliklari.varsayilan;
+      if (durum.alan && !alanlar.some(([deger]) => deger === durum.alan)) durum.alan = '';
+      secimiKur(
+        alanSecimi,
+        'Tüm alanlar',
+        alanlar.map(([deger, etiket]) => ({ deger, etiket })),
+        durum.alan
+      );
+    }
+
+    function ozetEtiket(ad: string, deger: string): string {
+      if (ad === 'q') return `Arama: ${deger}`;
+      const pil = alan!.querySelector<HTMLButtonElement>(
+        `[data-filtre="${ad}"][data-deger="${CSS.escape(deger)}"]`
+      );
+      if (pil) return pil.childNodes[0]?.textContent?.trim() || deger;
+      const secim = alan!.querySelector<HTMLSelectElement>(`[data-gelismis="${ad}"]`);
+      return secim?.selectedOptions[0]?.textContent?.replace(/\s+\(\d+\)$/, '').trim() || deger;
+    }
+
+    function seciliOzetiGuncelle() {
+      if (!seciliOzet || !seciliListe) return;
+      const secimler = Object.entries(durum).filter(([, deger]) => Boolean(deger));
+      if (arama) secimler.push(['q', arama]);
+      seciliListe.replaceChildren(
+        ...secimler.map(([ad, deger]) => {
+          const dugme = document.createElement('button');
+          dugme.type = 'button';
+          dugme.dataset.ozetFiltre = ad;
+          dugme.textContent = ozetEtiket(ad, deger);
+          dugme.setAttribute('aria-label', `${dugme.textContent} filtresini kaldır`);
+          return dugme;
+        })
+      );
+      seciliOzet.hidden = secimler.length === 0;
+      if (filtreAdet) {
+        filtreAdet.textContent = String(secimler.length);
+        filtreAdet.hidden = secimler.length === 0;
+      }
+    }
+
+    function paneliAyarla(acik: boolean) {
+      if (!filtrePaneli || !filtreAc) return;
+      filtrePaneli.toggleAttribute('data-acik', acik);
+      filtreAc.setAttribute('aria-expanded', String(acik));
+      if (acik) filtrePaneli.querySelector<HTMLButtonElement>('[data-filtre-kapat]')?.focus();
+      else filtreAc.focus({ preventScroll: true });
+    }
+
+    const urlAdlari: Record<string, string> = { altTip: 'tur' };
     function adresiGuncelle() {
       const p = new URLSearchParams();
-      for (const [ad, deger] of Object.entries(durum)) if (deger) p.set(ad, deger);
+      for (const [ad, deger] of Object.entries(durum)) if (deger) p.set(urlAdlari[ad] ?? ad, deger);
       if (arama) p.set('q', arama);
       if (sira !== 'yeni') p.set('sirala', sira);
       const yeni = p.toString() ? `?${p}` : location.pathname;
@@ -381,15 +899,30 @@ const jsonLd = {
     }
 
     function uygula() {
+      gelismisSecimleriGuncelle();
       const aranan = kelimeler(arama);
       let gorunen = 0;
+
+      const aralikta = (deger: number, aralik: string) => {
+        if (!aralik || !deger) return !aralik;
+        const [enAzHam, enCokHam] = aralik.split(':');
+        const enAz = enAzHam ? Number(enAzHam) : 0;
+        const enCok = enCokHam ? Number(enCokHam) : Number.POSITIVE_INFINITY;
+        return deger >= enAz && deger < enCok;
+      };
 
       for (const kart of kartlar) {
         const metin = kart.dataset.ara ?? '';
         const uygun =
           (!durum.islem || kart.dataset.islem === durum.islem) &&
           (!durum.tip || kart.dataset.tipGrup === durum.tip) &&
+          (!durum.il || kart.dataset.il === durum.il) &&
           (!durum.ilce || kart.dataset.ilce === durum.ilce) &&
+          (!durum.mahalle || kart.dataset.mahalle === durum.mahalle) &&
+          (!durum.altTip || kart.dataset.tip === durum.altTip) &&
+          (!durum.oda || kart.dataset.oda === durum.oda) &&
+          (!durum.butce || (kart.dataset.para === 'TRY' && aralikta(Number(kart.dataset.fiyat), durum.butce))) &&
+          (!durum.alan || aralikta(Number(kart.dataset.m2), durum.alan)) &&
           aranan.every((k) => metin.includes(k));
 
         kart.hidden = !uygun;
@@ -410,15 +943,23 @@ const jsonLd = {
       if (sonucSayisi) {
         sonucSayisi.textContent =
           gorunen === kartlar.length ? `${gorunen} ilan` : `${gorunen} / ${kartlar.length} ilan`;
+        sonucSayisi.setAttribute(
+          'aria-label',
+          gorunen === kartlar.length
+            ? `${gorunen} ilan gösteriliyor`
+            : `Toplam ${kartlar.length} ilandan ${gorunen} ilan gösteriliyor`
+        );
       }
+      if (panelSonuc) panelSonuc.textContent = `${gorunen} ilanı göster`;
       if (bosDurum) bosDurum.hidden = gorunen > 0;
 
-      const filtreVar = Boolean(durum.islem || durum.tip || durum.ilce || arama);
+      const filtreVar = Boolean(Object.values(durum).some(Boolean) || arama);
       temizleDugmeleri.forEach((d) => {
         if (d.classList.contains('temizle-dugme')) d.hidden = !filtreVar;
       });
 
       pilleriGuncelle();
+      seciliOzetiGuncelle();
       adresiGuncelle();
     }
 
@@ -429,6 +970,14 @@ const jsonLd = {
         const deger = pil.dataset.deger ?? '';
         // Aynı pile tekrar basmak filtreyi kaldırır
         durum[ad] = durum[ad] === deger ? '' : deger;
+        uygula();
+      });
+    });
+
+    gelismisSecimler.forEach((secim) => {
+      secim.addEventListener('change', () => {
+        const ad = secim.dataset.gelismis;
+        if (ad) durum[ad] = secim.value;
         uygula();
       });
     });
@@ -449,7 +998,7 @@ const jsonLd = {
 
     temizleDugmeleri.forEach((d) =>
       d.addEventListener('click', () => {
-        durum.islem = durum.tip = durum.ilce = '';
+        for (const ad of Object.keys(durum)) durum[ad] = '';
         arama = '';
         if (araGirdi) araGirdi.value = '';
         uygula();
@@ -457,11 +1006,35 @@ const jsonLd = {
       })
     );
 
+    filtreAc?.addEventListener('click', () => {
+      paneliAyarla(!filtrePaneli?.hasAttribute('data-acik'));
+    });
+    filtreKapat.forEach((d) => d.addEventListener('click', () => paneliAyarla(false)));
+    seciliListe?.addEventListener('click', (olay) => {
+      const dugme = (olay.target as HTMLElement).closest<HTMLButtonElement>('[data-ozet-filtre]');
+      if (!dugme) return;
+      const ad = dugme.dataset.ozetFiltre;
+      if (ad === 'q') {
+        arama = '';
+        if (araGirdi) araGirdi.value = '';
+      } else if (ad) durum[ad] = '';
+      uygula();
+    });
+    alan.addEventListener('keydown', (olay) => {
+      if (olay.key === 'Escape' && filtrePaneli?.hasAttribute('data-acik')) paneliAyarla(false);
+    });
+
     // --- Adresten gelen filtreleri uygula (ana sayfadaki kısayollar) ---
     const p = new URLSearchParams(location.search);
     durum.islem = p.get('islem') ?? '';
     durum.tip = p.get('tip') ?? '';
+    durum.il = p.get('il') ?? '';
     durum.ilce = p.get('ilce') ?? '';
+    durum.mahalle = p.get('mahalle') ?? '';
+    durum.altTip = p.get('tur') ?? '';
+    durum.oda = p.get('oda') ?? '';
+    durum.butce = p.get('butce') ?? '';
+    durum.alan = p.get('alan') ?? '';
     arama = p.get('q') ?? '';
     const gelenSira = p.get('sirala') as Sirala | null;
     if (gelenSira && siralaSecim) {

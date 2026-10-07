@@ -4,11 +4,13 @@
  * Kaynak: D1 veritabanı (zamanlanmış görev Emlakjet'ten doldurur).
  * Sunumla ilgili her dönüşüm burada; sayfalar ham satır görmez.
  *
- * Portföy 50 civarı kayıt olduğu için tamamını tek seferde okuyup kısa
- * ömürlü bir önbellekte tutuyoruz — her istekte D1'e gitmenin anlamı yok.
+ * Portföy aynı sayfa isteğinde bir kez okunur. İstekler arası hızlandırma
+ * HTML önbelleğindedir; eski veri yeni HTML'in ömrünü uzatamaz.
  */
 
 import { env } from 'cloudflare:workers';
+import { istekVerisi, istekVerisiniTemizle } from './istek-onbellegi';
+import { icerik } from './icerik';
 import {
   aktifIlanSatirlari,
   sonSenkron,
@@ -18,9 +20,23 @@ import {
 } from './senkron/depo';
 import { koordinatHaritasi, konumAnahtari, type Koordinat } from './senkron/konum';
 import { yuklenenFotograflar } from './senkron/foto-sema';
+import { videoKayitlari, type IlanVideoKaydi } from './senkron/video-sema';
+import { halkaAcikOzellikler, islemEtiketi } from './ilan-bilgileri';
+import {
+  gorunurIlanIdleri,
+  iliskiliIlanIdleri,
+  kaynakOzellikleriniUygula,
+  kaynakSunumDuzeltmesi,
+  mukerrerKanonikId,
+} from './ilan-butunlugu';
+import { arsaToplamAlani } from './portfoy-istatistikleri';
+import { alanOzellikleriniBirlestir, ilanAlanlariniCoz, type IlanAlanlari } from './ilan-alanlari';
+import { kamuKonumuSec, ozelKonumAlanlariniGizle } from './ilan-konum';
+import { vitrinIlanlariniDengele } from './vitrin';
+import { portalGorselleriniSec } from './portal-gorselleri';
 
-export type Islem = 'satilik' | 'kiralik';
-export type TipGrup = 'konut' | 'arsa' | 'isyeri' | 'diger';
+export type Islem = 'satilik' | 'kiralik' | 'gunluk-kiralik' | 'sezonluk-kiralik' | 'devren-satilik' | 'devren-kiralik' | 'kat-karsiligi-satilik';
+export type TipGrup = 'konut' | 'arsa' | 'isyeri' | 'bina' | 'turistik' | 'proje' | 'devre-mulk' | 'gunluk-konaklama' | 'diger';
 
 export interface Ilan {
   id: string;
@@ -29,6 +45,7 @@ export interface Ilan {
   baslik: string;
   aciklama: string;
   fiyat: number | null;
+  paraBirimi: string;
   islem: Islem;
   kategori: string;
   tip: string;
@@ -42,6 +59,7 @@ export interface Ilan {
   /** Onaylı özellikler: ankastre mutfak, çelik kapı, ebeveyn banyo… */
   donanim: string[];
   gorseller: string[];
+  video: { url: string; poster: string; mime: string; sure: number; boyut: number } | null;
   danismanSlug: string | null;
   guncellenme: string | null;
   ilkGorulme: string;
@@ -52,14 +70,17 @@ export interface Ilan {
   konum: string;
   konumKisa: string;
   fiyatMetin: string;
-  m2Metin: string | null;
+  alanlar: IlanAlanlari;
   birimFiyat: string | null;
+  birimFiyatTemeli: string | null;
   ozetMetin: string;
   yeniMi: boolean;
   kapak: string | null;
   etiketler: string[];
-  /** Mahalle merkezi — kesin adres değil. Bulunamadıysa null. */
+  /** Halka açık yaklaşık merkez — kesin adres değildir. Bulunamadıysa null. */
   koordinat: Koordinat | null;
+  /** Kamu haritasındaki yaklaşık alanın yarıçapı. */
+  koordinatYaricapi: number;
   /** Arama için düzleştirilmiş metin: başlık, konum, özellikler, açıklama. */
   aramaMetni: string;
 }
@@ -92,7 +113,8 @@ function olculeriDuzelt(metin: string): string {
     .replace(/(\d[\d.\s]*?)\s*Metrekare/gi, (_, sayi: string) => {
       const n = parseInt(sayi.replace(/[^\d]/g, ''), 10);
       return Number.isFinite(n) ? `${n.toLocaleString('tr-TR')} m²` : `${sayi} m²`;
-    });
+    })
+    .replace(/m²(?=\p{L})/giu, 'm² ');
 }
 
 export function baslikTemizle(baslik: string): string {
@@ -106,33 +128,42 @@ export function baslikTemizle(baslik: string): string {
    --------------------------------------------------------------- */
 const TR = 'tr-TR';
 
+const PARA_SIMGE: Record<string, string> = { TRY: '₺', USD: '$', EUR: '€', GBP: '£' };
+function paraSimgesi(paraBirimi: string): string { return PARA_SIMGE[paraBirimi] ?? paraBirimi }
+
 /** 7150000 -> "7.150.000 ₺" (Kılavuz 05: rakamdan sonra, boşlukla) */
-export function fiyatYaz(fiyat: number | null, islem?: Islem): string {
+export function fiyatYaz(fiyat: number | null, islem?: Islem, paraBirimi = 'TRY'): string {
+  if (islem === 'kat-karsiligi-satilik') return 'Kat karşılığı';
   if (!fiyat) return 'Fiyat için arayınız';
-  const s = `${fiyat.toLocaleString(TR)} ₺`;
-  return islem === 'kiralik' ? `${s} / ay` : s;
+  const s = `${fiyat.toLocaleString(TR)} ${paraSimgesi(paraBirimi)}`;
+  if (islem === 'kiralik') return `${s} / ay`;
+  if (islem === 'gunluk-kiralik') return `${s} / gün`;
+  if (islem === 'sezonluk-kiralik') return `${s} / sezon`;
+  return s;
 }
 
-/** Kart üstünde kısaltılmış fiyat: 7.150.000 -> "7,15 mn ₺" */
-export function fiyatKisa(fiyat: number | null): string {
+/** Kart üstünde okunaklı kısa fiyat: 7.150.000 -> "7,15 milyon ₺" */
+export function fiyatKisa(fiyat: number | null, paraBirimi = 'TRY', islem?: Islem): string {
+  if (islem === 'kat-karsiligi-satilik') return 'Kat karşılığı';
   if (!fiyat) return '—';
+  const simge = paraSimgesi(paraBirimi);
   if (fiyat >= 1_000_000) {
     const mn = fiyat / 1_000_000;
     const basamak = mn >= 100 ? 0 : mn >= 10 ? 1 : 2;
-    return `${mn.toLocaleString(TR, { maximumFractionDigits: basamak })} mn ₺`;
+    return `${mn.toLocaleString(TR, { maximumFractionDigits: basamak })} milyon ${simge}`;
   }
-  if (fiyat >= 1_000) return `${(fiyat / 1_000).toLocaleString(TR)} bin ₺`;
-  return `${fiyat.toLocaleString(TR)} ₺`;
+  if (fiyat >= 1_000) return `${(fiyat / 1_000).toLocaleString(TR)} bin ${simge}`;
+  return `${fiyat.toLocaleString(TR)} ${simge}`;
 }
 
 export function m2Yaz(m2: number | null): string | null {
   return m2 ? `${m2.toLocaleString(TR)} m²` : null;
 }
 
-function birimFiyatYaz(fiyat: number | null, m2: number | null, islem: Islem): string | null {
+function birimFiyatYaz(fiyat: number | null, m2: number | null, islem: Islem, paraBirimi: string): string | null {
   if (!fiyat || !m2 || m2 < 1 || islem !== 'satilik') return null;
   const birim = fiyat / m2;
-  return birim < 1 ? null : `${Math.round(birim).toLocaleString(TR)} ₺/m²`;
+  return birim < 1 ? null : `${Math.round(birim).toLocaleString(TR)} ${paraSimgesi(paraBirimi)}/m²`;
 }
 
 /* ---------------------------------------------------------------
@@ -158,19 +189,31 @@ export function slugla(metin: string): string {
 /* ---------------------------------------------------------------
    Satır -> İlan
    --------------------------------------------------------------- */
-function guvenliJson<T>(metin: string, varsayilan: T): T {
+function guvenliJson<T>(metin: string | null | undefined, varsayilan: T): T {
+  if (!metin) return varsayilan;
   try {
-    return JSON.parse(metin) as T;
+    return (JSON.parse(metin) as T | null) ?? varsayilan;
   } catch {
     return varsayilan;
   }
 }
 
-function etiketleriSec(oda: string | null, m2: number | null, o: Record<string, string>): string[] {
+function etiketleriSec(oda: string | null, alanlar: IlanAlanlari, o: Record<string, string>): string[] {
   const cikti: string[] = [];
   if (oda) cikti.push(oda);
-  const alan = m2Yaz(m2);
-  if (alan) cikti.push(alan);
+  const alanEkle = (etiket: string, m2: number | null) => {
+    const alan = m2Yaz(m2);
+    if (alan && cikti.length < 3) cikti.push(`${etiket} ${alan}`);
+  };
+  if (alanlar.beyanEdilen != null) cikti.push('Alan kapsamı teyit edilecek');
+  if (alanlar.toplamParsel != null || alanlar.satilanHisse != null) {
+    alanEkle('Hisse', alanlar.satilanHisse);
+    alanEkle('Parsel', alanlar.toplamParsel);
+  } else {
+    alanEkle('Brüt', alanlar.brutYapi);
+    if (alanlar.netYapi !== alanlar.brutYapi) alanEkle('Net', alanlar.netYapi);
+    if (alanlar.arsa !== alanlar.brutYapi && alanlar.arsa !== alanlar.netYapi) alanEkle('Arsa', alanlar.arsa);
+  }
 
   const oncelik: Array<[string, string, string]> = [
     ['Site İçerisinde', 'Evet', 'Site içi'],
@@ -226,7 +269,7 @@ function aramaMetniKur(
     baslikTemiz,
     s.kategori,
     s.tip,
-    islem === 'satilik' ? 'satılık' : 'kiralık',
+    islemEtiketi(islem).toLocaleLowerCase('tr-TR'),
     s.oda ?? '',
     s.mahalle ?? '',
     s.ilce ?? '',
@@ -302,71 +345,115 @@ function satirdanIlan(
   koordinatlar: Map<string, Koordinat>,
   duzen?: GorselDuzen,
   yuklenen?: string[],
-  duzenleme?: DuzenlemeKaydi
+  duzenleme?: DuzenlemeKaydi,
+  videoKaydi?: IlanVideoKaydi
 ): Ilan {
-  const baslikTemiz = baslikTemizle(s.baslik);
-  const slug = `${slugla(baslikTemiz)}-${s.id}`;
-  const islem = (s.islem === 'kiralik' ? 'kiralik' : 'satilik') as Islem;
-  const hamOzellikler = guvenliJson<Record<string, string>>(s.ozellikler, {});
+  const temel = guvenliJson<Partial<SatirIlan>>(duzenleme?.temel, {});
+  const kaynakDuzeltme = kaynakSunumDuzeltmesi(s.id);
+  // Kimlik ve kaynak senkron kaydına aittir; yalnızca sunum alanları geçersiz
+  // kılınabilir. Böylece paneldeki fiyat/kategori kararı sonraki senkronda kaybolmaz.
+  const etkin: SatirIlan = {
+    ...s,
+    baslik: duzenleme?.baslik ?? temel.baslik ?? kaynakDuzeltme?.baslik ?? s.baslik,
+    aciklama: duzenleme?.aciklama ?? temel.aciklama ?? kaynakDuzeltme?.aciklama ?? s.aciklama,
+    fiyat: temel.fiyat ?? s.fiyat,
+    para_birimi: temel.para_birimi ?? s.para_birimi,
+    islem: temel.islem ?? s.islem,
+    kategori: temel.kategori ?? s.kategori,
+    tip: temel.tip ?? s.tip,
+    tip_grup: temel.tip_grup ?? s.tip_grup,
+    oda: temel.oda ?? s.oda,
+    m2: temel.m2 !== undefined ? temel.m2 : s.m2,
+    il: temel.il ?? s.il,
+    ilce: temel.ilce ?? s.ilce,
+    mahalle: temel.mahalle ?? s.mahalle,
+    gorseller: temel.gorseller ?? s.gorseller,
+    danisman_slug: temel.danisman_slug !== undefined ? temel.danisman_slug : s.danisman_slug,
+    id: s.id,
+    kaynak: s.kaynak,
+    kaynak_url: s.kaynak_url,
+  };
+  const baslikTemiz = baslikTemizle(etkin.baslik);
+  const slug = `${slugla(baslikTemiz)}-${etkin.id}`;
+  const izinliIslemler: Islem[] = ['satilik', 'kiralik', 'gunluk-kiralik', 'sezonluk-kiralik', 'devren-satilik', 'devren-kiralik', 'kat-karsiligi-satilik'];
+  const islem = izinliIslemler.includes(etkin.islem as Islem) ? etkin.islem as Islem : 'satilik';
+  const hamOzellikler = guvenliJson<Record<string, string>>(etkin.ozellikler, {});
   const duzOzellikler = duzenleme?.ozellikler ? guvenliJson<Record<string, string>>(duzenleme.ozellikler, {}) : {};
-  const ozellikler = { ...hamOzellikler, ...duzOzellikler };
+  const ozellikler = alanOzellikleriniBirlestir({
+    tipGrup: etkin.tip_grup,
+    m2: etkin.m2,
+    ozellikler: temel.ozellikler != null
+      ? guvenliJson<Record<string, string>>(temel.ozellikler, {})
+      : kaynakOzellikleriniUygula(hamOzellikler, kaynakDuzeltme),
+  }, duzOzellikler, Boolean(duzenleme?.temel && duzenleme?.ozellikler));
+  const alanlar = ilanAlanlariniCoz({ tipGrup: etkin.tip_grup, m2: etkin.m2, ozellikler });
 
-  // Hepsiemlak görselleri varsa onları kullan: yatay çekim, daha yüksek
-  // çözünürlük ve üzerinde rakip portalın değil ofisin kendi logosu var.
-  const emlakjetGorselleri = guvenliJson<string[]>(s.gorseller, []);
-  const hepsiemlakGorselleri = s.hepsiemlak_gorseller
-    ? guvenliJson<string[]>(s.hepsiemlak_gorseller, [])
+  // En dolu portal setini göster. Hepsiemlak fotoğrafı sayısı eşitse daha
+  // yüksek çözünürlük ve marka görünümü nedeniyle Hepsiemlak seçilir.
+  const emlakjetGorselleri = guvenliJson<string[]>(etkin.gorseller, []);
+  const hepsiemlakGorselleri = etkin.hepsiemlak_gorseller
+    ? guvenliJson<string[]>(etkin.hepsiemlak_gorseller, [])
     : [];
   // Panelden yüklenenler en önde: tek bir iyi kapak yüklemek yeterli olsun,
   // kalan kareler portaldan gelmeye devam etsin.
-  const portalGorselleri = hepsiemlakGorselleri.length
-    ? hepsiemlakGorselleri
-    : emlakjetGorselleri;
+  const portalGorselleri = portalGorselleriniSec(emlakjetGorselleri, hepsiemlakGorselleri);
   const hamGorseller = [...(yuklenen ?? []), ...portalGorselleri];
   const gorseller = gorselleriDuzenle(hamGorseller, duzen);
-  const zaman = Date.parse(s.guncellenme ?? s.ilk_gorulme);
-  const etiketler = etiketleriSec(s.oda, s.m2, ozellikler);
-  const hamDonanim = guvenliJson<string[]>(s.donanim ?? '[]', []);
-  const duzDonanim = duzenleme?.donanim ? guvenliJson<string[]>(duzenleme.donanim, []) : null;
-  const donanim = duzDonanim && duzDonanim.length ? duzDonanim : hamDonanim;
+  const zaman = Date.parse(etkin.guncellenme ?? etkin.ilk_gorulme);
+  const etiketler = etiketleriSec(etkin.oda, alanlar, ozellikler);
+  const hamDonanim = guvenliJson<string[]>(etkin.donanim ?? '[]', []);
+  const duzDonanim = duzenleme?.donanim != null ? guvenliJson<string[]>(duzenleme.donanim, []) : null;
+  const donanim = duzDonanim ?? hamDonanim;
+  const mahalleKoordinati = koordinatlar.get(konumAnahtari(etkin.mahalle, etkin.ilce, etkin.il)) ?? null;
+  const kamuKonumu = kamuKonumuSec(etkin.id, ozellikler, mahalleKoordinati);
 
   return {
-    id: s.id,
-    kaynak: s.kaynak,
-    kaynakUrl: s.kaynak_url,
-    baslik: s.baslik,
-    aciklama: s.aciklama,
-    fiyat: s.fiyat,
+    id: etkin.id,
+    kaynak: etkin.kaynak,
+    kaynakUrl: etkin.kaynak_url,
+    baslik: etkin.baslik,
+    aciklama: etkin.aciklama,
+    fiyat: etkin.fiyat,
+    paraBirimi: etkin.para_birimi || 'TRY',
     islem,
-    kategori: s.kategori,
-    tip: s.tip,
-    tipGrup: (s.tip_grup as TipGrup) ?? 'diger',
-    oda: s.oda,
-    m2: s.m2,
-    il: s.il,
-    ilce: s.ilce,
-    mahalle: s.mahalle,
-    ozellikler,
+    kategori: etkin.kategori,
+    tip: etkin.tip,
+    tipGrup: (etkin.tip_grup as TipGrup) ?? 'diger',
+    oda: etkin.oda,
+    m2: etkin.m2,
+    il: etkin.il,
+    ilce: etkin.ilce,
+    mahalle: etkin.mahalle,
+    ozellikler: ozelKonumAlanlariniGizle(ozellikler),
     donanim,
     gorseller,
-    danismanSlug: s.danisman_slug,
-    guncellenme: s.guncellenme,
-    ilkGorulme: s.ilk_gorulme,
+    video: videoKaydi ? {
+      url: `/g/${videoKaydi.video_anahtar}`,
+      poster: `/g/${videoKaydi.poster_anahtar}`,
+      mime: videoKaydi.mime,
+      sure: videoKaydi.sure_saniye,
+      boyut: videoKaydi.boyut,
+    } : null,
+    danismanSlug: etkin.danisman_slug,
+    guncellenme: etkin.guncellenme,
+    ilkGorulme: etkin.ilk_gorulme,
 
     slug,
     yol: `/ilan/${slug}`,
     baslikTemiz,
-    konum: [s.mahalle, s.ilce, s.il].filter(Boolean).join(' · ') || 'Türkiye',
-    konumKisa: [s.ilce, s.il].filter(Boolean).join(' / ') || 'Türkiye',
-    fiyatMetin: fiyatYaz(s.fiyat, islem),
-    m2Metin: m2Yaz(s.m2),
-    birimFiyat: birimFiyatYaz(s.fiyat, s.m2, islem),
-    ozetMetin: ozetle(s.aciklama),
+    konum: [etkin.mahalle, etkin.ilce, etkin.il].filter(Boolean).join(' · ') || 'Türkiye',
+    konumKisa: [etkin.ilce, etkin.il].filter(Boolean).join(' / ') || 'Türkiye',
+    fiyatMetin: fiyatYaz(etkin.fiyat, islem, etkin.para_birimi || 'TRY'),
+    alanlar,
+    birimFiyat: birimFiyatYaz(etkin.fiyat, alanlar.karsilastirmaM2, islem, etkin.para_birimi || 'TRY'),
+    birimFiyatTemeli: islem === 'satilik' ? alanlar.birimFiyatTemeli : null,
+    ozetMetin: ozetle(etkin.aciklama),
     yeniMi: Number.isFinite(zaman) && Date.now() - zaman < YENI_GUN * 86_400_000,
     kapak: gorseller[0] ?? null,
     etiketler,
-    koordinat: koordinatlar.get(konumAnahtari(s.mahalle, s.ilce, s.il)) ?? null,
-    aramaMetni: aramaMetniKur(baslikTemiz, s, ozellikler, islem, etiketler),
+    koordinat: kamuKonumu.koordinat,
+    koordinatYaricapi: kamuKonumu.yaricap,
+    aramaMetni: aramaMetniKur(baslikTemiz, etkin, halkaAcikOzellikler(ozellikler), islem, etiketler),
   };
 }
 
@@ -386,6 +473,8 @@ export interface Portfoy {
     tipGrup: FiltreSecenek[];
     tip: FiltreSecenek[];
     ilce: FiltreSecenek[];
+    mahalle: FiltreSecenek[];
+    oda: FiltreSecenek[];
     il: FiltreSecenek[];
   };
   sayimlar: {
@@ -396,7 +485,7 @@ export interface Portfoy {
     arsa: number;
     ilce: number;
     gorsel: number;
-    toplamAlan: number;
+    arsaToplamAlan: number;
   };
   sonGuncelleme: string;
 }
@@ -418,32 +507,40 @@ const TIP_ETIKET: Record<string, string> = {
   konut: 'Konut',
   arsa: 'Arsa & Tarla',
   isyeri: 'İş Yeri',
+  bina: 'Komple Bina',
+  turistik: 'Turistik Tesis',
+  proje: 'Konut Projesi',
   diger: 'Diğer',
 };
 
-let onbellek: { veri: Portfoy; zaman: number } | null = null;
-const ONBELLEK_MS = 60_000;
-
 export async function portfoy(): Promise<Portfoy> {
-  if (onbellek && Date.now() - onbellek.zaman < ONBELLEK_MS) return onbellek.veri;
+  return istekVerisi('portfoy', portfoyuOku);
+}
 
+async function portfoyuOku(): Promise<Portfoy> {
   const vt = env.VT as D1Database;
-  const [satirlar, koordinatlar, duzenler, yuklenenler, duzenlemeler] = await Promise.all([
+  const [satirlar, koordinatlar, duzenler, yuklenenler, duzenlemeler, videolar] = await Promise.all([
     aktifIlanSatirlari(vt),
     koordinatHaritasi(vt),
     gorselDuzenleri(vt),
     yuklenenFotograflar(vt),
     duzenlemeleriGetir(vt),
+    videoKayitlari(vt),
   ]);
-  const ilanlar = satirlar.map((satir) =>
+  const tumIlanlar = satirlar.map((satir) =>
     satirdanIlan(
       satir,
       koordinatlar,
       duzenler.get(satir.id),
       yuklenenler.get(satir.id),
-      duzenlemeler.get(satir.id)
+      duzenlemeler.get(satir.id),
+      videolar.get(satir.id)
     )
   );
+  // Yeniden açılmış aynı taşınmaz kayıtlarını silmeden kamu portföyünde tekilleştir.
+  // Ana kayıt kaynakta yoksa eski kayıt görünür kalır.
+  const gorunurIdler = gorunurIlanIdleri(tumIlanlar.map((ilan) => ilan.id));
+  const ilanlar = tumIlanlar.filter((ilan) => gorunurIdler.has(ilan.id));
   const senkron = await sonSenkron(vt).catch(() => null);
 
   const veri: Portfoy = {
@@ -452,7 +549,7 @@ export async function portfoy(): Promise<Portfoy> {
       islem: say(
         ilanlar.map((i) => ({
           deger: i.islem,
-          etiket: i.islem === 'satilik' ? 'Satılık' : 'Kiralık',
+          etiket: islemEtiketi(i.islem),
         }))
       ),
       tipGrup: say(
@@ -470,6 +567,13 @@ export async function portfoy(): Promise<Portfoy> {
           etiket: i.il && i.ilce !== i.il ? `${i.ilce} / ${i.il}` : (i.ilce ?? ''),
         }))
       ),
+      mahalle: say(
+        ilanlar.map((i) => ({
+          deger: i.mahalle,
+          etiket: i.ilce ? `${i.mahalle ?? ''} / ${i.ilce}` : (i.mahalle ?? ''),
+        }))
+      ),
+      oda: say(ilanlar.map((i) => ({ deger: i.oda, etiket: i.oda ?? '' }))),
       il: say(ilanlar.map((i) => ({ deger: i.il, etiket: i.il ?? '' }))),
     },
     sayimlar: {
@@ -480,18 +584,18 @@ export async function portfoy(): Promise<Portfoy> {
       arsa: ilanlar.filter((i) => i.tipGrup === 'arsa').length,
       ilce: new Set(ilanlar.map((i) => i.ilce).filter(Boolean)).size,
       gorsel: ilanlar.reduce((t, i) => t + i.gorseller.length, 0),
-      toplamAlan: ilanlar.reduce((t, i) => t + (i.m2 ?? 0), 0),
+      arsaToplamAlan: arsaToplamAlani(ilanlar),
     },
     sonGuncelleme: senkron?.bitis ?? new Date().toISOString(),
   };
 
-  onbellek = { veri, zaman: Date.now() };
   return veri;
 }
 
 /** Senkron sonrası önbelleği düşürür. */
 export function onbellegiTemizle(): void {
-  onbellek = null;
+  istekVerisiniTemizle('portfoy');
+  istekVerisiniTemizle('bolgeler');
 }
 
 /* ---------------------------------------------------------------
@@ -505,9 +609,14 @@ export async function ilanBul(slug: string): Promise<Ilan | undefined> {
   // Başlık değişip slug kaydığında ilan numarasından yakala (en az 6 haneli rakam)
   const idEsleme = slug.match(/(\d{6,})$/);
   if (idEsleme) {
-    const idIle = ilanlar.find((i) => i.id === idEsleme[1]);
+    const istenenId = idEsleme[1];
+    const kanonikId = mukerrerKanonikId(istenenId) ?? istenenId;
+    const idIle = ilanlar.find((i) => i.id === kanonikId) ?? ilanlar.find((i) => i.id === istenenId);
     if (idIle) return idIle;
   }
+
+  const elleIle = ilanlar.find((i) => i.id.startsWith('elle-') && slug.endsWith(`-${i.id}`));
+  if (elleIle) return elleIle;
 
   // elle- veya serbest id eşleşmesi (slug sonundaki id parçası)
   const sonTire = slug.lastIndexOf('-');
@@ -520,9 +629,11 @@ export async function ilanBul(slug: string): Promise<Ilan | undefined> {
   return ilanlar.find((i) => i.id === slug);
 }
 
-export async function danismaninIlanlari(emlakjetSlug: string): Promise<Ilan[]> {
-  const { ilanlar } = await portfoy();
-  return ilanlar.filter((i) => i.danismanSlug === emlakjetSlug);
+export async function danismaninIlanlari(slug: string): Promise<Ilan[]> {
+  const [{ ilanlar }, { ekip }] = await Promise.all([portfoy(), icerik()]);
+  const danisman = ekip.find((d) => d.slug === slug || d.emlakjetSlug === slug);
+  const anahtarlar = new Set([slug, danisman?.slug, danisman?.emlakjetSlug].filter(Boolean));
+  return ilanlar.filter((i) => i.danismanSlug && anahtarlar.has(i.danismanSlug));
 }
 
 /* ---------------------------------------------------------------
@@ -722,6 +833,7 @@ export async function aciklamaParcala(ilan: Ilan): Promise<string[]> {
 /** Aynı ilçede, aynı işlemde, fiyatça en yakın ilanlar. */
 export async function benzerIlanlar(ilan: Ilan, adet = 3): Promise<Ilan[]> {
   const { ilanlar } = await portfoy();
+  const ayniTasinmaz = new Set(iliskiliIlanIdleri(ilan.id));
   const puan = (o: Ilan) => {
     let p = 0;
     if (o.ilce === ilan.ilce) p += 3;
@@ -734,48 +846,36 @@ export async function benzerIlanlar(ilan: Ilan, adet = 3): Promise<Ilan[]> {
     return p;
   };
   return ilanlar
-    .filter((o) => o.id !== ilan.id)
+    .filter((o) => o.id !== ilan.id && !ayniTasinmaz.has(o.id))
     .sort((a, b) => puan(b) - puan(a))
     .slice(0, adet);
 }
 
+/** Aynı taşınmazın satış/kiralama gibi diğer aktif işlem seçenekleri. */
+export async function baglantiliIlanlar(ilan: Ilan): Promise<Ilan[]> {
+  const idler = new Set(iliskiliIlanIdleri(ilan.id));
+  if (!idler.size) return [];
+  const { ilanlar } = await portfoy();
+  return ilanlar.filter((kayit) => idler.has(kayit.id));
+}
+
 /**
- * Ana sayfa seçkisi.
- *
- * Sadece fiyata göre sıralamak işe yaramıyor: en pahalı ilanlar büyük tarlalar
- * ve onların görselleri uydu ekran görüntüsü. Vitrin kartı gerçek fotoğrafı olan
- * bir konut olmalı; arsa tarafı da temsil edilsin diye ikisini dönüşümlü diziyoruz.
+ * Ana sayfa seçkisi: fiyatı yüksek ve yeterince görselli ilanlar önce gelir,
+ * ancak daire, villa ve arazi mümkün olduğunda aynı vitrinde dengelenir.
  */
 export async function oneCikanlar(adet = 6): Promise<Ilan[]> {
   const { ilanlar } = await portfoy();
   const gorselZengin = (i: Ilan) => i.gorseller.length >= 5;
   const fiyataGore = (a: Ilan, b: Ilan) => (b.fiyat ?? 0) - (a.fiyat ?? 0);
-
-  const konutlar = ilanlar.filter((i) => i.tipGrup === 'konut' && gorselZengin(i)).sort(fiyataGore);
-  const araziler = ilanlar.filter((i) => i.tipGrup === 'arsa' && gorselZengin(i)).sort(fiyataGore);
-
-  const secili: Ilan[] = [];
-  const ekle = (ilan: Ilan | undefined) => {
-    if (ilan && !secili.includes(ilan)) secili.push(ilan);
-  };
-
-  ekle(konutlar[0]);
-
-  let k = 1;
-  let a = 0;
-  while (secili.length < adet && (k < konutlar.length || a < araziler.length)) {
-    if (secili.length % 3 === 0 && a < araziler.length) ekle(araziler[a++]);
-    else if (k < konutlar.length) ekle(konutlar[k++]);
-    else if (a < araziler.length) ekle(araziler[a++]);
-    else break;
-  }
-
-  for (const ilan of [...ilanlar].sort(fiyataGore)) {
-    if (secili.length >= adet) break;
-    ekle(ilan);
-  }
-
-  return secili.slice(0, adet);
+  const uygun = ilanlar.filter(gorselZengin).sort(fiyataGore);
+  const temel = vitrinIlanlariniDengele(uygun, adet);
+  if (temel.length >= adet) return temel;
+  const seciliIdler = new Set(temel.map((i) => i.id));
+  const yedek = vitrinIlanlariniDengele(
+    [...ilanlar].filter((i) => !seciliIdler.has(i.id)).sort(fiyataGore),
+    adet - temel.length
+  );
+  return [...temel, ...yedek].slice(0, adet);
 }
 
 /**

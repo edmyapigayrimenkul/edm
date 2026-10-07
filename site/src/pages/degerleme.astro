@@ -13,14 +13,14 @@ const adimlar = [
     metin: 'Mülkün tipi, konumu ve büyüklüğü yeterli. Tapu bilgisi istemiyoruz.',
   },
   {
-    baslik: 'Bölgeyi tararız',
+    baslik: 'Verileri inceleriz',
     metin:
-      'Aynı mahallede, benzer metrekarede, son altı ayda gerçekleşen satışlara bakarız — portalda yazan istek fiyatlarına değil.',
+      'Konumu, metrekareyi, taşınmazın özelliklerini, benzer ilanları ve ulaşabildiğimiz güncel piyasa verilerini birlikte değerlendiririz.',
   },
   {
-    baslik: 'Raporu göndeririz',
+    baslik: 'Sizinle görüşürüz',
     metin:
-      'Tek sayfa: tahmini değer aralığı, karşılaştırdığımız satışlar ve fiyatı etkileyen unsurlar. Aynı gün içinde.',
+      'İlk değerlendirme ve gereken ek bilgiler için çalışma saatleri içinde size ulaşırız. Teslim kapsamı taşınmaza göre netleşir.',
   },
 ];
 
@@ -29,7 +29,7 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
 
 <Temel
   baslik="Ücretsiz Değerleme"
-  aciklama="Mülkünüzün güncel piyasa değerini ücretsiz öğrenin. Silivri ve Trakya'da gerçekleşmiş satışlara dayalı, aynı gün dönüş yapılan değerleme raporu."
+  aciklama={`Mülkünüz için ücretsiz piyasa değerlendirmesi talep edin. ${iletisim.yanitBeklentisi}`}
 >
   <section class="pt-28 pb-12 lg:pt-36">
     <div class="kab">
@@ -83,8 +83,8 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
               <div class="alan-ikili">
                 <label class="alan">
                   <span class="alan-etiket">Ad Soyad <span aria-hidden="true">*</span></span>
-                  <input type="text" name="ad" required autocomplete="name" placeholder="Adınız" />
-                  <span class="alan-hata" data-hata></span>
+                  <input id="degerleme-ad" type="text" name="ad" required autocomplete="name" placeholder="Adınız" aria-describedby="degerleme-ad-hata" />
+                  <span id="degerleme-ad-hata" class="alan-hata" data-hata></span>
                 </label>
 
                 <label class="alan">
@@ -96,8 +96,10 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
                     autocomplete="tel"
                     inputmode="tel"
                     placeholder="05xx xxx xx xx"
+                    id="degerleme-telefon"
+                    aria-describedby="degerleme-telefon-hata"
                   />
-                  <span class="alan-hata" data-hata></span>
+                  <span id="degerleme-telefon-hata" class="alan-hata" data-hata></span>
                 </label>
               </div>
 
@@ -108,14 +110,16 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
                   name="eposta"
                   autocomplete="email"
                   placeholder="Raporu e-postayla da gönderelim mi?"
+                  id="degerleme-eposta"
+                  aria-describedby="degerleme-eposta-hata"
                 />
-                <span class="alan-hata" data-hata></span>
+                <span id="degerleme-eposta-hata" class="alan-hata" data-hata></span>
               </label>
 
               <div class="alan-ikili">
                 <label class="alan">
                   <span class="alan-etiket">Mülk tipi <span aria-hidden="true">*</span></span>
-                  <select name="tip" required>
+                  <select id="degerleme-tip" name="tip" required aria-describedby="degerleme-tip-hata">
                     <option value="">Seçin…</option>
                     <option>Daire</option>
                     <option>Villa / Müstakil ev</option>
@@ -124,7 +128,7 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
                     <option>İş yeri / Dükkan</option>
                     <option>Diğer</option>
                   </select>
-                  <span class="alan-hata" data-hata></span>
+                  <span id="degerleme-tip-hata" class="alan-hata" data-hata></span>
                 </label>
 
                 <label class="alan">
@@ -136,11 +140,13 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
                     list="ilce-listesi"
                     placeholder="Silivri"
                     autocomplete="address-level2"
+                    id="degerleme-ilce"
+                    aria-describedby="degerleme-ilce-hata"
                   />
                   <datalist id="ilce-listesi">
                     {ilceler.map((i) => <option value={i}></option>)}
                   </datalist>
-                  <span class="alan-hata" data-hata></span>
+                  <span id="degerleme-ilce-hata" class="alan-hata" data-hata></span>
                 </label>
               </div>
 
@@ -152,7 +158,8 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
 
                 <label class="alan">
                   <span class="alan-etiket">Büyüklük (m²)</span>
-                  <input type="number" name="m2" min="1" inputmode="numeric" placeholder="220" />
+                  <input id="degerleme-m2" type="number" name="m2" min="1" inputmode="numeric" placeholder="220" aria-describedby="degerleme-m2-hata" />
+                  <span id="degerleme-m2-hata" class="alan-hata" data-hata></span>
                 </label>
               </div>
 
@@ -174,28 +181,40 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
               </div>
 
               <label class="onay">
-                <input type="checkbox" name="onay" required />
+                <input id="degerleme-onay" type="checkbox" name="onay" required aria-describedby="degerleme-onay-hata" />
                 <span>
                   Verdiğim bilgilerin değerleme talebim için kullanılmasına izin veriyorum.
                   Bilgiler üçüncü kişilerle paylaşılmaz.
+                  <small id="degerleme-onay-hata" class="onay-hata" data-hata></small>
                 </span>
               </label>
+
+              <div class="gonderim-hata" data-gonderim-hata role="alert" tabindex="-1" hidden>
+                <p class="font-medium" data-gonderim-hata-metni>
+                  Talep şu anda gönderilemedi. Bilgileriniz formda duruyor; yeniden
+                  deneyebilir veya WhatsApp’tan iletebilirsiniz.
+                </p>
+                <a href="#" data-wa-hata target="_blank" rel="noopener noreferrer" class="mt-2 inline-block alt-cizgi font-medium">
+                  WhatsApp’tan gönder
+                </a>
+              </div>
 
               <button type="submit" class="dugme dugme--kirmizi w-full !py-4" data-gonder>
                 Değerleme talebi gönder
               </button>
+              <p class="sr-only" data-form-durum role="status" aria-live="polite"></p>
 
-              <p class="text-center text-[0.75rem] text-kursun">
-                Ortalama dönüş süresi: aynı gün. Acilse
-                <a href={`tel:${iletisim.telefonHam}`} class="alt-cizgi text-metin-2">
-                  {iletisim.telefon}
+              <p class="text-center text-[0.75rem] text-kursun-okunur">
+                {iletisim.yanitBeklentisi} Görüşmek isterseniz
+                <a href={`tel:${iletisim.sabitHam}`} class="alt-cizgi text-metin-2">
+                  {iletisim.sabit}
                 </a>
               </p>
             </div>
           </form>
 
           <!-- Başarı ekranı -->
-          <div class="form-kart basari" data-basari hidden>
+          <div class="form-kart basari" data-basari role="status" tabindex="-1" hidden>
             <span class="basari-isaret" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M4 12.5l5 5L20 6.5"></path>
@@ -203,8 +222,8 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
             </span>
             <h2 class="baslik-orta mt-5">Talebiniz bize ulaştı</h2>
             <p class="mt-3 text-metin-2">
-              En geç bugün içinde size döneceğiz. Daha hızlı olsun isterseniz aynı bilgileri
-              WhatsApp’tan da gönderebilirsiniz.
+              Talebiniz kaydedildi. {iletisim.yanitBeklentisi} Dilerseniz aynı bilgileri
+              WhatsApp’tan da iletebilirsiniz.
             </p>
             <div class="mt-6 flex flex-col gap-2.5">
               <a href="#" data-wa-baglanti target="_blank" rel="noopener noreferrer" class="dugme dugme--kirmizi w-full">
@@ -237,7 +256,7 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
   }
   .adim-no {
     font-size: 0.75rem;
-    color: var(--color-kirmizi);
+    color: var(--color-kirmizi-derin);
     padding-top: 0.28rem;
   }
 
@@ -277,7 +296,7 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
     font-weight: 600;
   }
   .alan-etiket span {
-    color: var(--color-kirmizi);
+    color: var(--color-kirmizi-derin);
   }
 
   .alan input,
@@ -300,13 +319,12 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
   .alan input:focus,
   .alan select:focus,
   .alan textarea:focus {
-    outline: none;
     border-color: var(--color-murekkep);
     background: #fff;
   }
   .alan input::placeholder,
   .alan textarea::placeholder {
-    color: color-mix(in oklab, var(--color-kursun) 82%, transparent);
+    color: var(--color-kursun-okunur);
   }
 
   .alan[data-gecersiz] input,
@@ -337,6 +355,25 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
     height: 1.05rem;
     flex: none;
     accent-color: var(--color-kirmizi);
+  }
+  .onay-hata {
+    display: none;
+    margin-top: 0.25rem;
+    color: var(--color-kirmizi-derin);
+    font-size: 0.75rem;
+  }
+  .onay[data-gecersiz] .onay-hata {
+    display: block;
+  }
+
+  .gonderim-hata {
+    border: 1px solid color-mix(in oklab, var(--color-kirmizi) 32%, transparent);
+    border-radius: 6px;
+    padding: 0.9rem 1rem;
+    background: color-mix(in oklab, var(--color-kirmizi) 7%, #fff);
+    color: var(--color-kirmizi-derin);
+    font-size: 0.8125rem;
+    line-height: 1.55;
   }
 
   /* Bot tuzağı: ekrandan çıkarılır ama görüntüden gizlenmez ki botlar doldursun */
@@ -376,8 +413,13 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
   const basari = document.querySelector<HTMLElement>('[data-basari]');
   const waBaglanti = document.querySelector<HTMLAnchorElement>('[data-wa-baglanti]');
 
-  if (form && basari) {
+  if (form && basari && form.dataset.kuruldu !== 'evet') {
+    form.dataset.kuruldu = 'evet';
     const gonderDugme = form.querySelector<HTMLButtonElement>('[data-gonder]')!;
+    const hataKutusu = form.querySelector<HTMLElement>('[data-gonderim-hata]');
+    const gonderimHataMetni = form.querySelector<HTMLElement>('[data-gonderim-hata-metni]');
+    const waHata = form.querySelector<HTMLAnchorElement>('[data-wa-hata]');
+    const formDurum = form.querySelector<HTMLElement>('[data-form-durum]');
 
     const hataMetni = (alan: HTMLInputElement | HTMLSelectElement): string => {
       if (alan.validity.valueMissing) {
@@ -396,8 +438,8 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
       return haneler.length >= 10 && haneler.length <= 13;
     };
 
-    function alanDogrula(alan: HTMLInputElement | HTMLSelectElement): boolean {
-      const sarmal = alan.closest<HTMLElement>('.alan');
+    function alanDogrula(alan: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement): boolean {
+      const sarmal = alan.closest<HTMLElement>('.alan, .onay');
       let gecerli = alan.checkValidity();
       if (gecerli && alan.name === 'telefon') gecerli = telefonGecerli(alan.value);
 
@@ -405,33 +447,48 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
         const hataAlani = sarmal.querySelector<HTMLElement>('[data-hata]');
         if (gecerli) {
           sarmal.removeAttribute('data-gecersiz');
+          alan.removeAttribute('aria-invalid');
+          if (hataAlani) hataAlani.textContent = '';
         } else {
           sarmal.setAttribute('data-gecersiz', 'evet');
+          alan.setAttribute('aria-invalid', 'true');
           if (hataAlani) hataAlani.textContent = hataMetni(alan);
         }
       }
       return gecerli;
     }
 
-    form.querySelectorAll<HTMLInputElement>('input, select, textarea').forEach((alan) => {
+    form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input, select, textarea').forEach((alan) => {
       alan.addEventListener('blur', () => {
         if (alan.name !== 'website') alanDogrula(alan);
       });
       alan.addEventListener('input', () => {
-        alan.closest('.alan')?.removeAttribute('data-gecersiz');
+        alan.closest('.alan, .onay')?.removeAttribute('data-gecersiz');
+        alan.removeAttribute('aria-invalid');
+        const hataAlani = alan.closest('.alan, .onay')?.querySelector<HTMLElement>('[data-hata]');
+        if (hataAlani) hataAlani.textContent = '';
+      });
+      alan.addEventListener('change', () => {
+        alan.closest('.alan, .onay')?.removeAttribute('data-gecersiz');
+        alan.removeAttribute('aria-invalid');
+        const hataAlani = alan.closest('.alan, .onay')?.querySelector<HTMLElement>('[data-hata]');
+        if (hataAlani) hataAlani.textContent = '';
       });
     });
 
     form.addEventListener('submit', async (olay) => {
       olay.preventDefault();
 
-      const zorunlular = Array.from(
-        form.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[required]')
+      const dogrulanacaklar = Array.from(
+        form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+          'input:not([name="website"]), select, textarea'
+        )
       );
-      const hepsiGecerli = zorunlular.map(alanDogrula).every(Boolean);
+      const hepsiGecerli = dogrulanacaklar.map(alanDogrula).every(Boolean);
 
       if (!hepsiGecerli) {
-        const ilkHata = form.querySelector<HTMLElement>('[data-gecersiz] input, [data-gecersiz] select');
+        if (formDurum) formDurum.textContent = 'Formda düzeltilmesi gereken alanlar var.';
+        const ilkHata = form.querySelector<HTMLElement>('[data-gecersiz] input, [data-gecersiz] select, [data-gecersiz] textarea');
         ilkHata?.focus();
         return;
       }
@@ -451,27 +508,62 @@ const ilceler = FILTRELER.ilce.map((i) => i.deger);
       ].filter(Boolean);
 
       if (waBaglanti) {
-        waBaglanti.href = `https://wa.me/${waNumara}?text=${encodeURIComponent(
+        const waAdresi = `https://wa.me/${waNumara}?text=${encodeURIComponent(
           satirlar.join('\n')
         )}`;
+        waBaglanti.href = waAdresi;
+        if (waHata) waHata.href = waAdresi;
       }
 
+      if (hataKutusu) hataKutusu.hidden = true;
+      form.setAttribute('aria-busy', 'true');
+      if (formDurum) formDurum.textContent = 'Değerleme talebiniz gönderiliyor.';
       gonderDugme.disabled = true;
       gonderDugme.textContent = 'Gönderiliyor…';
 
+      let kullaniciHatasi =
+        'Talep şu anda gönderilemedi. Bilgileriniz formda duruyor; yeniden deneyebilir veya WhatsApp’tan iletebilirsiniz.';
       try {
-        await fetch('/api/talep', {
+        const yanit = await fetch('/api/talep', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...veri, tur: 'degerleme', kaynak: location.pathname }),
         });
+        const sonuc = (await yanit.json().catch(() => null)) as
+          | { tamam?: boolean; hata?: string; alan?: string }
+          | null;
+        if (!yanit.ok || !sonuc?.tamam) {
+          if (sonuc?.hata) kullaniciHatasi = sonuc.hata;
+          if (sonuc?.alan) {
+            const alan = form.elements.namedItem(sonuc.alan);
+            if (alan instanceof HTMLElement) {
+              const sarmal = alan.closest<HTMLElement>('.alan, .onay');
+              sarmal?.setAttribute('data-gecersiz', 'evet');
+              alan.setAttribute('aria-invalid', 'true');
+              const alanHatasi = sarmal?.querySelector<HTMLElement>('[data-hata]');
+              if (alanHatasi) alanHatasi.textContent = kullaniciHatasi;
+            }
+          }
+          throw new Error('Talep kaydedilmedi.');
+        }
       } catch {
-        // Sunucu ulaşılamazsa bile kullanıcıyı boşta bırakmıyoruz;
-        // WhatsApp yedeği başarı ekranında hazır duruyor.
+        if (gonderimHataMetni) gonderimHataMetni.textContent = kullaniciHatasi;
+        form.removeAttribute('aria-busy');
+        if (formDurum) formDurum.textContent = 'Değerleme talebi gönderilemedi. Hata açıklaması gösterildi.';
+        if (hataKutusu) {
+          hataKutusu.hidden = false;
+          hataKutusu.focus({ preventScroll: true });
+          hataKutusu.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        gonderDugme.disabled = false;
+        gonderDugme.textContent = 'Yeniden dene';
+        return;
       }
 
       form.hidden = true;
+      form.removeAttribute('aria-busy');
       basari.hidden = false;
+      basari.focus({ preventScroll: true });
       basari.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   }

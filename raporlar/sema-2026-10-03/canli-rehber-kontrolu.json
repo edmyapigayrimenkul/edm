@@ -1,0 +1,97 @@
+{
+  "tarih": "2026-10-03T01:07:59.410Z",
+  "surum": "55d140df-d96e-4737-81f0-4f5b728e53b5",
+  "rapor": [
+    {
+      "url": "https://edmyapigayrimenkul.com/rehber/istanbul-silivri",
+      "durum": 200,
+      "kanonik": "https://edmyapigayrimenkul.com/rehber/istanbul-silivri",
+      "kartlar": 2,
+      "kontroller": 3,
+      "kaynaklar": [
+        "https://www.silivri.gov.tr/cografi-konum",
+        "https://www.silivri.gov.tr/cografi-konum"
+      ],
+      "basarili": true,
+      "yazim": true
+    },
+    {
+      "url": "https://edmyapigayrimenkul.com/rehber/edirne-meric",
+      "durum": 200,
+      "kanonik": "https://edmyapigayrimenkul.com/rehber/edirne-meric",
+      "kartlar": 2,
+      "kontroller": 3,
+      "kaynaklar": [
+        "https://www.edirne.gov.tr/meric",
+        "https://www.edirne.gov.tr/meric-nehri-uzerindeki-sulamanin-duzenlenmesine-iliskin-duyuru"
+      ],
+      "basarili": true,
+      "yazim": true
+    },
+    {
+      "url": "https://edmyapigayrimenkul.com/rehber/edirne-merkez",
+      "durum": 200,
+      "kanonik": "https://edmyapigayrimenkul.com/rehber/edirne-merkez",
+      "kartlar": 2,
+      "kontroller": 3,
+      "kaynaklar": [
+        "https://www.kulturportali.gov.tr/turkiye/edirne/kulturenvanteri/sultan-mecid-koprusu",
+        "https://www.edirne.gov.tr/meric-nehri-uzerindeki-sulamanin-duzenlenmesine-iliskin-duyuru"
+      ],
+      "basarili": true,
+      "yazim": true
+    },
+    {
+      "url": "https://edmyapigayrimenkul.com/rehber/edirne-lalapasa",
+      "durum": 200,
+      "kanonik": "https://edmyapigayrimenkul.com/rehber/edirne-lalapasa",
+      "kartlar": 2,
+      "kontroller": 3,
+      "kaynaklar": [
+        "https://www.lalapasa.gov.tr/cografi-yapi",
+        "https://kulturportali.gov.tr/turkiye/edirne/gezilecekyer/lalapasa-dolmenleri"
+      ],
+      "basarili": true,
+      "yazim": true
+    },
+    {
+      "url": "https://edmyapigayrimenkul.com/rehber/tekirdag-marmaraereglisi",
+      "durum": 200,
+      "kanonik": "https://edmyapigayrimenkul.com/rehber/tekirdag-marmaraereglisi",
+      "kartlar": 2,
+      "kontroller": 3,
+      "kaynaklar": [
+        "https://www.marmaraereglisi.gov.tr/cografi-yapisi",
+        "https://www.marmaraereglisi.gov.tr/cografi-yapisi"
+      ],
+      "basarili": true,
+      "yazim": true
+    },
+    {
+      "url": "https://edmyapigayrimenkul.com/rehber/tekirdag-malkara",
+      "durum": 200,
+      "kanonik": "https://edmyapigayrimenkul.com/rehber/tekirdag-malkara",
+      "kartlar": 2,
+      "kontroller": 3,
+      "kaynaklar": [
+        "https://www.malkara.gov.tr/cografi-yapisi",
+        "https://www.malkara.gov.tr/cografi-yapisi"
+      ],
+      "basarili": true,
+      "yazim": true
+    },
+    {
+      "url": "https://edmyapigayrimenkul.com/rehber/edirne-enez",
+      "durum": 200,
+      "kanonik": "https://edmyapigayrimenkul.com/rehber/edirne-enez",
+      "kartlar": 2,
+      "kontroller": 3,
+      "kaynaklar": [
+        "https://www.enez.gov.tr/enez-hakkinda",
+        "https://bolge1.tarimorman.gov.tr/Menu/44/Milli-Parklar"
+      ],
+      "basarili": true,
+      "yazim": true
+    }
+  ]
+}

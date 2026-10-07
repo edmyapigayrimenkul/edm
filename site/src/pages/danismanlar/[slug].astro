@@ -10,7 +10,7 @@ const { ekip, iletisim } = await icerik();
 const danisman = ekip.find((d) => d.slug === slug);
 if (!danisman) return Astro.rewrite('/404');
 
-const ilanlar = danisman.emlakjetSlug ? await danismaninIlanlari(danisman.emlakjetSlug) : [];
+const ilanlar = await danismaninIlanlari(danisman.slug);
 const bas = danisman.ad
   .split(' ')
   .map((p) => p[0])
@@ -26,7 +26,7 @@ const jsonLd = {
   name: danisman.ad,
   jobTitle: danisman.unvan,
   description: danisman.hakkinda,
-  telephone: iletisim.telefonHam,
+  telephone: iletisim.sabitHam,
   worksFor: { '@id': `${KURUM.site}/#kurum` },
   areaServed: bolgeler.map((b) => ({ '@type': 'City', name: b })),
 };
@@ -99,8 +99,8 @@ const jsonLd = {
             >
               WhatsApp’tan yaz
             </a>
-            <a href={`tel:${iletisim.telefonHam}`} class="dugme dugme--murekkep">
-              {iletisim.telefon}
+            <a href={`tel:${iletisim.sabitHam}`} class="dugme dugme--murekkep">
+              {iletisim.sabit}
             </a>
           </div>
 

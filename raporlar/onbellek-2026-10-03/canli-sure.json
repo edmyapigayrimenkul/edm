@@ -1,0 +1,49 @@
+{
+  "surum": "efc93bf7-f9f7-4ef6-8e86-3f1a31a3c491",
+  "ayniHttp2Baglantisi": true,
+  "yol": "/ilanlar?edm047_sure=1791027197919",
+  "adimlar": [
+    {
+      "ad": "MISS",
+      "durum": 200,
+      "onbellek": "MISS",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "merkez": "MXP",
+      "sha256": "740043d4008b6b7b0bbace20e3cad4e16ee196ae556a4c04a8a2410da1379c62",
+      "zaman": "2026-10-03T11:33:18.774Z"
+    },
+    {
+      "ad": "HIT",
+      "durum": 200,
+      "onbellek": "HIT",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "merkez": "MXP",
+      "sha256": "740043d4008b6b7b0bbace20e3cad4e16ee196ae556a4c04a8a2410da1379c62",
+      "zaman": "2026-10-03T11:33:19.141Z"
+    },
+    {
+      "ad": "sure-sonrasi-MISS",
+      "durum": 200,
+      "onbellek": "MISS",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "merkez": "MXP",
+      "sha256": "740043d4008b6b7b0bbace20e3cad4e16ee196ae556a4c04a8a2410da1379c62",
+      "zaman": "2026-10-03T11:34:21.770Z"
+    },
+    {
+      "ad": "sure-sonrasi-HIT",
+      "durum": 200,
+      "onbellek": "HIT",
+      "kontrol": "public, max-age=0, must-revalidate, s-maxage=60",
+      "merkez": "MXP",
+      "sha256": "740043d4008b6b7b0bbace20e3cad4e16ee196ae556a4c04a8a2410da1379c62",
+      "zaman": "2026-10-03T11:34:22.134Z"
+    }
+  ],
+  "sonuc": {
+    "gecti": true,
+    "olcumSaniye": 63.357,
+    "merkez": "MXP",
+    "uretimVerisiDegistirilmedi": true
+  }
+}

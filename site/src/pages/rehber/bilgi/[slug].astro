@@ -1,0 +1,128 @@
+---
+import Temel from '../../../layouts/Temel.astro';
+import { BILMENIZ_GEREKENLER, rehberGetir } from '../../../lib/bilmeniz-gerekenler';
+import { KURUM, whatsappBaglanti } from '../../../lib/site';
+
+const { slug } = Astro.params;
+const rehber = rehberGetir(slug || '');
+
+if (!rehber) {
+  return Astro.redirect('/404');
+}
+
+const digerRehberler = BILMENIZ_GEREKENLER.filter((r) => r.slug !== rehber.slug).slice(0, 2);
+const whatsappMesaji = `Merhaba, "${rehber.baslik}" konulu rehberinizi okudum. Bu durumla ilgili bir danışmanlık rica edebilir miyim?`;
+---
+
+<Temel
+  baslik={rehber.baslik}
+  aciklama={rehber.spot}
+>
+  <article class="pt-28 pb-20 lg:pt-36 lg:pb-28">
+    <div class="kab max-w-4xl">
+      <!-- Üst Gezinme -->
+      <div class="mb-6 flex flex-wrap items-center gap-2 text-xs text-metin-3">
+        <a href="/rehber/bilgi" class="hover:text-metin transition-colors">← Mutlaka Bilmeniz Gerekenler</a>
+        <span>/</span>
+        <span class="rounded bg-kagit-3 px-2 py-0.5 font-semibold text-metin-2">{rehber.sutunAdi}</span>
+        <span>·</span>
+        <span>{rehber.okunmaSuresi}</span>
+      </div>
+
+      <h1 class="font-serif text-2xl font-bold leading-tight text-metin sm:text-3xl lg:text-4xl">
+        {rehber.baslik}
+      </h1>
+      <p class="mt-4 text-base sm:text-lg leading-relaxed text-metin-2 font-medium border-l-4 border-kiremit pl-4">
+        {rehber.spot}
+      </p>
+
+      <div class="mt-6 rounded-lg bg-kagit-2 p-3.5 border border-cizgi text-xs sm:text-sm text-metin-2 flex items-center justify-between">
+        <div><strong class="text-metin">Yasal Dayanak:</strong> {rehber.yasalDayanak}</div>
+        <span class="text-xs text-metin-3 font-mono">{rehber.kod}</span>
+      </div>
+
+      <aside class="mt-5 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-sm leading-relaxed text-metin-2" aria-label="Bilgilendirme kapsamı">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <strong class="text-metin">Genel bilgilendirme</strong>
+          <span class="text-xs text-metin-3">Son güncelleme: {rehber.guncellemeTarihi}</span>
+        </div>
+        <p class="mt-1.5">{rehber.kapsamNotu}</p>
+        <ul class="mt-3 grid gap-1.5 text-xs">
+          {rehber.kaynaklar.map((kaynak) => (
+            <li><a href={kaynak.url} target="_blank" rel="noopener noreferrer" class="alt-cizgi text-metin hover:text-kiremit">{kaynak.ad} ↗</a></li>
+          ))}
+        </ul>
+      </aside>
+
+      <!-- 3 Kritik Kural -->
+      <div class="mt-10">
+        <h2 class="font-serif text-xl font-bold text-metin mb-4">Bu Durumda Bilmeniz Gereken 3 Temel Kural</h2>
+        <div class="grid gap-4 sm:grid-cols-3">
+          {rehber.kritikKurallar.map((k) => (
+            <div class={`rounded-xl p-5 border flex flex-col justify-between ${
+              k.renk === 'kirmizi'
+                ? 'border-kiremit/30 bg-kiremit/5'
+                : k.renk === 'altin'
+                ? 'border-amber-500/30 bg-amber-500/5'
+                : 'border-lacivert/20 bg-lacivert/5'
+            }`}>
+              <div>
+                <span class={`inline-block px-2 py-0.5 rounded text-[0.625rem] font-bold uppercase text-white mb-2 ${
+                  k.renk === 'kirmizi' ? 'bg-kiremit' : k.renk === 'altin' ? 'bg-amber-600' : 'bg-lacivert'
+                }`}>
+                  {k.etiket}
+                </span>
+                <h3 class="font-bold text-sm text-metin mb-2">{k.baslik}</h3>
+                <p class="text-xs leading-relaxed text-metin-2">{k.aciklama}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Çözüm Yol Haritası -->
+      <div class="mt-12 rounded-2xl border border-cizgi bg-kagit-1 p-6 sm:p-8">
+        <h2 class="font-serif text-xl font-bold text-metin mb-6">Adım Adım Hak Kaybını Önleme Protokolü</h2>
+        <div class="space-y-6">
+          {rehber.cozumAdimlari.map((adim) => (
+            <div class="flex items-start gap-4">
+              <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-lacivert text-sm font-bold text-kagit">
+                {adim.adimNo}
+              </div>
+              <div>
+                <h3 class="font-bold text-base text-metin">{adim.baslik}</h3>
+                <p class="mt-1 text-sm leading-relaxed text-metin-2">{adim.detay}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Uzman Tavsiyesi -->
+      <div class="mt-8 rounded-xl border border-cizgi bg-kagit-2 p-6">
+        <p class="etiket text-kiremit">EDM UZMAN TAVSİYESİ</p>
+        <p class="mt-2 text-sm sm:text-base leading-relaxed text-metin italic">
+          "{rehber.uzmanTavsiyesi}"
+        </p>
+      </div>
+
+      <!-- WhatsApp CTA -->
+      <div class="mt-10 rounded-2xl bg-[#0f172a] p-8 text-kagit flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div>
+          <h3 class="font-serif text-xl font-bold">Benzer bir durumla mı karşı karşıyasınız?</h3>
+          <p class="text-xs sm:text-sm text-kagit/80 mt-1">
+            Tapu, noter veya tahliye öncesinde uzman görüşü almak haklarınızı korur.
+          </p>
+        </div>
+        <a
+          href={whatsappBaglanti(whatsappMesaji)}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="shrink-0 rounded-lg bg-kiremit px-6 py-3 text-sm font-bold text-kagit hover:bg-kiremit/90 transition-colors"
+        >
+          WhatsApp ile Danışın
+        </a>
+      </div>
+    </div>
+  </article>
+</Temel>

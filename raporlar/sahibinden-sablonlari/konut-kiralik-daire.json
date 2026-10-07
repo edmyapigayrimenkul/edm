@@ -1,0 +1,3740 @@
+{
+  "source": {
+    "platform": "Sahibinden Pro Ofis",
+    "categoryPath": [
+      "Emlak",
+      "Konut",
+      "Kiralık",
+      "Daire"
+    ],
+    "categoryId": "16624",
+    "capturedAt": "2026-10-05",
+    "captureMethod": "Authenticated browser form DOM via DevTools console",
+    "scope": "Selected category form only; not the full Sahibinden category catalog",
+    "labelNotes": "displayLabel alanları görünen Pro Ofis form etiketlerinden eşleştirildi; label alanı ham DOM kimliğini korur."
+  },
+  "template": "konut-kiralik-daire",
+  "fields": [
+    {
+      "tag": "input",
+      "type": "text",
+      "name": "addClassifiedTitle",
+      "id": null,
+      "label": "addClassifiedTitle",
+      "required": true,
+      "placeholder": null,
+      "displayLabel": "İlan Başlığı"
+    },
+    {
+      "tag": "input",
+      "type": "text",
+      "name": "addClassifiedPrice",
+      "id": "addClassifiedPrice",
+      "label": "addClassifiedPrice",
+      "required": true,
+      "placeholder": null,
+      "displayLabel": "Fiyat"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "form[currencyType]",
+      "id": "addClassifiedPriceCurrency",
+      "label": "form[currencyType]",
+      "required": false,
+      "placeholder": null,
+      "options": [
+        {
+          "label": "TL"
+        }
+      ],
+      "displayLabel": "Para Birimi"
+    },
+    {
+      "tag": "input",
+      "type": "text",
+      "name": "a24",
+      "id": null,
+      "label": "a24",
+      "required": true,
+      "placeholder": null,
+      "displayLabel": "Brüt m²"
+    },
+    {
+      "tag": "input",
+      "type": "text",
+      "name": "a107889",
+      "id": null,
+      "label": "a107889",
+      "required": true,
+      "placeholder": null,
+      "displayLabel": "Net m²"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "a20",
+      "id": null,
+      "label": "a20",
+      "required": true,
+      "placeholder": null,
+      "options": [
+        {
+          "label": "Seçiniz"
+        },
+        {
+          "label": "Stüdyo (1+0)"
+        },
+        {
+          "label": "1+1"
+        },
+        {
+          "label": "1.5+1"
+        },
+        {
+          "label": "2+0"
+        },
+        {
+          "label": "2+1"
+        },
+        {
+          "label": "2.5+1"
+        },
+        {
+          "label": "2+2"
+        },
+        {
+          "label": "3+0"
+        },
+        {
+          "label": "3+1"
+        },
+        {
+          "label": "3.5+1"
+        },
+        {
+          "label": "3+2"
+        },
+        {
+          "label": "3+3"
+        },
+        {
+          "label": "4+0"
+        },
+        {
+          "label": "4+1"
+        },
+        {
+          "label": "4.5+1"
+        },
+        {
+          "label": "4.5+2"
+        },
+        {
+          "label": "4+2"
+        },
+        {
+          "label": "4+3"
+        },
+        {
+          "label": "4+4"
+        },
+        {
+          "label": "5+1"
+        },
+        {
+          "label": "5.5+1"
+        },
+        {
+          "label": "5+2"
+        },
+        {
+          "label": "5+3"
+        },
+        {
+          "label": "5+4"
+        },
+        {
+          "label": "6+1"
+        },
+        {
+          "label": "6+2"
+        },
+        {
+          "label": "6.5+1"
+        },
+        {
+          "label": "6+3"
+        },
+        {
+          "label": "6+4"
+        },
+        {
+          "label": "7+1"
+        },
+        {
+          "label": "7+2"
+        },
+        {
+          "label": "7+3"
+        },
+        {
+          "label": "8+1"
+        },
+        {
+          "label": "8+2"
+        },
+        {
+          "label": "8+3"
+        },
+        {
+          "label": "8+4"
+        },
+        {
+          "label": "9+1"
+        },
+        {
+          "label": "9+2"
+        },
+        {
+          "label": "9+3"
+        },
+        {
+          "label": "9+4"
+        },
+        {
+          "label": "9+5"
+        },
+        {
+          "label": "9+6"
+        },
+        {
+          "label": "10+1"
+        },
+        {
+          "label": "10+2"
+        },
+        {
+          "label": "10 Üzeri"
+        }
+      ],
+      "displayLabel": "Oda Sayısı"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "a812",
+      "id": null,
+      "label": "a812",
+      "required": true,
+      "placeholder": null,
+      "options": [
+        {
+          "label": "Seçiniz"
+        },
+        {
+          "label": "0 (Oturuma Hazır)"
+        },
+        {
+          "label": "1"
+        },
+        {
+          "label": "2"
+        },
+        {
+          "label": "3"
+        },
+        {
+          "label": "4"
+        },
+        {
+          "label": "5"
+        },
+        {
+          "label": "6-10 arası"
+        },
+        {
+          "label": "11-15 arası"
+        },
+        {
+          "label": "16-20 arası"
+        },
+        {
+          "label": "21-25 arası"
+        },
+        {
+          "label": "26-30 arası"
+        },
+        {
+          "label": "31 ve üzeri"
+        }
+      ],
+      "displayLabel": "Bina Yaşı"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "a810",
+      "id": null,
+      "label": "a810",
+      "required": true,
+      "placeholder": null,
+      "options": [
+        {
+          "label": "Seçiniz"
+        },
+        {
+          "label": "1"
+        },
+        {
+          "label": "2"
+        },
+        {
+          "label": "3"
+        },
+        {
+          "label": "4"
+        },
+        {
+          "label": "5"
+        },
+        {
+          "label": "6"
+        },
+        {
+          "label": "7"
+        },
+        {
+          "label": "8"
+        },
+        {
+          "label": "9"
+        },
+        {
+          "label": "10"
+        },
+        {
+          "label": "11"
+        },
+        {
+          "label": "12"
+        },
+        {
+          "label": "13"
+        },
+        {
+          "label": "14"
+        },
+        {
+          "label": "15"
+        },
+        {
+          "label": "16"
+        },
+        {
+          "label": "17"
+        },
+        {
+          "label": "18"
+        },
+        {
+          "label": "19"
+        },
+        {
+          "label": "20"
+        },
+        {
+          "label": "21"
+        },
+        {
+          "label": "22"
+        },
+        {
+          "label": "23"
+        },
+        {
+          "label": "24"
+        },
+        {
+          "label": "25"
+        },
+        {
+          "label": "26"
+        },
+        {
+          "label": "27"
+        },
+        {
+          "label": "28"
+        },
+        {
+          "label": "29"
+        },
+        {
+          "label": "30 ve üzeri"
+        }
+      ],
+      "displayLabel": "Kat Sayısı"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "a811",
+      "id": null,
+      "label": "a811",
+      "required": true,
+      "placeholder": null,
+      "options": [
+        {
+          "label": "Seçiniz"
+        },
+        {
+          "label": "Giriş Altı Kot"
+        },
+        {
+          "label": "Bodrum Kat"
+        },
+        {
+          "label": "Zemin Kat"
+        },
+        {
+          "label": "Bahçe Katı"
+        },
+        {
+          "label": "Giriş Katı"
+        },
+        {
+          "label": "Yüksek Giriş"
+        },
+        {
+          "label": "Çatı Katı"
+        },
+        {
+          "label": "1"
+        },
+        {
+          "label": "2"
+        },
+        {
+          "label": "3"
+        },
+        {
+          "label": "4"
+        },
+        {
+          "label": "5"
+        },
+        {
+          "label": "6"
+        },
+        {
+          "label": "7"
+        },
+        {
+          "label": "8"
+        },
+        {
+          "label": "9"
+        },
+        {
+          "label": "10"
+        },
+        {
+          "label": "11"
+        },
+        {
+          "label": "12"
+        },
+        {
+          "label": "13"
+        },
+        {
+          "label": "14"
+        },
+        {
+          "label": "15"
+        },
+        {
+          "label": "16"
+        },
+        {
+          "label": "17"
+        },
+        {
+          "label": "18"
+        },
+        {
+          "label": "19"
+        },
+        {
+          "label": "20"
+        },
+        {
+          "label": "21"
+        },
+        {
+          "label": "22"
+        },
+        {
+          "label": "23"
+        },
+        {
+          "label": "24"
+        },
+        {
+          "label": "25"
+        },
+        {
+          "label": "26"
+        },
+        {
+          "label": "27"
+        },
+        {
+          "label": "28"
+        },
+        {
+          "label": "29"
+        },
+        {
+          "label": "30 ve üzeri"
+        }
+      ],
+      "displayLabel": "Bulunduğu Kat"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "a23",
+      "id": null,
+      "label": "a23",
+      "required": true,
+      "placeholder": null,
+      "options": [
+        {
+          "label": "Seçiniz"
+        },
+        {
+          "label": "Yok"
+        },
+        {
+          "label": "Soba"
+        },
+        {
+          "label": "Doğalgaz Sobası"
+        },
+        {
+          "label": "Kat Kaloriferi"
+        },
+        {
+          "label": "Merkezi"
+        },
+        {
+          "label": "Merkezi (Pay Ölçer)"
+        },
+        {
+          "label": "Kombi (Doğalgaz)"
+        },
+        {
+          "label": "Kombi (Elektrik)"
+        },
+        {
+          "label": "Yerden Isıtma"
+        },
+        {
+          "label": "Klima"
+        },
+        {
+          "label": "Fancoil Ünitesi"
+        },
+        {
+          "label": "Güneş Enerjisi"
+        },
+        {
+          "label": "Elektrikli Radyatör"
+        },
+        {
+          "label": "Jeotermal"
+        },
+        {
+          "label": "Şömine"
+        },
+        {
+          "label": "VRV"
+        },
+        {
+          "label": "Isı Pompası"
+        }
+      ],
+      "displayLabel": "Isıtma"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "a22",
+      "id": null,
+      "label": "a22",
+      "required": true,
+      "placeholder": null,
+      "options": [
+        {
+          "label": "Seçiniz"
+        },
+        {
+          "label": "Yok"
+        },
+        {
+          "label": "1"
+        },
+        {
+          "label": "2"
+        },
+        {
+          "label": "3"
+        },
+        {
+          "label": "4"
+        },
+        {
+          "label": "5"
+        },
+        {
+          "label": "6"
+        },
+        {
+          "label": "6 Üzeri"
+        }
+      ],
+      "displayLabel": "Banyo Sayısı"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "a118798",
+      "id": null,
+      "label": "a118798",
+      "required": true,
+      "placeholder": null,
+      "options": [
+        {
+          "label": "Seçiniz"
+        },
+        {
+          "label": "Açık (Amerikan)"
+        },
+        {
+          "label": "Kapalı"
+        }
+      ],
+      "displayLabel": "Mutfak"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "a106960",
+      "id": null,
+      "label": "a106960",
+      "required": true,
+      "placeholder": null,
+      "options": [
+        {
+          "label": "Seçiniz"
+        },
+        {
+          "label": "Var"
+        },
+        {
+          "label": "Yok"
+        }
+      ],
+      "displayLabel": "Balkon"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "a116768",
+      "id": null,
+      "label": "a116768",
+      "required": true,
+      "placeholder": null,
+      "options": [
+        {
+          "label": "Seçiniz"
+        },
+        {
+          "label": "Var"
+        },
+        {
+          "label": "Yok"
+        }
+      ],
+      "displayLabel": "Asansör"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "a116769",
+      "id": null,
+      "label": "a116769",
+      "required": true,
+      "placeholder": null,
+      "options": [
+        {
+          "label": "Seçiniz"
+        },
+        {
+          "label": "Açık Otopark"
+        },
+        {
+          "label": "Kapalı Otopark"
+        },
+        {
+          "label": "Açık & Kapalı Otopark"
+        },
+        {
+          "label": "Yok"
+        }
+      ],
+      "displayLabel": "Otopark"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": "a103713",
+      "id": "a103713",
+      "label": "a103713",
+      "required": false,
+      "placeholder": null,
+      "displayLabel": "Eşyalı",
+      "categoryGroup": "Genel özellikler"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "a98426",
+      "id": null,
+      "label": "a98426",
+      "required": true,
+      "placeholder": null,
+      "options": [
+        {
+          "label": "Seçiniz"
+        },
+        {
+          "label": "Boş"
+        },
+        {
+          "label": "Kiracılı"
+        },
+        {
+          "label": "Mülk Sahibi"
+        }
+      ],
+      "displayLabel": "Kullanım Durumu"
+    },
+    {
+      "tag": "input",
+      "type": "text",
+      "name": "a104239",
+      "id": null,
+      "label": "a104239",
+      "required": false,
+      "placeholder": null,
+      "displayLabel": "Aidat (TL)"
+    },
+    {
+      "tag": "input",
+      "type": "text",
+      "name": "a108238",
+      "id": null,
+      "label": "a108238",
+      "required": false,
+      "placeholder": null,
+      "displayLabel": "Depozito (TL)"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "a121236",
+      "id": null,
+      "label": "a121236",
+      "required": false,
+      "placeholder": null,
+      "options": [
+        {
+          "label": "Seçiniz"
+        },
+        {
+          "label": "A"
+        },
+        {
+          "label": "B"
+        },
+        {
+          "label": "C"
+        },
+        {
+          "label": "D"
+        },
+        {
+          "label": "E"
+        },
+        {
+          "label": "F"
+        },
+        {
+          "label": "G"
+        }
+      ],
+      "displayLabel": "Enerji Kimlik Belgesi"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "a118494",
+      "id": null,
+      "label": "a118494",
+      "required": true,
+      "placeholder": null,
+      "options": [
+        {
+          "label": "Seçiniz"
+        },
+        {
+          "label": "T.C. vatandaşı"
+        },
+        {
+          "label": "T.C. vatandaşı değil"
+        },
+        {
+          "label": "Banka / Vakıf / Dernek / Sendika"
+        },
+        {
+          "label": "Kamu Kurumu"
+        }
+      ],
+      "displayLabel": "Kimden"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "a115950",
+      "id": null,
+      "label": "a115950",
+      "required": true,
+      "placeholder": null,
+      "options": [
+        {
+          "label": "Seçiniz"
+        },
+        {
+          "label": "Kat Mülkiyetli"
+        },
+        {
+          "label": "Kat İrtifaklı"
+        },
+        {
+          "label": "Hisseli Tapu"
+        },
+        {
+          "label": "Müstakil Tapulu"
+        },
+        {
+          "label": "Arsa Tapulu"
+        },
+        {
+          "label": "Kooperatif Hisseli Tapu"
+        },
+        {
+          "label": "İntifa Hakkı Tesisli"
+        },
+        {
+          "label": "Yurt Dışı Tapulu"
+        },
+        {
+          "label": "Tapu Kaydı Yok"
+        }
+      ],
+      "displayLabel": "Tapu Durumu"
+    },
+    {
+      "tag": "input",
+      "type": "text",
+      "name": "a117822",
+      "id": null,
+      "label": "a117822",
+      "required": false,
+      "placeholder": null,
+      "displayLabel": "Taşınmaz Numarası"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "city",
+      "id": null,
+      "label": "İl",
+      "required": true,
+      "placeholder": null,
+      "displayLabel": "İl"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "town",
+      "id": null,
+      "label": "İlçe",
+      "required": true,
+      "placeholder": null,
+      "displayLabel": "İlçe"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "quarter",
+      "id": null,
+      "label": "Mahalle",
+      "required": true,
+      "placeholder": null,
+      "displayLabel": "Mahalle"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "inApartmentComplex",
+      "id": null,
+      "label": "Site içerisinde mi?",
+      "required": true,
+      "placeholder": null,
+      "options": [
+        {
+          "label": "Seçiniz"
+        },
+        {
+          "label": "Evet"
+        },
+        {
+          "label": "Hayır"
+        }
+      ],
+      "displayLabel": "Site içerisinde mi?"
+    },
+    {
+      "tag": "input",
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": "",
+      "required": false,
+      "placeholder": "Eklemek istediğiniz sitenin adını giriniz"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr0sub0",
+      "label": "Batı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Cephe"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr0sub1",
+      "label": "Doğu",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Cephe"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr0sub2",
+      "label": "Güney",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Cephe"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr0sub3",
+      "label": "Kuzey",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Cephe"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": "detail_attr_group_28375",
+      "id": "dontSelect0",
+      "label": "Cephe seçimi yapmak istemiyorum",
+      "required": true,
+      "placeholder": null,
+      "categoryGroup": "Cephe"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub0",
+      "label": "ADSL",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub1",
+      "label": "Ahşap Doğrama",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub2",
+      "label": "Akıllı Ev",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub3",
+      "label": "Alarm (Hırsız)",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub4",
+      "label": "Alarm (Yangın)",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub5",
+      "label": "Alaturka Tuvalet",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub6",
+      "label": "Alüminyum Doğrama",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub7",
+      "label": "Amerikan Kapı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub8",
+      "label": "Ankastre Fırın",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub9",
+      "label": "Barbekü",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub10",
+      "label": "Beyaz Eşya",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub11",
+      "label": "Boyalı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub12",
+      "label": "Bulaşık Makinesi",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub13",
+      "label": "Buzdolabı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub14",
+      "label": "Çamaşır Kurutma Makinesi",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub15",
+      "label": "Çamaşır Makinesi",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub16",
+      "label": "Çamaşır Odası",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub17",
+      "label": "Çelik Kapı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub18",
+      "label": "Duşakabin",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub19",
+      "label": "Duvar Kağıdı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub20",
+      "label": "Ebeveyn Banyosu",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub21",
+      "label": "Fırın",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub22",
+      "label": "Fiber İnternet",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub23",
+      "label": "Giyinme Odası",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub24",
+      "label": "Gömme Dolap",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub25",
+      "label": "Görüntülü Diyafon",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub26",
+      "label": "Hilton Banyo",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub27",
+      "label": "Intercom Sistemi",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub28",
+      "label": "Isıcam",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub29",
+      "label": "Jakuzi",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub30",
+      "label": "Kapalı / Cam Balkon",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub31",
+      "label": "Kartonpiyer",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub32",
+      "label": "Kiler",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub33",
+      "label": "Klima",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub34",
+      "label": "Küvet",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub35",
+      "label": "Laminat Zemin",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub36",
+      "label": "Marley",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub37",
+      "label": "Mobilya",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub38",
+      "label": "Mutfak (Ankastre)",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub39",
+      "label": "Mutfak (Laminat)",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub40",
+      "label": "Mutfak Doğalgazı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub41",
+      "label": "Panjur/Jaluzi",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub42",
+      "label": "Parke Zemin",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub43",
+      "label": "PVC Doğrama",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub44",
+      "label": "Seramik Zemin",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub45",
+      "label": "Set Üstü Ocak",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub46",
+      "label": "Spot Aydınlatma",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub47",
+      "label": "Şofben",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub48",
+      "label": "Şömine",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub49",
+      "label": "Teras",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub50",
+      "label": "Termosifon",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub51",
+      "label": "Vestiyer",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr1sub52",
+      "label": "Yüz Tanıma & Parmak İzi",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": "detail_attr_group_11440",
+      "id": "dontSelect1",
+      "label": "İç Özellikler seçimi yapmak istemiyorum",
+      "required": true,
+      "placeholder": null,
+      "categoryGroup": "İç Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub0",
+      "label": "Araç Şarj İstasyonu",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub1",
+      "label": "24 Saat Güvenlik",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub2",
+      "label": "Apartman Görevlisi",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub3",
+      "label": "Buhar Odası",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub4",
+      "label": "Çocuk Oyun Parkı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub5",
+      "label": "Hamam",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub6",
+      "label": "Hidrofor",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub7",
+      "label": "Isı Yalıtımı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub8",
+      "label": "Jeneratör",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub9",
+      "label": "Kablo TV",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub10",
+      "label": "Kamera Sistemi",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub11",
+      "label": "Köpek Parkı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub12",
+      "label": "Kreş",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub13",
+      "label": "Müstakil Havuzlu",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub14",
+      "label": "Sauna",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub15",
+      "label": "Ses Yalıtımı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub16",
+      "label": "Siding",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub17",
+      "label": "Spor Alanı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub18",
+      "label": "Su Deposu",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub19",
+      "label": "Tenis Kortu",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub20",
+      "label": "Uydu",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub21",
+      "label": "Yangın Merdiveni",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub22",
+      "label": "Yüzme Havuzu (Açık)",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr2sub23",
+      "label": "Yüzme Havuzu (Kapalı)",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": "detail_attr_group_11475",
+      "id": "dontSelect2",
+      "label": "Dış Özellikler seçimi yapmak istemiyorum",
+      "required": true,
+      "placeholder": null,
+      "categoryGroup": "Dış Özellikler"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub0",
+      "label": "Alışveriş Merkezi",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub1",
+      "label": "Belediye",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub2",
+      "label": "Cami",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub3",
+      "label": "Cemevi",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub4",
+      "label": "Denize Sıfır",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub5",
+      "label": "Eczane",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub6",
+      "label": "Eğlence Merkezi",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub7",
+      "label": "Fuar",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub8",
+      "label": "Göle Sıfır",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub9",
+      "label": "Hastane",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub10",
+      "label": "Havra",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub11",
+      "label": "İlkokul-Ortaokul",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub12",
+      "label": "İtfaiye",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub13",
+      "label": "Kilise",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub14",
+      "label": "Lise",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub15",
+      "label": "Market",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub16",
+      "label": "Park",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub17",
+      "label": "Plaj",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub18",
+      "label": "Polis Merkezi",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub19",
+      "label": "Sağlık Ocağı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub20",
+      "label": "Semt Pazarı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub21",
+      "label": "Spor Salonu",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub22",
+      "label": "Şehir Merkezi",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr3sub23",
+      "label": "Üniversite",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": "detail_attr_group_11479",
+      "id": "dontSelect3",
+      "label": "Muhit seçimi yapmak istemiyorum",
+      "required": true,
+      "placeholder": null,
+      "categoryGroup": "Muhit"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub0",
+      "label": "Anayol",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub1",
+      "label": "Avrasya Tüneli",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub2",
+      "label": "Boğaz Köprüleri",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub3",
+      "label": "Cadde",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub4",
+      "label": "Deniz Otobüsü",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub5",
+      "label": "Dolmuş",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub6",
+      "label": "E-5",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub7",
+      "label": "Havaalanı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub8",
+      "label": "İskele",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub9",
+      "label": "Marmaray",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub10",
+      "label": "Metro",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub11",
+      "label": "Metrobüs",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub12",
+      "label": "Minibüs",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub13",
+      "label": "Otobüs Durağı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub14",
+      "label": "Sahil",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub15",
+      "label": "TEM",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub16",
+      "label": "Tramvay",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr4sub17",
+      "label": "Tren İstasyonu",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": "detail_attr_group_11503",
+      "id": "dontSelect4",
+      "label": "Ulaşım seçimi yapmak istemiyorum",
+      "required": true,
+      "placeholder": null,
+      "categoryGroup": "Ulaşım"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr5sub0",
+      "label": "Boğaz",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Manzara"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr5sub1",
+      "label": "Deniz",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Manzara"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr5sub2",
+      "label": "Doğa",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Manzara"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr5sub3",
+      "label": "Göl",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Manzara"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr5sub4",
+      "label": "Havuz",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Manzara"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr5sub5",
+      "label": "Nehir",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Manzara"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr5sub6",
+      "label": "Park & Yeşil Alan",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Manzara"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr5sub7",
+      "label": "Şehir",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Manzara"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": "detail_attr_group_11509",
+      "id": "dontSelect5",
+      "label": "Manzara seçimi yapmak istemiyorum",
+      "required": true,
+      "placeholder": null,
+      "categoryGroup": "Manzara"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr6sub0",
+      "label": "Ara Kat Dubleks",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Konut Tipi"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr6sub1",
+      "label": "Dubleks",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Konut Tipi"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr6sub2",
+      "label": "En Üst Kat",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Konut Tipi"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr6sub3",
+      "label": "Bahçe Dubleksi",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Konut Tipi"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr6sub4",
+      "label": "Çatı Dubleksi",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Konut Tipi"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr6sub5",
+      "label": "Forleks",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Konut Tipi"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr6sub6",
+      "label": "Ters Dubleks",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Konut Tipi"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr6sub7",
+      "label": "Tripleks",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Konut Tipi"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": "detail_attr_group_11511",
+      "id": "dontSelect6",
+      "label": "Konut Tipi seçimi yapmak istemiyorum",
+      "required": true,
+      "placeholder": null,
+      "categoryGroup": "Konut Tipi"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr7sub0",
+      "label": "Araç Park Yeri",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr7sub1",
+      "label": "Engelliye Uygun Asansör",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr7sub2",
+      "label": "Engelliye Uygun Banyo",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr7sub3",
+      "label": "Engelliye Uygun Mutfak",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr7sub4",
+      "label": "Engelliye Uygun Park",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr7sub5",
+      "label": "Geniş Koridor",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr7sub6",
+      "label": "Giriş / Rampa",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr7sub7",
+      "label": "Merdiven",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr7sub8",
+      "label": "Oda Kapısı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr7sub9",
+      "label": "Priz / Elektrik Anahtarı",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr7sub10",
+      "label": "Tutamak / Korkuluk",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr7sub11",
+      "label": "Tuvalet",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "detailAttr7sub12",
+      "label": "Yüzme Havuzu",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": "detail_attr_group_105720",
+      "id": "dontSelect7",
+      "label": "Engelliye ve Yaşlıya Uygun seçimi yapmak istemiyorum",
+      "required": true,
+      "placeholder": null,
+      "categoryGroup": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "enhancePhoto",
+      "label": "Fotoğraflarınız Sahibinden.com'un akıllı FotoBot teknolojisi ile ÜCRETSİZ olarak iyileştirilsin.",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ortak ilan alanları"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "promoThumbnail",
+      "label": "İLANINIZ LİSTELERDE FOTOĞRAFIYLA GÖRÜNSÜN: Küçük Fotoğraf Dopingi (Kurumsal hesap sahibi olduğunuz için ücretsizdir.)",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ortak ilan alanları"
+    },
+    {
+      "tag": "input",
+      "type": "radio",
+      "name": "selectVirtualTour",
+      "id": "virtual-1",
+      "label": "Sanal Turlarımdan seç",
+      "required": false,
+      "placeholder": null
+    },
+    {
+      "tag": "input",
+      "type": "radio",
+      "name": "selectVirtualTour",
+      "id": "virtual-2",
+      "label": "Matterport ya da Immoviewer adresinden link ekle",
+      "required": false,
+      "placeholder": null
+    },
+    {
+      "tag": "input",
+      "type": "radio",
+      "name": "selectVirtualTour",
+      "id": "virtual-0",
+      "label": "Sanal Tur eklemeden devam et",
+      "required": false,
+      "placeholder": null
+    },
+    {
+      "tag": "input",
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": "",
+      "required": false,
+      "placeholder": "Sanal Tur Ara"
+    },
+    {
+      "tag": "textarea",
+      "type": "textarea",
+      "name": "classifiedNote",
+      "id": null,
+      "label": "classifiedNote",
+      "required": false,
+      "placeholder": null
+    },
+    {
+      "tag": "input",
+      "type": "radio",
+      "name": "form[contactPreferencePhone]",
+      "id": "enableShowPhone",
+      "label": "İlanda telefon numaram yayınlansın",
+      "required": false,
+      "placeholder": null
+    },
+    {
+      "tag": "input",
+      "type": "radio",
+      "name": "form[contactPreferencePhone]",
+      "id": "showPhone",
+      "label": "İlanımda telefon numaramın yayınlanmasını istemiyorum.",
+      "required": false,
+      "placeholder": null
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": "form[contactPreferenceMessage]",
+      "id": "showSendMessage",
+      "label": "Diğer kullanıcılardan sistem üzerinden mesaj almak istemiyorum.",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ortak ilan alanları"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": "postRulesCheck",
+      "id": "postRulesCheck",
+      "label": "postRulesCheck",
+      "required": true,
+      "placeholder": null,
+      "categoryGroup": "Ortak ilan alanları"
+    },
+    {
+      "tag": "input",
+      "type": "radio",
+      "name": null,
+      "id": null,
+      "label": "",
+      "required": false,
+      "placeholder": null
+    },
+    {
+      "tag": "input",
+      "type": "radio",
+      "name": null,
+      "id": null,
+      "label": "",
+      "required": false,
+      "placeholder": null
+    },
+    {
+      "tag": "input",
+      "type": "radio",
+      "name": "ccVerificationRadio",
+      "id": "ccVerificationRadio",
+      "label": "ccVerificationRadio",
+      "required": false,
+      "placeholder": null
+    },
+    {
+      "tag": "input",
+      "type": "text",
+      "name": "name",
+      "id": null,
+      "label": "name",
+      "required": false,
+      "placeholder": null
+    },
+    {
+      "tag": "input",
+      "type": "text",
+      "name": "phoneNumber",
+      "id": null,
+      "label": "phoneNumber",
+      "required": false,
+      "placeholder": "(5__) ___ ____"
+    },
+    {
+      "tag": "input",
+      "type": "text",
+      "name": "identityNumber",
+      "id": null,
+      "label": "identityNumber",
+      "required": true,
+      "placeholder": null
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "country",
+      "id": null,
+      "label": "country",
+      "required": true,
+      "placeholder": null
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "city",
+      "id": null,
+      "label": "city",
+      "required": true,
+      "placeholder": null,
+      "displayLabel": "İl"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "town",
+      "id": null,
+      "label": "town",
+      "required": true,
+      "placeholder": null,
+      "displayLabel": "İlçe"
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "quarter",
+      "id": null,
+      "label": "quarter",
+      "required": true,
+      "placeholder": null,
+      "displayLabel": "Mahalle"
+    },
+    {
+      "tag": "textarea",
+      "type": "textarea",
+      "name": "address",
+      "id": null,
+      "label": "address",
+      "required": true,
+      "placeholder": "Semt, cadde vb. bilgiler"
+    },
+    {
+      "tag": "input",
+      "type": "tel",
+      "name": "phoneNumber",
+      "id": "phoneNumber",
+      "label": "phoneNumber",
+      "required": true,
+      "placeholder": "05__ ___ __ __"
+    },
+    {
+      "tag": "input",
+      "type": "tel",
+      "name": "verifyCode",
+      "id": "verifyCode",
+      "label": "verifyCode",
+      "required": true,
+      "placeholder": "______"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "representsPhoto",
+      "label": "representsPhoto",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ortak ilan alanları"
+    },
+    {
+      "tag": "input",
+      "type": "checkbox",
+      "name": null,
+      "id": "selectedImageRepresentsPhoto",
+      "label": "selectedImageRepresentsPhoto",
+      "required": false,
+      "placeholder": null,
+      "categoryGroup": "Ortak ilan alanları"
+    },
+    {
+      "tag": "input",
+      "type": "range",
+      "name": null,
+      "id": null,
+      "label": "",
+      "required": false,
+      "placeholder": null
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "country",
+      "id": null,
+      "label": "country",
+      "required": true,
+      "placeholder": null
+    },
+    {
+      "tag": "input",
+      "type": "text",
+      "name": "suggestedValue",
+      "id": null,
+      "label": "suggestedValue",
+      "required": false,
+      "placeholder": null
+    },
+    {
+      "tag": "select",
+      "type": "select-one",
+      "name": "residenceInput",
+      "id": null,
+      "label": "residenceInput",
+      "required": false,
+      "placeholder": null
+    },
+    {
+      "tag": "input",
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": "",
+      "required": false,
+      "placeholder": "E-posta Adresi"
+    },
+    {
+      "tag": "input",
+      "type": "password",
+      "name": null,
+      "id": null,
+      "label": "",
+      "required": true,
+      "placeholder": "Şifre"
+    }
+  ],
+  "detailGroups": [
+    {
+      "label": "a103713",
+      "group": "Genel özellikler"
+    },
+    {
+      "label": "Batı",
+      "group": "Cephe"
+    },
+    {
+      "label": "Doğu",
+      "group": "Cephe"
+    },
+    {
+      "label": "Güney",
+      "group": "Cephe"
+    },
+    {
+      "label": "Kuzey",
+      "group": "Cephe"
+    },
+    {
+      "label": "Cephe seçimi yapmak istemiyorum",
+      "group": "Cephe"
+    },
+    {
+      "label": "ADSL",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Ahşap Doğrama",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Akıllı Ev",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Alarm (Hırsız)",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Alarm (Yangın)",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Alaturka Tuvalet",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Alüminyum Doğrama",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Amerikan Kapı",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Ankastre Fırın",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Barbekü",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Beyaz Eşya",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Boyalı",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Bulaşık Makinesi",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Buzdolabı",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Çamaşır Kurutma Makinesi",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Çamaşır Makinesi",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Çamaşır Odası",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Çelik Kapı",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Duşakabin",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Duvar Kağıdı",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Ebeveyn Banyosu",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Fırın",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Fiber İnternet",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Giyinme Odası",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Gömme Dolap",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Görüntülü Diyafon",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Hilton Banyo",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Intercom Sistemi",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Isıcam",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Jakuzi",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Kapalı / Cam Balkon",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Kartonpiyer",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Kiler",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Klima",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Küvet",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Laminat Zemin",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Marley",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Mobilya",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Mutfak (Ankastre)",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Mutfak (Laminat)",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Mutfak Doğalgazı",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Panjur/Jaluzi",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Parke Zemin",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "PVC Doğrama",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Seramik Zemin",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Set Üstü Ocak",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Spot Aydınlatma",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Şofben",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Şömine",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Teras",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Termosifon",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Vestiyer",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Yüz Tanıma & Parmak İzi",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "İç Özellikler seçimi yapmak istemiyorum",
+      "group": "İç Özellikler"
+    },
+    {
+      "label": "Araç Şarj İstasyonu",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "24 Saat Güvenlik",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Apartman Görevlisi",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Buhar Odası",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Çocuk Oyun Parkı",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Hamam",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Hidrofor",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Isı Yalıtımı",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Jeneratör",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Kablo TV",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Kamera Sistemi",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Köpek Parkı",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Kreş",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Müstakil Havuzlu",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Sauna",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Ses Yalıtımı",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Siding",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Spor Alanı",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Su Deposu",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Tenis Kortu",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Uydu",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Yangın Merdiveni",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Yüzme Havuzu (Açık)",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Yüzme Havuzu (Kapalı)",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Dış Özellikler seçimi yapmak istemiyorum",
+      "group": "Dış Özellikler"
+    },
+    {
+      "label": "Alışveriş Merkezi",
+      "group": "Muhit"
+    },
+    {
+      "label": "Belediye",
+      "group": "Muhit"
+    },
+    {
+      "label": "Cami",
+      "group": "Muhit"
+    },
+    {
+      "label": "Cemevi",
+      "group": "Muhit"
+    },
+    {
+      "label": "Denize Sıfır",
+      "group": "Muhit"
+    },
+    {
+      "label": "Eczane",
+      "group": "Muhit"
+    },
+    {
+      "label": "Eğlence Merkezi",
+      "group": "Muhit"
+    },
+    {
+      "label": "Fuar",
+      "group": "Muhit"
+    },
+    {
+      "label": "Göle Sıfır",
+      "group": "Muhit"
+    },
+    {
+      "label": "Hastane",
+      "group": "Muhit"
+    },
+    {
+      "label": "Havra",
+      "group": "Muhit"
+    },
+    {
+      "label": "İlkokul-Ortaokul",
+      "group": "Muhit"
+    },
+    {
+      "label": "İtfaiye",
+      "group": "Muhit"
+    },
+    {
+      "label": "Kilise",
+      "group": "Muhit"
+    },
+    {
+      "label": "Lise",
+      "group": "Muhit"
+    },
+    {
+      "label": "Market",
+      "group": "Muhit"
+    },
+    {
+      "label": "Park",
+      "group": "Muhit"
+    },
+    {
+      "label": "Plaj",
+      "group": "Muhit"
+    },
+    {
+      "label": "Polis Merkezi",
+      "group": "Muhit"
+    },
+    {
+      "label": "Sağlık Ocağı",
+      "group": "Muhit"
+    },
+    {
+      "label": "Semt Pazarı",
+      "group": "Muhit"
+    },
+    {
+      "label": "Spor Salonu",
+      "group": "Muhit"
+    },
+    {
+      "label": "Şehir Merkezi",
+      "group": "Muhit"
+    },
+    {
+      "label": "Üniversite",
+      "group": "Muhit"
+    },
+    {
+      "label": "Muhit seçimi yapmak istemiyorum",
+      "group": "Muhit"
+    },
+    {
+      "label": "Anayol",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "Avrasya Tüneli",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "Boğaz Köprüleri",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "Cadde",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "Deniz Otobüsü",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "Dolmuş",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "E-5",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "Havaalanı",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "İskele",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "Marmaray",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "Metro",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "Metrobüs",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "Minibüs",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "Otobüs Durağı",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "Sahil",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "TEM",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "Tramvay",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "Tren İstasyonu",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "Ulaşım seçimi yapmak istemiyorum",
+      "group": "Ulaşım"
+    },
+    {
+      "label": "Boğaz",
+      "group": "Manzara"
+    },
+    {
+      "label": "Deniz",
+      "group": "Manzara"
+    },
+    {
+      "label": "Doğa",
+      "group": "Manzara"
+    },
+    {
+      "label": "Göl",
+      "group": "Manzara"
+    },
+    {
+      "label": "Havuz",
+      "group": "Manzara"
+    },
+    {
+      "label": "Nehir",
+      "group": "Manzara"
+    },
+    {
+      "label": "Park & Yeşil Alan",
+      "group": "Manzara"
+    },
+    {
+      "label": "Şehir",
+      "group": "Manzara"
+    },
+    {
+      "label": "Manzara seçimi yapmak istemiyorum",
+      "group": "Manzara"
+    },
+    {
+      "label": "Ara Kat Dubleks",
+      "group": "Konut Tipi"
+    },
+    {
+      "label": "Dubleks",
+      "group": "Konut Tipi"
+    },
+    {
+      "label": "En Üst Kat",
+      "group": "Konut Tipi"
+    },
+    {
+      "label": "Bahçe Dubleksi",
+      "group": "Konut Tipi"
+    },
+    {
+      "label": "Çatı Dubleksi",
+      "group": "Konut Tipi"
+    },
+    {
+      "label": "Forleks",
+      "group": "Konut Tipi"
+    },
+    {
+      "label": "Ters Dubleks",
+      "group": "Konut Tipi"
+    },
+    {
+      "label": "Tripleks",
+      "group": "Konut Tipi"
+    },
+    {
+      "label": "Konut Tipi seçimi yapmak istemiyorum",
+      "group": "Konut Tipi"
+    },
+    {
+      "label": "Araç Park Yeri",
+      "group": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "label": "Engelliye Uygun Asansör",
+      "group": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "label": "Engelliye Uygun Banyo",
+      "group": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "label": "Engelliye Uygun Mutfak",
+      "group": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "label": "Engelliye Uygun Park",
+      "group": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "label": "Geniş Koridor",
+      "group": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "label": "Giriş / Rampa",
+      "group": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "label": "Merdiven",
+      "group": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "label": "Oda Kapısı",
+      "group": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "label": "Priz / Elektrik Anahtarı",
+      "group": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "label": "Tutamak / Korkuluk",
+      "group": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "label": "Tuvalet",
+      "group": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "label": "Yüzme Havuzu",
+      "group": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "label": "Engelliye ve Yaşlıya Uygun seçimi yapmak istemiyorum",
+      "group": "Engelliye ve Yaşlıya Uygun"
+    },
+    {
+      "label": "Fotoğraflarınız Sahibinden.com'un akıllı FotoBot teknolojisi ile ÜCRETSİZ olarak iyileştirilsin.",
+      "group": "Ortak ilan alanları"
+    },
+    {
+      "label": "İLANINIZ LİSTELERDE FOTOĞRAFIYLA GÖRÜNSÜN: Küçük Fotoğraf Dopingi (Kurumsal hesap sahibi olduğunuz için ücretsizdir.)",
+      "group": "Ortak ilan alanları"
+    },
+    {
+      "label": "Diğer kullanıcılardan sistem üzerinden mesaj almak istemiyorum.",
+      "group": "Ortak ilan alanları"
+    },
+    {
+      "label": "postRulesCheck",
+      "group": "Ortak ilan alanları"
+    },
+    {
+      "label": "representsPhoto",
+      "group": "Ortak ilan alanları"
+    },
+    {
+      "label": "selectedImageRepresentsPhoto",
+      "group": "Ortak ilan alanları"
+    }
+  ],
+  "counts": {
+    "formControls": 220,
+    "visibleCheckboxOptions": 167,
+    "selectControls": 25,
+    "note": "Checkbox options overlap checkbox controls in fields; these counts are not unique field counts.",
+    "detailSections": 8,
+    "detailOptionsGrouped": 167
+  },
+  "notes": [
+    "Tanımlı alanlardaki displayLabel, Sahibinden ekranında görünen Türkçe etikettir. Ham teknik name/label değerleri izlenebilirlik için korunmuştur. Form açıklaması zengin metin editörü olarak DOM dökümünde ayrıca görünür; ortak alan olarak tutulmalıdır.",
+    "Checkbox seçenekleri, sıralı “... seçimi yapmak istemiyorum” kontrolleriyle ekran gruplarına eşleştirildi; fotoğraf/iletişim/kural checkboxları ortak alan olarak ayrıldı. Bu eşlemenin alan sırası mevcut Kiralık Daire formundan alınmıştır; kapsam diğer kategorileri içermez.",
+    "Kişisel/seçilmiş kontrol değerleri ve Angular tarafından üretilen geçici option value kimlikleri çıkarıldı; il/ilçe/mahalle/ülke seçenek listeleri ortak adres bileşeninde kalır."
+  ],
+  "detailGroupSections": [
+    {
+      "label": "Genel özellikler",
+      "options": [
+        "a103713"
+      ],
+      "optionCount": 1
+    },
+    {
+      "label": "Cephe",
+      "options": [
+        "Batı",
+        "Doğu",
+        "Güney",
+        "Kuzey",
+        "Cephe seçimi yapmak istemiyorum"
+      ],
+      "optionCount": 5
+    },
+    {
+      "label": "İç Özellikler",
+      "options": [
+        "ADSL",
+        "Ahşap Doğrama",
+        "Akıllı Ev",
+        "Alarm (Hırsız)",
+        "Alarm (Yangın)",
+        "Alaturka Tuvalet",
+        "Alüminyum Doğrama",
+        "Amerikan Kapı",
+        "Ankastre Fırın",
+        "Barbekü",
+        "Beyaz Eşya",
+        "Boyalı",
+        "Bulaşık Makinesi",
+        "Buzdolabı",
+        "Çamaşır Kurutma Makinesi",
+        "Çamaşır Makinesi",
+        "Çamaşır Odası",
+        "Çelik Kapı",
+        "Duşakabin",
+        "Duvar Kağıdı",
+        "Ebeveyn Banyosu",
+        "Fırın",
+        "Fiber İnternet",
+        "Giyinme Odası",
+        "Gömme Dolap",
+        "Görüntülü Diyafon",
+        "Hilton Banyo",
+        "Intercom Sistemi",
+        "Isıcam",
+        "Jakuzi",
+        "Kapalı / Cam Balkon",
+        "Kartonpiyer",
+        "Kiler",
+        "Klima",
+        "Küvet",
+        "Laminat Zemin",
+        "Marley",
+        "Mobilya",
+        "Mutfak (Ankastre)",
+        "Mutfak (Laminat)",
+        "Mutfak Doğalgazı",
+        "Panjur/Jaluzi",
+        "Parke Zemin",
+        "PVC Doğrama",
+        "Seramik Zemin",
+        "Set Üstü Ocak",
+        "Spot Aydınlatma",
+        "Şofben",
+        "Şömine",
+        "Teras",
+        "Termosifon",
+        "Vestiyer",
+        "Yüz Tanıma & Parmak İzi",
+        "İç Özellikler seçimi yapmak istemiyorum"
+      ],
+      "optionCount": 54
+    },
+    {
+      "label": "Dış Özellikler",
+      "options": [
+        "Araç Şarj İstasyonu",
+        "24 Saat Güvenlik",
+        "Apartman Görevlisi",
+        "Buhar Odası",
+        "Çocuk Oyun Parkı",
+        "Hamam",
+        "Hidrofor",
+        "Isı Yalıtımı",
+        "Jeneratör",
+        "Kablo TV",
+        "Kamera Sistemi",
+        "Köpek Parkı",
+        "Kreş",
+        "Müstakil Havuzlu",
+        "Sauna",
+        "Ses Yalıtımı",
+        "Siding",
+        "Spor Alanı",
+        "Su Deposu",
+        "Tenis Kortu",
+        "Uydu",
+        "Yangın Merdiveni",
+        "Yüzme Havuzu (Açık)",
+        "Yüzme Havuzu (Kapalı)",
+        "Dış Özellikler seçimi yapmak istemiyorum"
+      ],
+      "optionCount": 25
+    },
+    {
+      "label": "Muhit",
+      "options": [
+        "Alışveriş Merkezi",
+        "Belediye",
+        "Cami",
+        "Cemevi",
+        "Denize Sıfır",
+        "Eczane",
+        "Eğlence Merkezi",
+        "Fuar",
+        "Göle Sıfır",
+        "Hastane",
+        "Havra",
+        "İlkokul-Ortaokul",
+        "İtfaiye",
+        "Kilise",
+        "Lise",
+        "Market",
+        "Park",
+        "Plaj",
+        "Polis Merkezi",
+        "Sağlık Ocağı",
+        "Semt Pazarı",
+        "Spor Salonu",
+        "Şehir Merkezi",
+        "Üniversite",
+        "Muhit seçimi yapmak istemiyorum"
+      ],
+      "optionCount": 25
+    },
+    {
+      "label": "Ulaşım",
+      "options": [
+        "Anayol",
+        "Avrasya Tüneli",
+        "Boğaz Köprüleri",
+        "Cadde",
+        "Deniz Otobüsü",
+        "Dolmuş",
+        "E-5",
+        "Havaalanı",
+        "İskele",
+        "Marmaray",
+        "Metro",
+        "Metrobüs",
+        "Minibüs",
+        "Otobüs Durağı",
+        "Sahil",
+        "TEM",
+        "Tramvay",
+        "Tren İstasyonu",
+        "Ulaşım seçimi yapmak istemiyorum"
+      ],
+      "optionCount": 19
+    },
+    {
+      "label": "Manzara",
+      "options": [
+        "Boğaz",
+        "Deniz",
+        "Doğa",
+        "Göl",
+        "Havuz",
+        "Nehir",
+        "Park & Yeşil Alan",
+        "Şehir",
+        "Manzara seçimi yapmak istemiyorum"
+      ],
+      "optionCount": 9
+    },
+    {
+      "label": "Konut Tipi",
+      "options": [
+        "Ara Kat Dubleks",
+        "Dubleks",
+        "En Üst Kat",
+        "Bahçe Dubleksi",
+        "Çatı Dubleksi",
+        "Forleks",
+        "Ters Dubleks",
+        "Tripleks",
+        "Konut Tipi seçimi yapmak istemiyorum"
+      ],
+      "optionCount": 9
+    },
+    {
+      "label": "Engelliye ve Yaşlıya Uygun",
+      "options": [
+        "Araç Park Yeri",
+        "Engelliye Uygun Asansör",
+        "Engelliye Uygun Banyo",
+        "Engelliye Uygun Mutfak",
+        "Engelliye Uygun Park",
+        "Geniş Koridor",
+        "Giriş / Rampa",
+        "Merdiven",
+        "Oda Kapısı",
+        "Priz / Elektrik Anahtarı",
+        "Tutamak / Korkuluk",
+        "Tuvalet",
+        "Yüzme Havuzu",
+        "Engelliye ve Yaşlıya Uygun seçimi yapmak istemiyorum"
+      ],
+      "optionCount": 14
+    },
+    {
+      "label": "Ortak ilan alanları",
+      "options": [
+        "Fotoğraflarınız Sahibinden.com'un akıllı FotoBot teknolojisi ile ÜCRETSİZ olarak iyileştirilsin.",
+        "İLANINIZ LİSTELERDE FOTOĞRAFIYLA GÖRÜNSÜN: Küçük Fotoğraf Dopingi (Kurumsal hesap sahibi olduğunuz için ücretsizdir.)",
+        "Diğer kullanıcılardan sistem üzerinden mesaj almak istemiyorum.",
+        "postRulesCheck",
+        "representsPhoto",
+        "selectedImageRepresentsPhoto"
+      ],
+      "optionCount": 6
+    }
+  ]
+}

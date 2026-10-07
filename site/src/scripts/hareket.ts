@@ -8,7 +8,7 @@
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from 'lenis';
+import type Lenis from 'lenis';
 
 const azHareket = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -45,11 +45,14 @@ export function hareketiDurdur(): void {
 /* ---------------------------------------------------------------
    Yumuşak kaydırma
    --------------------------------------------------------------- */
-function kaydirmaKur(): Lenis | null {
+async function kaydirmaKur(): Promise<Lenis | null> {
   if (azHareket) return null;
   // Dokunmatik cihazlarda yerel kaydırma zaten akıcı; araya girmiyoruz.
   if (window.matchMedia('(pointer: coarse)').matches) return null;
 
+  // Lenis yalnız masaüstünde kullanılıyor; dokunmatik cihazlarda bu ayrı
+  // parçayı indirmeyerek ortak istemci yükünü azalt.
+  const { default: Lenis } = await import('lenis');
   const lenis = new Lenis({
     duration: 1.05,
     easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -520,23 +523,51 @@ function menuKur() {
   const panel = document.querySelector<HTMLElement>('[data-menu-panel]');
   if (!dugme || !panel) return;
 
-  const kapat = () => {
+  const odaklanabilirleriBul = () =>
+    Array.from(
+      panel.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'),
+    ).filter((oge) => oge.getClientRects().length > 0);
+
+  const kapat = (odagiDondur = false) => {
     dugme.setAttribute('aria-expanded', 'false');
     panel.dataset.acik = 'hayir';
     document.documentElement.style.overflow = '';
+    if (odagiDondur) dugme.focus();
   };
   const ac = () => {
     dugme.setAttribute('aria-expanded', 'true');
     panel.dataset.acik = 'evet';
     document.documentElement.style.overflow = 'hidden';
+    // Görünürlük geçişi tamamlanmadan odak vermek bazı mobil tarayıcılarda
+    // odağı gövdeye düşürüyor; bir kare sonra ilk menü öğesine taşıyoruz.
+    requestAnimationFrame(() => odaklanabilirleriBul()[0]?.focus());
   };
 
   dugme.addEventListener('click', () => {
     dugme.getAttribute('aria-expanded') === 'true' ? kapat() : ac();
   });
-  panel.querySelectorAll('a').forEach((a) => a.addEventListener('click', kapat));
+  panel.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => kapat()));
   document.addEventListener('keydown', (o) => {
-    if (o.key === 'Escape') kapat();
+    if (dugme.getAttribute('aria-expanded') !== 'true') return;
+
+    if (o.key === 'Escape') {
+      o.preventDefault();
+      kapat(true);
+      return;
+    }
+
+    if (o.key !== 'Tab') return;
+    const odaklanabilirler = odaklanabilirleriBul();
+    if (!odaklanabilirler.length) return;
+    const ilk = odaklanabilirler[0];
+    const son = odaklanabilirler.at(-1);
+    if (o.shiftKey && document.activeElement === ilk) {
+      o.preventDefault();
+      son?.focus();
+    } else if (!o.shiftKey && document.activeElement === son) {
+      o.preventDefault();
+      ilk.focus();
+    }
   }, isaret());
 }
 

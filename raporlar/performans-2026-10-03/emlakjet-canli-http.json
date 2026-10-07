@@ -1,0 +1,68 @@
+{
+  "tarih": "2026-10-03T12:08:10.670Z",
+  "surum": "758b217e-84f7-4b58-8861-80368537c7fa",
+  "staging": "5d8db762-cd1d-4a8f-892a-ffe28e3df6c2",
+  "sonuclar": [
+    {
+      "yol": "/",
+      "durum": 200,
+      "cache": "private, no-store",
+      "emlakjetKucuk": 3,
+      "emlakjetKaynak": 3,
+      "yedek": 3,
+      "gizliEmlakjet": 0,
+      "galeriBaslangicBos": true
+    },
+    {
+      "yol": "/ilanlar",
+      "durum": 200,
+      "cache": "private, no-store",
+      "emlakjetKucuk": 19,
+      "emlakjetKaynak": 19,
+      "yedek": 19,
+      "gizliEmlakjet": 0,
+      "galeriBaslangicBos": true
+    },
+    {
+      "yol": "/favorilerim",
+      "durum": 200,
+      "cache": "private, no-store",
+      "emlakjetKucuk": 0,
+      "emlakjetKaynak": 0,
+      "yedek": 19,
+      "gizliEmlakjet": 19,
+      "galeriBaslangicBos": true
+    },
+    {
+      "yol": "/ilan/selimpasa-araptepede-kiralik-deniz-manzarali-7-2-villa-19797428",
+      "durum": 200,
+      "cache": "private, no-store",
+      "emlakjetKucuk": 6,
+      "emlakjetKaynak": 12,
+      "yedek": 6,
+      "gizliEmlakjet": 0,
+      "galeriBaslangicBos": true
+    },
+    {
+      "yol": "/api/senkron",
+      "durum": 200,
+      "cache": "no-store",
+      "emlakjetKucuk": 0,
+      "emlakjetKaynak": 0,
+      "yedek": 0,
+      "gizliEmlakjet": 0,
+      "galeriBaslangicBos": true
+    },
+    {
+      "yol": "/yonetim",
+      "durum": 302,
+      "cache": "private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "emlakjetKucuk": 0,
+      "emlakjetKaynak": 0,
+      "yedek": 0,
+      "gizliEmlakjet": 0,
+      "galeriBaslangicBos": true,
+      "access": true
+    }
+  ]
+}

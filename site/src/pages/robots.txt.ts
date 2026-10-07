@@ -1,9 +1,10 @@
 import type { APIRoute } from 'astro';
+import { env } from 'cloudflare:workers';
 import { KURUM } from '../lib/site';
 
 export const GET: APIRoute = () =>
   new Response(
-    `User-agent: *
+    (env as Record<string, unknown>).STAGING_ORTAMI === '1' ? 'User-agent: *\nDisallow: /\n' : `User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /yonetim/

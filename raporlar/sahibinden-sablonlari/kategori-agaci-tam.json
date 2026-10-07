@@ -1,0 +1,4237 @@
+{
+  "source": "Sahibinden Pro Ofis categoryService",
+  "capturedAt": "2026-10-05T15:58:57.471Z",
+  "scope": "Emlak",
+  "count": 355,
+  "leafCount": 336,
+  "errors": [],
+  "categories": [
+    {
+      "id": "3518",
+      "label": "Emlak",
+      "parentId": null,
+      "path": [
+        "Emlak"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "3613",
+      "label": "Konut",
+      "parentId": "3518",
+      "path": [
+        "Emlak",
+        "Konut"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "3620",
+      "label": "İş Yeri",
+      "parentId": "3518",
+      "path": [
+        "Emlak",
+        "İş Yeri"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "89789",
+      "label": "Arsa",
+      "parentId": "3518",
+      "path": [
+        "Emlak",
+        "Arsa"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "3615",
+      "label": "Konut Projeleri",
+      "parentId": "3518",
+      "path": [
+        "Emlak",
+        "Konut Projeleri"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "3618",
+      "label": "Bina",
+      "parentId": "3518",
+      "path": [
+        "Emlak",
+        "Bina"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "3619",
+      "label": "Devre Mülk",
+      "parentId": "3518",
+      "path": [
+        "Emlak",
+        "Devre Mülk"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "3617",
+      "label": "Turistik Tesis",
+      "parentId": "3518",
+      "path": [
+        "Emlak",
+        "Turistik Tesis"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "16623",
+      "label": "Satılık",
+      "parentId": "3613",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Satılık"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "16622",
+      "label": "Kiralık",
+      "parentId": "3613",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Kiralık"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "16621",
+      "label": "Turistik Günlük Kiralık",
+      "parentId": "3613",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Turistik Günlük Kiralık"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "229468",
+      "label": "Devren Satılık Konut",
+      "parentId": "3613",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Devren Satılık Konut"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "67378",
+      "label": "Satılık",
+      "parentId": "3620",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "67377",
+      "label": "Kiralık",
+      "parentId": "3620",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "67476",
+      "label": "Devren Satılık",
+      "parentId": "3620",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "238240",
+      "label": "Devren Kiralık",
+      "parentId": "3620",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "252839",
+      "label": "Kat Karşılığı Satılık",
+      "parentId": "89789",
+      "path": [
+        "Emlak",
+        "Arsa",
+        "Kat Karşılığı Satılık"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "3614",
+      "label": "Satılık",
+      "parentId": "89789",
+      "path": [
+        "Emlak",
+        "Arsa",
+        "Satılık"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "152602",
+      "label": "Kiralık",
+      "parentId": "89789",
+      "path": [
+        "Emlak",
+        "Arsa",
+        "Kiralık"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16398",
+      "label": "Satılık",
+      "parentId": "3618",
+      "path": [
+        "Emlak",
+        "Bina",
+        "Satılık"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16397",
+      "label": "Kiralık",
+      "parentId": "3618",
+      "path": [
+        "Emlak",
+        "Bina",
+        "Kiralık"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "254708",
+      "label": "Satılık",
+      "parentId": "3619",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "145414",
+      "label": "Satılık",
+      "parentId": "3617",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Satılık"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "145416",
+      "label": "Kiralık",
+      "parentId": "3617",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Kiralık"
+      ],
+      "hasChildren": true
+    },
+    {
+      "id": "16633",
+      "label": "Daire",
+      "parentId": "16623",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Satılık",
+        "Daire"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "152512",
+      "label": "Rezidans",
+      "parentId": "16623",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Satılık",
+        "Rezidans"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16635",
+      "label": "Müstakil Ev",
+      "parentId": "16623",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Satılık",
+        "Müstakil Ev"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16636",
+      "label": "Villa",
+      "parentId": "16623",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Satılık",
+        "Villa"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "152456",
+      "label": "Çiftlik Evi",
+      "parentId": "16623",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Satılık",
+        "Çiftlik Evi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "152480",
+      "label": "Köşk & Konak",
+      "parentId": "16623",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Satılık",
+        "Köşk & Konak"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "152490",
+      "label": "Yalı",
+      "parentId": "16623",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Satılık",
+        "Yalı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "152496",
+      "label": "Yalı Dairesi",
+      "parentId": "16623",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Satılık",
+        "Yalı Dairesi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16640",
+      "label": "Yazlık",
+      "parentId": "16623",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Satılık",
+        "Yazlık"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16641",
+      "label": "Kooperatif",
+      "parentId": "16623",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Satılık",
+        "Kooperatif"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16624",
+      "label": "Daire",
+      "parentId": "16622",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Kiralık",
+        "Daire"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16625",
+      "label": "Rezidans",
+      "parentId": "16622",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Kiralık",
+        "Rezidans"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16626",
+      "label": "Müstakil Ev",
+      "parentId": "16622",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Kiralık",
+        "Müstakil Ev"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16627",
+      "label": "Villa",
+      "parentId": "16622",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Kiralık",
+        "Villa"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "152436",
+      "label": "Çiftlik Evi",
+      "parentId": "16622",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Kiralık",
+        "Çiftlik Evi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "152484",
+      "label": "Köşk & Konak",
+      "parentId": "16622",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Kiralık",
+        "Köşk & Konak"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "152492",
+      "label": "Yalı",
+      "parentId": "16622",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Kiralık",
+        "Yalı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "152498",
+      "label": "Yalı Dairesi",
+      "parentId": "16622",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Kiralık",
+        "Yalı Dairesi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16642",
+      "label": "Daire",
+      "parentId": "16621",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Turistik Günlük Kiralık",
+        "Daire"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "152514",
+      "label": "Rezidans",
+      "parentId": "16621",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Turistik Günlük Kiralık",
+        "Rezidans"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16643",
+      "label": "Müstakil Ev",
+      "parentId": "16621",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Turistik Günlük Kiralık",
+        "Müstakil Ev"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16644",
+      "label": "Villa",
+      "parentId": "16621",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Turistik Günlük Kiralık",
+        "Villa"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "253464",
+      "label": "Devre Mülk",
+      "parentId": "16621",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Turistik Günlük Kiralık",
+        "Devre Mülk"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "253465",
+      "label": "Apart & Pansiyon",
+      "parentId": "16621",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Turistik Günlük Kiralık",
+        "Apart & Pansiyon"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "229469",
+      "label": "Daire",
+      "parentId": "229468",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Devren Satılık Konut",
+        "Daire"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "229471",
+      "label": "Villa",
+      "parentId": "229468",
+      "path": [
+        "Emlak",
+        "Konut",
+        "Devren Satılık Konut",
+        "Villa"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "158736",
+      "label": "Akaryakıt İstasyonu",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Akaryakıt İstasyonu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "158556",
+      "label": "Apartman Dairesi",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Apartman Dairesi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "219055",
+      "label": "Atölye ",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Atölye "
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "158784",
+      "label": "Çiftlik",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Çiftlik"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "159124",
+      "label": "Depo & Antrepo",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Depo & Antrepo"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16428",
+      "label": "Dükkan & Mağaza",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Dükkan & Mağaza"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "160398",
+      "label": "Fabrika & Üretim Tesisi",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Fabrika & Üretim Tesisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "241559",
+      "label": "Garaj & Park Yeri",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Garaj & Park Yeri"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "171272",
+      "label": "Hamam, Sauna & Spa",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Hamam, Sauna & Spa"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "218692",
+      "label": "İmalathane ",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "İmalathane "
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "159610",
+      "label": "İş Hanı Katı & Ofisi",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "İş Hanı Katı & Ofisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "170090",
+      "label": "Komple Bina",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Komple Bina"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "23043",
+      "label": "Maden Ocağı",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Maden Ocağı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "173230",
+      "label": "Ofis & Büro",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Ofis & Büro"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "260471",
+      "label": "Okul",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Okul"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "171198",
+      "label": "Otopark",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Otopark"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "93206",
+      "label": "Pazar Yeri",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Pazar Yeri"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "232248",
+      "label": "Plaza",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Plaza"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "158860",
+      "label": "Plaza Katı & Ofisi",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Plaza Katı & Ofisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "239928",
+      "label": "Rezidans Katı & Ofisi",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Rezidans Katı & Ofisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "171260",
+      "label": "Spor Tesisi ",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Spor Tesisi "
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "115721",
+      "label": "Toplantı & Etkinlik Salonu",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Toplantı & Etkinlik Salonu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "247741",
+      "label": "Villa",
+      "parentId": "67378",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Satılık",
+        "Villa"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "171346",
+      "label": "Akaryakıt İstasyonu",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Akaryakıt İstasyonu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16400",
+      "label": "Apartman Dairesi",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Apartman Dairesi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16403",
+      "label": "Atölye",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Atölye"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "173236",
+      "label": "Çiftlik",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Çiftlik"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16409",
+      "label": "Depo & Antrepo",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Depo & Antrepo"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16427",
+      "label": "Dükkan & Mağaza",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Dükkan & Mağaza"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16412",
+      "label": "Fabrika & Üretim Tesisi",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Fabrika & Üretim Tesisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "241177",
+      "label": "Garaj & Park Yeri",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Garaj & Park Yeri"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "172608",
+      "label": "Hamam, Sauna & Spa",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Hamam, Sauna & Spa"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "184168",
+      "label": "Hazır & Sanal Ofis",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Hazır & Sanal Ofis"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16418",
+      "label": "İmalathane",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "İmalathane"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16424",
+      "label": "İş Hanı Katı & Ofisi",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "İş Hanı Katı & Ofisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "171356",
+      "label": "Komple Bina",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Komple Bina"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "43878",
+      "label": "Ofis & Büro",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Ofis & Büro"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "88795",
+      "label": "Okul",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Okul"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "172592",
+      "label": "Otopark",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Otopark"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "93205",
+      "label": "Pazar Yeri",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Pazar Yeri"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16436",
+      "label": "Plaza",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Plaza"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16439",
+      "label": "Plaza Katı & Ofisi",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Plaza Katı & Ofisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "239929",
+      "label": "Rezidans Katı & Ofisi",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Rezidans Katı & Ofisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "172598",
+      "label": "Spor Tesisi",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Spor Tesisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "115718",
+      "label": "Toplantı & Etkinlik Salonu",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Toplantı & Etkinlik Salonu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "244698",
+      "label": "Villa",
+      "parentId": "67377",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Kiralık",
+        "Villa"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95511",
+      "label": "Acente",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Acente"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16405",
+      "label": "Akaryakıt İstasyonu",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Akaryakıt İstasyonu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "231021",
+      "label": "Aktar & Baharatçı",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Aktar & Baharatçı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "88778",
+      "label": "Anaokulu & Kreş",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Anaokulu & Kreş"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "96031",
+      "label": "Araç Galerisi & Servis",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Araç Galerisi & Servis"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16402",
+      "label": "Atölye",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Atölye"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "96476",
+      "label": "AVM Standı",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "AVM Standı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "115714",
+      "label": "Balıkçı",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Balıkçı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "188206",
+      "label": "Bar",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Bar"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95319",
+      "label": "Bijuteri & Takıcı",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Bijuteri & Takıcı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "241372",
+      "label": "Börekçi",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Börekçi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "89679",
+      "label": "Büfe",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Büfe"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95322",
+      "label": "Cep Telefonu Dükkanı",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Cep Telefonu Dükkanı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95479",
+      "label": "Çamaşırhane",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Çamaşırhane"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95383",
+      "label": "Çay Ocağı",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Çay Ocağı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95459",
+      "label": "Çiçekçi & Fidanlık",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Çiçekçi & Fidanlık"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16447",
+      "label": "Çiftlik",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Çiftlik"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "259873",
+      "label": "Çiğ Köfteci",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Çiğ Köfteci"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "261474",
+      "label": "Çocuk Oyun Alanı",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Çocuk Oyun Alanı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95410",
+      "label": "Düğün Salonu",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Düğün Salonu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16426",
+      "label": "Dükkan & Mağaza",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Dükkan & Mağaza"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "89756",
+      "label": "Eczane",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Eczane"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "115656",
+      "label": "Elektrikçi & Hırdavatçı",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Elektrikçi & Hırdavatçı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "258240",
+      "label": "Enerji Santrali",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Enerji Santrali"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16411",
+      "label": "Fabrika & Üretim Tesisi",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Fabrika & Üretim Tesisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95457",
+      "label": "Fotoğraf Stüdyosu",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Fotoğraf Stüdyosu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "247161",
+      "label": "Gece Kulübü & Disko",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Gece Kulübü & Disko"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95661",
+      "label": "Giyim Mağazası",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Giyim Mağazası"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "116379",
+      "label": "Gözlükçü",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Gözlükçü"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "260673",
+      "label": "Güzellik Merkezi",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Güzellik Merkezi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95577",
+      "label": "Halı Yıkama",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Halı Yıkama"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16414",
+      "label": "Hamam, Sauna & Spa",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Hamam, Sauna & Spa"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "219653",
+      "label": "Huzur Evi",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Huzur Evi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16417",
+      "label": "İmalathane",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "İmalathane"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "88776",
+      "label": "İnternet & Oyun Kafe",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "İnternet & Oyun Kafe"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "18901",
+      "label": "Kafe",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Kafe"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95365",
+      "label": "Kasap",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Kasap"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95398",
+      "label": "Kıraathane",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Kıraathane"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95321",
+      "label": "Kırtasiye",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Kırtasiye"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95369",
+      "label": "Kozmetik Mağazası",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Kozmetik Mağazası"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "88727",
+      "label": "Kuaför & Berber",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Kuaför & Berber"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "88779",
+      "label": "Kurs & Eğitim Merkezi",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Kurs & Eğitim Merkezi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95439",
+      "label": "Kuru Temizleme",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Kuru Temizleme"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95320",
+      "label": "Kuruyemişçi",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Kuruyemişçi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95578",
+      "label": "Kuyumcu",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Kuyumcu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "115715",
+      "label": "Lunapark",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Lunapark"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "81744",
+      "label": "Maden Ocağı",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Maden Ocağı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "115709",
+      "label": "Manav",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Manav"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "89712",
+      "label": "Market",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Market"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "115658",
+      "label": "Modaevi",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Modaevi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16429",
+      "label": "Muayenehane",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Muayenehane"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "115661",
+      "label": "Nakliyat & Kargo",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Nakliyat & Kargo"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95583",
+      "label": "Nalbur",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Nalbur"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "43877",
+      "label": "Ofis & Büro",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Ofis & Büro"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "219773",
+      "label": "Okul",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Okul"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "231343",
+      "label": "Oto Servis & Bakım",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Oto Servis & Bakım"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "241086",
+      "label": "Oto Yedek Parçacı",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Oto Yedek Parçacı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "88784",
+      "label": "Oto Yıkama & Kuaför",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Oto Yıkama & Kuaför"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "90992",
+      "label": "Pastane, Fırın & Tatlıcı",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Pastane, Fırın & Tatlıcı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "93204",
+      "label": "Pazar Yeri",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Pazar Yeri"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95356",
+      "label": "Pet Shop",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Pet Shop"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "237094",
+      "label": "Piknik Alanı & Kahvaltı Bahçesi ",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Piknik Alanı & Kahvaltı Bahçesi "
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "115659",
+      "label": "Radyo İstasyonu & TV Kanalı",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Radyo İstasyonu & TV Kanalı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16441",
+      "label": "Restoran & Lokanta",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Restoran & Lokanta"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95646",
+      "label": "Sağlık Merkezi",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Sağlık Merkezi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "239410",
+      "label": "Sebze & Meyve Hali",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Sebze & Meyve Hali"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16408",
+      "label": "Soğuk Hava Deposu",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Soğuk Hava Deposu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "89134",
+      "label": "Spor Tesisi",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Spor Tesisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "88775",
+      "label": "Su & Tüp Bayisi",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Su & Tüp Bayisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95318",
+      "label": "Şans Oyunları Bayisi",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Şans Oyunları Bayisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95427",
+      "label": "Şarküteri",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Şarküteri"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "89709",
+      "label": "Taksi Durağı",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Taksi Durağı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "16444",
+      "label": "Tamirhane",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Tamirhane"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "88777",
+      "label": "Tekel Bayisi",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Tekel Bayisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95675",
+      "label": "Teknik Servis",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Teknik Servis"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "115660",
+      "label": "Terzi",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Terzi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "115710",
+      "label": "Toplantı & Etkinlik Salonu",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Toplantı & Etkinlik Salonu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95352",
+      "label": "Tuhafiye",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Tuhafiye"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "255107",
+      "label": "Tuvalet",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Tuvalet"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "115657",
+      "label": "Veteriner",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Veteriner"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "152600",
+      "label": "Yurt",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Yurt"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "95512",
+      "label": "Züccaciye",
+      "parentId": "67476",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Satılık",
+        "Züccaciye"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238241",
+      "label": "Acente",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Acente"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238242",
+      "label": "Akaryakıt İstasyonu",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Akaryakıt İstasyonu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238243",
+      "label": "Aktar & Baharatçı",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Aktar & Baharatçı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238244",
+      "label": "Anaokulu & Kreş",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Anaokulu & Kreş"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238246",
+      "label": "Araç Galerisi & Servis",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Araç Galerisi & Servis"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238247",
+      "label": "Atölye",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Atölye"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238248",
+      "label": "AVM Standı",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "AVM Standı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238249",
+      "label": "Balıkçı",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Balıkçı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238250",
+      "label": "Bar",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Bar"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238251",
+      "label": "Bijuteri & Takıcı",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Bijuteri & Takıcı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "241371",
+      "label": "Börekçi",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Börekçi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238252",
+      "label": "Büfe",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Büfe"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238258",
+      "label": "Cep Telefonu Dükkanı",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Cep Telefonu Dükkanı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238255",
+      "label": "Çamaşırhane",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Çamaşırhane"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238256",
+      "label": "Çay Ocağı",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Çay Ocağı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238259",
+      "label": "Çiçekçi & Fidanlık",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Çiçekçi & Fidanlık"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238260",
+      "label": "Çiftlik",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Çiftlik"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "259874",
+      "label": "Çiğ Köfteci",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Çiğ Köfteci"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "261475",
+      "label": "Çocuk Oyun Alanı",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Çocuk Oyun Alanı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238263",
+      "label": "Düğün Salonu",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Düğün Salonu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238264",
+      "label": "Dükkan & Mağaza",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Dükkan & Mağaza"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238265",
+      "label": "Eczane",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Eczane"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238266",
+      "label": "Elektrikçi & Hırdavatçı",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Elektrikçi & Hırdavatçı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238267",
+      "label": "Elektronik Mağazası",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Elektronik Mağazası"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "259855",
+      "label": "Etkinlik Alanı",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Etkinlik Alanı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238268",
+      "label": "Fabrika & Üretim Tesisi",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Fabrika & Üretim Tesisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238270",
+      "label": "Fotoğraf Stüdyosu",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Fotoğraf Stüdyosu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "247162",
+      "label": "Gece Kulübü & Disko",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Gece Kulübü & Disko"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238272",
+      "label": "Giyim Mağazası",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Giyim Mağazası"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238273",
+      "label": "Gözlükçü",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Gözlükçü"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "260512",
+      "label": "Güzellik Merkezi",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Güzellik Merkezi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238274",
+      "label": "Halı Yıkama",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Halı Yıkama"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238317",
+      "label": "Hamam, Sauna & Spa",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Hamam, Sauna & Spa"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238275",
+      "label": "Huzur Evi",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Huzur Evi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238271",
+      "label": "İmalathane",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "İmalathane"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238276",
+      "label": "İnternet & Oyun Kafe",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "İnternet & Oyun Kafe"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238254",
+      "label": "Kafe",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Kafe"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "260472",
+      "label": "Kantin",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Kantin"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238279",
+      "label": "Kasap",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Kasap"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238281",
+      "label": "Kıraathane",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Kıraathane"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238282",
+      "label": "Kırtasiye",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Kırtasiye"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238283",
+      "label": "Kozmetik Mağazası",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Kozmetik Mağazası"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238284",
+      "label": "Kuaför & Berber",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Kuaför & Berber"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238262",
+      "label": "Kurs & Eğitim Merkezi",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Kurs & Eğitim Merkezi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238285",
+      "label": "Kuru Temizleme",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Kuru Temizleme"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238286",
+      "label": "Kuruyemişçi",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Kuruyemişçi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238287",
+      "label": "Kuyumcu",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Kuyumcu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238288",
+      "label": "Lunapark",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Lunapark"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238289",
+      "label": "Maden Ocağı",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Maden Ocağı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238290",
+      "label": "Manav",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Manav"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238291",
+      "label": "Market",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Market"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238292",
+      "label": "Matbaa",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Matbaa"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "239528",
+      "label": "Medikal Market",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Medikal Market"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238293",
+      "label": "Modaevi",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Modaevi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238294",
+      "label": "Muayenehane",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Muayenehane"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238295",
+      "label": "Nakliyat & Kargo",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Nakliyat & Kargo"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238296",
+      "label": "Nalbur",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Nalbur"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238253",
+      "label": "Ofis & Büro",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Ofis & Büro"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238298",
+      "label": "Okul",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Okul"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238299",
+      "label": "Oto Servis & Bakım",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Oto Servis & Bakım"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "252833",
+      "label": "Oto Yedek Parçacı",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Oto Yedek Parçacı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238300",
+      "label": "Oto Yıkama & Kuaför",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Oto Yıkama & Kuaför"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238302",
+      "label": "Pastane, Fırın & Tatlıcı",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Pastane, Fırın & Tatlıcı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238303",
+      "label": "Pazar Yeri",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Pazar Yeri"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238304",
+      "label": "Pet Shop",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Pet Shop"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238280",
+      "label": "Piknik Alanı & Kahvaltı Bahçesi",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Piknik Alanı & Kahvaltı Bahçesi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238307",
+      "label": "Prova & Kayıt Stüdyosu",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Prova & Kayıt Stüdyosu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238308",
+      "label": "Radyo İstasyonu & TV Kanalı",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Radyo İstasyonu & TV Kanalı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238309",
+      "label": "Restoran & Lokanta",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Restoran & Lokanta"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238310",
+      "label": "Saat Mağazası",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Saat Mağazası"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238311",
+      "label": "Sağlık Merkezi",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Sağlık Merkezi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "239409",
+      "label": "Sebze & Meyve Hali",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Sebze & Meyve Hali"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238316",
+      "label": "Soğuk Hava Deposu",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Soğuk Hava Deposu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238318",
+      "label": "Spor Tesisi",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Spor Tesisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238319",
+      "label": "Su & Tüp Bayisi",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Su & Tüp Bayisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238312",
+      "label": "Şans Oyunları Bayisi",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Şans Oyunları Bayisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238313",
+      "label": "Şarküteri",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Şarküteri"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238314",
+      "label": "Taksi Durağı",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Taksi Durağı"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238320",
+      "label": "Tamirhane",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Tamirhane"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238321",
+      "label": "Tekel Bayisi",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Tekel Bayisi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238322",
+      "label": "Teknik Servis",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Teknik Servis"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238323",
+      "label": "Terzi",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Terzi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238315",
+      "label": "Toplantı & Etkinlik Salonu",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Toplantı & Etkinlik Salonu"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238324",
+      "label": "Tuhafiye",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Tuhafiye"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "252860",
+      "label": "Tuvalet",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Tuvalet"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238325",
+      "label": "Veteriner",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Veteriner"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238297",
+      "label": "Yurt",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Yurt"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238326",
+      "label": "Züccaciye",
+      "parentId": "238240",
+      "path": [
+        "Emlak",
+        "İş Yeri",
+        "Devren Kiralık",
+        "Züccaciye"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238768",
+      "label": "Aforia Thermal Residence",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Aforia Thermal Residence"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "114432",
+      "label": "Afyon Korel Thermal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Afyon Korel Thermal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "241632",
+      "label": "Akasya Vadisi Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Akasya Vadisi Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "3631",
+      "label": "Akçabük Tatil Köyü",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Akçabük Tatil Köyü"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "217286",
+      "label": "Akropol Termal Megakent",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Akropol Termal Megakent"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "19909",
+      "label": "Aktaş Akyarlar - Bodrum",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Aktaş Akyarlar - Bodrum"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "92029",
+      "label": "Amiral 1",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Amiral 1"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "92030",
+      "label": "Amiral 3",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Amiral 3"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "92031",
+      "label": "Amiral 4",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Amiral 4"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "180126",
+      "label": "Armodies Termal Park",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Armodies Termal Park"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "3632",
+      "label": "Armonia",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Armonia"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "3633",
+      "label": "Avta Tatil Köyü",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Avta Tatil Köyü"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "3635",
+      "label": "Billurkent",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Billurkent"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "248254",
+      "label": "Camellia Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Camellia Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "3640",
+      "label": "Club Flipper / Bodrum",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Club Flipper / Bodrum"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "92024",
+      "label": "Club Mavi",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Club Mavi"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "218163",
+      "label": "Club Onat Garden",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Club Onat Garden"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "3650",
+      "label": "Club Patara",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Club Patara"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "114417",
+      "label": "Çağ Hayme Sultan",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Çağ Hayme Sultan"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "113747",
+      "label": "Çeşme Hürpa",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Çeşme Hürpa"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "117931",
+      "label": "Çınar Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Çınar Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "159032",
+      "label": "Çiftehan Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Çiftehan Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "3637",
+      "label": "Çimtur",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Çimtur"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "3638",
+      "label": "Dedeman - Bodrum",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Dedeman - Bodrum"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "18500",
+      "label": "Devtaş - Bodrum",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Devtaş - Bodrum"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "230997",
+      "label": "Ebrar Termal Resort",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Ebrar Termal Resort"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "18769",
+      "label": "Eliz Termal Kızılcahamam",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Eliz Termal Kızılcahamam"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "259254",
+      "label": "Emin Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Emin Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "232557",
+      "label": "Erzin İsos Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Erzin İsos Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "230506",
+      "label": "Göral Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Göral Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "113452",
+      "label": "Grand Özgül Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Grand Özgül Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "231478",
+      "label": "Grand Royal Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Grand Royal Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "256112",
+      "label": "Gülümser Hatun Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Gülümser Hatun Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "92057",
+      "label": "Gümüşlük Villaları - Bodrum",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Gümüşlük Villaları - Bodrum"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "243407",
+      "label": "Güre Termal Resort",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Güre Termal Resort"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "97642",
+      "label": "Hattuşa - Astyra Resort",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Hattuşa - Astyra Resort"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "117983",
+      "label": "Hattuşa Astyra Termal Resort",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Hattuşa Astyra Termal Resort"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "251368",
+      "label": "Hattuşa Thermal Club Saray",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Hattuşa Thermal Club Saray"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "231794",
+      "label": "Hayıtlı Merada Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Hayıtlı Merada Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "218934",
+      "label": "Heramis Termal Tatil Köyü",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Heramis Termal Tatil Köyü"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "118306",
+      "label": "Hera Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Hera Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "216827",
+      "label": "Hitit Ayaş Termal & Spa",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Hitit Ayaş Termal & Spa"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "117779",
+      "label": "HLC - Kuşadası",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "HLC - Kuşadası"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "3641",
+      "label": "Hürpa Akyarlar",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Hürpa Akyarlar"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "22204",
+      "label": "Hürpa Gündoğan",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Hürpa Gündoğan"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "17659",
+      "label": "Ilgaz Mountain Resort",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Ilgaz Mountain Resort"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "3643",
+      "label": "İhlas Armutlu Tatil Köyü",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "İhlas Armutlu Tatil Köyü"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "197810",
+      "label": "İnan Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "İnan Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "113484",
+      "label": "Kızılca Vadi Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Kızılca Vadi Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "114427",
+      "label": "Körfez Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Körfez Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "197784",
+      "label": "Kral Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Kral Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "3645",
+      "label": "Kuzuluk Kaplıca Evleri",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Kuzuluk Kaplıca Evleri"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "256072",
+      "label": "Laguna Termal Resort",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Laguna Termal Resort"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "220137",
+      "label": "Modern Saraylar",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Modern Saraylar"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "258956",
+      "label": "Mola İstanbul",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Mola İstanbul"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "245011",
+      "label": "My House Bodrum Tatil Evleri",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "My House Bodrum Tatil Evleri"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "236346",
+      "label": "Narven Termal Kasaba",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Narven Termal Kasaba"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "229043",
+      "label": "Naskon Sapphire Resort & Spa",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Naskon Sapphire Resort & Spa"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "3649",
+      "label": "Panclub",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Panclub"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "3652",
+      "label": "Petrokent - Abant",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Petrokent - Abant"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "258692",
+      "label": "Royal Doğa Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Royal Doğa Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "114428",
+      "label": "Roza Resort Termal Hotel",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Roza Resort Termal Hotel"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "3656",
+      "label": "Rüyakent",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Rüyakent"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "244059",
+      "label": "Sarayhan Termal Hotel",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Sarayhan Termal Hotel"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "229833",
+      "label": "Sefa Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Sefa Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "3658",
+      "label": "Simpa",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Simpa"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "256110",
+      "label": "Sinpaş Kızılbük",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Sinpaş Kızılbük"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "238493",
+      "label": "Sivas Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Sivas Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "92027",
+      "label": "Soytaş",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Soytaş"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "184064",
+      "label": "Taraklı Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Taraklı Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "255967",
+      "label": "Vadi Termal",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Vadi Termal"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "252345",
+      "label": "Watercastle Suites",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Watercastle Suites"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "230640",
+      "label": "Yalova Thermal Palace",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Yalova Thermal Palace"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "254737",
+      "label": "Diğer Devre Mülkler",
+      "parentId": "254708",
+      "path": [
+        "Emlak",
+        "Devre Mülk",
+        "Satılık",
+        "Diğer Devre Mülkler"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "145426",
+      "label": "Otel",
+      "parentId": "145414",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Satılık",
+        "Otel"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "145418",
+      "label": "Apart Otel",
+      "parentId": "145414",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Satılık",
+        "Apart Otel"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "145420",
+      "label": "Butik Otel",
+      "parentId": "145414",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Satılık",
+        "Butik Otel"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "145424",
+      "label": "Motel",
+      "parentId": "145414",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Satılık",
+        "Motel"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "145428",
+      "label": "Pansiyon",
+      "parentId": "145414",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Satılık",
+        "Pansiyon"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "145422",
+      "label": "Kamp Yeri (Mocamp)",
+      "parentId": "145414",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Satılık",
+        "Kamp Yeri (Mocamp)"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "150134",
+      "label": "Tatil Köyü",
+      "parentId": "145414",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Satılık",
+        "Tatil Köyü"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "149386",
+      "label": "Otel",
+      "parentId": "145416",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Kiralık",
+        "Otel"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "149390",
+      "label": "Apart Otel",
+      "parentId": "145416",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Kiralık",
+        "Apart Otel"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "149388",
+      "label": "Butik Otel",
+      "parentId": "145416",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Kiralık",
+        "Butik Otel"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "149394",
+      "label": "Motel",
+      "parentId": "145416",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Kiralık",
+        "Motel"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "149396",
+      "label": "Pansiyon",
+      "parentId": "145416",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Kiralık",
+        "Pansiyon"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "149400",
+      "label": "Kamp Yeri (Mocamp)",
+      "parentId": "145416",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Kiralık",
+        "Kamp Yeri (Mocamp)"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "149398",
+      "label": "Tatil Köyü",
+      "parentId": "145416",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Kiralık",
+        "Tatil Köyü"
+      ],
+      "hasChildren": false
+    },
+    {
+      "id": "190466",
+      "label": "Plaj",
+      "parentId": "145416",
+      "path": [
+        "Emlak",
+        "Turistik Tesis",
+        "Kiralık",
+        "Plaj"
+      ],
+      "hasChildren": false
+    }
+  ]
+}

@@ -37,8 +37,40 @@
       } catch {}
     };
 
+    const paylasimMetni = (liste, sayfa) => {
+      const kartlar = new Map(
+        [...sayfa.querySelectorAll('[data-id]')].map((kart) => [kart.dataset.id, kart])
+      );
+      const satirlar = liste.flatMap((id, sira) => {
+        const kart = kartlar.get(id);
+        if (!kart) return [];
+        const baslik = kart.dataset.baslik || `İlan ${id}`;
+        const fiyat = kart.dataset.fiyatMetin || '';
+        const yol = kart.dataset.yol || `/ilan/${id}`;
+        return [`${sira + 1}. ${baslik}`, fiyat, `${location.origin}${yol}`];
+      });
+      return [
+        `EDM Yapı & Gayrimenkul — ${liste.length} kayıtlı ilan`,
+        '',
+        ...satirlar,
+        '',
+        'Bu ilanlar hakkında bilgi ve uygun görüşme saatlerini öğrenmek istiyorum.',
+      ].join('\n');
+    };
+
     function tazele() {
-      const liste = oku();
+      let liste = oku();
+      const sayfa = document.querySelector('[data-favori-sayfa]');
+      if (sayfa) {
+        const mevcutKimlikler = new Set(
+          [...sayfa.querySelectorAll('[data-id]')].map((kart) => kart.dataset.id)
+        );
+        const gecerliListe = liste.filter((id) => mevcutKimlikler.has(id));
+        if (gecerliListe.length !== liste.length) {
+          liste = gecerliListe;
+          yaz(liste);
+        }
+      }
       const kume = new Set(liste);
 
       document.querySelectorAll('[data-favori]').forEach((d) => {
@@ -54,7 +86,6 @@
         if (sayi) sayi.textContent = String(liste.length);
       });
 
-      const sayfa = document.querySelector('[data-favori-sayfa]');
       if (!sayfa) return;
 
       let gorunen = 0;
@@ -66,24 +97,62 @@
         // Kapalı kartların adresi data-src'de bekliyor: tarayıcı gizli de
         // olsa lazy görselleri indirmeye kalkıyor, bu yüzden adresi ancak
         // kart açılırken veriyoruz.
+        kart.querySelectorAll('source[data-srcset]').forEach((g) => {
+          g.srcset = g.dataset.srcset;
+          delete g.dataset.srcset;
+        });
         kart.querySelectorAll('img[data-src]').forEach((g) => {
+          if (g.dataset.srcset) g.srcset = g.dataset.srcset;
           g.src = g.dataset.src;
           delete g.dataset.src;
+          delete g.dataset.srcset;
         });
       });
       const bos = sayfa.querySelector('[data-favori-bos]');
       const izgara = sayfa.querySelector('[data-favori-izgara]');
       const arac = sayfa.querySelector('[data-favori-arac]');
+      const wa = sayfa.querySelector('[data-favori-whatsapp]');
       if (bos) bos.hidden = gorunen > 0;
       if (izgara) izgara.hidden = gorunen === 0;
       if (arac) arac.hidden = gorunen === 0;
+      if (wa && arac) {
+        const numara = arac.dataset.wa || '';
+        wa.href = `https://wa.me/${numara}?text=${encodeURIComponent(paylasimMetni(liste, sayfa))}`;
+      }
     }
 
-    document.addEventListener('click', (olay) => {
+    document.addEventListener('click', async (olay) => {
       const temizle = olay.target.closest?.('[data-favori-temizle]');
       if (temizle) {
         yaz([]);
         tazele();
+        return;
+      }
+
+      const paylas = olay.target.closest?.('[data-favori-paylas]');
+      if (paylas) {
+        const sayfa = paylas.closest('[data-favori-sayfa]');
+        const liste = oku();
+        const metin = paylasimMetni(liste, sayfa);
+        const durum = sayfa.querySelector('[data-favori-paylas-durum]');
+        const etiket = paylas.querySelector('[data-favori-paylas-metin]');
+        try {
+          if (navigator.share) {
+            await navigator.share({ title: 'EDM kayıtlı ilanlarım', text: metin });
+            if (durum) durum.textContent = 'Paylaşım penceresi açıldı.';
+            return;
+          }
+          await navigator.clipboard.writeText(metin);
+          if (etiket) etiket.textContent = 'Liste kopyalandı';
+          if (durum) durum.textContent = 'İlan başlıkları, fiyatları ve bağlantıları panoya kopyalandı.';
+          setTimeout(() => {
+            if (etiket) etiket.textContent = 'Listeyi paylaş';
+          }, 2200);
+        } catch (hata) {
+          if (hata?.name !== 'AbortError' && durum) {
+            durum.textContent = 'Paylaşım açılamadı. WhatsApp düğmesini kullanabilirsiniz.';
+          }
+        }
         return;
       }
 

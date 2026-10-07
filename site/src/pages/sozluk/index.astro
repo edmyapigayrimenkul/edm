@@ -13,91 +13,308 @@ const kategoriler = [
   'İnşaat & Mimarlık',
   'Değerleme & Finans',
 ];
+
+// Kategori bazlı terim sayıları
+const kategoriSayilari: Record<string, number> = {
+  'Tümü': SOZLUK_TERIMLERI.length,
+};
+for (const t of SOZLUK_TERIMLERI) {
+  kategoriSayilari[t.kategori] = (kategoriSayilari[t.kategori] || 0) + 1;
+}
+
+// Popüler hızlı arama terimleri (Kullanıcının tek tıkla keşfetmesi için)
+const populerAramalar = [
+  'Kira Artış Tavanı',
+  'İzale-i Şüyu',
+  'Şufa Hakkı',
+  'Emsal (KAKS)',
+  'Kat İrtifakı',
+  'nZEB Bina',
+  'Ecrimisil',
+  'Tahliye Taahhütnamesi',
+  'Rayiç Bedel',
+  'Tapu Harcı',
+];
+
+// İstemci tarafı on-demand kart üretimi için optimize edilmiş sözlük veritabanı haritası
+const sozlukVeriHaritasi: Record<string, {
+  slug: string;
+  terim: string;
+  harf: string;
+  kategori: string;
+  kisaTanim: string;
+  hukukiKarsilik: string;
+  pratikteNeAnlamaGelir: string;
+  kritikUyari: string;
+  kaynaklar: Array<{ ad?: string; baslik?: string; url: string }>;
+}> = {};
+
+for (const t of SOZLUK_TERIMLERI) {
+  sozlukVeriHaritasi[t.slug] = {
+    slug: t.slug,
+    terim: t.terim,
+    harf: t.harf,
+    kategori: t.kategori,
+    kisaTanim: t.kisaTanim,
+    hukukiKarsilik: t.hukukiKarsilik,
+    pratikteNeAnlamaGelir: t.pratikteNeAnlamaGelir,
+    kritikUyari: t.kritikUyari,
+    kaynaklar: t.kaynaklar,
+  };
+}
 ---
 
 <Temel
   baslik="Emlak Terimleri Sözlüğü"
-  aciklama="Gayrimenkul, tapu, imar, vergi ve kira hukukundaki en kritik terimler için kanuni dayanaklı, saha gerçeklerini içeren açıklamalar."
+  aciklama="Gayrimenkul, tapu, imar, vergi ve kira hukukundaki 1.569 terim için kanuni dayanaklı, saha gerçeklerini içeren ansiklopedik rehber."
 >
-  <!-- KOMPAKT KAHRAMAN BÖLÜMÜ -->
-  <section class="pt-20 pb-4 lg:pt-24 lg:pb-6">
-    <div class="kab">
-      <!-- Başlık Satırı -->
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-murekkep/10 pb-5" data-belir>
-        <div>
-          <div class="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold tracking-widest text-kirmizi uppercase mb-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-kirmizi animate-pulse"></span>
-            EDM AKADEMİ · MEVZUAT VE SAHA SÖZLÜĞÜ
+  <!-- PAYLAŞILAN SVG SİMGELERİ -->
+  <svg style="display:none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <!-- Kitap Çizim Filigranı (Instagram Şablonu) -->
+    <symbol id="kitap-filigran" viewBox="0 0 200 130">
+      <polygon points="96,20 10,12 10,105 96,115" stroke="currentColor" stroke-width="1.8" />
+      <polygon points="104,20 190,12 190,105 104,115" stroke="currentColor" stroke-width="1.8" />
+      <line x1="100" y1="18" x2="100" y2="118" stroke="currentColor" stroke-width="2.5" />
+      <line x1="25" y1="36" x2="82" y2="39" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
+      <line x1="25" y1="52" x2="82" y2="55" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
+      <line x1="25" y1="68" x2="82" y2="71" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
+      <line x1="25" y1="84" x2="82" y2="87" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
+      <line x1="118" y1="39" x2="175" y2="36" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
+      <line x1="118" y1="55" x2="175" y2="52" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
+      <line x1="118" y1="71" x2="175" y2="68" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
+      <line x1="118" y1="87" x2="175" y2="84" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
+      <polygon points="97,114 103,114 102,128 100,124 98,128" fill="#c4030f" stroke="#c4030f" stroke-width="1" />
+    </symbol>
+
+    <!-- EDM Dairesel Amblem Filigranı -->
+    <symbol id="edm-amblem-svg" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="46" stroke="currentColor" stroke-width="4" stroke-dasharray="6 4" fill="none" />
+      <circle cx="50" cy="50" r="32" stroke="currentColor" stroke-width="2.5" fill="none" />
+      <path d="M50 25 L68 40 L68 70 L32 70 L32 40 Z" stroke="currentColor" stroke-width="3" fill="none" />
+      <circle cx="50" cy="52" r="7" stroke="currentColor" stroke-width="2.5" fill="none" />
+    </symbol>
+  </svg>
+
+  <!-- ŞABLON: TIKLANDIĞINDA 1 MS İÇİNDE ÜRETİLEN BİLGİ KARTI (INSTAGRAM POSTU GÖRÜNÜMÜ) -->
+  <template id="terim-kart-sablonu">
+    <article class="terim-acik relative flex-col justify-between rounded-2xl bg-[#ecece8] text-[#111214] p-5 sm:p-7 shadow-xl border border-[#d5d5ce] overflow-hidden transition-all duration-200">
+      <!-- Arka Plan Filigranı 1: Kitap Çizimi (Başlığın Arkasında) -->
+      <svg class="absolute right-4 top-14 w-48 sm:w-64 h-36 sm:h-48 text-[#111214]/[0.05] pointer-events-none select-none" viewBox="0 0 200 130" fill="none">
+        <use href="#kitap-filigran" />
+      </svg>
+
+      <!-- Arka Plan Filigranı 2: EDM Dairesel Logo (Sağ Altta) -->
+      <svg class="absolute -right-10 -bottom-10 w-48 h-48 text-[#111214]/[0.035] pointer-events-none select-none" viewBox="0 0 100 100" fill="none">
+        <use href="#edm-amblem-svg" />
+      </svg>
+
+      <!-- Arka Plan Filigranı 3: Devasa Harf -->
+      <span class="kart-harf absolute right-3 -bottom-6 font-serif text-9xl font-black text-[#111214]/[0.025] select-none pointer-events-none leading-none"></span>
+
+      <div class="relative z-10">
+        <!-- Kart Başlık Çubuğu: Kategori Rozeti + Logo & Küçült Butonu -->
+        <div class="flex items-center justify-between gap-2 border-b border-[#d5d5ce] pb-3">
+          <div class="kart-kategori inline-flex items-center px-3 py-1 rounded bg-[#111214] text-white text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-widest shadow-xs">
           </div>
-          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-serif font-black text-murekkep tracking-tight">
-            Emlak Terimleri Sözlüğü
-          </h1>
-          <p class="mt-1.5 text-xs sm:text-sm text-metin-2 max-w-xl leading-relaxed">
-            Detayını ve saha gerçeğini öğrenmek istediğiniz <strong>kelimeye tıklayarak bilgi kartını büyütebilirsiniz</strong>.
-          </p>
+          <div class="flex items-center gap-2">
+            <img src="/marka/logo-yatay.png" alt="EDM Yapı & Gayrimenkul" class="h-5 sm:h-6 w-auto hidden sm:block opacity-90" />
+            <button
+              type="button"
+              class="terim-kapat-btn inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-[#111214] bg-white hover:bg-[#f0000d] hover:text-white border border-[#d5d5ce] px-2.5 py-1 rounded-md transition-all cursor-pointer shadow-xs"
+              title="Kartı küçült"
+            >
+              <span class="text-xs leading-none">✕</span>
+              <span>Küçült</span>
+            </button>
+          </div>
         </div>
 
-        <div class="flex items-center gap-2 font-mono text-xs text-kursun shrink-0">
-          <span class="px-2.5 py-1 rounded bg-murekkep text-white font-bold">{SOZLUK_TERIMLERI.length} Terim</span>
-          <button
-            type="button"
-            id="tumunu-ac-kapat"
-            class="px-2.5 py-1 rounded bg-kagit-2 text-murekkep font-semibold hover:bg-murekkep hover:text-white transition-colors border border-murekkep/10 cursor-pointer"
-          >
-            Tümünü Büyüt
-          </button>
+        <!-- Terim Başlığı: Ağır, Yüksek Kontrastlı Editorial Serif (Instagram Tarzı) -->
+        <h3 class="kart-baslik font-serif text-2xl sm:text-3xl lg:text-4xl font-black text-[#111214] tracking-tight uppercase leading-[1.08] mt-4 sm:mt-5 break-words">
+        </h3>
+
+        <!-- İnce Ayırıcı Çizgi -->
+        <div class="border-b border-[#d5d5ce] mt-3.5 mb-2.5"></div>
+
+        <!-- Tanım ve Anlamı Etiketi -->
+        <div class="text-[10px] sm:text-[11px] font-mono font-bold text-[#7a7b80] tracking-widest uppercase mb-1.5 flex items-center gap-2">
+          <span>TANIM & ANLAMI</span>
+          <span class="h-px bg-[#d5d5ce] flex-1"></span>
+        </div>
+
+        <!-- Tanım Paragrafı ve Büyük Tırnak İşareti -->
+        <div class="font-sans text-sm sm:text-base leading-relaxed text-[#18181b] relative pl-4 sm:pl-5">
+          <span class="absolute left-0 -top-1 font-serif text-2xl sm:text-3xl text-[#7a7b80]/70 select-none leading-none">“</span>
+          <p class="kart-tanim"></p>
+        </div>
+
+        <!-- Hukuki Dayanak Şeridi (Varsa) -->
+        <div class="kart-hukuk-kutusu mt-3.5 rounded-lg bg-white/70 border border-[#d5d5ce] px-3.5 py-2 text-xs text-[#2c2d33]">
+          <span class="font-mono font-bold text-[10px] text-[#7a7b80] uppercase tracking-wider block mb-0.5">HUKUKİ DAYANAK // MEVZUAT:</span>
+          <p class="kart-hukuk font-sans text-xs sm:text-[13px] leading-snug"></p>
+        </div>
+
+        <!-- Sarı Şeritli Siyah Yatırımcı Uyarı Kutusu (Instagram Şablonu) -->
+        <div class="mt-4 sm:mt-5 rounded-xl bg-[#111214] border border-[#2b2d35] border-l-4 border-l-[#e6ad30] p-3.5 sm:p-4.5 text-xs sm:text-sm text-white shadow-md">
+          <div class="flex items-center gap-1.5 text-[#e6ad30] font-mono text-[11px] font-bold uppercase tracking-wider mb-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#e6ad30]"></span>
+            <span>YATIRIMCI İÇİN ÖNEMİ:</span>
+          </div>
+          <p class="kart-uyari text-[#f5f7fa] font-sans leading-relaxed text-xs sm:text-[13px]"></p>
         </div>
       </div>
 
-      <!-- KOMPAKT ARAMA VE FİLTRE KONTROL PANELİ -->
-      <div class="mt-4 rounded-xl border border-murekkep/10 bg-white p-3 sm:p-4 shadow-sm space-y-3" data-belir data-gecikme="0.05">
-        <!-- Arama Alanı -->
-        <div class="relative">
-          <input
-            type="text"
-            id="terim-arama"
-            placeholder="Terim ara (şufa, ifraz, kat mülkiyeti, emsal, tahliye...)"
-            class="w-full rounded-lg border border-murekkep/15 bg-kagit px-3.5 py-2 pl-10 text-xs sm:text-sm text-murekkep placeholder:text-kursun focus:border-kirmizi focus:bg-white focus:outline-none transition-all"
-          />
-          <svg class="absolute left-3 top-2.5 h-4 w-4 text-kursun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="7" cy="7" r="5" />
-            <path d="m11 11 3.5 3.5" />
-          </svg>
+      <!-- Alt Bilgi Şeridi: Telif, Mevzuat Linki ve Kart No -->
+      <div class="relative z-10 mt-5 pt-3 border-t border-[#d5d5ce] flex flex-wrap items-center justify-between gap-2 text-[10px] sm:text-[11px] font-mono text-[#7a7b80]">
+        <span class="tracking-wider uppercase">
+          EDM YAPI & GAYRİMENKUL // EMLAK SÖZLÜĞÜ
+        </span>
+        <div class="flex items-center gap-3">
+          <div class="kart-kaynaklar flex items-center gap-2"></div>
           <button
             type="button"
-            id="arama-temizle"
-            class="hidden absolute right-2.5 top-2 text-[11px] font-mono text-kursun hover:text-kirmizi transition-colors px-1.5 py-0.5 rounded bg-kagit-2 cursor-pointer"
+            class="kart-kopyala-btn inline-flex items-center gap-1 text-[#111214] hover:text-[#f0000d] font-bold px-2 py-0.5 rounded bg-white/60 hover:bg-white border border-[#d5d5ce] transition-colors cursor-pointer"
+            title="Özeti panoya kopyala"
           >
-            ✕
+            <span>📋</span>
+            <span class="kopyala-yazi">Kopyala</span>
           </button>
+          <span class="text-[#111214] font-bold hidden sm:inline">SÖZLÜK // 01</span>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <!-- HERO (KAHRAMAN) BÖLÜMÜ: EDİTORYAL PRESTİJ TASARIMI -->
+  <section class="relative pt-20 pb-6 lg:pt-28 lg:pb-8 bg-gradient-to-b from-[#f7f7f6] via-[#f2f2f0] to-[#ecece9] border-b border-murekkep/10">
+    <!-- Arka plan ince mimari kılavuz çizgileri -->
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#12131608_1px,transparent_1px),linear-gradient(to_bottom,#12131608_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none"></div>
+
+    <div class="kab relative">
+      <!-- Üst Etiket & Canlı İndeks Rozeti -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-3" data-belir>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-murekkep/10 shadow-2xs text-[11px] font-mono font-bold tracking-widest text-murekkep uppercase">
+          <span class="w-2 h-2 rounded-full bg-kirmizi animate-pulse"></span>
+          <span>EDM BİLGİ MERKEZİ</span>
+          <span class="text-kursun/60">//</span>
+          <span class="text-kirmizi">MEVZUAT & SAHA ANSİKLOPEDİSİ</span>
         </div>
 
-        <!-- Filtre ve Alfabe Satırı -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-murekkep/8 text-xs font-mono">
-          <!-- Kategori Butonları -->
-          <div class="flex flex-wrap items-center gap-1.5">
+        <div class="flex items-center gap-2 font-mono text-xs">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-murekkep text-white font-bold shadow-xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            {SOZLUK_TERIMLERI.length} Aktif Terim
+          </span>
+          <span class="hidden sm:inline-block px-2.5 py-1 rounded-full bg-white border border-murekkep/10 text-kursun font-medium">
+            Mevzuat Uyumlu
+          </span>
+        </div>
+      </div>
+
+      <!-- Ana Başlık ve Açıklama -->
+      <div class="max-w-3xl" data-belir data-gecikme="0.05">
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-serif font-black text-murekkep tracking-tight leading-[1.06]">
+          Emlak Terimleri <span class="text-kirmizi font-normal italic font-serif">Sözlüğü</span>
+        </h1>
+        <p class="mt-3 text-sm sm:text-base text-metin-2 leading-relaxed font-sans">
+          Tapu, imar, kira hukuku, vergi mevzuatı, kentsel dönüşüm, şantiye mühendisliği ve gayrimenkul değerleme alanındaki <strong>1.569 terim</strong>. Kelimelere tıklayarak resmi mevzuat dayanaklarını ve yatırımcı saha uyarılarını Instagram bilgi kartı formatında inceleyebilirsiniz.
+        </p>
+      </div>
+
+      <!-- Hızlı Keşif / Popüler Terimler Hapları -->
+      <div class="mt-5 pt-4 border-t border-murekkep/10 flex flex-wrap items-center gap-2 text-xs" data-belir data-gecikme="0.1">
+        <span class="font-mono text-[11px] font-bold text-kursun uppercase tracking-wider flex items-center gap-1">
+          <span>🔥</span> Popüler:
+        </span>
+        {populerAramalar.map((terim) => (
+          <button
+            type="button"
+            class="populer-terim-btn inline-flex items-center px-2.5 py-1 rounded-lg bg-white/90 hover:bg-murekkep hover:text-white border border-murekkep/12 text-murekkep text-xs font-medium transition-all shadow-2xs cursor-pointer"
+            data-arama-metni={terim}
+          >
+            {terim}
+          </button>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- KONTROL MERKEZİ: ARAMA, KATEGORİ TABS VE ALFABE (STICKY & ULTRA HIZLI) -->
+  <section class="sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-murekkep/10 shadow-xs transition-all py-3">
+    <div class="kab">
+      <div class="flex flex-col gap-3">
+        <!-- Üst Sıra: Büyük Arama Kutusu + Tümünü Büyüt Butonu -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+          <!-- Arama Input -->
+          <div class="relative flex-1">
+            <input
+              type="text"
+              id="terim-arama"
+              placeholder="Terim, kanun maddesi veya konu ara (örn: şufa, ifraz, kat mülkiyeti, emsal, tahliye, nzeb)..."
+              class="w-full rounded-xl border border-murekkep/20 bg-[#fafaf9] px-4 py-2.5 pl-11 pr-20 text-xs sm:text-sm text-murekkep placeholder:text-kursun focus:border-kirmizi focus:bg-white focus:ring-2 focus:ring-kirmizi/10 focus:outline-none transition-all font-sans"
+            />
+            <svg class="absolute left-3.5 top-3 h-4 w-4 text-kursun" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="8.5" cy="8.5" r="5.5" />
+              <path d="m13 13 4 4" stroke-linecap="round" />
+            </svg>
+            <div class="absolute right-3 top-2.5 flex items-center gap-1.5">
+              <button
+                type="button"
+                id="arama-temizle"
+                class="hidden text-[11px] font-mono text-kursun hover:text-kirmizi transition-colors px-1.5 py-0.5 rounded bg-kagit-2 cursor-pointer"
+                title="Aramayı temizle"
+              >
+                ✕ Temizle
+              </button>
+              <kbd class="hidden md:inline-flex items-center px-1.5 py-0.5 rounded border border-murekkep/15 bg-white text-[10px] font-mono text-kursun select-none shadow-2xs">
+                /
+              </kbd>
+            </div>
+          </div>
+
+          <!-- Tümünü Büyüt / Küçült Toggle Butonu -->
+          <div class="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              id="tumunu-ac-kapat"
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-murekkep text-white hover:bg-kirmizi text-xs font-mono font-bold transition-all shadow-xs cursor-pointer"
+            >
+              <span id="tumunu-ikon">⊞</span>
+              <span id="tumunu-metin">Tümünü Büyüt</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Alt Sıra: Kategori Filtreleri + Alfabe Gezinme Çubuğu -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pt-2 border-t border-murekkep/8 text-xs font-mono">
+          <!-- Kategori Tabs -->
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 lg:pb-0 scrollbar-none" id="kategori-listesi">
             {kategoriler.map((kat, index) => (
               <button
                 type="button"
-                class={`kategori-buton px-2.5 py-1 rounded-full text-[11px] cursor-pointer transition-all ${
+                class={`kategori-buton whitespace-nowrap px-3 py-1.5 rounded-lg text-[11px] cursor-pointer transition-all flex items-center gap-1.5 ${
                   index === 0
-                    ? 'bg-murekkep text-white font-bold shadow-sm'
-                    : 'bg-kagit text-metin-2 hover:bg-murekkep/10 hover:text-murekkep'
+                    ? 'bg-murekkep text-white font-bold shadow-xs'
+                    : 'bg-[#fafaf9] text-metin-2 hover:bg-murekkep/10 hover:text-murekkep border border-murekkep/8'
                 }`}
                 data-kategori-deger={kat === 'Tümü' ? 'hepsi' : kat}
               >
-                {kat}
+                <span>{kat}</span>
+                <span class="opacity-60 text-[10px] font-normal">
+                  ({kategoriSayilari[kat] || 0})
+                </span>
               </button>
             ))}
           </div>
 
-          <!-- Alfabe Hızlı Gezinme -->
-          <div class="flex flex-wrap items-center gap-1">
+          <!-- Alfabe Hızlı Atlama Şeridi -->
+          <div class="flex items-center gap-1 overflow-x-auto pb-1 lg:pb-0 scrollbar-none shrink-0" id="alfabe-cubugu">
             {harfler.map((h) => (
               <a
                 href={`#harf-${h}`}
-                class="harf-baglanti inline-flex h-6 w-6 items-center justify-center rounded bg-kagit text-[11px] font-bold text-murekkep hover:bg-kirmizi hover:text-white transition-colors"
+                class="harf-baglanti inline-flex h-7 w-7 items-center justify-center rounded-md bg-[#fafaf9] hover:bg-kirmizi hover:text-white text-[11px] font-bold text-murekkep border border-murekkep/8 transition-colors select-none shrink-0 shadow-2xs"
                 data-harf-hedef={h}
+                title={`${h} harfine git`}
               >
                 {h}
               </a>
@@ -105,201 +322,102 @@ const kategoriler = [
           </div>
         </div>
 
-        <!-- Canlı Durum -->
-        <div class="pt-1 text-[11px] font-mono text-kursun flex items-center justify-between">
-          <span id="arama-sayac">{SOZLUK_TERIMLERI.length} terim listeleniyor</span>
-          <span class="text-kursun/70 hidden sm:inline">EDM Yapı & Gayrimenkul Hukuk & Saha Arşivi</span>
+        <!-- Canlı Terim Sayacı ve Bilgilendirme -->
+        <div class="flex items-center justify-between text-[11px] font-mono text-kursun pt-0.5">
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span id="arama-sayac" class="font-bold text-murekkep">{SOZLUK_TERIMLERI.length} terim</span>
+            <span>listeleniyor</span>
+          </div>
+          <span class="hidden sm:inline text-kursun/80">
+            Arama yapıldığında eşleşen terimler otomatik büyütülür
+          </span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- TERİMLER ALANI: TIKLANDIĞINDA BÜYÜYEN BİLGİ KARTLARI (EDM POST TASARIMI) -->
-  <section class="pb-16 lg:pb-24">
+  <!-- TERİMLER IZGARASI: TIKLANDIĞINDA BÜYÜYEN BİLGİ KARTLARI -->
+  <section class="py-8 lg:py-12 bg-[#fafaf9]">
     <div class="kab">
-      <!-- Boş Durum -->
-      <div id="bos-durum" class="hidden text-center py-12 px-4 rounded-xl bg-white border border-murekkep/10 shadow-sm max-w-md mx-auto my-6">
-        <h3 class="font-serif text-lg font-bold text-murekkep">Terim Bulunamadı</h3>
-        <p class="text-xs text-metin-2 mt-1">Farklı bir kelime arayabilir veya filtreleri sıfırlayabilirsiniz.</p>
+      <!-- Terim Bulunamadı (Boş Durum) -->
+      <div id="bos-durum" class="hidden text-center py-16 px-6 rounded-2xl bg-white border border-murekkep/10 shadow-sm max-w-lg mx-auto my-8">
+        <div class="w-14 h-14 rounded-full bg-kagit flex items-center justify-center mx-auto text-2xl mb-3 text-kursun">
+          🔍
+        </div>
+        <h3 class="font-serif text-xl font-bold text-murekkep">Terim Bulunamadı</h3>
+        <p class="text-xs sm:text-sm text-metin-2 mt-2 leading-relaxed">
+          Aradığınız kelimeye ilişkin sonuç bulunamadı. Yazımı kontrol edebilir veya filtreleri sıfırlayabilirsiniz.
+        </p>
         <button
           type="button"
           id="filtreleri-sifirla"
-          class="mt-3 px-3 py-1.5 rounded bg-murekkep text-white text-xs font-mono font-semibold hover:bg-kirmizi transition-colors cursor-pointer"
+          class="mt-4 px-4 py-2 rounded-xl bg-murekkep text-white text-xs font-mono font-bold hover:bg-kirmizi transition-colors cursor-pointer shadow-xs"
         >
-          Filtreleri Sıfırla
+          Filtreleri Sıfırla ve Tüm Terimleri Göster
         </button>
       </div>
 
-      <div class="space-y-8" id="terimler-alani">
+      <!-- Harf Grupları ve Terim Kartları -->
+      <div class="space-y-10" id="terimler-alani">
         {harfler.map((harf) => {
           const buHarftekiTerimler = SOZLUK_TERIMLERI.filter((t) => t.harf === harf);
           return (
-            <div id={`harf-${harf}`} class="harf-bolumu scroll-mt-24" data-harf-bolumu={harf}>
-              <!-- Harf Ayırıcı Başlık -->
-              <div class="flex items-center justify-between border-b border-murekkep/15 pb-1.5 mb-3">
-                <div class="flex items-baseline gap-2">
-                  <span class="font-serif text-2xl font-black text-murekkep">{harf}</span>
-                  <span class="text-[10px] font-mono text-kursun uppercase tracking-wider">
+            <div id={`harf-${harf}`} class="harf-bolumu scroll-mt-48" data-harf-bolumu={harf}>
+              <!-- Harf Ayırıcı Başlık Plakası -->
+              <div class="flex items-center justify-between border-b-2 border-murekkep/15 pb-2 mb-4 bg-transparent">
+                <div class="flex items-baseline gap-3">
+                  <div class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-murekkep text-white font-serif text-xl font-black shadow-xs">
+                    {harf}
+                  </div>
+                  <span class="text-xs font-mono font-bold text-murekkep uppercase tracking-wider">
+                    {harf} Harfi İle Başlayanlar
+                  </span>
+                  <span class="text-[11px] font-mono text-kursun bg-white px-2 py-0.5 rounded-full border border-murekkep/10">
                     {buHarftekiTerimler.length} Terim
                   </span>
                 </div>
                 <a
                   href="#terim-arama"
-                  class="text-[10px] font-mono text-kursun hover:text-kirmizi transition-colors"
+                  class="text-[11px] font-mono font-semibold text-kursun hover:text-kirmizi transition-colors flex items-center gap-1"
                 >
-                  ↑ Yukarı
+                  <span>↑</span>
+                  <span>Yukarı Dön</span>
                 </a>
               </div>
 
-              <!-- Kompakt Kelime Izgarası (Tıklanınca Büyür) -->
+              <!-- Kompakt Kelime Izgarası (Tıklanınca Instagram Kartına Büyür) -->
               <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 items-start">
                 {buHarftekiTerimler.map((t) => (
                   <div
                     class="terim-kapsayici group transition-all duration-200"
-                    data-terim-adi={t.terim.toLowerCase()}
-                    data-terim-metin={`${t.terim} ${t.kisaTanim} ${t.pratikteNeAnlamaGelir} ${t.hukukiKarsilik} ${t.kategori} ${t.harf}`.toLowerCase()}
                     data-terim-kategori={t.kategori}
                     data-terim-harf={t.harf}
                     data-terim-slug={t.slug}
                     data-durum="kapali"
                   >
-                    <!-- 1. TIKLANMADIĞINDA: KÜÇÜK SADECE KELİME YAZAN HALİ -->
+                    <!-- TIKLANMADIĞINDA: KÜÇÜK VE ŞIK KELİME KARTI -->
                     <button
                       type="button"
-                      class="terim-kapali w-full text-left flex items-center justify-between gap-3 p-3 bg-white rounded-xl border border-murekkep/12 hover:border-kirmizi hover:shadow-sm transition-all duration-150 cursor-pointer"
+                      class="terim-kapali w-full text-left flex items-center justify-between gap-3 p-3.5 bg-white rounded-xl border border-murekkep/10 hover:border-kirmizi/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 cursor-pointer"
                       aria-expanded="false"
                       title="Detaylı bilgi kartını açmak için tıklayın"
                     >
                       <div class="flex items-center gap-2.5 min-w-0">
-                        <span class="w-2 h-2 rounded-full bg-kursun/40 group-hover:bg-kirmizi transition-colors shrink-0"></span>
-                        <span class="font-serif text-sm sm:text-base font-bold text-murekkep group-hover:text-kirmizi transition-colors truncate">
+                        <span class="w-2 h-2 rounded-full bg-murekkep/20 group-hover:bg-kirmizi transition-colors shrink-0"></span>
+                        <span class="font-serif text-[15px] sm:text-base font-bold text-murekkep group-hover:text-kirmizi transition-colors truncate">
                           {t.terim}
                         </span>
                       </div>
-                      <div class="flex items-center gap-2 shrink-0">
-                        <span class="text-[10px] font-mono text-kursun bg-kagit px-2 py-0.5 rounded border border-murekkep/8">
-                          {t.kategori.split(' ')[0]}
+                      <div class="flex items-center gap-1.5 shrink-0">
+                        <span class="text-[10px] font-mono text-metin-2 bg-[#f4f4f3] px-2 py-0.5 rounded border border-murekkep/8 max-w-[100px] truncate hidden sm:inline-block">
+                          {t.kategori.replace('&', '·')}
                         </span>
-                        <span class="w-6 h-6 rounded-full bg-kagit flex items-center justify-center text-xs font-mono font-bold text-kursun group-hover:bg-kirmizi group-hover:text-white transition-colors">
+                        <span class="w-6 h-6 rounded-full bg-[#f4f4f3] group-hover:bg-kirmizi group-hover:text-white flex items-center justify-center text-xs font-mono font-bold text-kursun transition-colors shadow-2xs">
                           +
                         </span>
                       </div>
                     </button>
-
-                    <!-- 2. TIKLANDIĞINDA: BÜYÜYEN EDM POST / SÖZLÜK ŞABLONU (KİREÇ BEJ PAFTA) -->
-                    <article
-                      class="terim-acik relative flex-col justify-between rounded-2xl bg-[#ebebe7] text-[#121316] p-5 sm:p-7 shadow-xl border border-[#d4d4ce] overflow-hidden transition-all duration-200"
-                    >
-                      <!-- Mimari Açık Kitap Filigranı (Instagram Sözlük Şablonu) -->
-                      <svg
-                        class="absolute right-4 top-14 w-48 sm:w-60 h-36 sm:h-44 text-[#121316]/[0.05] pointer-events-none select-none"
-                        viewBox="0 0 200 130"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                      >
-                        <!-- Sol ve Sağ Sayfalar -->
-                        <polygon points="96,20 10,12 10,105 96,115" stroke="currentColor" stroke-width="1.8" />
-                        <polygon points="104,20 190,12 190,105 104,115" stroke="currentColor" stroke-width="1.8" />
-                        <!-- Orta Cilt Çizgisi -->
-                        <line x1="100" y1="18" x2="100" y2="118" stroke="currentColor" stroke-width="2.5" />
-                        <!-- Sayfa İçi Kılavuz Çizgileri -->
-                        <line x1="25" y1="36" x2="82" y2="39" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
-                        <line x1="25" y1="52" x2="82" y2="55" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
-                        <line x1="25" y1="68" x2="82" y2="71" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
-                        <line x1="25" y1="84" x2="82" y2="87" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
-                        <line x1="118" y1="39" x2="175" y2="36" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
-                        <line x1="118" y1="55" x2="175" y2="52" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
-                        <line x1="118" y1="71" x2="175" y2="68" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
-                        <line x1="118" y1="87" x2="175" y2="84" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3" />
-                        <!-- Kırmızı Kitap Ayracı Şeridi -->
-                        <polygon points="97,114 103,114 102,128 100,124 98,128" fill="#c4030f" stroke="#c4030f" stroke-width="1" />
-                      </svg>
-
-                      <!-- Arka Planda Silik Büyük Harf Rölövesi -->
-                      <span class="absolute right-4 -bottom-6 font-serif text-9xl font-black text-[#121316]/[0.03] select-none pointer-events-none leading-none">
-                        {t.harf}
-                      </span>
-
-                      <div class="relative z-10">
-                        <!-- ÜST ŞERİT: SİYAH KAPSÜL ROZET + SAĞDA EDM LOGOSU & KÜÇÜLT -->
-                        <div class="flex items-center justify-between gap-2 border-b border-[#d4d4ce] pb-3">
-                          <!-- Siyah Dikdörtgen Hap Rozet -->
-                          <div class="inline-flex items-center px-2.5 py-1 rounded bg-[#121316] text-white text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider shadow-sm">
-                            EMLAK SÖZLÜĞÜ // {t.kategori.toUpperCase()}
-                          </div>
-
-                          <!-- Sağ Üst: Logo ve Küçült Butonu -->
-                          <div class="flex items-center gap-2">
-                            <img src="/marka/logo-yatay.png" alt="EDM Yapı & Gayrimenkul" class="h-5 sm:h-6 w-auto hidden sm:block opacity-90" />
-                            <button
-                              type="button"
-                              class="terim-kapat-btn inline-flex items-center gap-1 text-[11px] font-mono font-bold text-[#121316] bg-white/80 hover:bg-[#f0000d] hover:text-white border border-[#d4d4ce] px-2.5 py-0.5 rounded transition-all cursor-pointer shadow-2xs"
-                              title="Kartı küçült"
-                            >
-                              <span>✕</span>
-                              <span>Küçült</span>
-                            </button>
-                          </div>
-                        </div>
-
-                        <!-- İRİ VE DEV TERİM BAŞLIĞI (FRAUNCES SERİF BÜYÜK HARFLİ) -->
-                        <h3 class="font-serif text-2xl sm:text-3xl lg:text-4xl font-black text-[#121316] tracking-tight uppercase leading-[1.08] mt-4 sm:mt-5">
-                          {t.terim}
-                        </h3>
-
-                        <!-- İNCE AYRIM ÇİZGİSİ -->
-                        <div class="border-b border-[#d4d4ce] mt-3.5 mb-2.5"></div>
-
-                        <!-- TANIM & ANLAMI ETİKETİ -->
-                        <div class="text-[11px] font-mono font-bold text-[#8a8b8f] tracking-wider uppercase mb-1.5">
-                          TANIM & ANLAMI
-                        </div>
-
-                        <!-- TANIM VE SAHA GERÇEĞİ METNİ -->
-                        <div class="font-sans text-sm sm:text-base leading-relaxed text-[#121316] relative pl-4 sm:pl-5">
-                          <!-- Sol Baş Tırnak İşareti -->
-                          <span class="absolute left-0 -top-1 font-serif text-2xl sm:text-3xl text-[#8a8b8f]/70 select-none leading-none">“</span>
-                          <p>
-                            {t.kisaTanim} {t.pratikteNeAnlamaGelir}
-                          </p>
-                        </div>
-
-                        <!-- SİYAH KUTU: YATIRIMCI İÇİN ÖNEMİ / KRİTİK UYARI -->
-                        <div class="mt-4 sm:mt-5 rounded-xl bg-[#121316] border border-[#2b2d35] border-l-4 border-l-[#EBAF37] p-3.5 sm:p-4.5 text-xs sm:text-sm text-white shadow-md">
-                          <div class="flex items-center gap-1.5 text-[#EBAF37] font-mono text-[11px] font-bold uppercase tracking-wider mb-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-[#EBAF37]"></span>
-                            <span>YATIRIMCI İÇİN ÖNEMİ:</span>
-                          </div>
-                          <p class="text-[#f5f7fa] font-sans leading-relaxed text-xs sm:text-[13px]">
-                            {t.kritikUyari}
-                          </p>
-                        </div>
-                      </div>
-
-                      <!-- KART ALTI (FOOTER): EDM YAPI // EMLAK SÖZLÜĞÜ + RESMİ MEVZUAT -->
-                      <div class="relative z-10 mt-5 pt-3 border-t border-[#d4d4ce] flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-[#8a8b8f]">
-                        <span class="tracking-wider uppercase text-[10px] sm:text-[11px]">
-                          EDM YAPI & GAYRİMENKUL // EMLAK SÖZLÜĞÜ
-                        </span>
-
-                        <div class="flex items-center gap-3">
-                          {t.kaynaklar.map((kaynak) => (
-                            <a
-                              href={kaynak.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              class="text-[#121316] hover:text-[#f0000d] font-bold underline underline-offset-4 decoration-[#d4d4ce] hover:decoration-[#f0000d] transition-colors"
-                            >
-                              <span>{kaynak.baslik} ↗</span>
-                            </a>
-                          ))}
-                          <span class="text-[#121316] font-bold hidden sm:inline">
-                            SÖZLÜK // 01
-                          </span>
-                        </div>
-                      </div>
-                    </article>
                   </div>
                 ))}
               </div>
@@ -309,16 +427,42 @@ const kategoriler = [
       </div>
 
       <!-- GENEL YASAL BİLGİLENDİRME ŞERHİ -->
-      <div class="mt-14 pt-6 border-t border-murekkep/10 text-center max-w-2xl mx-auto">
+      <div class="mt-16 pt-8 border-t border-murekkep/15 text-center max-w-2xl mx-auto">
+        <div class="inline-flex items-center gap-2 text-xs font-mono font-bold text-murekkep uppercase tracking-wider mb-2">
+          <span>⚖️</span>
+          <span>YASAL BİLGİLENDİRME ŞERHİ</span>
+        </div>
         <p class="text-[11px] font-mono text-kursun leading-relaxed">
-          Genel bilgilendirme içindir. Taşınmaz işlemlerinizde kesin hukuki sonuç için tapu sicil kayıtlarını, güncel mevzuatı ve uzman danışmanlarımızı esas alınız.
+          Bu sözlükteki terim ve açıklamalar genel bilgilendirme amacıyla hazırlanmıştır. Taşınmaz işlemlerinizde kesin hukuki ve mali netice için ilgili tapu müdürlüğü sicil kayıtları, belediye imar arşivleri, yürürlükteki mevzuat ve lisanslı gayrimenkul değerleme uzmanlarımızın resmi raporları esas alınmalıdır.
         </p>
       </div>
     </div>
   </section>
+
+  <!-- YÜKSEK HIZLI VERİTABANI HARİTASI (GZIP İLE SIKIŞTIRILMIŞ ULTRA HAFİF JSON) -->
+  <script id="sozluk-veritabani" type="application/json" set:html={JSON.stringify(sozlukVeriHaritasi)}></script>
+
+  <!-- YUKARI ÇIK YÜZEN DÜĞMESİ (FLOATING BACK TO TOP) -->
+  <button
+    type="button"
+    id="basa-don-btn"
+    class="fixed bottom-6 right-6 z-40 hidden h-11 w-11 items-center justify-center rounded-full bg-murekkep text-white shadow-xl hover:bg-kirmizi hover:scale-105 transition-all duration-200 cursor-pointer border border-white/20"
+    title="Sayfa Başına Dön"
+    aria-label="Sayfa Başına Dön"
+  >
+    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M10 15V5M5 10l5-5 5 5" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </button>
 </Temel>
 
 <style is:global>
+  /* Performans Motoru: Ekran dışındaki kartlar için sıfır boyama maliyeti (Modern Web Standardı) */
+  .terim-kapsayici {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 52px;
+  }
+
   /* Kapalı durum (Kompakt kelime görünümü) */
   .terim-kapsayici .terim-acik {
     display: none !important;
@@ -327,10 +471,10 @@ const kategoriler = [
     display: flex !important;
   }
 
-  /* Açık durum (Büyümüş EDM Post / Pafta Görünümü) */
+  /* Açık durum (Büyümüş Instagram Kart Görünümü) */
   .terim-kapsayici[data-durum="acik"] .terim-acik {
     display: flex !important;
-    animation: slideGrow 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: slideGrow 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .terim-kapsayici[data-durum="acik"] .terim-kapali {
     display: none !important;
@@ -339,18 +483,100 @@ const kategoriler = [
   @keyframes slideGrow {
     from {
       opacity: 0;
-      transform: scale(0.97) translateY(-6px);
+      transform: scale(0.985) translateY(-6px);
     }
     to {
       opacity: 1;
       transform: scale(1) translateY(0);
     }
   }
+
+  /* Scrollbar gizleme */
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 </style>
 
 <script is:inline>
   (() => {
-    // 1. TIKLAYINCA BÜYÜME VE KÜÇÜLME (EVENT DELEGATION: EN SAĞLAM YÖNTEM)
+    // 1. JSON VERİTABANINI VE TEMPLATE ELEMANINI AL
+    const veriEl = document.getElementById('sozluk-veritabani');
+    const sozlukVerisi = veriEl ? JSON.parse(veriEl.textContent || '{}') : {};
+    const template = document.getElementById('terim-kart-sablonu');
+
+    // On-Demand (Tıklanınca) Kart Üretici
+    function kartUret(kapsayici) {
+      if (!kapsayici || kapsayici.querySelector('.terim-acik')) return;
+      const slug = kapsayici.getAttribute('data-terim-slug');
+      const t = sozlukVerisi[slug];
+      if (!t || !template) return;
+
+      const clone = template.content.cloneNode(true);
+      const harfEl = clone.querySelector('.kart-harf');
+      if (harfEl) harfEl.textContent = t.harf;
+
+      const katEl = clone.querySelector('.kart-kategori');
+      if (katEl) katEl.textContent = 'EMLAK SÖZLÜĞÜ // ' + t.kategori.toUpperCase();
+
+      const baslikEl = clone.querySelector('.kart-baslik');
+      if (baslikEl) baslikEl.textContent = t.terim;
+
+      const tanimEl = clone.querySelector('.kart-tanim');
+      if (tanimEl) tanimEl.textContent = t.kisaTanim + (t.pratikteNeAnlamaGelir ? ' ' + t.pratikteNeAnlamaGelir : '');
+
+      const hukukKutusu = clone.querySelector('.kart-hukuk-kutusu');
+      const hukukEl = clone.querySelector('.kart-hukuk');
+      if (t.hukukiKarsilik && t.hukukiKarsilik.trim()) {
+        if (hukukEl) hukukEl.textContent = t.hukukiKarsilik;
+      } else if (hukukKutusu) {
+        hukukKutusu.style.display = 'none';
+      }
+
+      const uyariEl = clone.querySelector('.kart-uyari');
+      if (uyariEl) uyariEl.textContent = t.kritikUyari;
+
+      // Kaynak linkleri
+      const kaynaklarDiv = clone.querySelector('.kart-kaynaklar');
+      if (kaynaklarDiv && t.kaynaklar && t.kaynaklar.length > 0) {
+        t.kaynaklar.forEach((kaynak) => {
+          const a = document.createElement('a');
+          a.href = kaynak.url;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.className = 'text-[#111214] hover:text-[#f0000d] font-bold underline underline-offset-4 decoration-[#d5d5ce] hover:decoration-[#f0000d] transition-colors';
+          a.innerHTML = `<span>${kaynak.ad || kaynak.baslik || 'Mevzuat'} ↗</span>`;
+          kaynaklarDiv.appendChild(a);
+        });
+      }
+
+      // Kopyalama butonu işlevi
+      const kopyalaBtn = clone.querySelector('.kart-kopyala-btn');
+      if (kopyalaBtn) {
+        kopyalaBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const metin = `📌 ${t.terim.toUpperCase()}\n\n📖 Tanım: ${t.kisaTanim}\n\n⚠️ Yatırımcı İçin Önemi: ${t.kritikUyari}\n\n🏛️ Kaynak: EDM Yapı & Gayrimenkul Emlak Sözlüğü (edm.tc/sozluk)`;
+          navigator.clipboard.writeText(metin).then(() => {
+            const yaziEl = kopyalaBtn.querySelector('.kopyala-yazi');
+            if (yaziEl) {
+              const eski = yaziEl.textContent;
+              yaziEl.textContent = 'Kopyalandı!';
+              setTimeout(() => {
+                yaziEl.textContent = eski;
+              }, 2000);
+            }
+          });
+        });
+      }
+
+      kapsayici.appendChild(clone);
+    }
+
+    // 2. TIKLAYINCA BÜYÜME VE KÜÇÜLME (DELEGATION)
     document.addEventListener('click', (e) => {
       // Kapalı kart tıklandı -> BÜYÜT
       const kapaliBtn = e.target.closest('.terim-kapali');
@@ -358,6 +584,7 @@ const kategoriler = [
         e.preventDefault();
         const kapsayici = kapaliBtn.closest('.terim-kapsayici');
         if (kapsayici) {
+          kartUret(kapsayici);
           kapsayici.setAttribute('data-durum', 'acik');
         }
         return;
@@ -381,40 +608,95 @@ const kategoriler = [
       const aramaTemizle = document.getElementById('arama-temizle');
       const filtreleriSifirla = document.getElementById('filtreleri-sifirla');
       const tumunuAcKapatBtn = document.getElementById('tumunu-ac-kapat');
+      const tumunuIkon = document.getElementById('tumunu-ikon');
+      const tumunuMetin = document.getElementById('tumunu-metin');
       const kategoriButonlari = document.querySelectorAll('.kategori-buton');
       const kapsayicilar = document.querySelectorAll('.terim-kapsayici');
       const harfBolumleri = document.querySelectorAll('.harf-bolumu');
       const harfBaglantilari = document.querySelectorAll('.harf-baglanti');
       const bosDurum = document.getElementById('bos-durum');
       const aramaSayac = document.getElementById('arama-sayac');
+      const basaDonBtn = document.getElementById('basa-don-btn');
+      const populerBtnler = document.querySelectorAll('.populer-terim-btn');
 
       let seciliKategori = 'hepsi';
       let aktifSorgu = '';
       let hepsiAcik = false;
 
-      // Tümünü Büyüt / Küçült
-      tumunuAcKapatBtn?.addEventListener('click', (e) => {
-        e.preventDefault();
-        hepsiAcik = !hepsiAcik;
-        tumunuAcKapatBtn.textContent = hepsiAcik ? 'Tümünü Küçült' : 'Tümünü Büyüt';
-
-        kapsayicilar.forEach((kapsayici) => {
-          if (kapsayici.style.display !== 'none') {
-            kapsayici.setAttribute('data-durum', hepsiAcik ? 'acik' : 'kapali');
+      // Popüler terim haplarına tıklanınca arama yap
+      populerBtnler.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const metin = btn.getAttribute('data-arama-metni') || '';
+          if (aramaGirdisi) {
+            aramaGirdisi.value = metin;
+            aktifSorgu = metin.trim().toLowerCase();
+            aramaTemizle?.classList.toggle('hidden', !aktifSorgu);
+            filtrele();
+            // Arama kutusuna odaklan
+            aramaGirdisi.focus();
           }
         });
       });
 
-      // Filtreleme fonksiyonu
+      // Klavye kısayolu: '/' veya 'cmd+k' basınca aramaya odaklan
+      window.addEventListener('keydown', (e) => {
+        if ((e.key === '/' || ((e.metaKey || e.ctrlKey) && e.key === 'k')) && document.activeElement !== aramaGirdisi) {
+          e.preventDefault();
+          aramaGirdisi?.focus();
+          aramaGirdisi?.select();
+        }
+      });
+
+      // Başa dön düğmesi görünürlüğü
+      window.addEventListener('scroll', () => {
+        if (basaDonBtn) {
+          if (window.scrollY > 400) {
+            basaDonBtn.classList.remove('hidden');
+            basaDonBtn.classList.add('flex');
+          } else {
+            basaDonBtn.classList.add('hidden');
+            basaDonBtn.classList.remove('flex');
+          }
+        }
+      });
+
+      basaDonBtn?.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      // Tümünü Büyüt / Küçült
+      tumunuAcKapatBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        hepsiAcik = !hepsiAcik;
+        if (tumunuMetin) tumunuMetin.textContent = hepsiAcik ? 'Tümünü Küçült' : 'Tümünü Büyüt';
+        if (tumunuIkon) tumunuIkon.textContent = hepsiAcik ? '⊟' : '⊞';
+        tumunuAcKapatBtn.classList.toggle('bg-kirmizi', hepsiAcik);
+        tumunuAcKapatBtn.classList.toggle('bg-murekkep', !hepsiAcik);
+
+        kapsayicilar.forEach((kapsayici) => {
+          if (kapsayici.style.display !== 'none') {
+            if (hepsiAcik) {
+              kartUret(kapsayici);
+              kapsayici.setAttribute('data-durum', 'acik');
+            } else {
+              kapsayici.setAttribute('data-durum', 'kapali');
+            }
+          }
+        });
+      });
+
+      // Filtreleme fonksiyonu (Mikrosaniye seviyesinde ultra hızlı)
       function filtrele() {
         let gorunenSayisi = 0;
         const gorunenHarfler = new Set();
 
         kapsayicilar.forEach((kapsayici) => {
-          const metin = kapsayici.getAttribute('data-terim-metin') || '';
+          const slug = kapsayici.getAttribute('data-terim-slug') || '';
           const kategori = kapsayici.getAttribute('data-terim-kategori') || '';
           const harf = kapsayici.getAttribute('data-terim-harf') || '';
+          const t = sozlukVerisi[slug];
 
+          const metin = t ? (t.terim + ' ' + t.kisaTanim + ' ' + (t.pratikteNeAnlamaGelir || '') + ' ' + t.hukukiKarsilik + ' ' + t.kategori + ' ' + t.harf).toLowerCase() : '';
           const sorguUyumu = !aktifSorgu || metin.includes(aktifSorgu);
           const kategoriUyumu = seciliKategori === 'hepsi' || kategori === seciliKategori;
 
@@ -425,6 +707,7 @@ const kategoriler = [
 
             // Arama yapıldıysa eşleşen terimleri otomatik büyüt
             if (aktifSorgu.length >= 2) {
+              kartUret(kapsayici);
               kapsayici.setAttribute('data-durum', 'acik');
             }
           } else {
@@ -445,90 +728,78 @@ const kategoriler = [
             baglanti.style.opacity = '1';
             baglanti.style.pointerEvents = 'auto';
           } else {
-            baglanti.style.opacity = '0.3';
+            baglanti.style.opacity = '0.25';
             baglanti.style.pointerEvents = 'none';
           }
         });
 
-        // Boş durum bildirimi
-        if (bosDurum) {
-          bosDurum.style.display = gorunenSayisi === 0 ? 'block' : 'none';
-        }
-
-        // Sayaç güncelle
+        // Sayacı güncelle ve boş durumu yönet
         if (aramaSayac) {
-          if (aktifSorgu || seciliKategori !== 'hepsi') {
-            aramaSayac.textContent = `${gorunenSayisi} terim bulundu`;
-          } else {
-            aramaSayac.textContent = `${gorunenSayisi} terim listeleniyor`;
-          }
+          aramaSayac.textContent = `${gorunenSayisi} terim`;
         }
-
-        // Temizle butonunu göster/gizle
-        if (aramaTemizle) {
-          aramaTemizle.style.display = aktifSorgu ? 'inline-block' : 'none';
+        if (bosDurum) {
+          bosDurum.classList.toggle('hidden', gorunenSayisi > 0);
         }
       }
 
-      aramaGirdisi?.addEventListener('input', (e) => {
-        aktifSorgu = e.target.value.trim().toLocaleLowerCase('tr');
-        filtrele();
-      });
-
-      aramaTemizle?.addEventListener('click', () => {
-        if (aramaGirdisi) {
-          aramaGirdisi.value = '';
-          aktifSorgu = '';
-          filtrele();
-          aramaGirdisi.focus();
-        }
-      });
-
+      // Kategori butonları
       kategoriButonlari.forEach((btn) => {
-        btn.addEventListener('click', () => {
-          kategoriButonlari.forEach((b) => {
-            b.classList.remove('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
-            b.classList.add('bg-kagit', 'text-metin-2');
-          });
-
-          btn.classList.remove('bg-kagit', 'text-metin-2');
-          btn.classList.add('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
-
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
           seciliKategori = btn.getAttribute('data-kategori-deger') || 'hepsi';
+
+          kategoriButonlari.forEach((b) => {
+            b.classList.remove('bg-murekkep', 'text-white', 'font-bold', 'shadow-xs');
+            b.classList.add('bg-[#fafaf9]', 'text-metin-2');
+          });
+          btn.classList.remove('bg-[#fafaf9]', 'text-metin-2');
+          btn.classList.add('bg-murekkep', 'text-white', 'font-bold', 'shadow-xs');
+
           filtrele();
         });
       });
 
+      // Arama kutusu girdisi
+      aramaGirdisi?.addEventListener('input', (e) => {
+        aktifSorgu = (e.target.value || '').trim().toLowerCase();
+        aramaTemizle?.classList.toggle('hidden', !aktifSorgu);
+        filtrele();
+      });
+
+      // Arama temizle butonu
+      aramaTemizle?.addEventListener('click', () => {
+        if (aramaGirdisi) aramaGirdisi.value = '';
+        aktifSorgu = '';
+        aramaTemizle.classList.add('hidden');
+        filtrele();
+        aramaGirdisi?.focus();
+      });
+
+      // Filtreleri sıfırla butonu
       filtreleriSifirla?.addEventListener('click', () => {
         if (aramaGirdisi) aramaGirdisi.value = '';
         aktifSorgu = '';
+        aramaTemizle?.classList.add('hidden');
         seciliKategori = 'hepsi';
 
-        kategoriButonlari.forEach((b, index) => {
-          if (index === 0) {
-            b.classList.add('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
-            b.classList.remove('bg-kagit', 'text-metin-2');
+        kategoriButonlari.forEach((b, i) => {
+          if (i === 0) {
+            b.classList.add('bg-murekkep', 'text-white', 'font-bold', 'shadow-xs');
+            b.classList.remove('bg-[#fafaf9]', 'text-metin-2');
           } else {
-            b.classList.remove('bg-murekkep', 'text-white', 'font-bold', 'shadow-sm');
-            b.classList.add('bg-kagit', 'text-metin-2');
+            b.classList.remove('bg-murekkep', 'text-white', 'font-bold', 'shadow-xs');
+            b.classList.add('bg-[#fafaf9]', 'text-metin-2');
           }
         });
 
         filtrele();
       });
-
-      // URL hash varsa doğrudan büyüt
-      if (window.location.hash) {
-        const slug = window.location.hash.replace('#', '');
-        const hedef = document.querySelector(`[data-terim-slug="${slug}"]`);
-        if (hedef) {
-          hedef.setAttribute('data-durum', 'acik');
-          hedef.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }
     }
 
-    sayfaBagla();
-    document.addEventListener('astro:page-load', sayfaBagla);
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', sayfaBagla);
+    } else {
+      sayfaBagla();
+    }
   })();
 </script>

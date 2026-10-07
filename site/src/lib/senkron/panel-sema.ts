@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS ilan_duzenleme (
   ilan_id     TEXT PRIMARY KEY,
   baslik      TEXT,
   aciklama    TEXT,
+  temel       TEXT,
   ozellikler  TEXT,
   donanim     TEXT,
   one_cikan   INTEGER NOT NULL DEFAULT 0,
@@ -53,6 +54,8 @@ CREATE TABLE IF NOT EXISTS talepler (
   m2          INTEGER,
   mesaj       TEXT,
   kaynak      TEXT,
+  ilan_id     TEXT,
+  ilan_baslik TEXT,
   ip_ulke     TEXT,
   olusturma   TEXT NOT NULL DEFAULT (datetime('now')),
   durum       TEXT NOT NULL DEFAULT 'yeni',
@@ -95,6 +98,8 @@ export const TALEP_EKLERI = [
   `ALTER TABLE talepler ADD COLUMN ic_not TEXT`,
   `ALTER TABLE talepler ADD COLUMN ilgilenen TEXT`,
   `ALTER TABLE talepler ADD COLUMN kapanma TEXT`,
+  `ALTER TABLE talepler ADD COLUMN ilan_id TEXT`,
+  `ALTER TABLE talepler ADD COLUMN ilan_baslik TEXT`,
 ];
 
 /** Elle eklenen ilanların senkronda pasife düşmemesi için işaret. */

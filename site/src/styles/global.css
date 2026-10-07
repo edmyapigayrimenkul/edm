@@ -97,6 +97,9 @@
   --color-murekkep-4: #33373f;
   --color-kagit-2: #ececeb;
   --color-metin-2: #56575c;
+  /* Marka kurşunu dekoratif yüzeylerde kalır; küçük metin açık zeminde
+     en az 4,5:1 kontrast için bu koyu türevi kullanır. */
+  --color-kursun-okunur: #6c6d71;
 
   /* Kılavuz 04 — Tipografi */
   --font-baslik: 'Fraunces', 'Times New Roman', Georgia, serif;
@@ -167,8 +170,9 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-kirmizi);
-    outline-offset: 3px;
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--color-kirmizi-derin);
     border-radius: 3px;
   }
 
@@ -213,10 +217,10 @@
     font-size: 0.6875rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--color-kursun);
+    color: var(--color-kursun-okunur);
   }
   .etiket--kirmizi {
-    color: var(--color-kirmizi);
+    color: var(--color-kirmizi-derin);
   }
   .etiket--acik {
     color: color-mix(in oklab, var(--color-kagit) 62%, transparent);
@@ -484,4 +488,125 @@
   body:has([data-ilan-cubuk]) .wa-dugme {
     display: none;
   }
+}
+
+/* İlan kartı kuralları herkese açık sayfalarda ortak kullanılır. Bu kuralları
+   ortak dosyada tutmak kart içeren sayfalardaki ayrı CSS isteğini kaldırır. */
+.ilan-kart {
+  position: relative;
+  background: #fff;
+  border: 1px solid color-mix(in oklab, var(--color-murekkep) 9%, transparent);
+  border-radius: var(--radius-kart);
+  overflow: hidden;
+  transition: border-color 0.5s var(--ease-yumusak), box-shadow 0.6s var(--ease-yumusak),
+    transform 0.6s var(--ease-yumusak);
+}
+.ilan-kart:hover {
+  border-color: color-mix(in oklab, var(--color-murekkep) 16%, transparent);
+  box-shadow: var(--shadow-kalkik);
+  transform: translateY(-3px);
+}
+.ilan-kart .ilan-gorsel {
+  aspect-ratio: 4 / 3;
+}
+.ilan-kart .ilan-gorsel picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.ilan-kart .ilan-gorsel--genis {
+  aspect-ratio: 16 / 10;
+}
+@media (min-width: 900px) {
+  .ilan-kart.ilan-kart--genis {
+    grid-column: span 2;
+  }
+  .ilan-kart.ilan-kart--genis .ilan-gorsel--genis {
+    aspect-ratio: 21 / 10;
+  }
+}
+.ilan-kart .ilan-rozetler {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  display: flex;
+  gap: 0.35rem;
+}
+.ilan-kart .rozet--yeni {
+  background: color-mix(in oklab, var(--color-kagit) 92%, transparent);
+  color: var(--color-murekkep);
+  backdrop-filter: blur(8px);
+}
+.ilan-kart .ilan-foto-sayisi {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  color: var(--color-kagit);
+  background: color-mix(in oklab, var(--color-murekkep) 62%, transparent);
+  backdrop-filter: blur(6px);
+  padding: 0.28rem 0.5rem;
+  border-radius: 2px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.45s var(--ease-yumusak), transform 0.45s var(--ease-yumusak);
+}
+.ilan-kart.grup-kart:hover .ilan-foto-sayisi {
+  opacity: 1;
+  transform: none;
+}
+.ilan-kart .ilan-alt {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.7rem 1rem;
+  padding-top: 0.9rem;
+}
+.ilan-kart .ilan-fiyat {
+  font-family: var(--font-govde);
+  font-size: clamp(1.125rem, 0.98rem + 0.35vw, 1.3125rem);
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-murekkep);
+  margin-left: auto;
+  text-align: right;
+}
+.ilan-kart .ilan-fiyat-ek {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--color-kursun-okunur);
+  margin-left: 0.2rem;
+}
+.ilan-kart .ilan-ozellikler {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0;
+  font-size: 0.71875rem;
+  line-height: 1.4;
+  color: var(--color-metin-2);
+  min-width: 0;
+}
+.ilan-kart .ilan-ozellikler li {
+  display: inline-flex;
+  align-items: center;
+}
+.ilan-kart .ilan-ozellikler li:not(:last-child)::after {
+  content: '';
+  width: 2px;
+  height: 2px;
+  margin-inline: 0.55rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-murekkep) 32%, transparent);
+}
+.ilan-kart .line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

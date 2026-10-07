@@ -1,14 +1,20 @@
 ---
 import Panel from '../../layouts/Panel.astro';
-import { paneleGiris } from '../../lib/panel/yetki';
+import { adminProfiliniBul, paneleGiris } from '../../lib/panel/yetki';
 import { env } from 'cloudflare:workers';
 import { icerikOnbellegiTemizle } from '../../lib/icerik';
 import { slugla } from '../../lib/ilanlar';
+import { semayiKur } from '../../lib/senkron/depo';
+import { islemKaydiKomutu } from '../../lib/panel/islem-gecmisi';
+import { rolYetkisiGerekli, rolYetkisiVar } from '../../lib/panel/roller';
 
 const giris = await paneleGiris(Astro.request);
 if ('yanit' in giris) return giris.yanit;
 
 const vt = env.VT as D1Database;
+await semayiKur(vt);
+const admin = adminProfiliniBul(giris.kimlik.eposta);
+const ekipYazabilir = rolYetkisiVar(admin?.rol ?? null, 'ekip-yonet');
 let bildirim: { tur: 'basari' | 'hata'; metin: string } | null = null;
 
 if (Astro.request.method === 'POST') {
@@ -17,6 +23,7 @@ if (Astro.request.method === 'POST') {
   const slug = String(form.get('slug') ?? '');
 
   try {
+    rolYetkisiGerekli(admin?.rol ?? null, 'ekip-yonet');
     if (eylem === 'kaydet') {
       const ad = String(form.get('ad') ?? '').trim();
       if (!ad) throw new Error('İsim gerekli.');
@@ -27,8 +34,20 @@ if (Astro.request.method === 'POST') {
         .map((u) => u.trim())
         .filter(Boolean);
 
-      await vt
-        .prepare(
+      const onceki = slug
+        ? await vt.prepare(`SELECT slug, ad, unvan, telefon, eposta, uzmanlik, sira, yayinda FROM ekip WHERE slug = ?`).bind(slug).first<Record<string, unknown>>()
+        : null;
+      const sonraki = {
+        slug: yeniSlug,
+        ad: ad.slice(0, 120),
+        unvan: String(form.get('unvan') ?? '').trim().slice(0, 120),
+        telefon: String(form.get('telefon') ?? '').trim() || null,
+        eposta: String(form.get('eposta') ?? '').trim() || null,
+        uzmanlik,
+        sira: Number(form.get('sira')) || 0,
+        yayinda: form.get('yayinda') ? 1 : 0,
+      };
+      const yazma = vt.prepare(
           `INSERT INTO ekip (slug, emlakjet_slug, ad, unvan, telefon, eposta, foto, uzmanlik, hakkinda, sira, yayinda)
            VALUES (?,?,?,?,?,?,?,?,?,?,?)
            ON CONFLICT(slug) DO UPDATE SET
@@ -49,11 +68,31 @@ if (Astro.request.method === 'POST') {
           String(form.get('hakkinda') ?? '').trim().slice(0, 1500),
           Number(form.get('sira')) || 0,
           form.get('yayinda') ? 1 : 0
-        )
-        .run();
+        );
+      await vt.batch([
+        yazma,
+        islemKaydiKomutu(vt, giris.kimlik, {
+          eylem: onceki ? 'ekip-guncellendi' : 'ekip-eklendi',
+          varlikTuru: 'ekip',
+          varlikId: yeniSlug,
+          ozet: `${ad} ${onceki ? 'güncellendi' : 'eklendi'}.`,
+          onceki,
+          sonraki,
+        }),
+      ]);
       bildirim = { tur: 'basari', metin: `${ad} kaydedildi.` };
     } else if (eylem === 'sil' && slug) {
-      await vt.prepare(`DELETE FROM ekip WHERE slug = ?`).bind(slug).run();
+      const onceki = await vt.prepare(`SELECT slug, ad, unvan, telefon, eposta, uzmanlik, sira, yayinda FROM ekip WHERE slug = ?`).bind(slug).first<Record<string, unknown>>();
+      await vt.batch([
+        vt.prepare(`DELETE FROM ekip WHERE slug = ?`).bind(slug),
+        islemKaydiKomutu(vt, giris.kimlik, {
+          eylem: 'ekip-silindi',
+          varlikTuru: 'ekip',
+          varlikId: slug,
+          ozet: `${String(onceki?.ad ?? slug)} ekipten silindi.`,
+          onceki,
+        }),
+      ]);
       bildirim = { tur: 'basari', metin: 'Danışman silindi.' };
     }
     icerikOnbellegiTemizle();
@@ -110,11 +149,11 @@ const uzmanlikMetni = (deger: unknown) => {
               </div>
               <div class="ekip-eylem">
                 <a href={`?duzenle=${e.slug}#form`} class="pd pd--sade">Düzenle</a>
-                <form method="POST" onsubmit="return confirm('Bu danışman kalıcı olarak silinecek. Emin misiniz?')">
+                {ekipYazabilir && <form method="POST" onsubmit="return confirm('Bu danışman kalıcı olarak silinecek. Emin misiniz?')">
                   <input type="hidden" name="slug" value={String(e.slug)} />
                   <input type="hidden" name="eylem" value="sil" />
                   <button type="submit" class="pd pd--tehlike">Sil</button>
-                </form>
+                </form>}
               </div>
             </li>
           ))
@@ -187,7 +226,8 @@ const uzmanlikMetni = (deger: unknown) => {
           <span>Sitede göster</span>
         </label>
 
-        <button type="submit" class="pd pd--kirmizi">Kaydet</button>
+        <button type="submit" class="pd pd--kirmizi" disabled={!ekipYazabilir}>Kaydet</button>
+        {!ekipYazabilir && <p class="ipucu">Ekip değişikliği için ana admin yetkisi gerekir.</p>}
         <p class="ipucu">
           Emlakjet profil kodu, danışmanın ilanlarının profiline bağlanmasını sağlar.
           Boş bırakılırsa ilan sayısı gösterilmez.

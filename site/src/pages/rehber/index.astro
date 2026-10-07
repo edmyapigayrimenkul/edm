@@ -1,7 +1,7 @@
 ---
 import Temel from '../../layouts/Temel.astro';
 import { bolgeler } from '../../lib/bolgeler';
-import { portfoy } from '../../lib/ilanlar';
+import { fiyatYaz, portfoy } from '../../lib/ilanlar';
 import { KURUM } from '../../lib/site';
 
 const BOLGELER = await bolgeler();
@@ -12,7 +12,11 @@ const guncelleme = new Date(sonGuncelleme).toLocaleDateString('tr-TR', {
   month: 'long',
   year: 'numeric',
 });
-const tl = (n: number | null) => (n === null ? '—' : `${n.toLocaleString('tr-TR')} ₺`);
+const fiyatAraligi = (grup: (typeof BOLGELER)[number]['fiyatGruplari'][number]) => {
+  const alt = fiyatYaz(grup.enDusuk, undefined, grup.paraBirimi);
+  const ust = fiyatYaz(grup.enYuksek, undefined, grup.paraBirimi);
+  return `${grup.enDusuk === grup.enYuksek ? alt : `${alt} — ${ust}`}${grup.donem ? ` ${grup.donem}` : ''}`;
+};
 ---
 
 <Temel
@@ -28,9 +32,48 @@ const tl = (n: number | null) => (n === null ? '—' : `${n.toLocaleString('tr-T
         </h1>
         <p class="max-w-[48ch] text-metin-2" data-belir data-gecikme="0.1">
           Aşağıdaki her rakam, kendi portföyümüzdeki {SAYIMLAR.toplam} ilandan hesaplandı —
-          başka bir yerden alınmadı. Portföy değiştikçe sayılar da değişir.
+          başka bir yerden alınmadı. Portföy değiştikçe sayılar da değişir. Bu örnekler bölgenin genel piyasa verisi değildir.
           <span class="block mt-2 etiket">Son güncelleme: {guncelleme}</span>
         </p>
+      </div>
+
+      <!-- Bilgi Rehberi & Sözlük Öne Çıkan Kartlar -->
+      <div class="mt-12 grid gap-6 md:grid-cols-2" data-belir data-gecikme="0.15">
+        <a
+          href="/rehber/bilgi"
+          class="group relative block overflow-hidden rounded-2xl border border-kiremit/20 bg-gradient-to-br from-kiremit/[0.05] via-transparent to-transparent p-7 transition-all duration-300 hover:border-kiremit/50 hover:shadow-xl hover:-translate-y-0.5"
+        >
+          <div class="flex items-center justify-between gap-4">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-kiremit/10 px-3 py-1 font-mono text-[11px] font-semibold tracking-wider text-kiremit uppercase">
+              Hukuk & Mevzuat
+            </span>
+            <span class="font-mono text-xs text-kursun group-hover:text-metin-1 transition-colors">Rehberi Gör &rarr;</span>
+          </div>
+          <h3 class="mt-4 font-serif text-2xl font-bold text-metin-1 group-hover:text-kiremit transition-colors">
+            Mutlaka Bilmeniz Gerekenler
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-metin-2">
+            Kentsel dönüşüm ve kira hukuku gibi gayrimenkul konularında kaynakları incelenmiş, adım adım rehberler.
+          </p>
+        </a>
+
+        <a
+          href="/sozluk"
+          class="group relative block overflow-hidden rounded-2xl border border-lacivert/20 bg-gradient-to-br from-lacivert/[0.05] via-transparent to-transparent p-7 transition-all duration-300 hover:border-lacivert/50 hover:shadow-xl hover:-translate-y-0.5"
+        >
+          <div class="flex items-center justify-between gap-4">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-lacivert/10 px-3 py-1 font-mono text-[11px] font-semibold tracking-wider text-lacivert uppercase">
+              Terimler & İndeks
+            </span>
+            <span class="font-mono text-xs text-kursun group-hover:text-metin-1 transition-colors">Sözlüğe Git &rarr;</span>
+          </div>
+          <h3 class="mt-4 font-serif text-2xl font-bold text-metin-1 group-hover:text-lacivert transition-colors">
+            Emlak Terimleri Sözlüğü
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-metin-2">
+            Şufa, İfraz, Tevhid, İntifa, Gabari, KAKS, TAKS, Kat İrtifakı ve Aile Konutu Şerhi gibi tapuda ve sahada karşınıza çıkan tüm terimlerin yalın ve anlaşılır açıklamaları.
+          </p>
+        </a>
       </div>
     </div>
   </section>
@@ -62,16 +105,14 @@ const tl = (n: number | null) => (n === null ? '—' : `${n.toLocaleString('tr-T
                   <dt class="etiket">Arsa & tarla</dt>
                   <dd class="font-veri">{b.arsa}</dd>
                 </div>
-                <div>
-                  <dt class="etiket">Fiyat aralığı</dt>
-                  <dd class="font-veri text-[0.8125rem]">
-                    {b.enDusuk === b.enYuksek ? tl(b.enDusuk) : `${tl(b.enDusuk)} — ${tl(b.enYuksek)}`}
-                  </dd>
-                </div>
+                {b.fiyatGruplari.slice(0, 3).map((grup) => <div class="bolge-fiyat">
+                  <dt class="etiket">{grup.etiket}</dt>
+                  <dd class="font-veri text-[0.8125rem]">{fiyatAraligi(grup)}</dd>
+                </div>)}
                 {b.ortancaBirimFiyat && (
                   <div>
-                    <dt class="etiket">Arsada m²</dt>
-                    <dd class="font-veri">{b.ortancaBirimFiyat.toLocaleString('tr-TR')} ₺</dd>
+                    <dt class="etiket">Satılık arazide ortanca ₺/m²</dt>
+                    <dd class="font-veri">{b.ortancaBirimFiyat.toLocaleString('tr-TR')} ₺ <span class="block mt-1 text-xs text-kursun">{b.birimFiyatOrnekSayisi} taşınmaz</span></dd>
                   </div>
                 )}
               </dl>
@@ -89,8 +130,8 @@ const tl = (n: number | null) => (n === null ? '—' : `${n.toLocaleString('tr-T
 
       <p class="mt-10 max-w-[62ch] text-sm leading-relaxed text-kursun">
         Not: Buradaki fiyatlar {KURUM.ad} portföyündeki güncel <strong>istek fiyatlarıdır</strong>;
-        gerçekleşmiş satış fiyatı değildir. Bölgenizde gerçekleşmiş satışlara dayalı bir
-        değerlendirme için <a href="/degerleme" class="alt-cizgi text-metin-2">ücretsiz değerleme</a>
+        gerçekleşmiş satış fiyatı değildir. Taşınmazınıza özel bir piyasa değerlendirmesi
+        için <a href="/degerleme" class="alt-cizgi text-metin-2">ücretsiz değerleme</a>
         talebinde bulunabilirsiniz.
       </p>
     </div>
@@ -139,6 +180,7 @@ const tl = (n: number | null) => (n === null ? '—' : `${n.toLocaleString('tr-T
     font-size: 1rem;
     font-variant-numeric: tabular-nums;
   }
+  .bolge-veri .bolge-fiyat{grid-column:span 2}.bolge-veri .bolge-fiyat dd{font-size:.8125rem}
 
   .bolge-git {
     display: inline-flex;

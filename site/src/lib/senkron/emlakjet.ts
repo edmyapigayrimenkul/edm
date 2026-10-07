@@ -235,6 +235,47 @@ function donanimCoz(html: string): string[] {
 }
 
 /**
+ * Emlakjet'in Product JSON-LD'si bazı ilanlarda galerinin ilk 10 karesiyle
+ * sınırlı. Aynı sayfaya gömülü küçük/responsive CDN adreslerinden kalan
+ * fotoğrafları da toplar ve hepsini EDM'in görsel sunum katmanının tanıdığı
+ * kanonik listing adresine çevirir. Yalnızca bu ilanın listing yolu kabul edilir.
+ */
+export function emlakjetGorselleriniCoz(html: string, ilanId: string, jsonLd: unknown): string[] {
+  const degerler = typeof jsonLd === 'string'
+    ? [jsonLd]
+    : Array.isArray(jsonLd)
+      ? jsonLd.filter((deger): deger is string => typeof deger === 'string')
+      : [];
+  // Emlakjet sayfa verisi JSON içinde eğik çizgileri ters eğik çizgiyle
+  // kaçırabiliyor; HTML öznitelikleri de &amp; olarak yazılabiliyor.
+  const kaynak = [...degerler, varlikCoz(html)]
+    .join('\n')
+    .replace(/\\u002f/gi, '/')
+    .replace(/\\\//g, '/');
+  const desen = /(?:https?:)?\/\/imaj\.emlakjet\.com\/(?:resize\/(?:\d+\/)*)?listing\/(\d+)\/([a-f\d]{32}\d+\.(?:jpg|jpeg|png|webp))/gi;
+  const bulunan = new Set<string>();
+  const sonuc: string[] = [];
+  let eslesme: RegExpExecArray | null;
+  while ((eslesme = desen.exec(kaynak))) {
+    if (eslesme[1] !== ilanId) continue;
+    const anahtar = eslesme[2].toLowerCase();
+    if (bulunan.has(anahtar)) continue;
+    bulunan.add(anahtar);
+    sonuc.push(`https://imaj.emlakjet.com/listing/${ilanId}/${eslesme[2]}`);
+  }
+  return sonuc;
+}
+
+function urunGorselleriCoz(urunImage: unknown, html: string, ilanId: string): string[] {
+  const jsonLd = typeof urunImage === 'string'
+    ? [urunImage]
+    : Array.isArray(urunImage)
+      ? urunImage.filter((deger): deger is string => typeof deger === 'string')
+      : [];
+  return emlakjetGorselleriniCoz(html, ilanId, jsonLd);
+}
+
+/**
  * "220 m²" değeri ile "Brüt" etiketinin ayrı etiketlerde durduğu ikilileri
  * okur: Oda Sayısı, Banyo Sayısı, Kat Sayısı, Brüt, Net, Bina Yaşı.
  */
@@ -257,27 +298,60 @@ function olcuCiftleri(html: string): Record<string, string> {
 export async function ofisIlanLinkleri(
   ofisUrl = OFIS_URL,
   enFazlaSayfa = 10
-): Promise<Array<{ id: string; url: string }>> {
+): Promise<{ linkler: Array<{ id: string; url: string }>; tamam: boolean; sebep: string | null }> {
   const gorulen = new Map<string, string>();
+  let ilkSayfaIdleri: string[] = [];
+  let tamam = false;
+  let sebep: string | null = null;
 
   for (let sayfa = 1; sayfa <= enFazlaSayfa; sayfa++) {
     const url = sayfa === 1 ? ofisUrl : `${ofisUrl}?sayfa=${sayfa}`;
-    const html = await htmlAl(url);
-    if (!html) break;
+    let html: string | null;
+    try {
+      html = await htmlAl(url);
+    } catch (hata) {
+      if (sayfa === 1) throw hata;
+      sebep = `Sayfa ${sayfa} alınamadı; liste eksik olabilir.`;
+      break;
+    }
+    if (!html) {
+      if (sayfa > 1) tamam = true;
+      else sebep = 'Ofis ilan listesi alınamadı.';
+      break;
+    }
 
     const linkler = [...html.matchAll(/href="(\/ilan\/[^"]+?-(\d+))"/g)].map((m) => ({
       url: `https://www.emlakjet.com${m[1]}`,
       id: m[2],
     }));
 
+    if (linkler.length === 0) {
+      tamam = true;
+      break;
+    }
+
+    if (sayfa === 1) ilkSayfaIdleri = [...new Set(linkler.map((l) => l.id))];
+
     const yeni = linkler.filter((l) => !gorulen.has(l.id));
-    if (yeni.length === 0) break; // aynı sayfa tekrar geldi -> sayfalama bitti
+    if (yeni.length === 0) {
+      // Emlakjet, mevcut son sayfadan sonra ?sayfa=N için ilk sayfayı
+      // döndürüyor. Bu ancak en az bir farklı ara sayfa başarıyla okunduysa
+      // doğal son kabul edilir; sayfa 2'nin tekrarı eksik liste sayılır.
+      const yinelenenIdler = [...new Set(linkler.map((l) => l.id))];
+      const ilkSayfayaDondu =
+        yinelenenIdler.length === ilkSayfaIdleri.length &&
+        yinelenenIdler.every((id) => ilkSayfaIdleri.includes(id));
+      if (sayfa > 2 && ilkSayfayaDondu && gorulen.size > ilkSayfaIdleri.length) tamam = true;
+      else sebep = `Sayfa ${sayfa} önceki sayfayla aynı ilanları döndürdü.`;
+      break;
+    }
 
     for (const l of yeni) gorulen.set(l.id, l.url);
     if (sayfa < enFazlaSayfa) await bekle(600);
+    else sebep = `Sayfa sınırına (${enFazlaSayfa}) ulaşıldı; listenin devamı olabilir.`;
   }
 
-  return [...gorulen].map(([id, url]) => ({ id, url }));
+  return { linkler: [...gorulen].map(([id, url]) => ({ id, url })), tamam, sebep };
 }
 
 export async function ilanDetay(link: { id: string; url: string }): Promise<HamIlan | null> {
@@ -334,7 +408,7 @@ export async function ilanDetay(link: { id: string; url: string }): Promise<HamI
     ilce: konum.ilce,
     mahalle: konum.mahalle,
     ozellikler,
-    gorseller: [...new Set((urun.image ?? []) as string[])],
+    gorseller: urunGorselleriCoz(urun.image, html, String(link.id)),
     danismanSlug: danisman?.[1] ?? null,
     guncellenme: kayit?.dateModified ?? null,
     donanim: donanimCoz(html),
@@ -345,7 +419,11 @@ export async function ilanDetay(link: { id: string; url: string }): Promise<HamI
 export async function portfoyuCek(
   ilerleme?: (sira: number, toplam: number, ilan: HamIlan | null) => void
 ): Promise<{ ilanlar: HamIlan[]; basarisiz: string[] }> {
-  const linkler = await ofisIlanLinkleri();
+  const liste = await ofisIlanLinkleri();
+  if (!liste.tamam) {
+    throw new Error(`Portal ilan listesi doğrulanamadı: ${liste.sebep ?? 'eksik sonuç'}`);
+  }
+  const linkler = liste.linkler;
   const ilanlar: HamIlan[] = [];
   const basarisiz: string[] = [];
 

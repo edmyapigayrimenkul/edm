@@ -1,0 +1,35 @@
+---
+import { YANIT_DURUMLARI,NITELIK_DURUMLARI,RANDEVU_DURUMLARI,ISLEM_TURLERI,isSonucuFormTarihi } from '../../lib/talep-is-sonucu';
+interface Props {talep:Record<string,unknown>}
+const {talep:t}=Astro.props;
+const secenekler=[
+  {alan:'yanit_durumu',ad:'Gerçek ilk yanıt',liste:YANIT_DURUMLARI},
+  {alan:'nitelik',ad:'İhtiyaç / hizmet uygunluğu',liste:NITELIK_DURUMLARI},
+  {alan:'randevu_durumu',ad:'Randevu',liste:RANDEVU_DURUMLARI},
+  {alan:'islem_turu',ad:'Gerçekleşen işlem',liste:ISLEM_TURLERI},
+];
+---
+<details class="is-sonucu">
+  <summary>İlk yanıt, randevu ve gerçek işlem sonucu</summary>
+  <p>Otomatik e-posta veya iletişim düğmesine tıklamak yanıt değildir. Talebi kapatmak satış değildir. Yalnız bildiğiniz gerçek durumu seçin; bilinmeyen alanları teyit edilmemiş bırakın.</p>
+  <form method="POST">
+    <input type="hidden" name="id" value={String(t.id)}/>
+    <input type="hidden" name="eylem" value="is-sonucu"/>
+    <input type="hidden" name="takip_surumu" value={String(t.takip_surumu)}/>
+    <div class="sonuc-alanlar">
+      {secenekler.map(s=><label class="p-alan"><span>{s.ad}</span><select name={s.alan}>{Object.entries(s.liste).map(([deger,ad])=><option value={deger} selected={(t[s.alan]??'bilinmiyor')===deger}>{ad}</option>)}</select></label>)}
+      {[
+        {alan:'ilk_yanit',ad:'İlk yanıt zamanı'},
+        {alan:'randevu_tarihi',ad:'Randevu zamanı'},
+        {alan:'islem_tarihi',ad:'Gerçek işlem zamanı'},
+      ].map(s=><label class="p-alan"><span>{s.ad} · Türkiye saati</span><input type="datetime-local" step="1" name={s.alan} value={isSonucuFormTarihi(t[s.alan])}/></label>)}
+    </div>
+    <p>Nitelik: gerçek görüşmede ihtiyaç, EDM hizmet kapsamı ve somut sonraki adım doğrulanmalıdır. Bu alan kişi hakkında otomatik uygunluk puanı üretmez. Tek talebin güncel randevu durumunu kaydeder; her kaydetme yeni randevu oluşturmaz.</p>
+    <label class="teyit"><input type="checkbox" name="gercek_kayit_teyidi" value="1" required/> Seçtiğim bilgiler gerçek yanıtı, gerçekten planlanan/gerçekleşen randevuyu ve gerçekleşen işlemi yansıtıyor.</label>
+    {t.is_sonucu_kayitli && <label class="teyit"><input type="checkbox" name="duzeltme_teyidi" value="1"/> Mevcut iş sonucunu değiştiriyorum; önceki değerlerin işlem geçmişinde korunacağını biliyorum.</label>}
+    <button type="submit" class="pd pd--birincil">İş sonucunu kaydet</button>
+  </form>
+</details>
+<style>
+  .is-sonucu{padding:1rem;background:#f5f7f8;border:1px solid #dfe5e9;border-radius:8px;margin-top:1rem}summary{cursor:pointer;font-size:.9rem;font-weight:600}p{font-size:.8rem;line-height:1.6;color:#596975;margin:.8rem 0}.sonuc-alanlar{display:grid;gap:.8rem}.teyit{display:flex;align-items:start;gap:.5rem;font-size:.8rem;line-height:1.6;margin:.8rem 0}.teyit input{margin-top:.25rem;flex:none}button{margin-top:.5rem}@media(min-width:700px){.sonuc-alanlar{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>

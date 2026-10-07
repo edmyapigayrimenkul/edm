@@ -20,10 +20,21 @@ const EKIP_ALANI = 'ozbornstudio.cloudflareaccess.com';
 const ALAN = 'edmyapigayrimenkul.com/yonetim';
 const UYGULAMA_ADI = 'EDM Yönetim Paneli';
 
-/** Panele girebilecek e-postalar. Yeni kişi eklemek için buraya yaz. */
-const IZINLI_EPOSTALAR = ['ozdogandogukan@gmail.com'];
-
-const { hesap } = ortam();
+const VARSAYILAN_ADMINLER = [
+  'edmyapigayrimenkul@gmail.com',
+  'ozdogandogukan@gmail.com',
+];
+const { hesap, panelAdminEpostalari } = ortam();
+const IZINLI_EPOSTALAR = (panelAdminEpostalari || VARSAYILAN_ADMINLER.join(','))
+  .split(',')
+  .map((eposta) => eposta.trim().toLowerCase())
+  .filter(Boolean);
+if (new Set(IZINLI_EPOSTALAR).size !== IZINLI_EPOSTALAR.length) {
+  throw new Error('PANEL_ADMIN_EPOSTALARI içinde yinelenen e-posta var.');
+}
+if (IZINLI_EPOSTALAR.some((eposta) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(eposta))) {
+  throw new Error('PANEL_ADMIN_EPOSTALARI geçerli, virgülle ayrılmış e-postalar içermeli.');
+}
 const yaz = (i, m) => console.log(`${i} ${m}`);
 
 function wrangler(argumanlar) {
@@ -113,6 +124,18 @@ if (!yapilandirma.includes('ACCESS_EKIP_ALANI')) {
   yapilandirma = yapilandirma
     .replace(/"ACCESS_EKIP_ALANI":\s*"[^"]*"/, `"ACCESS_EKIP_ALANI": "${EKIP_ALANI}"`)
     .replace(/"ACCESS_AUD":\s*"[^"]*"/, `"ACCESS_AUD": "${uygulama.aud}"`);
+}
+
+if (!yapilandirma.includes('PANEL_ADMIN_EPOSTALARI')) {
+  yapilandirma = yapilandirma.replace(
+    '"BILDIRIM_ADRESI"',
+    `"PANEL_ADMIN_EPOSTALARI": "${IZINLI_EPOSTALAR.join(',')}",\n    "BILDIRIM_ADRESI"`
+  );
+} else {
+  yapilandirma = yapilandirma.replace(
+    /"PANEL_ADMIN_EPOSTALARI":\s*"[^"]*"/,
+    `"PANEL_ADMIN_EPOSTALARI": "${IZINLI_EPOSTALAR.join(',')}"`
+  );
 }
 
 await writeFile(yapilandirmaYolu, yapilandirma, 'utf8');

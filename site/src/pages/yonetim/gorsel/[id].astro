@@ -10,6 +10,7 @@ import Panel from '../../../layouts/Panel.astro';
 import { paneleGiris } from '../../../lib/panel/yetki';
 import { env } from 'cloudflare:workers';
 import { onbellegiTemizle, baslikTemizle, slugla } from '../../../lib/ilanlar';
+import { fotografKaliteUyarilari } from '../../../lib/fotograf-kurallari';
 
 const giris = await paneleGiris(Astro.request);
 if ('yanit' in giris) return giris.yanit;
@@ -160,6 +161,7 @@ const yol = `/ilan/${slugla(baslik)}-${ilan.id}`;
     eklenir, silinen kendiliğinden düşer.
     {hepsiemlak.length > 0 && <> Bu ilanın fotoğrafları <strong>Hepsiemlak</strong>’tan geliyor.</>}
   </p>
+  <p class="foto-standardi-notu"><strong>Fotoğraf standardı:</strong> Kapakta net, aydınlık ve yatay 4:3/3:2 kare kullanın; dış görünümden başlayıp mekânları doğal sırayla gösterin. Yalnızca kullanım izni olan görselleri yayımlayın; portal filigranını kaldırmayın. Kişi, belge ve plaka görünürlüğünü paylaşmadan önce kontrol edin.</p>
 
   <div class="kutu">
     <div class="kutu-bas">
@@ -249,6 +251,7 @@ const yol = `/ilan/${slugla(baslik)}-${ilan.id}`;
                   {y.genislik && y.yukseklik ? `${y.genislik}×${y.yukseklik}` : '—'}
                   {y.boyut ? ` · ${Math.round(y.boyut / 1024)} KB` : ''}
                 </span>
+                {y.genislik && y.yukseklik && fotografKaliteUyarilari(y.genislik, y.yukseklik).length > 0 && <small class="foto-kalite-uyari">{fotografKaliteUyarilari(y.genislik, y.yukseklik).join(' ')}</small>}
                 <button type="button" class="pd pd--tehlike" data-sil={y.anahtar}>
                   Sil
                 </button>
@@ -472,6 +475,7 @@ const yol = `/ilan/${slugla(baslik)}-${ilan.id}`;
     font-size: 0.6875rem;
     color: var(--color-kursun);
   }
+  .foto-standardi-notu{margin:-.35rem 0 1rem;padding:.75rem .9rem;border-left:3px solid var(--color-kirmizi);background:var(--color-kagit);font-size:.7rem;line-height:1.5;color:var(--color-kursun)}.foto-standardi-notu strong{color:var(--color-murekkep)}.foto-kalite-uyari{display:block;color:#825d13;font-size:.63rem;line-height:1.4}
   .yuklenen .pd {
     height: 1.7rem;
     padding-inline: 0.55rem;
@@ -480,13 +484,12 @@ const yol = `/ilan/${slugla(baslik)}-${ilan.id}`;
 </style>
 
 <script>
+  import { ILAN_FOTOGRAFI_EN_UZUN_KENAR } from '../../../lib/fotograf-kurallari';
+
   const ILAN = document.querySelector<HTMLElement>('[data-ilan-id]')?.dataset.ilanId ?? '';
   const alan = document.querySelector<HTMLLabelElement>('[data-birakma]');
   const secici = document.querySelector<HTMLInputElement>('[data-dosya-secici]');
   const durum = document.querySelector<HTMLElement>('[data-durum]');
-
-  /** Uzun kenarı bu değere indiriyoruz; ilan fotoğrafı için fazlasıyla yeterli. */
-  const EN_UZUN = 1800;
 
   function bildir(metin: string, satirlar: string[] = []) {
     if (!durum) return;
@@ -511,7 +514,7 @@ const yol = `/ilan/${slugla(baslik)}-${ilan.id}`;
   async function kucult(dosya: File): Promise<{ blob: Blob; g: number; y: number } | null> {
     try {
       const kaynak = await createImageBitmap(dosya, { imageOrientation: 'from-image' });
-      const oran = Math.min(1, EN_UZUN / Math.max(kaynak.width, kaynak.height));
+      const oran = Math.min(1, ILAN_FOTOGRAFI_EN_UZUN_KENAR / Math.max(kaynak.width, kaynak.height));
       const g = Math.round(kaynak.width * oran);
       const y = Math.round(kaynak.height * oran);
 
@@ -606,12 +609,25 @@ const yol = `/ilan/${slugla(baslik)}-${ilan.id}`;
     d.addEventListener('click', async () => {
       if (!confirm('Bu fotoğraf kalıcı olarak silinecek. Emin misiniz?')) return;
       d.disabled = true;
-      await fetch('/yonetim/api/foto', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ anahtar: d.dataset.sil }),
-      });
-      location.reload();
+      try {
+        const cevap = await fetch('/yonetim/api/foto', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ anahtar: d.dataset.sil }),
+        });
+        const sonuc = await cevap.json().catch(() => ({
+          hata: 'Oturum süresi dolmuş olabilir. Sayfayı yenileyip yeniden deneyin.',
+        })) as { tamam?: boolean; hata?: string };
+        if (!cevap.ok || !sonuc.tamam) {
+          bildir(sonuc.hata ?? 'Fotoğraf silinemedi. Yeniden deneyin.');
+          d.disabled = false;
+          return;
+        }
+        location.reload();
+      } catch {
+        bildir('Bağlantı hatası nedeniyle fotoğraf silinemedi. Yeniden deneyin.');
+        d.disabled = false;
+      }
     })
   );
 </script>

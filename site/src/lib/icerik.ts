@@ -7,6 +7,7 @@
  */
 
 import { env } from 'cloudflare:workers';
+import { istekVerisi, istekVerisiniTemizle } from './istek-onbellegi';
 import {
   DANISMANLAR as VARSAYILAN_EKIP,
   ILETISIM as VARSAYILAN_ILETISIM,
@@ -49,6 +50,10 @@ export interface Iletisim {
   adresSatir2: string;
   adresIlce: string;
   adresIl: string;
+  haftaCalismaGunleri: string;
+  haftaCalismaSaatleri: string;
+  pazarCalismaSaatleri: string;
+  yanitBeklentisi: string;
 }
 
 export interface Hizmet {
@@ -83,6 +88,10 @@ const AYAR_VARSAYILAN: Iletisim = {
   adresSatir2: VARSAYILAN_ILETISIM.adres.satir2,
   adresIlce: VARSAYILAN_ILETISIM.adres.ilce,
   adresIl: VARSAYILAN_ILETISIM.adres.il,
+  haftaCalismaGunleri: VARSAYILAN_ILETISIM.haftaCalismaGunleri,
+  haftaCalismaSaatleri: VARSAYILAN_ILETISIM.haftaCalismaSaatleri,
+  pazarCalismaSaatleri: VARSAYILAN_ILETISIM.pazarCalismaSaatleri,
+  yanitBeklentisi: VARSAYILAN_ILETISIM.yanitBeklentisi,
 };
 
 function vt(): D1Database {
@@ -140,14 +149,13 @@ async function ayarlariTohumla(): Promise<void> {
 }
 
 /* ---------------------------------------------------------------
-   Okuma — 60 saniyelik önbellekle
+   Okuma — yalnız aynı istek içinde paylaşılır
    --------------------------------------------------------------- */
-let onbellek: { veri: Icerik; zaman: number } | null = null;
-const ONBELLEK_MS = 60_000;
-
 export async function icerik(): Promise<Icerik> {
-  if (onbellek && Date.now() - onbellek.zaman < ONBELLEK_MS) return onbellek.veri;
+  return istekVerisi('icerik', icerigiOku);
+}
 
+async function icerigiOku(): Promise<Icerik> {
   let ekipSatirlari = await vt()
     .prepare(`SELECT * FROM ekip WHERE yayinda = 1 ORDER BY sira ASC, ad ASC`)
     .all<Record<string, unknown>>();
@@ -235,12 +243,12 @@ export async function icerik(): Promise<Icerik> {
     ),
   };
 
-  onbellek = { veri, zaman: Date.now() };
   return veri;
 }
 
 export function icerikOnbellegiTemizle(): void {
-  onbellek = null;
+  istekVerisiniTemizle('icerik');
+  istekVerisiniTemizle('bolgeler');
 }
 
 function guvenliJson<T>(metin: string, varsayilan: T): T {

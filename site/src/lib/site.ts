@@ -15,6 +15,22 @@ export const KURUM = {
   site: 'https://edmyapigayrimenkul.com',
 } as const;
 
+/**
+ * İşletmenin kamuya açık kayıt ve mesleki yeterlilik numaraları.
+ *
+ * Numara ve sahip eşleşmeleri işletme tarafından beyan edilmiştir. Bu listeyi
+ * merkezi tutuyoruz; Hakkımızda sayfası ile yapılandırılmış veri aynı kaynağı
+ * kullandığı için ileride yapılacak bir düzeltme iki yerde çelişmez.
+ */
+export const BELGELER = [
+  { tur: 'Esnaf Oda Sicil No', no: '13578' },
+  { tur: 'Vergi No', no: '5840041137' },
+  { tur: 'Taşınmaz Ticareti Yetki Belge No', no: '3409203' },
+  { tur: 'Emlak Kursu Belge No', no: '16197220170048572965' },
+  { tur: 'Mesleki Yeterlilik', sahip: 'Metin Özdoğan', no: 'YB0217/17UY0333-5/00/4395' },
+  { tur: 'Mesleki Yeterlilik', sahip: 'Doğukan Özdoğan', no: 'YB0217/17UY0333-5/00/4389' },
+] as const;
+
 export const ILETISIM = {
   telefon: '0536 343 41 97',
   telefonHam: '+905363434197',
@@ -36,10 +52,10 @@ export const ILETISIM = {
   haritaArama:
     'https://www.google.com/maps/search/?api=1&query=' +
     encodeURIComponent('EDM Yapı Gayrimenkul Alibey Mah. Albay Yunus Dirik Cad. Silivri İstanbul'),
-  calismaSaatleri: [
-    { gun: 'Pazartesi — Cumartesi', saat: '09:00 — 19:00' },
-    { gun: 'Pazar', saat: 'Randevuyla' },
-  ],
+  haftaCalismaGunleri: 'Pazartesi — Cumartesi',
+  haftaCalismaSaatleri: '09:00 — 19:00',
+  pazarCalismaSaatleri: 'Randevuyla',
+  yanitBeklentisi: 'Mesajlar çalışma saatleri içinde sırayla yanıtlanır.',
 } as const;
 
 /** WhatsApp bağlantısı üretir; metin ilan başlığıyla doldurulabilir. */
@@ -136,12 +152,12 @@ export const SUREC = [
   {
     baslik: 'Yerinde görüyoruz',
     ozet:
-      'Mülkü geziyor, çevreyi ve son satışları konuşuyoruz. Arsa ya da tarlaysa imar durumunu, kadastral yolu ve tapu kaydını çıkarıyoruz.',
+      'Mülkü geziyor, çevreyi ve ulaşabildiğimiz güncel piyasa verilerini konuşuyoruz. Arsa ya da tarlaysa imar durumunu, kadastral yolu ve tapu kaydını inceliyoruz.',
   },
   {
     baslik: 'Fiyatı birlikte koyuyoruz',
     ozet:
-      'Bölgede gerçekleşmiş satışlara bakıp bir aralık çıkarıyoruz. Değerleme ücretsiz — sonunda satmak zorunda değilsiniz.',
+      'Benzer ilanları, konumu ve taşınmazın özelliklerini birlikte değerlendirip bir fiyat aralığı çıkarıyoruz. Değerleme ücretsiz — sonunda satmak zorunda değilsiniz.',
   },
   {
     baslik: 'Alıcıyı biz buluyoruz',
@@ -169,7 +185,7 @@ export const HIZMETLER = [
   {
     baslik: 'Değerleme',
     ozet:
-      'Bölgedeki gerçekleşmiş satışlara bakarak mülkünüzün güncel piyasa değerini ücretsiz çıkarıyoruz.',
+      'Benzer ilanları, konumu ve taşınmazın özelliklerini inceleyerek ücretsiz bir piyasa değerlendirmesi hazırlıyoruz.',
   },
   {
     baslik: 'Yatırım Danışmanlığı',
@@ -190,8 +206,10 @@ export const HIZMETLER = [
 
 export const MENU = [
   { ad: 'İlanlar', yol: '/ilanlar' },
+  { ad: 'Bülten', yol: '/bulten' },
+  { ad: 'Sözlük', yol: '/sozluk' },
+  { ad: 'Rehber', yol: '/rehber' },
   { ad: 'Danışmanlar', yol: '/danismanlar' },
-  { ad: 'Bölge Rehberi', yol: '/rehber' },
   { ad: 'Hakkımızda', yol: '/hakkimizda' },
   { ad: 'İletişim', yol: '/iletisim' },
 ] as const;

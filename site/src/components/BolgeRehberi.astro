@@ -1,0 +1,70 @@
+---
+import { PARSEL_KAYNAGI, type YerelBolgeRehberi } from '../lib/bolge-rehberi';
+
+interface Props { rehber: YerelBolgeRehberi; }
+const { rehber } = Astro.props;
+const kontrolTarihi = new Date(`${rehber.kontrolTarihi}T12:00:00+03:00`).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Istanbul' });
+---
+
+<section id="bolgeyi-tani" class="yerel-rehber mt-16 border-t border-murekkep/10 py-14 lg:py-20" aria-labelledby="yerel-baslik">
+  <div class="kab">
+    <div class="rehber-bas">
+      <div>
+        <p class="etiket">Bölgeyi tanıyın</p>
+        <h2 id="yerel-baslik" class="baslik-orta mt-3">Konumdan günlük yaşama</h2>
+      </div>
+      <p class="kaynak-tarihi">Kaynak kontrolü: <time datetime={rehber.kontrolTarihi}>{kontrolTarihi}</time></p>
+    </div>
+
+    <div class="kaynakli-bilgiler mt-7">
+      {rehber.bilgiler.map((bilgi) => <article class="yerel-bilgi">
+        <h3>{bilgi.baslik}</h3>
+        <p>{bilgi.metin}</p>
+        <a href={bilgi.kaynak.url} class="kaynak-baglantisi" target="_blank" rel="noopener noreferrer">{bilgi.kaynak.ad}<span aria-hidden="true"> ↗</span><span class="sr-only"> (yeni sekmede)</span></a>
+      </article>)}
+    </div>
+
+    <div class="mt-12">
+      <p class="etiket">EDM karşılaştırma soruları</p>
+      <h2 class="baslik-orta mt-3">Taşınmazı yerinde değerlendirirken</h2>
+      <p class="rehber-aciklama mt-4">Aşağıdaki sorular, seçenekleri aynı ölçütlerle incelemenize yardımcı olur. Bölgenin genel bilgileri, belirli bir taşınmazın özelliklerini veya kullanım izinlerini doğrulamaz.</p>
+      <div class="kontrol-kartlari mt-7">
+        {rehber.kontroller.map((kontrol, sira) => <article class="kontrol-karti">
+          <span class="kontrol-sira font-veri" aria-hidden="true">{String(sira + 1).padStart(2, '0')}</span>
+          <h3>{kontrol.baslik}</h3>
+          <ul>{kontrol.sorular.map((soru) => <li>{soru}</li>)}</ul>
+        </article>)}
+      </div>
+    </div>
+
+    <aside class="parsel-notu mt-7" aria-label="Parsel konumunu kontrol etme">
+      <div>
+        <h3>İlandaki parseli haritada bulun</h3>
+        <p>TKGM Parsel Sorgulama’da il, ilçe, mahalle, ada ve parsel bilgileriyle konumu inceleyebilirsiniz. Kullanım planınız için güncel imar bilgilerini ayrıca yetkili idareden isteyin.</p>
+      </div>
+      <a href={PARSEL_KAYNAGI.url} class="dugme dugme--hayalet" target="_blank" rel="noopener noreferrer">Parsel sorgulama<span aria-hidden="true"> ↗</span><span class="sr-only"> (yeni sekmede)</span></a>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .yerel-rehber { scroll-margin-top: 7rem; }
+  .rehber-bas { display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:1.5rem; }
+  .kaynak-tarihi { font-size:.75rem;color:var(--color-kursun); }
+  .kaynakli-bilgiler { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem; }
+  .yerel-bilgi { padding:clamp(1.25rem,3vw,2rem);border-left:2px solid var(--color-kirmizi);background:white; }
+  h3 { font-size:1.0625rem;line-height:1.4;font-weight:650; }
+  .yerel-bilgi p,.parsel-notu p,.rehber-aciklama { max-width:70ch;font-size:.9375rem;line-height:1.75;color:var(--color-metin-2); }
+  .yerel-bilgi p { margin-top:.75rem; }
+  .kaynak-baglantisi { display:inline-block;margin-top:1.25rem;font-size:.75rem;line-height:1.6;text-decoration:underline;text-underline-offset:4px;overflow-wrap:anywhere; }
+  .kontrol-kartlari { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.25rem; }
+  .kontrol-karti { padding:clamp(1.25rem,2.5vw,1.75rem);border:1px solid color-mix(in oklab,var(--color-murekkep) 12%,transparent);border-radius:var(--radius-kart); }
+  .kontrol-sira { display:block;margin-bottom:1rem;font-size:.8rem;color:var(--color-kirmizi); }
+  .kontrol-karti ul { display:grid;gap:1rem;margin-top:1.25rem; }
+  .kontrol-karti li { border-top:1px solid color-mix(in oklab,var(--color-murekkep) 10%,transparent);padding-top:1rem;font-size:.875rem;line-height:1.75;color:var(--color-metin-2); }
+  .parsel-notu { display:flex;align-items:center;justify-content:space-between;gap:2rem;padding:clamp(1.25rem,3vw,2rem);background:color-mix(in oklab,var(--color-murekkep) 4%,transparent);border-radius:var(--radius-kart); }
+  .parsel-notu p { margin-top:.5rem; }
+  .parsel-notu a { flex-shrink:0; }
+  @media(max-width:900px) { .kontrol-kartlari { grid-template-columns:1fr; }.parsel-notu { flex-direction:column;align-items:flex-start; } }
+  @media(max-width:600px) { .kaynakli-bilgiler { grid-template-columns:1fr; } }
+</style>

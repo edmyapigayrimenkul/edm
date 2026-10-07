@@ -237,10 +237,11 @@ export function paylasimMetni(ilan: PaylasimIlan, ayar: PaylasimAyar): string {
   const kunye = [ilan.oda, ilan.m2, ilan.birim].filter(Boolean).join(' · ');
   const sadeles = (m: string) => m.toLocaleLowerCase('tr').replace(/[^\p{L}\p{N}]/gu, '');
 
+  const islemEtiketi = `#${sadeles(ilan.islem)}`;
   const etiketler = [
     '#silivri',
     `#${sadeles(ilan.ilce || 'silivri')}`,
-    ilan.islem === 'SATILIK' ? '#satılık' : '#kiralık',
+    islemEtiketi,
     `#${sadeles(ilan.kategori)}`,
     '#emlak',
     '#gayrimenkul',

@@ -1,0 +1,192 @@
+---
+import Temel from '../../layouts/Temel.astro';
+import { bultenleriBirlestir } from '../../lib/bulten';
+import { KURUM } from '../../lib/site';
+import { env } from 'cloudflare:workers';
+import { siteIcerikleriniGetir } from '../../lib/icerik-yayini';
+
+const dinamikYazilar = await siteIcerikleriniGetir(env.VT as D1Database, { tur: 'bulten', durum: 'yayinda' });
+const tumYazilar = bultenleriBirlestir(dinamikYazilar);
+const seciliKategori = Astro.url.searchParams.get('kategori') || 'Tümü';
+const kategoriler = ['Tümü', ...new Set(tumYazilar.map((yazi) => yazi.kategori))];
+const gorunenYazilar = seciliKategori === 'Tümü'
+  ? tumYazilar
+  : tumYazilar.filter((yazi) => yazi.kategori === seciliKategori);
+const oneCikan = gorunenYazilar[0];
+const digerYazilar = gorunenYazilar.slice(1);
+---
+
+<Temel
+  baslik="Gayrimenkul Bülteni & Piyasa Analizleri"
+  aciklama="Trakya ve Türkiye gayrimenkul piyasasından güncel gelişmeler, hukuki analizler, tapu ve kentsel dönüşüm bültenleri."
+>
+  <section class="pt-28 pb-12 lg:pt-36 lg:pb-16">
+    <div class="kab">
+      <div class="max-w-3xl">
+        <p class="etiket" data-belir>EDM BÜLTEN & PİYASA ANALİZİ</p>
+        <h1 class="baslik-buyuk mt-3" data-belir data-gecikme="0.05">
+          Toprağın, hukukun ve piyasanın nabzı
+        </h1>
+        <p class="mt-4 text-base leading-relaxed text-metin-2 lg:text-lg" data-belir data-gecikme="0.1">
+          Gayrimenkulde kulaktan dolma bilgiler değil; kanun maddeleri, resmi veriler ve sahadaki tecrübeyle hazırlanan bağımsız analiz bülteni.
+        </p>
+      </div>
+
+      <!-- Kategori Filtreleri -->
+      <div class="mt-8 flex flex-wrap gap-2" data-belir data-gecikme="0.15">
+        {kategoriler.map((kat) => (
+          <a
+            href={kat === 'Tümü' ? '/bulten' : `/bulten?kategori=${encodeURIComponent(kat)}`}
+            class={`rounded-full px-4 py-2 text-xs font-semibold transition-colors duration-200 ${
+              seciliKategori === kat
+                ? 'bg-lacivert text-kagit'
+                : 'bg-kagit-2 text-metin-2 hover:bg-kagit-3 hover:text-metin'
+            }`}
+          >
+            {kat}
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Öne Çıkan Manşet Bülten -->
+  {oneCikan && (
+    <section class="pb-12 lg:pb-16">
+      <div class="kab">
+        <article class="group relative overflow-hidden rounded-2xl border border-cizgi bg-kagit-1 transition-all duration-300 hover:border-metin-2/30 hover:shadow-xl lg:grid lg:grid-cols-12">
+          <div class="relative aspect-[16/9] w-full overflow-hidden bg-kagit-3 lg:col-span-7 lg:aspect-auto lg:min-h-[380px]">
+            <div class="h-full w-full bg-[#111827] flex flex-col items-center justify-center p-8 text-center text-kagit relative overflow-hidden">
+              <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+              <span class="inline-block rounded px-2.5 py-1 text-[0.6875rem] font-bold tracking-wider uppercase bg-kiremit text-kagit mb-3 z-10">
+                {oneCikan.kategori}
+              </span>
+              <h2 class="font-serif text-xl sm:text-2xl lg:text-3xl font-bold leading-tight max-w-[26ch] z-10">
+                {oneCikan.baslik}
+              </h2>
+              <div class="mt-4 flex items-center gap-3 text-xs text-kagit/70 z-10">
+                <span>{oneCikan.tarih}</span>
+                <span>·</span>
+                <span>{oneCikan.okunmaSuresi}</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-col justify-between p-6 sm:p-8 lg:col-span-5 lg:p-10">
+            <div>
+              <div class="hidden lg:flex items-center gap-2 mb-3">
+                <span class="rounded-full bg-kiremit/10 px-3 py-1 text-xs font-semibold text-kiremit">
+                  ÖNE ÇIKAN BÜLTEN
+                </span>
+                <span class="text-xs text-metin-3">{oneCikan.okunmaSuresi}</span>
+              </div>
+              <h3 class="text-xl font-bold text-metin lg:text-2xl leading-snug">
+                <a href={`/bulten/${oneCikan.slug}`} class="hover:text-kiremit transition-colors duration-200">
+                  {oneCikan.baslik}
+                </a>
+              </h3>
+              <p class="mt-3 text-sm leading-relaxed text-metin-2 lg:text-base line-clamp-3">
+                {oneCikan.spot}
+              </p>
+              {oneCikan.yasalDayanak && (
+                <div class="mt-4 rounded-lg bg-kagit-2 p-3 text-xs text-metin-2 border border-cizgi">
+                  <strong class="text-metin block mb-0.5">Yasal Dayanak:</strong>
+                  {oneCikan.yasalDayanak}
+                </div>
+              )}
+            </div>
+            <div class="mt-6 pt-6 border-t border-cizgi flex items-center justify-between">
+              <span class="text-xs text-metin-3 font-medium">{oneCikan.yazar}</span>
+              <a
+                href={`/bulten/${oneCikan.slug}`}
+                class="inline-flex items-center gap-1.5 text-sm font-bold text-kiremit hover:underline"
+              >
+                Yazıyı Oku
+                <svg class="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 8h10M9 4l4 4-4 4" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  )}
+
+  <!-- Bülten Listesi Gridi -->
+  <section class="pb-24 lg:pb-32">
+    <div class="kab">
+      <div class="flex items-center justify-between border-b border-cizgi pb-4 mb-8">
+        <h2 class="text-lg font-bold text-metin lg:text-xl">Tüm Analiz ve Bülten Yazıları</h2>
+        <span class="text-xs text-metin-3">Toplam {gorunenYazilar.length} bülten yayında</span>
+      </div>
+
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" id="bulten-grid">
+        {digerYazilar.map((yazi) => (
+          <article
+            data-kategori={yazi.kategori}
+            class="bulten-karti group flex flex-col justify-between rounded-xl border border-cizgi bg-kagit-1 p-6 transition-all duration-300 hover:border-metin-2/30 hover:shadow-lg"
+          >
+            <div>
+              <div class="flex items-center justify-between gap-2 text-xs">
+                <span class="rounded bg-kagit-3 px-2.5 py-1 font-semibold text-metin-2">
+                  {yazi.kategori}
+                </span>
+                <span class="text-metin-3">{yazi.okunmaSuresi}</span>
+              </div>
+              <h3 class="mt-4 text-lg font-bold leading-snug text-metin group-hover:text-kiremit transition-colors duration-200 line-clamp-2">
+                <a href={`/bulten/${yazi.slug}`}>
+                  {yazi.baslik}
+                </a>
+              </h3>
+              <p class="mt-2.5 text-sm leading-relaxed text-metin-2 line-clamp-3">
+                {yazi.spot}
+              </p>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-cizgi flex items-center justify-between text-xs text-metin-3">
+              <span>{yazi.tarih}</span>
+              <a
+                href={`/bulten/${yazi.slug}`}
+                class="font-semibold text-metin hover:text-kiremit transition-colors inline-flex items-center gap-1"
+              >
+                İncele
+                <svg class="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 8h10M9 4l4 4-4 4" />
+                </svg>
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+      {!oneCikan && <p class="rounded-xl border border-cizgi bg-kagit-1 p-6 text-sm text-metin-2">Bu kategoride henüz yayınlanmış bir bülten yok.</p>}
+
+      <!-- Bülten Sayfa Altı Danışma Kutusu -->
+      <div class="mt-16 rounded-2xl bg-[#0f172a] p-8 text-kagit lg:p-12 text-center relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-60 h-60 rounded-full bg-kiremit/20 blur-3xl"></div>
+        <div class="relative z-10 max-w-2xl mx-auto">
+          <p class="etiket text-kiremit">HUKUKİ VE TİCARİ GÜVENCE</p>
+          <h3 class="font-serif text-2xl font-bold mt-2 sm:text-3xl">
+            Gayrimenkulünüzle ilgili özel bir hukuki durum mu var?
+          </h3>
+          <p class="mt-3 text-sm sm:text-base text-kagit/80 leading-relaxed">
+            Hisseli tapu, kira tahliyesi, kentsel dönüşüm uzlaşması veya imar problemleri için uzman ekibimize danışın.
+          </p>
+          <div class="mt-6 flex flex-wrap justify-center gap-4">
+            <a
+              href="/iletisim"
+              class="rounded-lg bg-kiremit px-6 py-3 text-sm font-bold text-kagit hover:bg-kiremit/90 transition-colors"
+            >
+              Uzmana Danışın
+            </a>
+            <a
+              href="/degerleme"
+              class="rounded-lg bg-white/10 px-6 py-3 text-sm font-bold text-kagit hover:bg-white/20 transition-colors"
+            >
+              Ücretsiz Değerleme Alın
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Temel>

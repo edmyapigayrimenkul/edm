@@ -1,0 +1,88 @@
+[
+  {
+    "gorunum": "mobil",
+    "genislik": 390,
+    "gorseller": [
+      {
+        "ekran": 328,
+        "kaynak": "https://hecdn01.hemlak.com/mnresize/960/720/ds01/0/3/7/2/1/8/5/4/64606ec9-72d2-41e6-a0fe-b85b8e8c2cf4.jpg",
+        "secili": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/64606ec9-72d2-41e6-a0fe-b85b8e8c2cf4.jpg",
+        "tamam": true
+      },
+      {
+        "ekran": 328,
+        "kaynak": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/47d3a69a-f669-492f-854d-e8bb6eaee7d3.jpg",
+        "secili": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/47d3a69a-f669-492f-854d-e8bb6eaee7d3.jpg",
+        "tamam": true
+      },
+      {
+        "ekran": 328,
+        "kaynak": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/984a290c-0992-4cf4-bd82-ec469afd1419.jpg",
+        "secili": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/984a290c-0992-4cf4-bd82-ec469afd1419.jpg",
+        "tamam": true
+      },
+      {
+        "ekran": 328,
+        "kaynak": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/9b2c5577-54aa-4144-bd4d-257646683b1c.jpg",
+        "secili": "",
+        "tamam": false
+      },
+      {
+        "ekran": 328,
+        "kaynak": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/0a51ca3d-fbd1-4ae4-82cd-30d8a154bc76.jpg",
+        "secili": "",
+        "tamam": false
+      },
+      {
+        "ekran": 0,
+        "kaynak": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/47d3a69a-f669-492f-854d-e8bb6eaee7d3.jpg",
+        "secili": "https://hecdn01.hemlak.com/mnresize/1280/960/ds01/0/3/7/2/1/8/5/4/47d3a69a-f669-492f-854d-e8bb6eaee7d3.jpg",
+        "tamam": true
+      }
+    ],
+    "tasiyor": false
+  },
+  {
+    "gorunum": "masaustu",
+    "genislik": 1280,
+    "gorseller": [
+      {
+        "ekran": 707,
+        "kaynak": "https://hecdn01.hemlak.com/mnresize/960/720/ds01/0/3/7/2/1/8/5/4/64606ec9-72d2-41e6-a0fe-b85b8e8c2cf4.jpg",
+        "secili": "https://hecdn01.hemlak.com/mnresize/960/720/ds01/0/3/7/2/1/8/5/4/64606ec9-72d2-41e6-a0fe-b85b8e8c2cf4.jpg",
+        "tamam": true
+      },
+      {
+        "ekran": 214,
+        "kaynak": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/47d3a69a-f669-492f-854d-e8bb6eaee7d3.jpg",
+        "secili": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/47d3a69a-f669-492f-854d-e8bb6eaee7d3.jpg",
+        "tamam": true
+      },
+      {
+        "ekran": 214,
+        "kaynak": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/984a290c-0992-4cf4-bd82-ec469afd1419.jpg",
+        "secili": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/984a290c-0992-4cf4-bd82-ec469afd1419.jpg",
+        "tamam": true
+      },
+      {
+        "ekran": 214,
+        "kaynak": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/9b2c5577-54aa-4144-bd4d-257646683b1c.jpg",
+        "secili": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/9b2c5577-54aa-4144-bd4d-257646683b1c.jpg",
+        "tamam": true
+      },
+      {
+        "ekran": 214,
+        "kaynak": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/0a51ca3d-fbd1-4ae4-82cd-30d8a154bc76.jpg",
+        "secili": "https://hecdn01.hemlak.com/mnresize/640/480/ds01/0/3/7/2/1/8/5/4/0a51ca3d-fbd1-4ae4-82cd-30d8a154bc76.jpg",
+        "tamam": true
+      },
+      {
+        "ekran": 0,
+        "kaynak": null,
+        "secili": "",
+        "tamam": true
+      }
+    ],
+    "tasiyor": false
+  }
+]

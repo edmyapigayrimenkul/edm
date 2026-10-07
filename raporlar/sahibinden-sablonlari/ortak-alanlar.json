@@ -1,0 +1,91 @@
+{
+  "source": {
+    "platform": "Sahibinden Pro Ofis",
+    "capturedAt": "2026-10-05",
+    "captureMethod": "Authenticated Kiralık Daire form accessibility/DOM inspection",
+    "scope": "Visible reusable controls and choices only; no entered values or account contact details"
+  },
+  "components": [
+    {
+      "key": "ilan-basligi",
+      "label": "İlan Başlığı",
+      "type": "text",
+      "required": true,
+      "categorySpecific": false
+    },
+    {
+      "key": "ilan-aciklamasi",
+      "label": "Açıklama",
+      "type": "rich-text",
+      "required": true,
+      "categorySpecific": false,
+      "toolbar": ["Kalın", "Eğik", "Altı çizili", "Sola yasla", "Ortala", "Sağa yasla", "Sırasız Liste", "Sıralı Liste", "Yinele", "Geri Al", "Biçimlendirmeyi temizle", "Resim ekle", "Bağlantı", "Yazı tipi", "Yazı boyutu", "Yazı rengi", "Fon rengi"]
+    },
+    {
+      "key": "fiyat",
+      "label": "Fiyat",
+      "type": "money",
+      "required": true,
+      "categorySpecific": false,
+      "currencyOptions": ["TL"]
+    },
+    {
+      "key": "adres",
+      "label": "Adres Bilgileri",
+      "categorySpecific": false,
+      "fields": [
+        {"key":"ulke","label":"Ülke","required":true},
+        {"key":"il","label":"İl","required":true},
+        {"key":"ilce","label":"İlçe","required":true},
+        {"key":"mahalle","label":"Mahalle","required":true},
+        {"key":"site","label":"Site içerisinde mi?","required":true}
+      ],
+      "notes": ["İl/ilçe/mahalle seçenek listeleri ilan şablonlarına kopyalanmaz; ortak adres verisi olarak tutulur.", "Harita konumu adres formunun parçasıdır; hassas pin veya kullanıcının seçtiği konum bu şemaya dahil edilmez."]
+    },
+    {
+      "key": "fotograflar",
+      "label": "Fotoğraf",
+      "categorySpecific": false,
+      "uploadMethods": ["Bilgisayardan fotoğraf ekle veya sürükle bırak", "Cep telefonundan fotoğraf ekle", "QR kodu ile fotoğraf ekle"],
+      "options": ["FotoBot ile fotoğrafları ücretsiz iyileştir", "Küçük fotoğraf dopingi"],
+      "sourceLimitObserved": 35,
+      "notes": ["Bu 35 sınırı Sahibinden formunda gözlendi; EDM'nin kendi fotoğraf sınırını belirlemez.", "İlan görseli/thumbnail yayını için seçenek bulunuyor."]
+    },
+    {
+      "key": "video",
+      "label": "Video",
+      "categorySpecific": false,
+      "uploadMethods": ["Bilgisayardan video ekle veya sürükle bırak"],
+      "formats": ["3gp", "mp4", "mov"],
+      "maxDurationMinutes": 1
+    },
+    {
+      "key": "sanal-tur",
+      "label": "Sanal Tur",
+      "categorySpecific": false,
+      "choices": ["Sanal Turlarımdan seç", "Matterport ya da Immoviewer adresinden link ekle", "Sanal Tur eklemeden devam et"]
+    },
+    {
+      "key": "ilan-notu",
+      "label": "İlan Notum",
+      "type": "textarea",
+      "required": false,
+      "categorySpecific": false,
+      "visibility": "Yalnızca ilan sahibi görebilir"
+    },
+    {
+      "key": "iletisim",
+      "label": "İletişim Bilgileri",
+      "categorySpecific": false,
+      "fields": ["Adı Soyadı", "İş Telefonu", "İş Telefonu 2", "Cep Telefonu"],
+      "choices": ["İlanda telefon numaram yayınlansın", "İlanımda telefon numaramın yayınlanmasını istemiyorum", "Diğer kullanıcılardan sistem üzerinden mesaj almak istemiyorum"]
+    },
+    {
+      "key": "ilan-kurallari",
+      "label": "İlan verme kurallarını okudum, kabul ediyorum",
+      "type": "required-checkbox",
+      "categorySpecific": false
+    }
+  ],
+  "privacy": "Bu dosyada kullanıcının girdiği ilan açıklaması, adresi, telefon numarası, hesap adı, ilan kimliği veya seçilmiş konum saklanmaz."
+}

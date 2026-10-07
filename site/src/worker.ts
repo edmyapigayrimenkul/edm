@@ -14,24 +14,48 @@ import { portfoyuCek } from './lib/senkron/emlakjet';
 import { semayiKur, portfoyuYaz, gunlugeYaz } from './lib/senkron/depo';
 import { onbellegiTemizle } from './lib/ilanlar';
 import { gunlukOzet } from './lib/eposta';
+import { bekleyenTalepBildirimleriniGonder } from './lib/talep-bildirim';
+import { senkronUyarilariniKaydet, talepUyarilariniKaydet, bekleyenUyarilariGonder } from './lib/isletim-uyari';
 import { googleYorumlariniCek } from './lib/senkron/yorumlar';
+import { bekleyenPasifBildirimleriniGonder, pasifBildirimleriniKaydet } from './lib/ilan-isletim';
+import { genelHtmlSun } from './lib/edge-cache';
+import { emlakjetGorselSun } from './lib/emlakjet-gorseli';
+import { r2FotografiSil } from './lib/r2-gorseller';
 
 export interface Env {
   VT: D1Database;
   ASSETS: Fetcher;
+  STAGING_ORTAMI?: string;
   BILDIRIM_ADRESI?: string;
   /** Places API anahtarı; tanımlı değilse yorum çekme sessizce atlanır. */
   GOOGLE_ANAHTARI?: string;
   GOOGLE_ISLETME_ARAMASI?: string;
   EPOSTA?: { send: (mesaj: unknown) => Promise<void> };
+  GORSELLER?: R2Bucket;
+  WHATSAPP_TELEFON_NO_KIMLIGI?: string;
+  WHATSAPP_ERISIM_JETONU?: string;
+  WHATSAPP_BILDIRIM_ALICI?: string;
+  WHATSAPP_PASIF_SABLONU?: string;
 }
 
 export default {
-  fetch: handle,
+  async fetch(request: Request, env: Env, baglam: ExecutionContext) {
+    if (new URL(request.url).pathname.startsWith('/foto/emlakjet/')) {
+      return emlakjetGorselSun(request, caches.default, (is) => baglam.waitUntil(is));
+    }
+    return genelHtmlSun(request, caches.default,
+      () => handle(request, env, baglam), (is) => baglam.waitUntil(is));
+  },
 
   async scheduled(olay: ScheduledController, env: Env, baglam: ExecutionContext) {
+    // Staging'e yanlışlıkla cron bağlansa bile gerçek portalı çekme.
+    if (env.STAGING_ORTAMI === '1') return;
     baglam.waitUntil(
       (async () => {
+        await semayiKur(env.VT);
+        await bekleyenTalepBildirimleriniGonder(env.VT, env).catch(() =>
+          console.error('Talep bildirim kuyruğu işlenemedi.')
+        );
         await senkronla(env);
         // Günlük özet yalnızca sabah çalışmasında (03:00 UTC = 06:00 TR).
         // Diğer üç çalışmada sessizce sadece senkron yapılıyor.
@@ -55,6 +79,7 @@ export default {
 } satisfies ExportedHandler<Env>;
 
 export async function senkronla(env: Env): Promise<Record<string, unknown>> {
+  if (env.STAGING_ORTAMI === '1') return { tamam: false, sebep: 'staging-ortami' };
   const baslangic = new Date().toISOString();
 
   try {
@@ -66,11 +91,37 @@ export async function senkronla(env: Env): Promise<Record<string, unknown>> {
     // pasife çekmemize sebep olmamalı. Böyle bir durumda hiçbir şey yazmıyoruz.
     if (ilanlar.length === 0) {
       await gunlugeYaz(env.VT, baslangic, null, 'Portaldan hiç ilan gelmedi — yazma atlandı.');
+      await senkronUyarilariniKaydet(env.VT, null, baslangic).catch(() => console.error('Senkron uyarısı kaydedilemedi.'));
       return { tamam: false, sebep: 'bos-yanit' };
     }
 
     const sonuc = await portfoyuYaz(env.VT, ilanlar, basarisiz);
     await gunlugeYaz(env.VT, baslangic, sonuc);
+    await senkronUyarilariniKaydet(env.VT, sonuc, baslangic).catch(() => console.error('Senkron uyarısı kaydedilemedi.'));
+    if (sonuc.pasiflemeErtelendi) {
+      console.warn(
+        `Senkron: ${sonuc.eksikAdet} eksik ilan pasife alınmadı; portal sonucu eksik veya büyük düşüş ikinci tam çekimle doğrulanmalı.`
+      );
+    }
+    await pasifBildirimleriniKaydet(env.VT, sonuc.pasifIdler);
+    const whatsApp = await bekleyenPasifBildirimleriniGonder(env.VT, env);
+    if (whatsApp.gonderilen || whatsApp.bekleyen) console.log('WhatsApp bildirimleri:', JSON.stringify(whatsApp));
+
+    // Yeni ilan formunda yüklenip kaydı tamamlanmayan taslak fotoğraflar bir gün
+    // sonra temizlenir. Form hatasında aynı taslağa dönmek için yeterli süre kalır.
+    if (env.GORSELLER) {
+      const sahipsizler = await env.VT
+        .prepare(
+          `SELECT f.anahtar FROM ilan_foto f LEFT JOIN ilanlar i ON i.id = f.ilan_id
+           WHERE i.id IS NULL AND datetime(f.yuklenme) < datetime('now', '-1 day') LIMIT 100`
+        )
+        .all<{ anahtar: string }>()
+        .catch(() => ({ results: [] as Array<{ anahtar: string }> }));
+      for (const foto of sahipsizler.results ?? []) {
+        await r2FotografiSil(env.GORSELLER, foto.anahtar).catch(() => {});
+        await env.VT.prepare(`DELETE FROM ilan_foto WHERE anahtar = ?`).bind(foto.anahtar).run().catch(() => {});
+      }
+    }
 
     // Not: koordinat çözümü buradan yapılmıyor. Nominatim veri merkezi
     // IP'lerinden gelen istekleri boş yanıtla geçiştiriyor; Worker'dan
@@ -90,6 +141,11 @@ export async function senkronla(env: Env): Promise<Record<string, unknown>> {
     const mesaj = hata instanceof Error ? hata.message : String(hata);
     console.error('Senkron başarısız:', mesaj);
     await gunlugeYaz(env.VT, baslangic, null, mesaj).catch(() => {});
+    await senkronUyarilariniKaydet(env.VT, null, baslangic).catch(() => console.error('Senkron uyarısı kaydedilemedi.'));
     return { tamam: false, hata: mesaj };
+  } finally {
+    // Senkron başarısız olsa da talep eşiğini kontrol et. Bildirim hatası senkron sonucunu değiştirmez.
+    await talepUyarilariniKaydet(env.VT).catch(() => console.error('Talep uyarıları kontrol edilemedi.'));
+    await bekleyenUyarilariGonder(env.VT, env).catch(() => console.error('İşletim uyarıları gönderilemedi.'));
   }
 }

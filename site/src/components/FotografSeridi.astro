@@ -11,6 +11,7 @@
  */
 import type { Ilan } from '../lib/ilanlar';
 import { fiyatKisa } from '../lib/ilanlar';
+import { gorselSunumu, GORSEL_YEDEK_BETIGI } from '../lib/gorsel-sunum';
 
 interface Props {
   ilanlar: Ilan[];
@@ -24,20 +25,31 @@ const sure = Math.max(45, ilanlar.length * 7);
     <div class="serit serit-durakla" aria-label="Portföyden fotoğraflar">
       <div class="serit-akis" style={`--sure:${sure}s`}>
         {[0, 1].map((kopya) =>
-          ilanlar.map((ilan) => (
+          ilanlar.map((ilan) => {
+            const sunum = gorselSunumu(ilan.kapak!, 'serit');
+            return (
             <a
               href={ilan.yol}
               class="serit-kare"
               aria-hidden={kopya === 1 ? 'true' : undefined}
               tabindex={kopya === 1 ? -1 : undefined}
             >
-              <img src={ilan.kapak!} alt={kopya === 0 ? ilan.baslikTemiz : ''} loading="lazy" decoding="async" />
+              <picture>
+                {sunum.mobilYogunKaynak && <source media="(min-resolution: 1.5dppx) and (max-width: 899px)" srcset={sunum.mobilYogunKaynak} />}
+                {sunum.yogunKaynak && <source media="(min-resolution: 1.5dppx)" srcset={sunum.yogunKaynak} />}
+                <img src={sunum.kaynak} srcset={sunum.secenekler}
+                  data-gorsel-yedek={sunum.yogunKaynak || sunum.mobilYogunKaynak ? ilan.kapak : undefined}
+                  data-gorsel-alternatif={sunum.alternatifKaynak}
+                  onerror={sunum.yogunKaynak || sunum.mobilYogunKaynak ? GORSEL_YEDEK_BETIGI : undefined}
+                  alt={kopya === 0 ? ilan.baslikTemiz : ''} loading="lazy" decoding="async" />
+              </picture>
               <span class="serit-bilgi">
                 <span class="serit-yer">{ilan.ilce}</span>
-                <span class="serit-fiyat font-veri">{fiyatKisa(ilan.fiyat)}</span>
+                <span class="serit-fiyat">{fiyatKisa(ilan.fiyat, ilan.paraBirimi)}</span>
               </span>
             </a>
-          ))
+            );
+          })
         )}
       </div>
     </div>
@@ -68,6 +80,11 @@ const sure = Math.max(45, ilanlar.length * 7);
     overflow: hidden;
     border-radius: var(--radius-kart);
     background: var(--color-murekkep-3);
+  }
+  .serit-kare picture {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
   .serit-kare img {
     width: 100%;
@@ -108,7 +125,9 @@ const sure = Math.max(45, ilanlar.length * 7);
   }
   .serit-fiyat {
     font-size: 0.8125rem;
-    font-weight: 500;
+    font-weight: 650;
+    letter-spacing: -0.015em;
+    font-variant-numeric: tabular-nums;
   }
 
   /* Hareket azaltma tercihinde şerit durur, taşan kısım kırpılır */

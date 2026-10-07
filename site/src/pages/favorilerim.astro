@@ -12,9 +12,11 @@
  */
 import Temel from '../layouts/Temel.astro';
 import IlanKart from '../components/IlanKart.astro';
+import { icerik } from '../lib/icerik';
 import { portfoy } from '../lib/ilanlar';
 
 const { ilanlar } = await portfoy();
+const { iletisim } = await icerik();
 ---
 
 <Temel
@@ -27,19 +29,33 @@ const { ilanlar } = await portfoy();
       <p class="etiket">Sizin listeniz</p>
       <div class="mt-4 flex flex-wrap items-end justify-between gap-6">
         <h1 class="baslik-buyuk max-w-[16ch]">Kaydettikleriniz</h1>
-        <div data-favori-arac hidden>
+        <div data-favori-arac hidden class="favori-araclar" data-wa={iletisim.whatsapp}>
+          <a
+            href="#"
+            data-favori-whatsapp
+            target="_blank"
+            rel="noopener noreferrer"
+            class="dugme dugme--kirmizi"
+          >
+            WhatsApp’tan ilet
+          </a>
+          <button type="button" data-favori-paylas class="dugme dugme--murekkep">
+            <span data-favori-paylas-metin>Listeyi paylaş</span>
+          </button>
           <button type="button" data-favori-temizle class="dugme dugme--hayalet">
             Listeyi temizle
           </button>
         </div>
       </div>
 
+      <p class="paylas-durum mt-4" data-favori-paylas-durum role="status" aria-live="polite"></p>
+
       <!-- Hiç kayıt yokken -->
       <div data-favori-bos class="bos-kutu mt-10">
         <p class="baslik-orta max-w-[22ch]">Henüz bir ilan kaydetmediniz.</p>
         <p class="mt-4 max-w-[46ch] text-metin-2">
           İlan kartlarının köşesindeki kalbe dokunduğunuzda ilan bu sayfada birikir.
-          Liste yalnızca bu tarayıcıda durur — üyelik gerekmez, kimseyle paylaşılmaz.
+          Liste yalnızca bu tarayıcıda durur — üyelik gerekmez, siz paylaşmadıkça gönderilmez.
         </p>
         <a href="/ilanlar" class="dugme dugme--kirmizi mt-7">Portföye göz atın</a>
       </div>
@@ -51,9 +67,8 @@ const { ilanlar } = await portfoy();
 
       <p class="mt-10 text-sm text-kursun">
         Listeniz bu tarayıcıda saklanıyor. Başka bir telefondan bakarsanız boş görünür.
-        Beğendiklerinizi bize iletmek isterseniz
-        <a href="/iletisim" class="alt-cizgi font-medium text-murekkep">iletişim sayfasından</a>
-        yazabilirsiniz.
+        Paylaş düğmeleri yalnızca seçtiğiniz ilanların başlık, fiyat ve bağlantılarını
+        hazırlar; gönderme işlemi sizin seçiminizle tamamlanır.
       </p>
     </div>
   </section>
@@ -65,5 +80,31 @@ const { ilanlar } = await portfoy();
     border-radius: var(--radius-kart);
     padding: clamp(2rem, 6vw, 4rem);
     background: color-mix(in oklab, var(--color-murekkep) 2.5%, transparent);
+  }
+  .favori-araclar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.6rem;
+  }
+  .paylas-durum:empty {
+    display: none;
+  }
+  .paylas-durum {
+    color: var(--color-metin-2);
+    font-size: 0.8125rem;
+    text-align: right;
+  }
+  @media (max-width: 639px) {
+    .favori-araclar {
+      width: 100%;
+      justify-content: stretch;
+    }
+    .favori-araclar > * {
+      flex: 1 1 100%;
+    }
+    .paylas-durum {
+      text-align: left;
+    }
   }
 </style>

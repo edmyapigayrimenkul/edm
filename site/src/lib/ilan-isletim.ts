@@ -8,6 +8,7 @@
  */
 
 import { env } from 'cloudflare:workers';
+import { r2FotografiSil } from './r2-gorseller';
 
 export const ILAN_ISLETIM_SEMA = `
 CREATE TABLE IF NOT EXISTS ilan_hatirlatma (
@@ -389,7 +390,7 @@ export async function siradakiPaylasimiAl(vt: D1Database): Promise<PaylasimKaydi
 export async function paylasimSonucunuYaz(
   vt: D1Database,
   id: number,
-  durum: 'yayinlandi' | 'hata' | 'iptal',
+  durum: 'yayinlandi' | 'hata' | 'iptal' | 'kuru',
   sonuc = '',
   hata = ''
 ): Promise<boolean> {
@@ -413,8 +414,11 @@ export async function elleIlaniKaliciSil(vt: D1Database, kova: R2Bucket | undefi
     .first<{ adet: number }>();
   if ((isleniyor?.adet ?? 0) > 0) throw new Error('İlanın sosyal medya yayını sürüyor; işlem tamamlanmadan silinemez.');
   const fotograflar = await vt.prepare(`SELECT anahtar FROM ilan_foto WHERE ilan_id = ?`).bind(ilanId).all<{ anahtar: string }>();
+  const video = await vt.prepare(`SELECT video_anahtar, poster_anahtar FROM ilan_video WHERE ilan_id = ?`).bind(ilanId)
+    .first<{ video_anahtar: string; poster_anahtar: string }>().catch(() => null);
   await vt.batch([
     vt.prepare(`DELETE FROM ilan_foto WHERE ilan_id = ?`).bind(ilanId),
+    vt.prepare(`DELETE FROM ilan_video WHERE ilan_id = ?`).bind(ilanId),
     vt.prepare(`DELETE FROM ilan_gorsel_duzen WHERE ilan_id = ?`).bind(ilanId),
     vt.prepare(`DELETE FROM ilan_hatirlatma WHERE ilan_id = ?`).bind(ilanId),
     vt.prepare(`DELETE FROM ilan_bildirim WHERE ilan_id = ?`).bind(ilanId),
@@ -423,5 +427,6 @@ export async function elleIlaniKaliciSil(vt: D1Database, kova: R2Bucket | undefi
     vt.prepare(`DELETE FROM ilan_duzenleme WHERE ilan_id = ?`).bind(ilanId),
     vt.prepare(`DELETE FROM ilanlar WHERE id = ? AND kaynak = 'elle'`).bind(ilanId),
   ]);
-  for (const foto of fotograflar.results ?? []) await kova?.delete(foto.anahtar).catch(() => {});
+  for (const foto of fotograflar.results ?? []) await (kova ? r2FotografiSil(kova, foto.anahtar) : Promise.resolve()).catch(() => {});
+  if (video) await Promise.allSettled([kova?.delete(video.video_anahtar), kova?.delete(video.poster_anahtar)]);
 }

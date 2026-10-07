@@ -9,7 +9,7 @@ const { ekip: ekipListesi, iletisim } = await icerik();
 const ekip = await Promise.all(
   ekipListesi.map(async (d) => {
     // Doğukan'ın Emlakjet'te ayrı profili yok; ilanları Metin üzerinden geçiyor.
-    const ilanlar = d.emlakjetSlug ? await danismaninIlanlari(d.emlakjetSlug) : [];
+    const ilanlar = await danismaninIlanlari(d.slug);
     return {
       ...d,
       adet: ilanlar.length,
@@ -97,8 +97,8 @@ const ekip = await Promise.all(
                   >
                     WhatsApp
                   </a>
-                  <a href={`tel:${iletisim.telefonHam}`} class="dugme dugme--hayalet">
-                    {iletisim.telefon}
+                  <a href={`tel:${iletisim.sabitHam}`} class="dugme dugme--hayalet">
+                    {iletisim.sabit}
                   </a>
                 </div>
               </div>

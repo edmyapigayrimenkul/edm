@@ -7,52 +7,8 @@
 
 import type { HamIlan } from './emlakjet';
 import type { AyrintiliIlanGirdisi } from '../ilan-bilgileri';
-
-export const SEMA = `
-CREATE TABLE IF NOT EXISTS ilanlar (
-  id             TEXT PRIMARY KEY,
-  kaynak         TEXT NOT NULL,
-  kaynak_url     TEXT NOT NULL,
-  baslik         TEXT NOT NULL,
-  aciklama       TEXT NOT NULL DEFAULT '',
-  fiyat          INTEGER,
-  para_birimi    TEXT NOT NULL DEFAULT 'TRY',
-  islem          TEXT NOT NULL,
-  kategori       TEXT NOT NULL DEFAULT '',
-  tip            TEXT NOT NULL DEFAULT '',
-  tip_grup       TEXT NOT NULL DEFAULT 'diger',
-  oda            TEXT,
-  m2             INTEGER,
-  il             TEXT,
-  ilce           TEXT,
-  mahalle        TEXT,
-  ozellikler     TEXT NOT NULL DEFAULT '{}',
-  donanim        TEXT NOT NULL DEFAULT '[]',
-  gorseller      TEXT NOT NULL DEFAULT '[]',
-  danisman_slug  TEXT,
-  guncellenme    TEXT,
-  ilk_gorulme    TEXT NOT NULL,
-  son_gorulme    TEXT NOT NULL,
-  durum          TEXT NOT NULL DEFAULT 'aktif',
-  pasif_tarihi   TEXT
-);
-CREATE INDEX IF NOT EXISTS ilan_durum   ON ilanlar (durum);
-CREATE INDEX IF NOT EXISTS ilan_islem   ON ilanlar (islem);
-CREATE INDEX IF NOT EXISTS ilan_ilce    ON ilanlar (ilce);
-CREATE INDEX IF NOT EXISTS ilan_tarih   ON ilanlar (guncellenme DESC);
-
-CREATE TABLE IF NOT EXISTS senkron_gunlugu (
-  id          INTEGER PRIMARY KEY AUTOINCREMENT,
-  baslangic   TEXT NOT NULL,
-  bitis       TEXT,
-  bulunan     INTEGER,
-  eklenen     INTEGER,
-  guncellenen INTEGER,
-  pasiflenen  INTEGER,
-  basarisiz   INTEGER,
-  hata        TEXT
-);
-`;
+import { aniDususeKarsiKontrol, dususTeyitKarari } from './emniyet.ts';
+import { gerekliD1Migrasyonu, d1SurumHatasi } from './surum.ts';
 
 export interface SatirIlan {
   id: string;
@@ -98,45 +54,41 @@ export interface SenkronSonuc {
   pasifIdler: string[];
   yeniIdler: string[];
   sureMs: number;
+  pasiflemeErtelendi: boolean;
+  oncekiAktif: number;
+  eksikAdet: number;
+  supheliDusus: boolean;
 }
 
-/**
- * Şemayı kurar — her senkron öncesi güvenle çağrılabilir.
- *
- * İfadeleri ';' ile ayırmadan önce açıklama satırlarını siliyoruz: bir
- * açıklamanın içinde geçen noktalı virgül aksi halde ifadeyi ikiye bölüp
- * D1'e anlamsız bir parça gönderiyor.
- */
-export async function semayiKur(vt: D1Database): Promise<void> {
-  const { PANEL_SEMA } = await import('./panel-sema');
-  const { PANEL_SEMA2 } = await import('./panel-sema2');
-  const { FOTO_SEMA } = await import('./foto-sema');
+/** Uygulanmış D1 migration sürümünü doğrular; uygulama sırasında şema değiştirmez. */
+const semaHazirligi = new WeakMap<object, Promise<void>>();
 
-  const tumu = `${SEMA}\n${PANEL_SEMA}\n${PANEL_SEMA2}\n${FOTO_SEMA}`
-    .split('\n')
-    .filter((satir) => !satir.trim().startsWith('--'))
-    .join('\n');
-
-  for (const ifade of tumu.split(';')) {
-    const kirpik = ifade.trim();
-    if (kirpik) await vt.prepare(kirpik).run();
+async function semayiGercektenDogrula(vt: D1Database): Promise<void> {
+  try {
+    const kayit = await vt
+      .prepare('SELECT name FROM d1_migrations WHERE name = ? LIMIT 1')
+      .bind(gerekliD1Migrasyonu)
+      .first<{ name: string }>();
+    if (!kayit) throw new Error(d1SurumHatasi(gerekliD1Migrasyonu));
+  } catch (hata) {
+    if (hata instanceof Error && hata.message.includes(gerekliD1Migrasyonu)) throw hata;
+    throw new Error(
+      `${d1SurumHatasi(gerekliD1Migrasyonu)} Ayrıntı: ${hata instanceof Error ? hata.message : String(hata)}`
+    );
   }
+}
 
-  // Var olan tablolara sonradan eklenen sütunlar ve indeksler (zaten varsa SQLite hata verir, yutuyoruz)
-  const ekSorgular = [
-    `ALTER TABLE yorumlar ADD COLUMN dis_kimlik TEXT`,
-    `ALTER TABLE yorumlar ADD COLUMN foto TEXT`,
-    `ALTER TABLE yorumlar ADD COLUMN profil_url TEXT`,
-    `ALTER TABLE yorumlar ADD COLUMN google_url TEXT`,
-    `ALTER TABLE talepler ADD COLUMN ic_not TEXT`,
-    `ALTER TABLE talepler ADD COLUMN ilgilenen TEXT`,
-    `ALTER TABLE talepler ADD COLUMN kapanma TEXT`,
-    `ALTER TABLE ilan_duzenleme ADD COLUMN ozellikler TEXT`,
-    `ALTER TABLE ilan_duzenleme ADD COLUMN donanim TEXT`,
-    `CREATE UNIQUE INDEX IF NOT EXISTS yorum_dis_kimlik ON yorumlar (dis_kimlik)`,
-  ];
-  for (const sql of ekSorgular) {
-    await vt.prepare(sql).run().catch(() => {});
+export async function semayiKur(vt: D1Database): Promise<void> {
+  const anahtar = vt as unknown as object;
+  const suren = semaHazirligi.get(anahtar);
+  if (suren) return await suren;
+  const kontrol = semayiGercektenDogrula(vt);
+  semaHazirligi.set(anahtar, kontrol);
+  try {
+    await kontrol;
+  } catch (hata) {
+    semaHazirligi.delete(anahtar);
+    throw hata;
   }
 }
 
@@ -161,6 +113,7 @@ export async function portfoyuYaz(
     .prepare(`SELECT id, durum, fiyat, guncellenme FROM ilanlar WHERE kaynak <> 'elle'`)
     .all<{ id: string; durum: string; fiyat: number | null; guncellenme: string | null }>();
   const onceki = new Map((oncekiSatirlar.results ?? []).map((s) => [s.id, s]));
+  const oncekiAktif = [...onceki.values()].filter((s) => s.durum === 'aktif').length;
 
   let eklenen = 0;
   let guncellenen = 0;
@@ -245,9 +198,49 @@ export async function portfoyuYaz(
   // Bu turda görülmeyen ve okunamamış olmayanlar pasife düşer.
   const gorulen = new Set(ilanlar.map((i) => i.id));
   const dokunulmaz = new Set(basarisizIdler);
-  const pasifIdler = [...onceki.keys()].filter(
+  const eksikIdler = [...onceki.keys()].filter(
     (id) => !gorulen.has(id) && !dokunulmaz.has(id) && onceki.get(id)!.durum === 'aktif'
   );
+
+  const dusus = aniDususeKarsiKontrol(oncekiAktif, ilanlar.length, eksikIdler);
+  let pasiflemeErtelendi = false;
+  let oncekiTeyit: { eksik_imzasi: string; teyit_sayisi: number } | null = null;
+  if (dusus.supheli && !basarisizIdler.length) {
+    oncekiTeyit = await vt
+      .prepare('SELECT eksik_imzasi, teyit_sayisi FROM senkron_pasifleme_teyidi WHERE id = 1')
+      .first<{ eksik_imzasi: string; teyit_sayisi: number }>();
+  }
+  const teyitKarari = dususTeyitKarari(
+    dusus.imza,
+    oncekiTeyit?.eksik_imzasi ?? null,
+    oncekiTeyit?.teyit_sayisi ?? 0,
+    basarisizIdler.length > 0
+  );
+  if (teyitKarari === 'eksik-veri') {
+    // Detay sayfaları okunamayan bir turda eksikliği portala bağlayamayız.
+    await vt.prepare('DELETE FROM senkron_pasifleme_teyidi WHERE id = 1').run();
+    pasiflemeErtelendi = true;
+  } else if (teyitKarari === 'pasiflestir') {
+    // İkinci ardışık tam çekimde aynı ilanların eksik olduğu doğrulandı.
+    await vt.prepare('DELETE FROM senkron_pasifleme_teyidi WHERE id = 1').run();
+  } else if (teyitKarari === 'bekle' && dusus.imza) {
+    await vt
+      .prepare(
+        `INSERT INTO senkron_pasifleme_teyidi (id, eksik_imzasi, teyit_sayisi, son_gorulme)
+         VALUES (1, ?, 1, ?)
+         ON CONFLICT(id) DO UPDATE SET
+           eksik_imzasi = excluded.eksik_imzasi,
+           teyit_sayisi = 1,
+           son_gorulme = excluded.son_gorulme`
+      )
+      .bind(dusus.imza, suAn)
+      .run();
+    pasiflemeErtelendi = true;
+  } else {
+    await vt.prepare('DELETE FROM senkron_pasifleme_teyidi WHERE id = 1').run();
+  }
+
+  const pasifIdler = pasiflemeErtelendi ? [] : eksikIdler;
 
   if (pasifIdler.length) {
     const yerTutucu = pasifIdler.map(() => '?').join(',');
@@ -270,6 +263,10 @@ export async function portfoyuYaz(
     pasifIdler,
     yeniIdler,
     sureMs: Date.now() - baslangic,
+    pasiflemeErtelendi,
+    oncekiAktif,
+    eksikAdet: eksikIdler.length,
+    supheliDusus: dusus.supheli,
   };
 }
 
@@ -330,7 +327,7 @@ export async function tumIlanSatirlari(vt: D1Database): Promise<
          i.*,
          COALESCE(d.one_cikan, 0) AS one_cikan,
          COALESCE(d.gizli, 0)     AS gizli,
-         CASE WHEN d.baslik IS NOT NULL OR d.aciklama IS NOT NULL THEN 1 ELSE 0 END AS duzenlendi
+         CASE WHEN d.baslik IS NOT NULL OR d.aciklama IS NOT NULL OR d.temel IS NOT NULL THEN 1 ELSE 0 END AS duzenlendi
        FROM ilanlar i
        LEFT JOIN ilan_duzenleme d ON d.ilan_id = i.id
        ORDER BY i.durum ASC, COALESCE(i.guncellenme, i.ilk_gorulme) DESC`
@@ -355,6 +352,7 @@ export interface DuzenlemeKaydi {
   ilan_id: string;
   baslik?: string | null;
   aciklama?: string | null;
+  temel?: string | null;
   ozellikler?: string | null;
   donanim?: string | null;
 }
@@ -364,7 +362,7 @@ export async function duzenlemeleriGetir(
 ): Promise<Map<string, DuzenlemeKaydi>> {
   try {
     const sonuc = await vt
-      .prepare(`SELECT ilan_id, baslik, aciklama, ozellikler, donanim FROM ilan_duzenleme`)
+      .prepare(`SELECT ilan_id, baslik, aciklama, temel, ozellikler, donanim FROM ilan_duzenleme`)
       .all<DuzenlemeKaydi>();
     return new Map((sonuc.results ?? []).map((r) => [r.ilan_id, r]));
   } catch {
@@ -383,18 +381,36 @@ export async function duzenlemeleriGetir(
  * İlan ekleme veya güncelleme.
  *
  * Elle eklenen ilanlar doğrudan ilanlar tablosuna yazılır;
- * Portaldan gelen ilanlarda ise hem anında görünmesi için ilanlar
- * güncellenir hem de senkronun ezmemesi için ilan_duzenleme'ye işlenir.
+ * Portaldan gelen ilanlarda kaynak satır değiştirilmez; panel kararı
+ * ilan_duzenleme'de tutulur ve okuma sırasında kaynağın üstüne bindirilir.
  */
 export async function ilanKaydetVeyaGuncelle(
   vt: D1Database,
   veri: AyrintiliIlanGirdisi,
-  id?: string
+  id?: string,
+  yeniIdAdayi?: string
 ): Promise<string> {
   const suAn = new Date().toISOString();
   const ozelliklerJson = JSON.stringify(veri.ozellikler);
   const donanimJson = JSON.stringify(veri.donanim ?? []);
   const gorsellerJson = JSON.stringify(veri.gorseller ?? []);
+  const temelJson = JSON.stringify({
+    baslik: veri.baslik,
+    aciklama: veri.aciklama,
+    fiyat: veri.fiyat,
+    para_birimi: veri.paraBirimi,
+    islem: veri.islem,
+    kategori: veri.kategori,
+    tip: veri.tip,
+    tip_grup: veri.tipGrup,
+    oda: veri.oda,
+    m2: veri.m2,
+    il: veri.il,
+    ilce: veri.ilce,
+    mahalle: veri.mahalle,
+    gorseller: gorsellerJson,
+    danisman_slug: veri.danismanSlug,
+  });
 
   if (id) {
     const mevcut = await vt
@@ -436,70 +452,42 @@ export async function ilanKaydetVeyaGuncelle(
           id
         )
         .run();
+
+      // Eski hızlı düzenleyiciden kalmış içerik geçersiz kılmaları,
+      // ayrıntılı formda kaydedilen temel satırın önüne geçmesin.
+      // Görünürlük ve öne çıkarma tercihleri aynı satırda korunur.
+      await vt
+        .prepare(
+          `UPDATE ilan_duzenleme SET
+             baslik = NULL, aciklama = NULL, temel = NULL,
+             ozellikler = NULL, donanim = NULL, guncelleme = ?
+           WHERE ilan_id = ?`
+        )
+        .bind(suAn, id)
+        .run();
     } else {
       await vt
         .prepare(
-          `INSERT INTO ilan_duzenleme (ilan_id, baslik, aciklama, ozellikler, donanim, guncelleme)
-           VALUES (?, ?, ?, ?, ?, ?)
+          `INSERT INTO ilan_duzenleme (ilan_id, baslik, aciklama, temel, ozellikler, donanim, guncelleme)
+           VALUES (?, ?, ?, ?, ?, ?, ?)
            ON CONFLICT(ilan_id) DO UPDATE SET
              baslik = excluded.baslik,
              aciklama = excluded.aciklama,
+             temel = excluded.temel,
              ozellikler = excluded.ozellikler,
              donanim = excluded.donanim,
              guncelleme = excluded.guncelleme`
         )
-        .bind(id, veri.baslik, veri.aciklama, ozelliklerJson, donanimJson, suAn)
-        .run()
-        .catch(async () => {
-          await vt
-            .prepare(
-              `INSERT INTO ilan_duzenleme (ilan_id, baslik, aciklama, guncelleme)
-               VALUES (?, ?, ?, ?)
-               ON CONFLICT(ilan_id) DO UPDATE SET
-                 baslik = excluded.baslik,
-                 aciklama = excluded.aciklama,
-                 guncelleme = excluded.guncelleme`
-            )
-            .bind(id, veri.baslik, veri.aciklama, suAn)
-            .run();
-        });
-
-      await vt
-        .prepare(
-          `UPDATE ilanlar SET
-             baslik = ?, aciklama = ?, fiyat = ?, para_birimi = ?, islem = ?,
-             kategori = ?, tip = ?, tip_grup = ?, oda = ?, m2 = ?, il = ?,
-             ilce = ?, mahalle = ?, ozellikler = ?, donanim = ?, danisman_slug = ?,
-             guncellenme = ?
-           WHERE id = ?`
-        )
-        .bind(
-          veri.baslik,
-          veri.aciklama,
-          veri.fiyat,
-          veri.paraBirimi,
-          veri.islem,
-          veri.kategori,
-          veri.tip,
-          veri.tipGrup,
-          veri.oda,
-          veri.m2,
-          veri.il,
-          veri.ilce,
-          veri.mahalle,
-          ozelliklerJson,
-          donanimJson,
-          veri.danismanSlug,
-          suAn,
-          id
-        )
+        .bind(id, veri.baslik, veri.aciklama, temelJson, ozelliklerJson, donanimJson, suAn)
         .run();
     }
 
     return id;
   }
 
-  const yeniId = `elle-${Date.now().toString(36)}`;
+  const yeniId = yeniIdAdayi && /^elle-[a-z0-9-]{6,34}$/i.test(yeniIdAdayi)
+    ? yeniIdAdayi
+    : `elle-${Date.now().toString(36)}`;
   await vt
     .prepare(
       `INSERT INTO ilanlar (
@@ -536,4 +524,3 @@ export async function ilanKaydetVeyaGuncelle(
 
   return yeniId;
 }
-

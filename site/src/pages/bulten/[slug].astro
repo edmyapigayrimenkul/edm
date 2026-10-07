@@ -1,0 +1,214 @@
+---
+import Temel from '../../layouts/Temel.astro';
+import { bultenleriBirlestir } from '../../lib/bulten';
+import { KURUM, whatsappBaglanti } from '../../lib/site';
+import { env } from 'cloudflare:workers';
+import { siteIcerikleriniGetir } from '../../lib/icerik-yayini';
+
+const { slug } = Astro.params;
+const yayinlananYazilar = await siteIcerikleriniGetir(env.VT as D1Database, { tur: 'bulten', durum: 'yayinda' });
+const tumYazilar = bultenleriBirlestir(yayinlananYazilar);
+const yazi = tumYazilar.find((aday) => aday.slug === (slug || ''));
+
+if (!yazi) {
+  return Astro.redirect('/404');
+}
+
+const digerYazilar = tumYazilar.filter((y) => y.slug !== yazi.slug).slice(0, 3);
+const whatsappMesaji = `Merhaba, web sitenizdeki "${yazi.baslik}" başlıklı bülten yazınızla ilgili bilgi almak istiyorum.`;
+const yaziSemasi = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: yazi.baslik,
+  description: yazi.spot,
+  image: new URL(yazi.gorsel, KURUM.site).href,
+  datePublished: yazi.tarihIso,
+  dateModified: yazi.guncellemeTarihi,
+  author: { '@type': 'Organization', name: yazi.yazar, url: KURUM.site },
+  publisher: { '@type': 'Organization', '@id': `${KURUM.site}/#kurum`, name: KURUM.ad },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': new URL(`/bulten/${yazi.slug}`, KURUM.site).href },
+  articleSection: yazi.kategori,
+  keywords: yazi.etiketler.join(', '),
+};
+---
+
+<Temel
+  baslik={yazi.baslik}
+  aciklama={yazi.spot}
+  gorsel={yazi.gorsel}
+  jsonLd={yaziSemasi}
+>
+  <article class="pt-28 pb-20 lg:pt-36 lg:pb-28">
+    <div class="kab max-w-4xl">
+      <!-- Üst Gezinme & Meta -->
+      <div class="mb-6 flex flex-wrap items-center gap-2 text-xs text-metin-3">
+        <a href="/bulten" class="hover:text-metin transition-colors">← Bültenler</a>
+        <span>/</span>
+        <span class="rounded bg-kagit-3 px-2 py-0.5 font-semibold text-metin-2">{yazi.kategori}</span>
+        <span>·</span>
+        <span>{yazi.tarih}</span>
+        <span>·</span>
+        <span>{yazi.okunmaSuresi}</span>
+      </div>
+
+      <!-- Başlık & Spot -->
+      <h1 class="font-serif text-2xl font-bold leading-tight text-metin sm:text-3xl lg:text-4xl">
+        {yazi.baslik}
+      </h1>
+      <p class="mt-4 text-base sm:text-lg leading-relaxed text-metin-2 font-medium border-l-4 border-kiremit pl-4">
+        {yazi.spot}
+      </p>
+
+      <!-- Yazar & Yasal Dayanak Bandı -->
+      <div class="mt-6 flex flex-wrap items-center justify-between gap-4 border-y border-cizgi py-3.5 text-xs text-metin-2">
+        <div class="flex items-center gap-2">
+          <div class="h-8 w-8 rounded-full bg-lacivert text-kagit flex items-center justify-center font-bold text-[0.6875rem]">
+            EDM
+          </div>
+          <div>
+            <span class="block font-semibold text-metin">{yazi.yazar}</span>
+            <span class="text-metin-3">{KURUM.ad}</span>
+          </div>
+        </div>
+        {yazi.yasalDayanak && (
+          <div class="rounded bg-kagit-2 px-3 py-1.5 border border-cizgi text-[0.8125rem]">
+            <strong class="text-metin">Dayanak:</strong> {yazi.yasalDayanak}
+          </div>
+        )}
+      </div>
+
+      <aside class="mt-5 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-sm leading-relaxed text-metin-2" aria-label="Bilgilendirme kapsamı">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <strong class="text-metin">Genel bilgilendirme</strong>
+          <span class="text-xs text-metin-3">Son güncelleme: {yazi.guncellemeTarihi}</span>
+        </div>
+        <p class="mt-1.5">{yazi.kapsamNotu}</p>
+      </aside>
+
+      <!-- Vurgu Kutusu (Varsa) -->
+      {yazi.vurguKutusu && (
+        <div class={`mt-8 rounded-xl p-5 sm:p-6 border ${
+          yazi.vurguKutusu.tur === 'dikkat'
+            ? 'border-kiremit/30 bg-kiremit/5 text-metin'
+            : yazi.vurguKutusu.tur === 'oneri'
+            ? 'border-emerald-500/30 bg-emerald-500/5 text-metin'
+            : 'border-lacivert/20 bg-lacivert/5 text-metin'
+        }`}>
+          <h3 class="flex items-center gap-2 font-bold text-sm sm:text-base text-metin">
+            {yazi.vurguKutusu.tur === 'dikkat' && '⚠️ '}
+            {yazi.vurguKutusu.tur === 'oneri' && '💡 '}
+            {yazi.vurguKutusu.tur === 'bilgi' && 'ℹ️ '}
+            {yazi.vurguKutusu.baslik}
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-metin-2">
+            {yazi.vurguKutusu.metin}
+          </p>
+        </div>
+      )}
+
+      <!-- Makale Paragrafları -->
+      <div class="mt-8 space-y-5 text-base leading-relaxed text-metin-1 sm:text-lg sm:leading-loose">
+        {yazi.paragraflar.map((paragraf) => (
+          <p>{paragraf}</p>
+        ))}
+      </div>
+
+      <!-- Çözüm & Kritik Maddeler -->
+      {yazi.maddeler && yazi.maddeler.length > 0 && (
+        <div class="mt-10 rounded-2xl border border-cizgi bg-kagit-1 p-6 sm:p-8">
+          <h3 class="font-serif text-xl font-bold text-metin mb-6">
+            Bu Konuda Dikkat Edilmesi Gereken Kritik Maddeler
+          </h3>
+          <div class="space-y-4">
+            {yazi.maddeler.map((madde) => (
+              <div class="border-b border-cizgi/60 pb-4 last:border-b-0 last:pb-0">
+                <h4 class="font-bold text-base text-metin mb-1">{madde.baslik}</h4>
+                <p class="text-sm leading-relaxed text-metin-2">{madde.aciklama}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <!-- Etiketler -->
+      <div class="mt-8 flex flex-wrap items-center gap-2">
+        <span class="text-xs text-metin-3 font-semibold">Etiketler:</span>
+        {yazi.etiketler.map((e) => (
+          <span class="rounded-full bg-kagit-2 px-3 py-1 text-xs text-metin-2 border border-cizgi">
+            #{e}
+          </span>
+        ))}
+      </div>
+
+      {yazi.kaynaklar && yazi.kaynaklar.length > 0 && (
+        <section class="mt-8 rounded-xl border border-cizgi bg-kagit-1 p-5 sm:p-6">
+          <h3 class="font-bold text-metin">Kaynaklar</h3>
+          <ul class="mt-3 grid gap-2 text-sm text-metin-2">
+            {yazi.kaynaklar.map((kaynak) => (
+              <li>
+                <a href={kaynak.url} target="_blank" rel="noopener noreferrer" class="alt-cizgi text-metin hover:text-kiremit">
+                  {kaynak.ad} ↗
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {yazi.sosyalBaglantilar && yazi.sosyalBaglantilar.length > 0 && (
+        <section class="mt-5 rounded-xl border border-cizgi bg-kagit-1 p-5 sm:p-6" aria-label="Sosyal medya kaynakları">
+          <h3 class="font-bold text-metin">Sosyal medya paylaşımı</h3>
+          <ul class="mt-3 grid gap-2 text-sm text-metin-2">
+            {yazi.sosyalBaglantilar.map((baglanti) => (
+              <li><a href={baglanti.url} target="_blank" rel="noopener noreferrer" class="alt-cizgi text-metin hover:text-kiremit">{baglanti.ad} ↗</a></li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <!-- WhatsApp ve Danışma Eylem Alanı -->
+      <div class="mt-12 rounded-2xl bg-[#0f172a] p-8 text-kagit sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div>
+          <span class="etiket text-kiremit">ÜCRETSİZ DANIŞMA</span>
+          <h3 class="font-serif text-xl sm:text-2xl font-bold mt-1">Bu konuda sorunuz mu var?</h3>
+          <p class="text-sm text-kagit/80 mt-1 max-w-md">
+            Mülkünüzün durumuyla ilgili doğrudan uzman ekibimizle görüşebilir, süreci güvenle planlayabilirsiniz.
+          </p>
+        </div>
+        <a
+          href={whatsappBaglanti(whatsappMesaji)}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="shrink-0 rounded-lg bg-kiremit px-6 py-3.5 text-sm font-bold text-kagit hover:bg-kiremit/90 transition-colors flex items-center gap-2 shadow-lg"
+        >
+          <span>WhatsApp ile Sorun</span>
+          <svg class="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.364 2.76 1.057 3.96L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326z"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- İlgili Diğer Bültenler -->
+      {digerYazilar.length > 0 && (
+        <div class="mt-16 pt-10 border-t border-cizgi">
+          <h3 class="font-serif text-xl font-bold text-metin mb-6">İlgili Diğer Bülten Yazıları</h3>
+          <div class="grid gap-6 sm:grid-cols-3">
+            {digerYazilar.map((d) => (
+              <a href={`/bulten/${d.slug}`} class="group flex flex-col justify-between rounded-xl border border-cizgi bg-kagit-1 p-5 transition-all hover:border-metin-2/30 hover:shadow">
+                <div>
+                  <span class="text-[0.6875rem] font-semibold text-metin-3 uppercase">{d.kategori}</span>
+                  <h4 class="mt-2 text-sm font-bold text-metin group-hover:text-kiremit transition-colors line-clamp-2">
+                    {d.baslik}
+                  </h4>
+                </div>
+                <span class="mt-4 text-xs font-semibold text-kiremit inline-flex items-center gap-1">
+                  Yazıyı Oku →
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </article>
+</Temel>

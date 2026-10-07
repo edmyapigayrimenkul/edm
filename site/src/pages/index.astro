@@ -13,17 +13,17 @@ const { ekip, yorumlar, iletisim, hizmetler: HIZMETLER } = await icerik();
 const ekipSayili = await Promise.all(
   ekip.map(async (d) => ({
     ...d,
-    adet: d.emlakjetSlug ? (await danismaninIlanlari(d.emlakjetSlug)).length : 0,
+    adet: (await danismaninIlanlari(d.slug)).length,
   }))
 );
 const secki = await oneCikanlar(7);
 const serit = await seritIcin(10);
-const donum = Math.round(SAYIMLAR.toplamAlan / 1000);
+const donum = Math.round(SAYIMLAR.arsaToplamAlan / 1000);
 
 const rakamlar = [
   { sayi: SAYIMLAR.toplam, etiket: 'aktif ilan', ek: 'canlı portföy' },
   { sayi: SAYIMLAR.arsa, etiket: 'arsa & tarla', ek: 'portföyün yarısı' },
-  { sayi: donum, etiket: 'dönüm arazi', ek: 'toplam yüzölçümü' },
+  { sayi: donum, etiket: 'dönüm arazi', ek: 'alanı belirli ilanlar' },
   { sayi: SAYIMLAR.ilce, etiket: 'ilçe', ek: 'İstanbul · Edirne · Tekirdağ' },
 ];
 
@@ -142,7 +142,7 @@ const hizliFiltreler = [
       </div>
 
       <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-belir="sira">
-        {secki.map((ilan, i) => <IlanKart ilan={ilan} oncelikli={i < 3} genis={i === 0} />)}
+        {secki.map((ilan, i) => <IlanKart ilan={ilan} genis={i === 0} />)}
       </div>
     </div>
   </section>
@@ -287,7 +287,9 @@ const hizliFiltreler = [
                         <li>{u}</li>
                       ))}
                     </ul>
-                    <span class="font-veri text-[0.75rem] text-kursun">{adet} ilan</span>
+                    <span class="font-veri text-[0.75rem] text-kursun">
+                      {adet > 0 ? `${adet} ilan` : 'Ofis portföyü'}
+                    </span>
                   </div>
                 </div>
               </a>
@@ -400,18 +402,18 @@ const hizliFiltreler = [
             Eviniz bugün ne eder?
           </h2>
           <p class="mt-6 max-w-[50ch] leading-relaxed text-metin-2" data-belir data-gecikme="0.12">
-            Aynı sokakta, aynı metrekarede, son altı ayda gerçekleşen satışlara bakıyoruz.
-            Portalda yazan istek fiyatlarına değil — gerçekten el değiştiren rakamlara.
-            Sonucu tek sayfalık bir rapor olarak gönderiyoruz.
+            Konumu, metrekareyi ve taşınmazın özelliklerini benzer ilanlarla ve
+            ulaşabildiğimiz güncel piyasa verileriyle birlikte değerlendiriyoruz.
+            İlk görüşmede ihtiyaç duyduğumuz ek bilgileri ve sonraki adımı netleştiriyoruz.
           </p>
         </div>
 
         <div class="flex flex-col gap-3" data-belir data-gecikme="0.18">
           <a href="/degerleme" class="dugme dugme--kirmizi w-full !py-4">Değerleme talebi oluştur</a>
-          <a href={`tel:${iletisim.telefonHam}`} class="dugme dugme--hayalet w-full !py-4">
-            Telefonla konuşalım — {iletisim.telefon}
+          <a href={`tel:${iletisim.sabitHam}`} class="dugme dugme--hayalet w-full !py-4">
+            Ofisi arayın — {iletisim.sabit}
           </a>
-          <p class="etiket mt-2 text-center">Ortalama dönüş süresi: aynı gün</p>
+          <p class="etiket mt-2 text-center">{iletisim.yanitBeklentisi}</p>
         </div>
       </div>
     </div>

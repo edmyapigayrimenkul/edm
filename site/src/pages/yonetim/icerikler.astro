@@ -1,0 +1,153 @@
+---
+/** postEDM taslaklarının insan incelemesiyle siteye alındığı panel ekranı. */
+import Panel from '../../layouts/Panel.astro';
+import { env } from 'cloudflare:workers';
+import { adminProfiliniBul, paneleGiris } from '../../lib/panel/yetki';
+import { islemKaydet } from '../../lib/panel/islem-gecmisi';
+import { rolYetkisiGerekli } from '../../lib/panel/roller';
+import {
+  siteIcerigiTaslakYap,
+  siteIcerigiYayinaAl,
+  siteIcerikleriniGetir,
+  type SiteIcerikKaydi,
+} from '../../lib/icerik-yayini';
+
+const giris = await paneleGiris(Astro.request);
+if ('yanit' in giris) return giris.yanit;
+
+const vt = env.VT as D1Database;
+const admin = adminProfiliniBul(giris.kimlik.eposta);
+let bildirim: { tur: 'basari' | 'hata'; metin: string } | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const eylem = String(form.get('eylem') ?? '');
+  const id = Number(form.get('id'));
+  try {
+    rolYetkisiGerekli(admin?.rol ?? null, 'icerik-yonet');
+    if (!Number.isInteger(id) || id <= 0) throw new Error('Geçerli içerik kaydı gerekli.');
+    if (eylem === 'yayina-al') {
+      const sonraki = await siteIcerigiYayinaAl(vt, id, Boolean(form.get('hukuki-inceleme-onayi')));
+      await islemKaydet(vt, giris.kimlik, {
+        eylem: 'icerik-yayina-alindi', varlikTuru: 'site-icerik', varlikId: String(id),
+        ozet: `${sonraki.baslik} siteye yayınlandı.`,
+        onceki: { durum: 'taslak' },
+        sonraki: { durum: sonraki.durum, hukukiInceleme: sonraki.hukukiInceleme, siteYayini: sonraki.siteYayini },
+      });
+      bildirim = { tur: 'basari', metin: 'İçerik siteye yayınlandı.' };
+    } else if (eylem === 'taslaga-al') {
+      const sonraki = await siteIcerigiTaslakYap(vt, id);
+      await islemKaydet(vt, giris.kimlik, {
+        eylem: 'icerik-yayindan-kaldirildi', varlikTuru: 'site-icerik', varlikId: String(id),
+        ozet: `${sonraki.baslik} taslağa geri alındı.`,
+        onceki: { durum: 'yayinda' }, sonraki: { durum: sonraki.durum },
+      });
+      bildirim = { tur: 'basari', metin: 'İçerik taslağa geri alındı.' };
+    } else {
+      throw new Error('Geçersiz içerik işlemi.');
+    }
+  } catch (hata) {
+    bildirim = { tur: 'hata', metin: (hata as Error).message };
+  }
+}
+
+const icerikler = await siteIcerikleriniGetir(vt, { limit: 150 });
+const taslakSayisi = icerikler.filter((icerik) => icerik.durum === 'taslak').length;
+const tarih = (deger: string | null) => deger
+  ? new Date(deger).toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' })
+  : '—';
+const durumEtiketi = (icerik: SiteIcerikKaydi) => icerik.durum === 'yayinda' ? 'Yayında' : icerik.durum === 'arsiv' ? 'Arşiv' : 'Taslak';
+---
+
+<Panel
+  baslik="İçerikler"
+  eposta={giris.kimlik.eposta}
+  ozet="postEDM’den gelen taslakları kaynaklarıyla inceleyip yayınlayın"
+>
+  {bildirim && <div class={`bildirim bildirim--${bildirim.tur}`}>{bildirim.metin}</div>}
+
+  <p class="aciklama-kutu">
+    postEDM buraya yalnızca <strong>taslak</strong> bırakır. Yayın kararı paneldedir;
+    hukuk, vergi, kredi, imar, tapu ve kira içerikleri ayrıca inceleme onayı ister.
+  </p>
+
+  <div class="icerik-ozetleri">
+    <div><strong>{taslakSayisi}</strong><span>inceleme bekleyen taslak</span></div>
+    <div><strong>{icerikler.filter((icerik) => icerik.durum === 'yayinda').length}</strong><span>site yayını</span></div>
+    <div><strong>{icerikler.length}</strong><span>toplam içerik</span></div>
+  </div>
+
+  <section class="kutu">
+    <div class="kutu-bas">
+      <h2>Yayın kuyruğu</h2>
+      <span class="yardim">İçerik güncellenirse postEDM kaydı yeniden taslağa alır.</span>
+    </div>
+
+    {icerikler.length === 0 ? (
+      <p class="bos">Henüz postEDM’den gelen bir içerik yok. İlk taslak geldiğinde burada kaynaklarıyla görünür.</p>
+    ) : (
+      <div class="icerik-listesi">
+        {icerikler.map((icerik) => (
+          <article class:list={['icerik-karti', icerik.durum === 'yayinda' && 'icerik-karti--yayinda']}>
+            <div class="icerik-karti-bas">
+              <div>
+                <div class="cipler">
+                  <span class:list={['cip', icerik.durum === 'yayinda' ? 'cip--kapandi' : 'cip--pasif']}>{durumEtiketi(icerik)}</span>
+                  <span class="cip cip--gizli">{icerik.tur}</span>
+                  {icerik.hukukiInceleme === 'gerekli' && <span class="cip cip--uyari">İnceleme gerekli</span>}
+                  {icerik.hukukiInceleme === 'tamam' && <span class="cip cip--kapandi">İnceleme tamam</span>}
+                </div>
+                <h3>{icerik.baslik}</h3>
+                <p>{icerik.spot}</p>
+              </div>
+              <dl class="icerik-tarihleri">
+                <div><dt>Güncelleme</dt><dd>{tarih(icerik.guncelleme)}</dd></div>
+                {icerik.siteYayini && <div><dt>Site yayını</dt><dd>{tarih(icerik.siteYayini)}</dd></div>}
+              </dl>
+            </div>
+
+            <details class="icerik-onizleme">
+              <summary>Metni ve kaynakları incele</summary>
+              <div class="icerik-onizleme-govde">
+                <p class="govde">{icerik.govde}</p>
+                <div>
+                  <strong>Kaynaklar</strong>
+                  <ul>
+                    {icerik.kaynakUrlleri.map((url, index) => <li><a href={url} target="_blank" rel="noopener noreferrer">{icerik.kaynakAdlari[index] || `Kaynak ${index + 1}`} ↗</a></li>)}
+                  </ul>
+                </div>
+              </div>
+            </details>
+
+            <div class="icerik-eylemleri">
+              {icerik.durum === 'yayinda' && icerik.tur === 'bulten' && <a class="pd pd--sade" href={`/bulten/${icerik.slug}`} target="_blank" rel="noopener">Sitede gör ↗</a>}
+              {icerik.durum === 'yayinda' ? (
+                <form method="POST">
+                  <input type="hidden" name="eylem" value="taslaga-al" />
+                  <input type="hidden" name="id" value={String(icerik.id)} />
+                  <button type="submit" class="pd pd--sade">Yayından kaldır</button>
+                </form>
+              ) : (
+                <form method="POST" class="yayina-al-form">
+                  <input type="hidden" name="eylem" value="yayina-al" />
+                  <input type="hidden" name="id" value={String(icerik.id)} />
+                  {icerik.hukukiInceleme === 'gerekli' && (
+                    <label class="onay-satir">
+                      <input type="checkbox" name="hukuki-inceleme-onayi" required />
+                      <span>Hukuki/ticari incelemeyi tamamladım.</span>
+                    </label>
+                  )}
+                  <button type="submit" class="pd pd--birincil">Siteye yayınla</button>
+                </form>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    )}
+  </section>
+</Panel>
+
+<style>
+  .aciklama-kutu{max-width:76ch}.icerik-ozetleri{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;margin:1.25rem 0}.icerik-ozetleri>div{display:grid;gap:.15rem;padding:1rem;background:var(--color-kagit);border:1px solid var(--color-cizgi);border-radius:var(--radius-kart)}.icerik-ozetleri strong{font:700 1.45rem/1 var(--font-veri);color:var(--color-murekkep)}.icerik-ozetleri span,.yardim{font-size:.75rem;color:var(--color-kursun)}.icerik-listesi{display:grid;gap:1rem}.icerik-karti{border:1px solid var(--color-cizgi);border-radius:var(--radius-kart);padding:1.15rem;background:var(--color-kagit)}.icerik-karti--yayinda{border-left:3px solid var(--color-yesil)}.icerik-karti-bas{display:flex;gap:1rem;justify-content:space-between}.cipler{display:flex;flex-wrap:wrap;gap:.35rem}.icerik-karti h3{margin:.65rem 0 .35rem;font-size:1rem}.icerik-karti p{margin:0;color:var(--color-metin-2);font-size:.875rem;line-height:1.55}.icerik-tarihleri{display:grid;gap:.5rem;flex:none;font-size:.72rem;color:var(--color-kursun);text-align:right}.icerik-tarihleri dt{font-weight:600}.icerik-tarihleri dd{margin:.1rem 0 0}.icerik-onizleme{margin-top:1rem;border-top:1px solid var(--color-cizgi);padding-top:.75rem}.icerik-onizleme summary{cursor:pointer;font-size:.8125rem;font-weight:650;color:var(--color-metin-2)}.icerik-onizleme-govde{display:grid;gap:1rem;margin-top:.75rem;font-size:.8125rem}.icerik-onizleme-govde .govde{white-space:pre-line;max-height:16rem;overflow:auto;background:var(--color-kagit-2);padding:.75rem;border-radius:6px}.icerik-onizleme-govde ul{margin:.35rem 0 0;padding-left:1.1rem}.icerik-onizleme-govde a{color:var(--color-metin-2);text-decoration:underline}.icerik-eylemleri{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin-top:1rem}.icerik-eylemleri form{margin:0}.yayina-al-form{display:flex;flex-wrap:wrap;gap:.65rem;align-items:center}.cip--uyari{background:#fff3d4;color:#875300}@media(max-width:650px){.icerik-ozetleri{grid-template-columns:1fr}.icerik-karti-bas{display:grid}.icerik-tarihleri{text-align:left;grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>

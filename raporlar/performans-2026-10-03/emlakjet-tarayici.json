@@ -1,0 +1,24 @@
+{
+  "tarih": "2026-10-03T12:12:11.895Z",
+  "yerel": {
+    "mobilGenislik": 390,
+    "masaustuGenislik": 1280,
+    "tasma": false,
+    "ozgunDonusGenisligi": 1600,
+    "gizliFavoriEtkinKaynak": 0,
+    "denemeFavorisiKaldirildi": true
+  },
+  "canli": {
+    "mobilGenislik": 390,
+    "masaustuGenislik": 1280,
+    "tasma": false,
+    "ozgunDonusGenisligi": 1600,
+    "buyutecBaslangicSrc": null,
+    "buyutecAcikGenislik": 1600,
+    "sonrakiSayac": "2 / 10",
+    "gizliFavoriEtkinKaynak": 0,
+    "denemeFavorisiKaldirildi": true,
+    "konsolHatasi": 0
+  },
+  "sinir": "Tarayıcı ağ hata yanıtı yakalanmadı; gömülü küçük fotoğraf yerine özgün kaynak yüklendi. Küçük dosyanın toplam sayfa kazanımı kanıtlanmadı; yoğun ekranlı fiziksel cihaz testi yapılmadı."
+}
